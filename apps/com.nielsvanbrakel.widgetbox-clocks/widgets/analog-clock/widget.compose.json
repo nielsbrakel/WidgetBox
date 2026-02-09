@@ -1,0 +1,209 @@
+{
+    "name": {
+        "en": "Analog Clock",
+        "nl": "Analoge Klok"
+    },
+    "description": {
+        "en": "Classic analog clock face.",
+        "nl": "Klassieke analoge klok."
+    },
+    "height": 128,
+    "transparent": false,
+    "settings": [
+        {
+            "id": "color",
+            "type": "dropdown",
+            "label": {
+                "en": "Second Hand Color",
+                "nl": "Kleur Secondewijzer"
+            },
+            "value": "red",
+            "values": [
+                {
+                    "id": "blue",
+                    "label": {
+                        "en": "Blue",
+                        "nl": "Blauw"
+                    }
+                },
+                {
+                    "id": "green",
+                    "label": {
+                        "en": "Green",
+                        "nl": "Groen"
+                    }
+                },
+                {
+                    "id": "orange",
+                    "label": {
+                        "en": "Orange",
+                        "nl": "Oranje"
+                    }
+                },
+                {
+                    "id": "red",
+                    "label": {
+                        "en": "Red",
+                        "nl": "Rood"
+                    }
+                },
+                {
+                    "id": "black",
+                    "label": {
+                        "en": "Black",
+                        "nl": "Zwart"
+                    }
+                },
+                {
+                    "id": "white",
+                    "label": {
+                        "en": "White",
+                        "nl": "Wit"
+                    }
+                }
+            ]
+        },
+        {
+            "id": "horizontalAlignment",
+            "type": "dropdown",
+            "label": {
+                "en": "Horizontal Alignment",
+                "nl": "Horizontale Uitlijning"
+            },
+            "value": "center",
+            "values": [
+                {
+                    "id": "left",
+                    "label": {
+                        "en": "Left",
+                        "nl": "Links"
+                    }
+                },
+                {
+                    "id": "center",
+                    "label": {
+                        "en": "Center",
+                        "nl": "Midden"
+                    }
+                },
+                {
+                    "id": "right",
+                    "label": {
+                        "en": "Right",
+                        "nl": "Rechts"
+                    }
+                }
+            ]
+        },
+        {
+            "id": "showDate",
+            "type": "checkbox",
+            "label": {
+                "en": "Show Date",
+                "nl": "Toon Datum"
+            },
+            "value": true
+        },
+        {
+            "id": "showSeconds",
+            "type": "checkbox",
+            "label": {
+                "en": "Show Second Hand",
+                "nl": "Toon Secondewijzer"
+            },
+            "value": true
+        },
+        {
+            "id": "size",
+            "type": "dropdown",
+            "label": {
+                "en": "Size",
+                "nl": "Grootte"
+            },
+            "value": "medium",
+            "values": [
+                {
+                    "id": "xsmall",
+                    "label": {
+                        "en": "Extra Small",
+                        "nl": "Extra Klein"
+                    }
+                },
+                {
+                    "id": "small",
+                    "label": {
+                        "en": "Small",
+                        "nl": "Klein"
+                    }
+                },
+                {
+                    "id": "medium",
+                    "label": {
+                        "en": "Medium",
+                        "nl": "Gemiddeld"
+                    }
+                },
+                {
+                    "id": "large",
+                    "label": {
+                        "en": "Large",
+                        "nl": "Groot"
+                    }
+                },
+                {
+                    "id": "xlarge",
+                    "label": {
+                        "en": "Extra Large",
+                        "nl": "Extra Groot"
+                    }
+                }
+            ]
+        },
+        {
+            "id": "style",
+            "type": "dropdown",
+            "label": {
+                "en": "Style",
+                "nl": "Stijl"
+            },
+            "value": "modern",
+            "values": [
+                {
+                    "id": "minimal",
+                    "label": {
+                        "en": "Minimal (No Numbers)",
+                        "nl": "Minimalistisch (Geen Cijfers)"
+                    }
+                },
+                {
+                    "id": "modern",
+                    "label": {
+                        "en": "Modern (Markers)",
+                        "nl": "Modern (Markeringen)"
+                    }
+                },
+                {
+                    "id": "classic",
+                    "label": {
+                        "en": "Classic (Numbers)",
+                        "nl": "Klassiek (Cijfers)"
+                    }
+                },
+                {
+                    "id": "classic-no-numbers",
+                    "label": {
+                        "en": "Classic (No Numbers)",
+                        "nl": "Klassiek (Geen Cijfers)"
+                    }
+                },
+                {
+                    "id": "swiss",
+                    "label": {
+                        "en": "Swiss Railway",
+                        "nl": "Zwitserse Spoorwegen"
+                    }
+                }
+            ]
+        }
+    ]
+}

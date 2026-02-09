@@ -1,0 +1,100 @@
+<html>
+
+<head>
+  <style>
+    .windy-container {
+      width: 100%;
+      height: 100%;
+    }
+
+    .windy-container iframe {
+      border: none;
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="windy-container" class="windy-container">
+  </div>
+
+  <script type="text/javascript">
+    // State of the widget
+    let currentSettings = {};
+
+    function getAspectRatioPercentage(aspectRatio) {
+      const ratios = {
+        '1:1': '100%',
+        '4:3': '75%',
+        '16:9': '56.25%',
+        '21:9': '42.86%',
+        '3:1': '33.33%'
+      };
+      return ratios[aspectRatio];
+    }
+
+    function buildIframeUrl() {
+      const baseUrl = 'https://embed.windy.com/embed.html';
+
+      const params = new URLSearchParams();
+      params.append('type', 'map');
+      params.append('location', 'coordinates');
+
+      // Metrics settings
+      params.append('metricRain', currentSettings.metricRain);
+      params.append('metricTemp', currentSettings.metricTemp);
+      params.append('metricWind', currentSettings.metricWind);
+
+      // Location settings
+      params.append('lat', currentSettings.latitude);
+      params.append('lon', currentSettings.longitude);
+
+      // Detail location
+      params.append('detailLat', currentSettings.detailLatitude || currentSettings.latitude);
+      params.append('detailLon', currentSettings.detailLongitude || currentSettings.longitude);
+
+      // Detail view
+      params.append('detail', currentSettings.detail ? 'true' : 'false');
+
+      // Map settings
+      params.append('zoom', currentSettings.zoom);
+      params.append('overlay', currentSettings.overlay);
+      params.append('product', currentSettings.product);
+      params.append('level', currentSettings.level);
+
+      // Visibility settings
+      params.append('pressure', currentSettings.pressure ? 'true' : 'false');
+      params.append('marker', currentSettings.marker ? 'true' : 'false');
+      params.append('message', currentSettings.message ? 'true' : 'false');
+
+      // Build query string
+      const queryString = params.toString();
+      return `${baseUrl}?${queryString}`;
+    }
+
+    function render() {
+      const content = document.getElementById('windy-container');
+
+      const iframeUrl = buildIframeUrl();
+
+      const iframe = document.createElement('iframe');
+      iframe.src = iframeUrl;
+      iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+      iframe.setAttribute('frameborder', '0');
+
+      content.innerHTML = '';
+      content.appendChild(iframe);
+    }
+
+    async function onHomeyReady(Homey) {
+      currentSettings = Homey.getSettings();
+      const heightPercentage = getAspectRatioPercentage(currentSettings.aspectRatio || '16:9');
+      render();
+
+      Homey.ready({ height: heightPercentage });
+    }
+  </script>
+</body>
+
+</html>

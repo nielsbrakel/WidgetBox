@@ -1,0 +1,87 @@
+{
+  "name": {
+    "en": "Timer",
+    "nl": "Timer"
+  },
+  "description": {
+    "en": "Countdown timer with multiple support",
+    "nl": "Afteltimer met ondersteuning voor meerdere timers"
+  },
+  "height": 200,
+  "transparent": true,
+  "settings": [
+    {
+      "id": "allowAddingTimers",
+      "type": "checkbox",
+      "label": {
+        "en": "Allow adding new timers",
+        "nl": "Nieuwe timers toevoegen toestaan"
+      },
+      "value": true
+    },
+    {
+      "id": "debugMode",
+      "type": "checkbox",
+      "label": {
+        "en": "Debug Mode",
+        "nl": "Debug Modus"
+      },
+      "value": false
+    },
+    {
+      "id": "defaultHours",
+      "type": "number",
+      "label": {
+        "en": "Default timer hours",
+        "nl": "Standaard timer uren"
+      },
+      "min": 0,
+      "max": 23,
+      "value": 0
+    },
+    {
+      "id": "defaultMinutes",
+      "type": "number",
+      "label": {
+        "en": "Default timer minutes",
+        "nl": "Standaard timer minuten"
+      },
+      "min": 0,
+      "max": 59,
+      "value": 5
+    },
+    {
+      "id": "defaultSeconds",
+      "type": "number",
+      "label": {
+        "en": "Default timer seconds",
+        "nl": "Standaard timer seconden"
+      },
+      "min": 0,
+      "max": 59,
+      "value": 0
+    },
+    {
+      "id": "initialTimers",
+      "type": "number",
+      "label": {
+        "en": "Number of timers to start with",
+        "nl": "Aantal timers bij starten"
+      },
+      "min": 1,
+      "max": 10,
+      "value": 1
+    },
+    {
+      "id": "maxTimers",
+      "type": "number",
+      "label": {
+        "en": "Maximum number of timers",
+        "nl": "Maximaal aantal timers"
+      },
+      "min": 1,
+      "max": 10,
+      "value": 5
+    }
+  ]
+}

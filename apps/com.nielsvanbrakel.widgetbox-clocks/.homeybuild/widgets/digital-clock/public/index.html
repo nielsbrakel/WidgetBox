@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../../_shared/shared-styles.css">
+  <style>
+    /* Widget Specific Styles */
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      background-color: transparent;
+      overflow: hidden;
+    }
+
+    /* Outer Wrapper for Spacing */
+    .widget-spacing-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      width: 100%;
+      box-sizing: border-box;
+      transition: none;
+    }
+
+    /* Inner Card for Background/Border */
+    .widget-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      width: 100%;
+      /* Card should take available width inside padding */
+      height: auto;
+      /* Dynamic height */
+      background: var(--homey-background-color);
+      border-radius: var(--homey-border-radius, 12px);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
+      padding: 16px;
+      /* Internal padding for text breathing room */
+      box-sizing: border-box;
+    }
+
+    .bg-transparent .widget-card {
+      background: transparent;
+      box-shadow: none;
+    }
+
+    /* Alignment (Applied to Spacer) */
+    .align-h-left {
+      align-items: flex-start;
+      text-align: left;
+    }
+
+    .align-h-center {
+      align-items: center;
+      text-align: center;
+    }
+
+    .align-h-right {
+      align-items: flex-end;
+      text-align: right;
+    }
+
+    .align-v-top {
+      justify-content: flex-start;
+    }
+
+    .align-v-center {
+      justify-content: center;
+    }
+
+    .align-v-bottom {
+      justify-content: flex-end;
+    }
+
+
+    /* Typography Sizes (Applied to Card) */
+    .size-xsmall .time {
+      font-size: 16px;
+    }
+
+    .size-xsmall .date {
+      font-size: 8px;
+      margin-top: 1px;
+    }
+
+    .size-small .time {
+      font-size: 24px;
+    }
+
+    .size-small .date {
+      font-size: 10px;
+      margin-top: 2px;
+    }
+
+    .size-medium .time {
+      font-size: 42px;
+    }
+
+    .size-medium .date {
+      font-size: 14px;
+      margin-top: 4px;
+    }
+
+    .size-large .time {
+      font-size: 56px;
+    }
+
+    .size-large .date {
+      font-size: 18px;
+      margin-top: 6px;
+    }
+
+    .size-xlarge .time {
+      font-size: 72px;
+    }
+
+    .size-xlarge .date {
+      font-size: 24px;
+      margin-top: 8px;
+    }
+
+    /* Font Weights */
+    .weight-thin .time {
+      font-weight: 200;
+    }
+
+    .weight-normal .time {
+      font-weight: 500;
+    }
+
+    .weight-bold .time {
+      font-weight: 800;
+    }
+
+    .weight-thin .date {
+      font-weight: 300;
+    }
+
+    .weight-normal .date {
+      font-weight: 400;
+    }
+
+    .weight-bold .date {
+      font-weight: 600;
+    }
+
+    /* Colors */
+    .color-default {
+      color: var(--homey-text-color);
+    }
+
+    /* Time Elements */
+    .time {
+      line-height: 1;
+      white-space: nowrap;
+      font-feature-settings: "tnum";
+      font-variant-numeric: tabular-nums;
+    }
+
+    .date {
+      opacity: 0.8;
+      line-height: 1.2;
+    }
+
+    .seconds {
+      font-size: 0.6em;
+      opacity: 0.7;
+    }
+
+    .period {
+      font-size: 0.4em;
+      margin-left: 0.1em;
+      opacity: 0.6;
+      vertical-align: top;
+    }
+
+    .no-card {
+      background: transparent !important;
+      box-shadow: none !important;
+      padding: 0 !important;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="widget-spacing-wrapper" id="app-container">
+    <div class="widget-card" id="widget-card">
+      <div class="time" id="time"></div>
+      <div class="date" id="date"></div>
+    </div>
+  </div>
+
+  <script>
+    let currentSettings = {};
+
+    function updateTime() {
+      const now = new Date();
+      const timeElement = document.getElementById('time');
+      const dateElement = document.getElementById('date');
+
+      // 1. Time Formatting
+      const is24h = currentSettings.clockFormat !== '12';
+      let hours = now.getHours();
+      let minutes = now.getMinutes();
+      let seconds = now.getSeconds();
+      let period = '';
+
+      if (!is24h) {
+        period = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12;
+        hours = hours ? hours : 12; // the hour '0' should be '12'
+      }
+
+      const pad = (num) => num.toString().padStart(2, '0');
+
+      let timeHtml = `${pad(hours)}<span class="colon">:</span>${pad(minutes)}`;
+
+      if (currentSettings.showSeconds) {
+        timeHtml += `<span class="seconds">:${pad(seconds)}</span>`;
+      }
+
+      if (period) {
+        timeHtml += `<span class="period">${pad(period)}</span>`;
+      }
+
+      timeElement.innerHTML = timeHtml;
+
+      // 2. Date Formatting
+      if (currentSettings.showDate) {
+        dateElement.style.display = 'block';
+        dateElement.innerText = formatDate(now);
+      } else {
+        dateElement.style.display = 'none';
+      }
+    }
+
+    function formatDate(date) {
+      const format = currentSettings.dateFormat || 'weekday-short';
+      const options = {};
+
+      switch (format) {
+        case 'dmy':
+          return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
+        case 'mdy':
+          return `${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getDate().toString().padStart(2, '0')}/${date.getFullYear()}`;
+        case 'ymd':
+          return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+        case 'short':
+          options.month = 'short'; options.day = 'numeric'; options.year = 'numeric';
+          break;
+        case 'long':
+          options.month = 'long'; options.day = 'numeric'; options.year = 'numeric';
+          break;
+        case 'weekday-short':
+          options.weekday = 'short'; options.month = 'short'; options.day = 'numeric';
+          break;
+        case 'weekday-long':
+          options.weekday = 'long'; options.month = 'long'; options.day = 'numeric';
+          break;
+        case 'weekday-only':
+          options.weekday = 'long';
+          break;
+        case 'day-month':
+          options.day = 'numeric'; options.month = 'long';
+          break;
+        default:
+          options.weekday = 'short'; options.month = 'short'; options.day = 'numeric';
+      }
+
+      return date.toLocaleDateString(undefined, options);
+    }
+
+
+
+    function updateStyles(Homey) {
+      const appContainer = document.getElementById('app-container');
+      const widgetCard = document.getElementById('widget-card');
+
+      // Styles applied to Card (sizes, colors, weights)
+      widgetCard.className = 'widget-card'; // Reset
+      const size = currentSettings.size || 'medium';
+      widgetCard.classList.add(`size-${size}`);
+      widgetCard.classList.add(`color-default`);
+      widgetCard.classList.add(`weight-${currentSettings.fontWeight || 'normal'}`);
+
+
+
+      // Alignment applied to Wrapper
+      appContainer.className = 'widget-spacing-wrapper';
+      widgetCard.classList.add(`align-h-${currentSettings.horizontalAlignment || 'center'}`);
+
+
+
+
+      // Card background is handled by widget compose transparent setting
+    }
+
+    function calculateTotalHeight() {
+      // Use offsetHeight of the container to get actual content size
+      const appContainer = document.getElementById('app-container');
+      return appContainer.offsetHeight;
+    }
+
+    function onHomeyReady(Homey) {
+      currentSettings = Homey.getSettings();
+
+      Homey.on('settings.set', (key, value) => {
+        currentSettings[key] = value;
+        updateStyles(Homey);
+        updateTime();
+        // ResizeObserver will handle height
+      });
+
+      updateStyles(null);
+      updateTime();
+
+      setInterval(updateTime, 1000);
+
+      // Dynamic Height
+      const updateHeight = () => {
+        if (Homey) {
+          Homey.ready({ height: calculateTotalHeight() });
+          if (Homey.setHeight) {
+            Homey.setHeight(calculateTotalHeight());
+          }
+        }
+      };
+
+      const resizeObserver = new ResizeObserver(() => {
+        updateHeight();
+      });
+      resizeObserver.observe(document.body);
+
+      setTimeout(updateHeight, 0);
+    }
+  </script>
+</body>
+
+</html>

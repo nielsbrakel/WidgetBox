@@ -1,0 +1,1203 @@
+<style>
+  :root {
+    --chart-line-color: var(--homey-color-blue-500);
+    --chart-fill-color: var(--homey-color-blue-500);
+    --chart-grid-color: var(--homey-line-color-light);
+    --text-color-secondary: var(--homey-text-color-secondary);
+    --danger-color: var(--homey-color-red-500);
+  }
+
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .widget-container {
+    height: 100%;
+    width: 100%;
+    position: relative;
+    overflow: visible;
+    background: transparent;
+  }
+
+  /* Status Message Overlay */
+  .status-overlay {
+    position: absolute;
+    top: 30px;
+    left: 10px;
+    right: 10px;
+    bottom: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: var(--text-color-secondary);
+    font-size: 14px;
+    pointer-events: none;
+    z-index: 50;
+    text-shadow: 0 1px 4px var(--homey-bg-color);
+    opacity: 0.7;
+  }
+
+  .status-overlay.error {
+    color: var(--danger-color);
+  }
+
+  /* Chart Container */
+  .chart-container {
+    position: absolute;
+    top: 30px;
+    bottom: 30px;
+    left: 15px;
+    right: 15px;
+    display: flex;
+    z-index: 10;
+    border-bottom: 1px solid var(--chart-grid-color);
+  }
+
+  /* Chart Elements */
+  .grid-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    border-top: 1px solid var(--chart-grid-color);
+    pointer-events: none;
+  }
+
+  .grid-label {
+    position: absolute;
+    right: 0;
+    transform: translateY(-100%);
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-color-secondary);
+    text-transform: uppercase;
+    opacity: 0.9;
+    pointer-events: none;
+    padding-bottom: 2px;
+    text-shadow: 0 1px 2px var(--homey-bg-color), 0 0 1px var(--homey-bg-color);
+    z-index: 100;
+  }
+
+  .now-line {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 1px;
+    background-color: var(--danger-color);
+    z-index: 10;
+    pointer-events: none;
+  }
+
+  .now-label {
+    position: absolute;
+    top: -12px;
+    left: 0;
+    color: var(--danger-color);
+    font-size: 10px;
+    font-weight: bold;
+    pointer-events: none;
+    text-shadow: 0 0 2px var(--homey-bg-color);
+  }
+
+  .chart-bar {
+    flex: 1;
+    background: linear-gradient(to top, var(--bar-gradient-start, var(--homey-color-blue-400)), var(--bar-gradient-end, var(--homey-color-blue-600)));
+    border-radius: 2px 2px 0 0;
+    transition: height 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    min-height: 1px;
+    /* Always visible line for baseline */
+  }
+
+  .chart-bar:hover {
+    background: var(--bar-hover, var(--homey-color-blue-300));
+    z-index: 100;
+  }
+
+  .chart-tooltip {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: translateX(-50%) translateY(-100%);
+    background: rgba(0, 0, 0, 0.85);
+    color: white;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 500;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 9999;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    margin-top: -8px;
+    transition: opacity 0.15s ease;
+  }
+
+  .chart-bar:hover .chart-tooltip,
+  .chart-interaction-zone:hover .chart-tooltip,
+  .chart-interaction-zone.active .chart-tooltip {
+    opacity: 1;
+  }
+
+  .chart-axis-label {
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    color: var(--text-color-secondary);
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    text-shadow: 0 0 2px var(--homey-bg-color);
+  }
+
+  .chart-bar:nth-child(6n+1) .chart-axis-label,
+  .chart-interaction-zone:nth-child(6n+1) .chart-axis-label {
+    opacity: 1;
+  }
+
+  .chart-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: flex-end;
+  }
+
+  .chart-interaction-zone {
+    position: relative;
+    flex: 1;
+    height: 100%;
+    cursor: pointer;
+  }
+
+  /* Interaction highlights */
+  .chart-interaction-zone:hover,
+  .chart-interaction-zone.active {
+    background: rgba(255, 255, 255, 0.05);
+    touch-action: none;
+  }
+
+  /* Dot Indicator for Line Chart */
+  .indicator-dot {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: 10px;
+    height: 10px;
+    background: var(--chart-line-color);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    box-sizing: border-box;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s ease, top 0.3s ease;
+    z-index: 55;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  }
+
+  .chart-interaction-zone:hover .indicator-dot,
+  .chart-interaction-zone.active .indicator-dot {
+    opacity: 1;
+  }
+
+  /* Debug Panel Styles */
+  .debug-panel {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(10px);
+    padding: 8px 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+    z-index: 1000;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    transform: translateY(100%);
+    transition: transform 0.2s ease;
+  }
+
+  .debug-panel.visible {
+    transform: translateY(0);
+  }
+
+  .debug-panel-label {
+    color: var(--homey-color-orange-400);
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-right: 4px;
+  }
+
+  .debug-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+  }
+
+  .debug-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+
+  .debug-btn.active {
+    background: var(--homey-color-orange-500);
+    border-color: var(--homey-color-orange-600);
+  }
+
+  .debug-btn.real-data {
+    background: var(--homey-color-green-500);
+    border-color: var(--homey-color-green-600);
+  }
+
+  .debug-btn.real-data:hover {
+    background: var(--homey-color-green-400);
+  }
+
+  .debug-indicator {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background: var(--homey-color-orange-500);
+    color: white;
+    font-size: 8px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    z-index: 100;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .debug-indicator.visible {
+    opacity: 1;
+  }
+</style>
+</head>
+
+<body class="homey-widget">
+  <div id="app" class="widget-container"></div>
+
+  <script type="text/javascript">
+    /**
+     * Constants & Configuration
+     */
+    const CONFIG = {
+      API_URL: 'https://gpsgadget.buienradar.nl/data/raintext/',
+      DEFAULT_LAT: '52.0907',
+      DEFAULT_LON: '5.1214',
+      DEFAULT_MAX_MM: 6.0, // Reduced from 8.0 to zoom in, but kept > 5.0 to show heavy line
+      ASPECT_RATIOS: {
+        '1:1': '100%',
+        '4:3': '75%',
+        '16:9': '56.25%',
+        '21:9': '42.86%',
+        '3:1': '33.33%'
+      },
+      LEVELS: [
+        { val: 0.5, key: 'light' },    // Reverted to original
+        { val: 2.5, key: 'moderate' }, // Reverted to original
+        { val: 5.0, key: 'heavy' }     // Reduced from 7.6 to focus on smaller values
+      ]
+    };
+
+    /**
+     * Utility Functions
+     */
+    const Utils = {
+      // 0-255 value to mm/h formula
+      valToMm: (val) => val === 0 ? 0 : Math.pow(10, (val - 109) / 32),
+
+      // Homey translation helper
+      __: (key) => Homey.__(`widgets.buientabel.${key}`) || key,
+
+      // Error mapper
+      getError: (err) => {
+        if (err.message.includes('Location outside')) return Utils.__('locationError');
+        return Utils.__('error');
+      },
+
+      // Simple Catmull-Rom to SVG Path with clamping
+      getSmoothPath: (points, k = 0.25) => {
+        if (points.length === 0) return '';
+        if (points.length === 1) return `M ${points[0][0]},${points[0][1]}`;
+
+        // Clamp helper for Y values (0=top, 100=bottom)
+        const clampY = (y) => Math.max(0, Math.min(100, y));
+
+        let path = `M ${points[0][0]},${points[0][1]}`;
+
+        for (let i = 0; i < points.length - 1; i++) {
+          let p0 = points[i - 1] || points[i];
+          let p1 = points[i];
+          let p2 = points[i + 1];
+          let p3 = points[i + 2] || p2;
+
+          let cp1x = p1[0] + (p2[0] - p0[0]) * k;
+          let cp1y = clampY(p1[1] + (p2[1] - p0[1]) * k);
+          let cp2x = p2[0] - (p3[0] - p1[0]) * k;
+          let cp2y = clampY(p2[1] - (p3[1] - p1[1]) * k);
+
+          path += ` C ${cp1x},${cp1y} ${cp2x},${cp2y} ${p2[0]},${p2[1]}`;
+        }
+        return path;
+      }
+    };
+
+    /**
+     * Service to fetch weather data from Buienradar
+     */
+    class WeatherService {
+      static async fetchForecast(lat, lon) {
+        // Timestamp to prevent caching
+        const url = `${CONFIG.API_URL}?lat=${lat}&lon=${lon}&_t=${Date.now()}`;
+        const response = await fetch(url);
+        if (response.status === 404) throw new Error('Location outside NL/BE');
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const text = await response.text();
+        return this.parseData(text);
+      }
+
+      static parseData(text) {
+        return text.trim().split(/\r?\n/).reduce((acc, line) => {
+          if (!line) return acc;
+          const [valStr, timeStr] = line.split('|');
+          if (valStr && timeStr) {
+            const val = parseInt(valStr.trim(), 10);
+            acc.push({
+              time: timeStr.trim(),
+              val: val,
+              mm: Utils.valToMm(val)
+            });
+          }
+          return acc;
+        }, []);
+      }
+
+    }
+
+    /**
+     * Mock Data Service for Debug Panel
+     * Generates fake precipitation data for testing visualization
+     */
+    class MockDataService {
+      static PATTERNS = {
+        noRain: {
+          label: 'No Rain',
+          generate: () => MockDataService.generatePattern(() => 0)
+        },
+        lightDrizzle: {
+          label: 'Light Drizzle',
+          generate: () => MockDataService.generatePattern((i, len) => {
+            // Gentle variation between 0.1 and 0.4 mm/h
+            return 0.1 + Math.sin(i * 0.5) * 0.15 + Math.random() * 0.1;
+          })
+        },
+        normalRain: {
+          label: 'Normal Rain',
+          generate: () => MockDataService.generatePattern((i, len) => {
+            // Bell curve peaking in the middle around 1.5-2.5 mm/h
+            const mid = len / 2;
+            const dist = Math.abs(i - mid) / mid;
+            const base = (1 - dist * dist) * 2.5;
+            return Math.max(0, base + (Math.random() - 0.5) * 0.4);
+          })
+        },
+        heavyRain: {
+          label: 'Heavy Rain',
+          generate: () => MockDataService.generatePattern((i, len) => {
+            // Sustained heavy rain 3-5 mm/h with variations
+            const base = 4 + Math.sin(i * 0.3) * 1.5;
+            return Math.max(0, base + (Math.random() - 0.5) * 0.8);
+          })
+        },
+        extremeRain: {
+          label: 'Extreme Rain',
+          generate: () => MockDataService.generatePattern((i, len) => {
+            // Very intense rainfall 7-12 mm/h
+            const base = 9 + Math.sin(i * 0.4) * 2;
+            return Math.max(0, base + (Math.random() - 0.5) * 1.5);
+          })
+        },
+        passingShower: {
+          label: 'Passing Shower',
+          generate: () => MockDataService.generatePattern((i, len) => {
+            // Quick spike in the middle, mostly dry
+            const mid = len / 2;
+            const dist = Math.abs(i - mid);
+            if (dist <= 2) {
+              return 3 + (2 - dist) * 1.5 + Math.random() * 0.5;
+            }
+            return Math.random() * 0.1;
+          })
+        }
+      };
+
+      static generatePattern(valueGenerator) {
+        const now = new Date();
+        const data = [];
+        const numPoints = 24; // ~2 hours of 5-min intervals
+
+        for (let i = 0; i < numPoints; i++) {
+          const time = new Date(now.getTime() + i * 5 * 60 * 1000);
+          const timeStr = `${String(time.getHours()).padStart(2, '0')}:${String(time.getMinutes()).padStart(2, '0')}`;
+          const mm = valueGenerator(i, numPoints);
+
+          data.push({
+            time: timeStr,
+            val: 0,
+            mm: Math.max(0, mm)
+          });
+        }
+
+        return data;
+      }
+
+      static getPatternList() {
+        return Object.entries(this.PATTERNS).map(([key, pattern]) => ({
+          key,
+          label: pattern.label
+        }));
+      }
+
+      static getData(patternKey) {
+        const pattern = this.PATTERNS[patternKey];
+        if (!pattern) return null;
+        return pattern.generate();
+      }
+    }
+
+    /**
+     * Handles Chart Rendering
+     */
+    class ChartRenderer {
+      constructor(container) {
+        this.container = container;
+        this.currentStyle = null;
+        this.barElements = []; // Cache for updates
+      }
+
+      // Initialize the empty chart structure (Grid, Axis, Empty Elements)
+      // Initialize the empty chart structure (Grid, Axis, Empty Elements)
+      renderEmpty(style = 'bars', maxMm = CONFIG.DEFAULT_MAX_MM) {
+        this.container.innerHTML = '';
+        this.container.className = 'chart-container';
+
+        // 1. Grid & Layers
+        this.drawGrid(maxMm);
+        this.drawNowLine();
+
+        // 2. Wrapper for data
+        this.wrapper = document.createElement('div');
+        this.wrapper.className = 'chart-wrapper';
+        this.container.appendChild(this.wrapper);
+
+        // 3. Global Tooltip Element (Always Top Level)
+        this.tooltip = document.createElement('div');
+        this.tooltip.className = 'chart-tooltip';
+        this.container.appendChild(this.tooltip);
+
+        this.currentStyle = style;
+        this.barElements = []; // Clear cache
+        this.svg = null;
+        this.svgPath = null;
+        this.svgArea = null;
+        this.interactions = [];
+      }
+
+      // Update calls render logic but tries to reuse if possible?
+      // Or we just implement 'render' that decides whether to build or update.
+      render(data, style, maxMm, noRain = false) {
+        // Robust reuse check: same style, same data length, and elements exist
+        const isBar = style !== 'line' && style !== 'smooth';
+        const hasContainerConfig = !!this.wrapper && !!this.tooltip;
+        const matchesStyle = this.currentStyle === style;
+
+        // For lines, check SVG presence. For bars, check elements count vs data
+        const matchesElements = isBar
+          ? this.barElements.length === data.length
+          : (!!this.svgPath && this.interactions.length === data.length);
+
+        const canReuse = this.container.innerHTML !== '' && hasContainerConfig && matchesStyle && matchesElements;
+
+        if (!canReuse) {
+          this.build(data, style, maxMm);
+          // Force reflow after build to ensure transitions start from initial state
+          void this.container.offsetHeight;
+        }
+
+        // Force layout flush so 0-height bars animate to new height if we just built them
+        if (!canReuse) {
+          // Reading a layout property forces reflow
+          void this.container.offsetHeight;
+        }
+
+        // Now Update Values (Animations happen here)
+        this.updateValues(data, style, maxMm);
+
+        // Handle Overlays (No Rain / Loading)
+        // Clean up old overlays
+        const oldOverlay = this.container.querySelector('.status-overlay');
+        if (oldOverlay) oldOverlay.remove();
+
+        if (noRain) {
+          const overlay = document.createElement('div');
+          overlay.className = 'status-overlay';
+          overlay.textContent = Utils.__('noRain');
+          this.container.appendChild(overlay);
+        }
+      }
+
+      setLoading(isLoading) {
+        const oldOverlay = this.container.querySelector('.status-overlay');
+        if (oldOverlay) oldOverlay.remove();
+
+        if (isLoading) {
+          const overlay = document.createElement('div');
+          overlay.className = 'status-overlay';
+          overlay.innerHTML = Utils.__('loading');
+          this.container.appendChild(overlay);
+        }
+      }
+
+      build(data, style, maxMm) {
+        // If wrapper missing (shouldn't happen if renderEmpty called, but safe check)
+        if (!this.wrapper) this.renderEmpty(style, maxMm);
+
+        // Clear wrapper content if rebuilding to be safe (e.g. switching styles)
+        if (this.currentStyle !== style) {
+          this.renderEmpty(style, maxMm);
+        }
+
+        if (style === 'line' || style === 'smooth') {
+          this.buildLineChart(data);
+        } else {
+          this.buildBarChart(data);
+        }
+
+        this.currentStyle = style;
+      }
+
+      updateValues(data, style, maxMm) {
+        if (style === 'line' || style === 'smooth') {
+          this.updateLineChart(data, maxMm, style === 'smooth');
+        } else {
+          this.updateBarChart(data, maxMm);
+        }
+      }
+
+      // --- Grid Logic ---
+      drawGrid(maxMm) {
+        CONFIG.LEVELS.forEach(lvl => {
+          if (lvl.val < maxMm) {
+            const yPct = 100 - ((lvl.val / maxMm) * 100);
+            const line = document.createElement('div');
+            line.className = 'grid-line';
+            line.style.top = `${yPct}%`;
+
+            const label = document.createElement('div');
+            label.className = 'grid-label';
+            label.style.top = `${yPct}%`;
+            label.textContent = Utils.__(lvl.key);
+
+            this.container.appendChild(line);
+            this.container.appendChild(label);
+          }
+        });
+      }
+
+      drawNowLine() {
+        const line = document.createElement('div');
+        line.className = 'now-line';
+        const label = document.createElement('div');
+        label.className = 'now-label';
+        label.textContent = Utils.__('now');
+        this.container.appendChild(line);
+        this.container.appendChild(label);
+      }
+
+      // --- Bar Logic ---
+      buildBarChart(data) {
+        this.wrapper.style.justifyContent = 'space-between';
+        this.wrapper.style.gap = '1px';
+        this.barElements = [];
+
+        data.forEach(d => {
+          const bar = document.createElement('div');
+          bar.className = 'chart-bar';
+          bar.style.height = '0%';
+
+          // For bars, trigger and position element are the same
+          this.setupTooltip(bar, bar, d);
+          this.addAxisLabel(bar, d);
+
+          this.wrapper.appendChild(bar);
+          this.barElements.push(bar);
+        });
+      }
+
+      updateBarChart(data, maxMm) {
+        data.forEach((d, i) => {
+          const bar = this.barElements[i];
+          if (!bar) return;
+
+          const heightPct = (d.mm / maxMm) * 100;
+          // Ensure we always render something if data exists, but 0.5% min is good for visual
+          bar.style.height = `${Math.max(d.mm > 0 ? heightPct : 0.5, 0)}%`;
+
+          // Update tooltip text dynamic?
+          const tooltip = bar.querySelector('.chart-tooltip');
+          if (tooltip) tooltip.textContent = `${d.time}: ${d.mm.toFixed(1)} mm/h`;
+        });
+      }
+
+      // --- Line Logic ---
+      buildLineChart(data) {
+        // SVG Container
+        this.svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        this.svg.style.width = '100%';
+        this.svg.style.height = '100%';
+        this.svg.style.overflow = 'visible';
+        this.svg.setAttribute("preserveAspectRatio", "none");
+        this.svg.setAttribute("viewBox", "0 0 100 100");
+
+        // Initialize with a flat line matching DATA LENGTH
+        // CSS transitions require the same Path Commands (L vs C) match.
+        const isSmooth = this.currentStyle === 'smooth';
+
+        const flatPoints = data.map((d, i) => {
+          const x = (i / (data.length - 1)) * 100;
+          return [x, 100]; // y=100 (bottom)
+        });
+
+        let flatD = "";
+        if (isSmooth) {
+          flatD = Utils.getSmoothPath(flatPoints);
+        } else {
+          flatD = flatPoints.map((p, i) => (i === 0 ? "M" : "L") + ` ${p[0]},${p[1]}`).join(" ");
+        }
+
+        const flatAreaD = `${flatD} L 100,100 L 0,100 Z`;
+
+        // Area
+        this.svgArea = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        this.svgArea.setAttribute("d", flatAreaD);
+        this.svgArea.style.fill = "var(--chart-fill-color)";
+        this.svgArea.style.opacity = "0.2";
+        this.svgArea.style.transition = "d 0.3s ease";
+
+        // Path
+        this.svgPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        this.svgPath.setAttribute("d", flatD);
+        this.svgPath.style.fill = "none";
+        this.svgPath.style.stroke = "var(--chart-line-color)";
+        this.svgPath.style.strokeWidth = "2";
+        this.svgPath.style.vectorEffect = "non-scaling-stroke";
+        this.svgPath.style.transition = "d 0.3s ease";
+
+        this.svg.appendChild(this.svgArea);
+        this.svg.appendChild(this.svgPath);
+        this.wrapper.appendChild(this.svg);
+
+        // Interaction Layer
+        this.buildInteractionLayer(data);
+      }
+
+      buildInteractionLayer(data) {
+        const interactionLayer = document.createElement('div');
+        interactionLayer.style.position = 'absolute';
+        interactionLayer.style.top = '0';
+        interactionLayer.style.left = '0';
+        interactionLayer.style.width = '100%';
+        interactionLayer.style.height = '100%';
+        interactionLayer.style.display = 'flex';
+        this.interactions = [];
+
+        // Create dots separate from zones so they can be positioned absolutely
+        const dotsLayer = document.createElement('div');
+        dotsLayer.style.position = 'absolute';
+        dotsLayer.style.top = '0';
+        dotsLayer.style.left = '0';
+        dotsLayer.style.width = '100%';
+        dotsLayer.style.height = '100%';
+        dotsLayer.style.pointerEvents = 'none';
+
+        data.forEach((d, index) => {
+          const zone = document.createElement('div');
+          zone.className = 'chart-interaction-zone';
+
+          // Dot is positioned absolutely in dotsLayer
+          const dot = document.createElement('div');
+          dot.className = 'indicator-dot';
+          // Set horizontal position matching SVG X coordinate
+          const xPct = (index / (data.length - 1)) * 100;
+          dot.style.left = `${xPct}%`;
+          dotsLayer.appendChild(dot);
+
+          // Store reference for hover activation
+          zone.dataset.dotIndex = index;
+
+          // Bind tooltip to zone (receives events), position relative to dot
+          this.setupTooltipWithDot(zone, dot, d);
+          this.addAxisLabel(zone, d);
+
+          interactionLayer.appendChild(zone);
+          this.interactions.push({ zone, dot, data: d });
+        });
+
+        this.wrapper.appendChild(interactionLayer);
+        this.wrapper.appendChild(dotsLayer);
+      }
+
+      updateLineChart(data, maxMm, smooth) {
+        // Points
+        const points = data.map((d, i) => {
+          const x = (i / (data.length - 1)) * 100;
+          let y = 100 - ((d.mm / maxMm) * 100);
+          y = Math.max(0, Math.min(100, y)); // Clamp Y to [0,100]
+          return [x, y];
+        });
+
+        let dPath = "";
+        if (smooth) {
+          dPath = Utils.getSmoothPath(points);
+        } else {
+          dPath = points.map((p, i) => (i === 0 ? "M" : "L") + ` ${p[0]},${p[1]}`).join(" ");
+        }
+
+        const areaPath = `${dPath} L 100,100 L 0,100 Z`;
+
+        this.svgPath.setAttribute("d", dPath);
+        this.svgArea.setAttribute("d", areaPath);
+
+        // Update dots position
+        data.forEach((d, i) => {
+          const inter = this.interactions[i];
+          if (!inter) return;
+
+          // Calculate Y position as percentage from TOP (matches SVG coordinate system)
+          // SVG Y: 0=top, 100=bottom. Higher mm = lower Y = higher on chart
+          const yPct = 100 - ((d.mm / maxMm) * 100);
+          const clampedPct = Math.max(0, Math.min(100, yPct));
+          inter.dot.style.top = `${clampedPct}%`;
+        });
+      }
+
+      // For line charts with separate dots layer
+      setupTooltipWithDot(triggerElement, dot, data) {
+        const showDot = () => dot.style.opacity = '1';
+        const hideDot = () => {
+          if (!this.activeZone) dot.style.opacity = '0';
+        };
+
+        // Click/tap toggle for persistent tooltip
+        const toggleTooltip = (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+
+          // Clear any other active zones and dots first
+          if (this.activeZone && this.activeZone !== triggerElement) {
+            this.activeZone.classList.remove('active');
+            const prevDot = this.interactions.find(i => i.zone === this.activeZone)?.dot;
+            if (prevDot) prevDot.style.opacity = '0';
+          }
+
+          // Toggle this zone
+          const isActive = triggerElement.classList.toggle('active');
+          if (isActive) {
+            this.activeZone = triggerElement;
+            dot.style.opacity = '1';
+            this.showTooltip(dot, data);
+          } else {
+            this.activeZone = null;
+            dot.style.opacity = '0';
+            this.hideTooltip();
+          }
+        };
+
+        // Mouse hover (non-persistent)
+        triggerElement.addEventListener('mouseenter', () => {
+          if (!this.activeZone) {
+            showDot();
+            this.showTooltip(dot, data);
+          }
+        });
+        triggerElement.addEventListener('mouseleave', () => {
+          if (!this.activeZone) {
+            hideDot();
+            this.hideTooltip();
+          }
+        });
+
+        // Click/touch for persistent tooltip
+        triggerElement.addEventListener('click', toggleTooltip);
+        triggerElement.addEventListener('touchstart', toggleTooltip, { passive: false });
+      }
+
+      // For bar charts (trigger and position are the same element)
+      setupTooltip(triggerElement, positionElement, data) {
+        // Click/tap toggle for persistent tooltip
+        const toggleTooltip = (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+
+          // Clear any other active zones first
+          if (this.activeZone && this.activeZone !== triggerElement) {
+            this.activeZone.classList.remove('active');
+          }
+
+          // Toggle this zone
+          const isActive = triggerElement.classList.toggle('active');
+          if (isActive) {
+            this.activeZone = triggerElement;
+            this.showTooltip(positionElement, data);
+          } else {
+            this.activeZone = null;
+            this.hideTooltip();
+          }
+        };
+
+        // Mouse hover (non-persistent)
+        triggerElement.addEventListener('mouseenter', () => {
+          if (!this.activeZone) this.showTooltip(positionElement, data);
+        });
+        triggerElement.addEventListener('mouseleave', () => {
+          if (!this.activeZone) this.hideTooltip();
+        });
+
+        // Click/touch for persistent tooltip
+        triggerElement.addEventListener('click', toggleTooltip);
+        triggerElement.addEventListener('touchstart', toggleTooltip, { passive: false });
+      }
+
+      showTooltip(positionElement, data) {
+        if (!this.tooltip) return;
+
+        // Set Content
+        this.tooltip.textContent = `${data.time}: ${data.mm.toFixed(1)} mm/h`;
+
+        // Position relative to positionElement
+        const containerRect = this.container.getBoundingClientRect();
+        const targetRect = positionElement.getBoundingClientRect();
+
+        // Center horizontally on the element, position above it
+        const left = targetRect.left - containerRect.left + (targetRect.width / 2);
+        const top = targetRect.top - containerRect.top;
+
+        this.tooltip.style.left = `${left}px`;
+        this.tooltip.style.top = `${top}px`;
+        this.tooltip.style.opacity = '1';
+      }
+
+      hideTooltip() {
+        if (this.tooltip) this.tooltip.style.opacity = '0';
+      }
+
+      addAxisLabel(element, data) {
+        const label = document.createElement('div');
+        label.className = 'chart-axis-label';
+        label.textContent = data.time;
+        element.appendChild(label);
+      }
+    }
+
+    /**
+     * Main Widget Controller
+     */
+    class BuienradarWidget {
+      constructor(root) {
+        this.root = root;
+        this.settings = {};
+        this.data = [];
+        this.refreshInterval = null;
+        this.renderer = new ChartRenderer(root);
+
+        // Debug mode state
+        this.debugMode = false;
+        this.debugPattern = null;
+        this.debugPanelVisible = false;
+        this.clickCount = 0;
+        this.clickTimer = null;
+      }
+
+      init(Homey) {
+        this.Homey = Homey;
+        this.settings = Homey.getSettings() || {};
+
+        this.renderUI();
+
+        // Show empty table logic immediately
+        const style = this.settings.graphStyle || 'bars';
+        this.renderer.renderEmpty(style);
+        this.renderer.setLoading(true);
+
+        this.fetch();
+        this.setupAutoRefresh();
+        this.updateHeight();
+
+        Homey.on('settings', (newSettings) => {
+          this.settings = newSettings;
+          this.renderUI();
+
+          // Re-render empty chart if style changed
+          this.renderer.renderEmpty(this.settings.graphStyle || 'bars');
+          this.renderer.setLoading(true);
+
+          this.fetch();
+          this.setupAutoRefresh();
+          this.updateHeight();
+        });
+      }
+
+      renderUI() {
+        const debugModeEnabled = this.settings.debugMode === true;
+
+        this.root.innerHTML = `
+          <div id="chart-mount" class="chart-container"></div>
+          ${debugModeEnabled ? '<div class="debug-indicator visible" id="debug-toggle-btn" style="cursor:pointer; pointer-events:all;">Debug Menu</div>' : '<div class="debug-indicator" id="debug-indicator">Debug</div>'}
+          <div class="debug-panel" id="debug-panel">
+            <span class="debug-panel-label">Mock Data:</span>
+            ${MockDataService.getPatternList().map(p =>
+          `<button class="debug-btn" data-pattern="${p.key}">${p.label}</button>`
+        ).join('')}
+            <button class="debug-btn real-data" id="debug-real-data">Use Real Data</button>
+          </div>
+        `;
+        this.mountPoint = this.root.querySelector('#chart-mount');
+        this.debugPanel = this.root.querySelector('#debug-panel');
+        this.debugIndicator = this.root.querySelector('#debug-indicator');
+
+        if (debugModeEnabled) {
+          const btn = this.root.querySelector('#debug-toggle-btn');
+          if (btn) {
+            this.debugToggleBtn = btn;
+            this.debugToggleBtn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              this.toggleDebugPanel();
+            });
+          }
+        }
+
+        this.setupDebugHandlers();
+      }
+
+      setupDebugHandlers() {
+        // Triple-click handler on the root container using capture to bypass stopPropagation
+        this.root.addEventListener('click', (e) => {
+          // If debug mode setting is ON, we use the button instead of triple click
+          if (this.settings.debugMode) return;
+
+          this.clickCount++;
+
+          if (this.clickTimer) clearTimeout(this.clickTimer);
+
+          this.clickTimer = setTimeout(() => {
+            if (this.clickCount >= 3) {
+              this.toggleDebugPanel();
+            }
+            this.clickCount = 0;
+          }, 400);
+        }, { capture: true });
+
+        // Debug panel button handlers
+        this.debugPanel.querySelectorAll('.debug-btn[data-pattern]').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const pattern = btn.dataset.pattern;
+            this.setDebugPattern(pattern);
+
+            // Update active state
+            this.debugPanel.querySelectorAll('.debug-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+          });
+        });
+
+        // Real data button
+        this.root.querySelector('#debug-real-data').addEventListener('click', (e) => {
+          e.stopPropagation();
+          this.exitDebugMode();
+        });
+
+        // Click outside to close debug panel
+        document.addEventListener('click', (e) => {
+          if (this.debugPanelVisible && !this.debugPanel.contains(e.target) && !this.mountPoint.contains(e.target)) {
+            this.hideDebugPanel();
+          }
+        });
+      }
+
+      toggleDebugPanel() {
+        this.debugPanelVisible = !this.debugPanelVisible;
+        this.debugPanel.classList.toggle('visible', this.debugPanelVisible);
+      }
+
+      hideDebugPanel() {
+        this.debugPanelVisible = false;
+        this.debugPanel.classList.remove('visible');
+      }
+
+      setDebugPattern(patternKey) {
+        this.debugMode = true;
+        this.debugPattern = patternKey;
+        // Indicator handles visibility via renderUI or toggle
+        if (this.debugToggleBtn) this.debugToggleBtn.classList.add('visible');
+
+        // Stop auto-refresh while in debug mode
+        if (this.refreshInterval) {
+          clearInterval(this.refreshInterval);
+          this.refreshInterval = null;
+        }
+
+        // Generate and render mock data
+        this.data = MockDataService.getData(patternKey);
+        this.renderData();
+      }
+
+      exitDebugMode() {
+        this.debugMode = false;
+        this.debugPattern = null;
+        // Keep button visible if debug setting is on
+        if (!this.settings.debugMode && this.debugToggleBtn) {
+          this.debugToggleBtn.classList.remove('visible');
+        }
+        this.hideDebugPanel();
+
+        // Clear active states
+        this.debugPanel.querySelectorAll('.debug-btn').forEach(b => b.classList.remove('active'));
+
+        // Resume normal operation
+        this.fetch();
+        this.setupAutoRefresh();
+      }
+
+      async fetch() {
+        // Skip fetch if in debug mode
+        if (this.debugMode) return;
+
+        // If we have no data, show loading overlay (not full replacement)
+        if (!this.data.length) this.renderer.setLoading(true);
+
+        try {
+          const lat = this.settings.lat || CONFIG.DEFAULT_LAT;
+          const lon = this.settings.lon || CONFIG.DEFAULT_LON;
+
+          this.data = await WeatherService.fetchForecast(lat, lon);
+          this.renderData();
+        } catch (err) {
+          console.error(err);
+          // Show specific error if known, else generic
+          const msg = Utils.getError(err);
+          this.showStatus(msg, true);
+        }
+      }
+
+      renderData() {
+        if (!this.mountPoint) return;
+
+        if (!this.data || this.data.length === 0) {
+          this.showStatus(Utils.__('noData'));
+          return;
+        }
+
+        // Apply Color Setting
+        const color = this.settings.chartColor || 'blue';
+        const colorVar = color === 'mono' ? 'mono' : color;
+        const style = this.settings.graphStyle || 'bars';
+
+        const rootStyle = document.documentElement.style;
+        rootStyle.setProperty('--chart-line-color', `var(--homey-color-${colorVar}-500)`);
+        rootStyle.setProperty('--chart-fill-color', `var(--homey-color-${colorVar}-500)`);
+
+        // Specific tweak for gradient bars if needed, but linear-gradient uses specific vars
+        // We'll update the bar gradient dynamically too
+        if (style !== 'line' && style !== 'smooth') {
+          // For bars we might need to update the styled rule or use vars in CSS
+          // Let's update css vars for bars too
+          rootStyle.setProperty('--bar-gradient-start', `var(--homey-color-${colorVar}-400)`);
+          rootStyle.setProperty('--bar-gradient-end', `var(--homey-color-${colorVar}-600)`);
+          rootStyle.setProperty('--bar-hover', `var(--homey-color-${colorVar}-300)`);
+        } else {
+          // Reset to blue defaults just in case? no, variables handle it.
+        }
+
+        const totalRain = this.data.reduce((sum, item) => sum + item.mm, 0);
+        const peakRain = Math.max(...this.data.map(d => d.mm));
+        const maxMm = Math.max(peakRain * 1.1, CONFIG.DEFAULT_MAX_MM);
+
+        // Debug data
+        // console.log('Rendering Data:', this.data);
+
+        // If no rain, still render but with overlay
+        this.renderer.render(this.data, style, maxMm, totalRain === 0);
+      }
+
+      showStatus(msg, isError = false) {
+        if (!this.mountPoint) return;
+
+        // If we have a renderer, try to use it to inject status
+        if (this.renderer && this.renderer.container) {
+          const oldOverlay = this.renderer.container.querySelector('.status-overlay');
+          if (oldOverlay) oldOverlay.remove();
+
+          const overlay = document.createElement('div');
+          overlay.className = `status-overlay ${isError ? 'error' : ''}`;
+          overlay.innerHTML = msg;
+          this.renderer.container.appendChild(overlay);
+        } else {
+          // Fallback
+          this.mountPoint.innerHTML = `<div class="status-overlay ${isError ? 'error' : ''}" style="pointer-events:all; background:var(--homey-bg-color); top:0; bottom:0;">${msg}</div>`;
+        }
+      }
+
+      setupAutoRefresh() {
+        if (this.refreshInterval) clearInterval(this.refreshInterval);
+
+        // Don't setup refresh if in debug mode
+        if (this.debugMode) return;
+
+        const sec = parseInt(this.settings.refreshInterval, 10);
+        if (sec > 0) {
+          this.refreshInterval = setInterval(() => this.fetch(), sec * 1000);
+        }
+      }
+
+      updateHeight() {
+        const ratio = this.settings.aspectRatio || '16:9';
+        const heightPct = CONFIG.ASPECT_RATIOS[ratio] || '56.25%';
+        this.Homey.ready({ height: heightPct });
+      }
+    }
+
+    // --- Singleton Instance ---
+    const widget = new BuienradarWidget(document.getElementById('app'));
+
+    function onHomeyReady(Homey) {
+      widget.init(Homey);
+    }
+  </script>
+</body>
+
+</html>

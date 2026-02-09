@@ -3,9 +3,17 @@
   "ui": "tui",
   "tasks": {
     "build": {
-      "dependsOn": ["^build"],
-      "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".next/**", "!.next/cache/**"]
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        ".env*"
+      ],
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**"
+      ]
     },
     "lint": {},
     "format": {
@@ -13,11 +21,24 @@
     },
     "format:check": {},
     "check-types": {
-      "dependsOn": ["^check-types"]
+      "dependsOn": [
+        "^check-types"
+      ]
     },
     "dev": {
       "cache": false,
       "persistent": true
+    },
+    "homey:run": {
+      "cache": false,
+      "persistent": true
+    },
+    "homey:install": {
+      "cache": false
+    },
+    "homey:build": {},
+    "homey:publish": {
+      "cache": false
     }
   }
 }

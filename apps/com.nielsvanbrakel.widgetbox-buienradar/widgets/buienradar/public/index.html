@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .buienradar-container {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    .buienradar-container iframe {
+      border: none;
+      display: block;
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="buienradar-container" class="buienradar-container"></div>
+
+  <script type="text/javascript">
+    let currentSettings = {};
+
+    function render() {
+      const content = document.getElementById('buienradar-container');
+      // Always use 5-day radar
+      const iframeUrl = 'https://gadgets.buienradar.nl/gadget/radarfivedays';
+
+      // Use widget dimensions
+      const width = 256;
+      const height = 406;
+      // Note: The gadget has a fixed size initially but we can try to fit it or simpler just verify it works.
+      // The original code passed fixed w/h for radarfivedays.
+
+      const iframe = document.createElement('iframe');
+      iframe.src = iframeUrl;
+      iframe.setAttribute('noresize', 'true');
+      iframe.setAttribute('scrolling', 'NO');
+      iframe.setAttribute('hspace', '0');
+      iframe.setAttribute('vspace', '0');
+      iframe.setAttribute('frameborder', '0');
+      iframe.setAttribute('marginheight', '0');
+      iframe.setAttribute('marginwidth', '0');
+      iframe.setAttribute('width', '256');
+      iframe.setAttribute('height', '406');
+
+      content.innerHTML = '';
+      content.appendChild(iframe);
+    }
+
+    async function onHomeyReady(Homey) {
+      currentSettings = Homey.getSettings();
+      render();
+      Homey.ready();
+    }
+  </script>
+</body>
+
+</html>

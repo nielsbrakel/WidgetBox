@@ -1,0 +1,320 @@
+/**
+ * Shared styles for all Homey Widgets
+ * Includes typography, spacing, and common utility classes
+ */
+
+:root {
+  /* Spacing base unit (already defined by Homey, but reference here) */
+  --widget-su: var(--homey-su, 4px);
+  --widget-su-1: var(--homey-su-1, 4px);
+  --widget-su-2: var(--homey-su-2, 8px);
+  --widget-su-3: var(--homey-su-3, 12px);
+  --widget-su-4: var(--homey-su-4, 16px);
+  --widget-su-5: var(--homey-su-5, 20px);
+  --widget-su-6: var(--homey-su-6, 24px);
+  --widget-su-7: var(--homey-su-7, 28px);
+  --widget-su-8: var(--homey-su-8, 32px);
+}
+
+/* ============================= */
+/* Typography Presets */
+/* ============================= */
+
+.widget-text-display {
+  font-size: var(--homey-font-size-large);
+  font-weight: var(--homey-font-weight-bold);
+  line-height: var(--homey-line-height-large);
+  color: var(--homey-text-color);
+}
+
+.widget-text-title {
+  font-size: var(--homey-font-size-medium);
+  font-weight: var(--homey-font-weight-bold);
+  line-height: var(--homey-line-height-medium);
+  color: var(--homey-text-color);
+}
+
+.widget-text-body {
+  font-size: var(--homey-font-size-default);
+  font-weight: var(--homey-font-weight-regular);
+  line-height: var(--homey-line-height-default);
+  color: var(--homey-text-color);
+}
+
+.widget-text-secondary {
+  font-size: var(--homey-font-size-default);
+  font-weight: var(--homey-font-weight-regular);
+  line-height: var(--homey-line-height-default);
+  color: var(--homey-text-color-secondary);
+}
+
+.widget-text-small {
+  font-size: var(--homey-font-size-small);
+  font-weight: var(--homey-font-weight-regular);
+  line-height: var(--homey-line-height-small);
+  color: var(--homey-text-color-secondary);
+}
+
+.widget-text-mono {
+  font-family: 'Courier New', 'Monaco', monospace;
+  font-weight: var(--homey-font-weight-regular);
+}
+
+/* ============================= */
+/* Layout & Spacing Utilities */
+/* ============================= */
+
+.widget-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--widget-su-3);
+  padding: var(--widget-su-4) 0;
+  width: 100%;
+}
+
+.widget-container--compact {
+  padding: var(--widget-su-2) 0;
+}
+
+.widget-container--spacious {
+  padding: var(--widget-su-6) 0;
+}
+
+.widget-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: var(--widget-su-2);
+  width: 100%;
+}
+
+.widget-column {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--widget-su-3);
+  width: 100%;
+}
+
+.widget-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.widget-spacer {
+  width: 100%;
+  height: var(--widget-su-4);
+  flex-shrink: 0;
+}
+
+.widget-separator {
+  width: 100%;
+  height: 1px;
+  background-color: var(--homey-line-color-light);
+  margin: var(--widget-su-2) 0;
+}
+
+/* ============================= */
+/* Common Components */
+/* ============================= */
+
+.widget-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--widget-su-2) var(--widget-su-3);
+  border: 1px solid var(--homey-line-color);
+  border-radius: var(--homey-border-radius-small);
+  background-color: var(--homey-color-mono-100);
+  color: var(--homey-text-color);
+  font-size: var(--homey-font-size-small);
+  font-weight: var(--homey-font-weight-regular);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  user-select: none;
+}
+
+.widget-button:hover {
+  background-color: var(--homey-color-mono-200);
+}
+
+.widget-button:active {
+  opacity: 0.8;
+}
+
+.widget-button--small {
+  padding: var(--widget-su-1) var(--widget-su-2);
+  font-size: 12px;
+}
+
+.widget-button--primary {
+  background-color: var(--homey-color-blue-500);
+  color: white;
+  border-color: var(--homey-color-blue-500);
+}
+
+.widget-button--primary:hover {
+  background-color: var(--homey-color-blue-600);
+}
+
+.widget-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ============================= */
+/* State Indicators */
+/* ============================= */
+
+.widget-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--widget-su-4);
+  color: var(--homey-text-color-secondary);
+}
+
+.widget-loading::after {
+  content: '';
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin-left: var(--widget-su-2);
+  border: 2px solid var(--homey-color-mono-300);
+  border-top-color: var(--homey-text-color);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.widget-error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--widget-su-4);
+  color: var(--homey-text-color-danger);
+  font-size: var(--homey-font-size-small);
+  text-align: center;
+}
+
+.widget-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--widget-su-6) var(--widget-su-4);
+  color: var(--homey-text-color-secondary);
+  font-size: var(--homey-font-size-default);
+  text-align: center;
+  min-height: 100px;
+}
+
+/* ============================= */
+/* Dark Mode Support */
+/* ============================= */
+
+.homey-dark-mode {
+  /* Homey handles this automatically, but ensure consistency */
+  background-color: var(--homey-background-color);
+  color: var(--homey-text-color);
+}
+
+/* ============================= */
+/* Accessibility */
+/* ============================= */
+
+.widget-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* ============================= */
+/* Animations */
+/* ============================= */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.widget-fade-in {
+  animation: fadeIn 0.3s ease-in;
+}
+
+.widget-pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* ============================= */
+/* Responsive */
+/* ============================= */
+
+@media (max-width: 320px) {
+  .widget-container {
+    padding: var(--widget-su-2) 0;
+  }
+
+  .widget-text-display {
+    font-size: var(--homey-font-size-medium);
+  }
+}
+
+/* ============================= */
+/* Card Style (Non-transparent)  */
+/* ============================= */
+
+/**
+ * Standard card styling for widgets with "Show In Card" option enabled.
+ * Uses Homey's component variables with fallbacks for environments
+ * where these variables may not be defined.
+ * 
+ * NOTE: Per Homey docs, avoid heavy shadows inside widgets as the
+ * widget frame already has a shadow. This uses a subtle shadow.
+ */
+.widget-card {
+  background-color: var(--homey-background-color, #fff);
+  border-radius: var(--homey-border-radius, 12px);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Dark mode - remove shadow as it's less visible and can look muddy */
+.homey-dark-mode .widget-card {
+  background-color: var(--homey-background-color, #1a1a1a);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}

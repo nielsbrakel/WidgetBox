@@ -1,0 +1,11 @@
+{
+    "name": "com.nielsvanbrakel.widgetbox-windy",
+    "version": "1.0.0",
+    "main": "app.js",
+    "scripts": {
+        "homey:run": "homey app run",
+        "homey:install": "homey app install",
+        "homey:build": "homey app build",
+        "homey:publish": "homey app publish"
+    }
+}

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../../_shared/shared-styles.css">
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            background-color: transparent;
+            overflow: hidden;
+        }
+
+        .widget-spacing-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .widget-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            width: 100%;
+            height: auto;
+            background: var(--homey-background-color);
+            border-radius: var(--homey-border-radius, 12px);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
+            padding: 16px;
+            box-sizing: border-box;
+        }
+
+        .bg-transparent .widget-card {
+            background: transparent;
+            box-shadow: none;
+        }
+
+        .align-h-left {
+            align-items: flex-start;
+            text-align: left;
+        }
+
+        .align-h-center {
+            align-items: center;
+            text-align: center;
+        }
+
+        .align-h-right {
+            align-items: flex-end;
+            text-align: right;
+        }
+
+        .time-text {
+            line-height: 1.4;
+            color: var(--homey-text-color);
+            font-weight: 300;
+        }
+
+        .time-text .highlight {
+            font-weight: 700;
+        }
+
+        .size-xsmall .time-text {
+            font-size: 14px;
+        }
+
+        .size-small .time-text {
+            font-size: 18px;
+        }
+
+        .size-medium .time-text {
+            font-size: 24px;
+        }
+
+        .size-large .time-text {
+            font-size: 32px;
+        }
+
+        .size-xlarge .time-text {
+            font-size: 42px;
+        }
+
+        .color-default .time-text .highlight {
+            color: var(--homey-text-color);
+        }
+
+        .color-blue .time-text .highlight {
+            color: #3B82F6;
+        }
+
+        .color-green .time-text .highlight {
+            color: #22C55E;
+        }
+
+        .color-orange .time-text .highlight {
+            color: #F97316;
+        }
+
+        .color-red .time-text .highlight {
+            color: #EF4444;
+        }
+
+        .color-purple .time-text .highlight {
+            color: #A855F7;
+        }
+
+        .no-card {
+            background: transparent !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="widget-spacing-wrapper" id="app-container">
+        <div class="widget-card" id="widget-card">
+            <div id="clock-display"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentSettings = {};
+
+        const hourNamesEN = ['twelve', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'];
+        const hourNamesNL = ['twaalf', 'een', 'twee', 'drie', 'vier', 'vijf', 'zes', 'zeven', 'acht', 'negen', 'tien', 'elf', 'twaalf'];
+
+        function getLanguage() {
+            return (navigator.language || 'en').startsWith('nl') ? 'nl' : 'en';
+        }
+
+
+
+
+
+        function getTextEN(hours, minutes) {
+            const h12 = hours % 12;
+            const nextHour = (h12 + 1) % 12 || 12;
+            const m5 = Math.round(minutes / 5) * 5;
+
+            if (m5 === 0 || m5 === 60) {
+                const h = m5 === 60 ? nextHour : (h12 || 12);
+                return `It is <span class="highlight">${hourNamesEN[h]}</span> o'clock`;
+            } else if (m5 === 15) {
+                return `It is <span class="highlight">quarter</span> past <span class="highlight">${hourNamesEN[h12 || 12]}</span>`;
+            } else if (m5 === 30) {
+                return `It is <span class="highlight">half</span> past <span class="highlight">${hourNamesEN[h12 || 12]}</span>`;
+            } else if (m5 === 45) {
+                return `It is <span class="highlight">quarter</span> to <span class="highlight">${hourNamesEN[nextHour]}</span>`;
+            } else if (m5 < 30) {
+                const minWords = { 5: 'five', 10: 'ten', 20: 'twenty', 25: 'twenty-five' };
+                return `It is <span class="highlight">${minWords[m5]}</span> past <span class="highlight">${hourNamesEN[h12 || 12]}</span>`;
+            } else {
+                const minWords = { 35: 'twenty-five', 40: 'twenty', 50: 'ten', 55: 'five' };
+                return `It is <span class="highlight">${minWords[m5]}</span> to <span class="highlight">${hourNamesEN[nextHour]}</span>`;
+            }
+        }
+
+        function getTextNL(hours, minutes) {
+            const h12 = hours % 12;
+            const nextHour = (h12 + 1) % 12 || 12;
+            const m5 = Math.round(minutes / 5) * 5;
+
+            if (m5 === 0 || m5 === 60) {
+                const h = m5 === 60 ? nextHour : (h12 || 12);
+                return `Het is <span class="highlight">${hourNamesNL[h]}</span> uur`;
+            } else if (m5 === 15) {
+                return `Het is <span class="highlight">kwart</span> over <span class="highlight">${hourNamesNL[h12 || 12]}</span>`;
+            } else if (m5 === 30) {
+                return `Het is <span class="highlight">half</span> <span class="highlight">${hourNamesNL[nextHour]}</span>`;
+            } else if (m5 === 45) {
+                return `Het is <span class="highlight">kwart</span> voor <span class="highlight">${hourNamesNL[nextHour]}</span>`;
+            } else if (m5 === 5) {
+                return `Het is <span class="highlight">vijf</span> over <span class="highlight">${hourNamesNL[h12 || 12]}</span>`;
+            } else if (m5 === 10) {
+                return `Het is <span class="highlight">tien</span> over <span class="highlight">${hourNamesNL[h12 || 12]}</span>`;
+            } else if (m5 === 20) {
+                return `Het is <span class="highlight">tien</span> voor <span class="highlight">half</span> <span class="highlight">${hourNamesNL[nextHour]}</span>`;
+            } else if (m5 === 25) {
+                return `Het is <span class="highlight">vijf</span> voor <span class="highlight">half</span> <span class="highlight">${hourNamesNL[nextHour]}</span>`;
+            } else if (m5 === 35) {
+                return `Het is <span class="highlight">vijf</span> over <span class="highlight">half</span> <span class="highlight">${hourNamesNL[nextHour]}</span>`;
+            } else if (m5 === 40) {
+                return `Het is <span class="highlight">tien</span> over <span class="highlight">half</span> <span class="highlight">${hourNamesNL[nextHour]}</span>`;
+            } else if (m5 === 50) {
+                return `Het is <span class="highlight">tien</span> voor <span class="highlight">${hourNamesNL[nextHour]}</span>`;
+            } else if (m5 === 55) {
+                return `Het is <span class="highlight">vijf</span> voor <span class="highlight">${hourNamesNL[nextHour]}</span>`;
+            }
+        }
+
+        function updateClock() {
+            const now = new Date();
+            const lang = getLanguage();
+            const sentence = lang === 'nl'
+                ? getTextNL(now.getHours(), now.getMinutes())
+                : getTextEN(now.getHours(), now.getMinutes());
+            document.getElementById('clock-display').innerHTML = `<div class="time-text">${sentence}</div>`;
+        }
+
+        function updateStyles() {
+            const widgetCard = document.getElementById('widget-card');
+            widgetCard.className = 'widget-card';
+            widgetCard.classList.add(`size-${currentSettings.size || 'medium'}`);
+            widgetCard.classList.add(`align-h-${currentSettings.horizontalAlignment || 'center'}`);
+            widgetCard.classList.add(`color-${currentSettings.color || 'default'}`);
+            // Card background is handled by widget compose transparent setting
+        }
+
+        function onHomeyReady(Homey) {
+            currentSettings = Homey.getSettings();
+            Homey.on('settings.set', (key, value) => {
+                currentSettings[key] = value;
+                updateStyles();
+                updateClock();
+            });
+            updateStyles();
+            updateClock();
+            setInterval(updateClock, 1000);
+
+            const updateHeight = () => {
+                const height = document.getElementById('app-container').offsetHeight;
+                Homey.ready({ height });
+                if (Homey.setHeight) Homey.setHeight(height);
+            };
+            new ResizeObserver(updateHeight).observe(document.body);
+            setTimeout(updateHeight, 0);
+        }
+    </script>
+</body>
+
+</html>

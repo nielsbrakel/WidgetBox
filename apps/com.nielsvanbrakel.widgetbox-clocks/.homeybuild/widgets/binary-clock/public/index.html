@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../../_shared/shared-styles.css">
+    <style>
+        /* Base Styles */
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            background: transparent;
+            overflow: visible;
+        }
+
+        /* Outer Wrapper */
+        .widget-spacing-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* Card Container */
+        .widget-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: auto;
+            background: var(--homey-background-color);
+            border-radius: var(--homey-border-radius, 12px);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
+            padding: 16px;
+            box-sizing: border-box;
+        }
+
+        .bg-transparent .widget-card {
+            background: transparent;
+            box-shadow: none;
+        }
+
+        .no-card {
+            background: transparent !important;
+            box-shadow: none !important;
+            padding: 8px !important;
+        }
+
+        /* Alignment */
+        .align-h-left .widget-card {
+            align-items: flex-start;
+        }
+
+        .align-h-center .widget-card {
+            align-items: center;
+        }
+
+        .align-h-right .widget-card {
+            align-items: flex-end;
+        }
+
+        /* Binary Clock Container - VERTICAL (default) */
+        .binary-clock {
+            display: flex;
+            gap: 2em;
+            align-items: flex-end;
+            justify-content: center;
+            line-height: 1;
+            padding: 0.4em;
+        }
+
+        /* PM group aligns to top in vertical mode */
+        .group-ampm {
+            align-self: flex-start;
+        }
+
+        /* Size Classes */
+        .size-xsmall .binary-clock {
+            font-size: 4px;
+        }
+
+        .size-small .binary-clock {
+            font-size: 6px;
+        }
+
+        .size-medium .binary-clock {
+            font-size: 10px;
+        }
+
+        .size-large .binary-clock {
+            font-size: 14px;
+        }
+
+        .size-xlarge .binary-clock {
+            font-size: 18px;
+        }
+
+        /* Time Group (H, M, S, AM/PM) - VERTICAL */
+        .time-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5em;
+        }
+
+        .label {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: var(--homey-text-color-light, #999);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .digits {
+            display: flex;
+            gap: 0.8em;
+        }
+
+        .column {
+            display: flex;
+            flex-direction: column-reverse;
+            gap: 0.5em;
+        }
+
+        /* Dots */
+        .dot {
+            width: 1.2em;
+            height: 1.2em;
+            border-radius: 50%;
+            background-color: rgba(0, 0, 0, 0.25);
+            transition: all 0.2s ease;
+        }
+
+        .dot.active {
+            background-color: var(--active-color, var(--homey-color-orange-500, #ff9800));
+            box-shadow: 0 0 0.6em var(--active-color, var(--homey-color-orange-500, #ff9800));
+        }
+
+        /* Dark Mode */
+        @media (prefers-color-scheme: dark) {
+            .dot {
+                background-color: rgba(255, 255, 255, 0.2);
+            }
+        }
+
+        /* Color Themes */
+        .color-default {
+            --active-color: var(--homey-text-color, #333);
+        }
+
+        .color-blue {
+            --active-color: var(--homey-color-blue-500, #2196f3);
+        }
+
+        .color-green {
+            --active-color: var(--homey-color-green-500, #4caf50);
+        }
+
+        .color-orange {
+            --active-color: var(--homey-color-orange-500, #ff9800);
+        }
+
+        .color-red {
+            --active-color: var(--homey-color-red-500, #f44336);
+        }
+
+        .color-purple {
+            --active-color: #9c27b0;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .color-default {
+                --active-color: #fff;
+            }
+        }
+
+        /* Hide Options */
+        .hide-seconds .group-s {
+            display: none;
+        }
+
+        .hide-labels .label {
+            display: none;
+        }
+
+        .hide-ampm .group-ampm {
+            display: none;
+        }
+
+        /* ========================== */
+        /* HORIZONTAL LAYOUT          */
+        /* ========================== */
+        .layout-horizontal .binary-clock {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.6em;
+            padding: 0.3em;
+        }
+
+        .layout-horizontal .time-group {
+            flex-direction: row;
+            align-items: center;
+            gap: 0.8em;
+        }
+
+        .layout-horizontal .group-ampm {
+            align-self: flex-start;
+        }
+
+        .layout-horizontal .label {
+            width: 2em;
+            text-align: right;
+        }
+
+        .layout-horizontal .digits {
+            flex-direction: row;
+        }
+
+        .layout-horizontal .column {
+            flex-direction: row;
+            gap: 0.5em;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="widget-spacing-wrapper" id="app-container">
+        <div class="widget-card" id="widget-card">
+            <div class="binary-clock" id="clock"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentSettings = {};
+
+        function calculateTotalHeight() {
+            return document.getElementById('app-container').offsetHeight;
+        }
+
+        function createGrid() {
+            const clock = document.getElementById('clock');
+            clock.innerHTML = '';
+            const is12Hour = currentSettings.clockFormat === '12';
+
+            const createGroup = (label, cols, className = '') => {
+                const group = document.createElement('div');
+                group.className = `time-group group-${label.toLowerCase()} ${className}`.trim();
+
+                const labelEl = document.createElement('div');
+                labelEl.className = 'label';
+                labelEl.textContent = label;
+                group.appendChild(labelEl);
+
+                const digits = document.createElement('div');
+                digits.className = 'digits';
+
+                cols.forEach((bits, idx) => {
+                    const colDiv = document.createElement('div');
+                    colDiv.className = 'column';
+                    colDiv.id = `${label.toLowerCase()}${idx + 1}`;
+
+                    for (let b = 0; b < bits; b++) {
+                        const dot = document.createElement('div');
+                        dot.className = 'dot';
+                        dot.dataset.bit = b;
+                        colDiv.appendChild(dot);
+                    }
+                    digits.appendChild(colDiv);
+                });
+
+                group.appendChild(digits);
+                return group;
+            };
+
+            clock.appendChild(createGroup('H', [2, 4]));
+            clock.appendChild(createGroup('M', [3, 4]));
+            clock.appendChild(createGroup('S', [3, 4]));
+
+            // AM/PM indicator - single dot (PM = active)
+            // Always append after seconds, CSS handles alignment
+            if (is12Hour) {
+                clock.appendChild(createGroup('PM', [1], 'group-ampm'));
+            }
+        }
+
+        function updateClock() {
+            const now = new Date();
+            const rawHours = now.getHours();
+            let h = rawHours;
+            const m = now.getMinutes();
+            const s = now.getSeconds();
+            const is12Hour = currentSettings.clockFormat === '12';
+
+            if (is12Hour) {
+                h = rawHours % 12 || 12;
+            }
+
+            const updateCol = (id, val) => {
+                const col = document.getElementById(id);
+                if (!col) return;
+                Array.from(col.children).forEach(dot => {
+                    const bit = parseInt(dot.dataset.bit);
+                    dot.classList.toggle('active', (val & (1 << bit)) !== 0);
+                });
+            };
+
+            const d = (val, pos) => parseInt(String(val).padStart(2, '0')[pos]);
+
+            updateCol('h1', d(h, 0));
+            updateCol('h2', d(h, 1));
+            updateCol('m1', d(m, 0));
+            updateCol('m2', d(m, 1));
+            updateCol('s1', d(s, 0));
+            updateCol('s2', d(s, 1));
+
+            // AM/PM: PM = 1 (active), AM = 0 (inactive)
+            if (is12Hour) {
+                updateCol('pm1', rawHours >= 12 ? 1 : 0);
+            }
+        }
+
+        function updateStyles() {
+            const card = document.getElementById('widget-card');
+            const wrapper = document.getElementById('app-container');
+
+            card.className = 'widget-card';
+            card.classList.add(`color-${currentSettings.color || 'orange'}`);
+            card.classList.add(`size-${currentSettings.size || 'medium'}`);
+
+            if (!currentSettings.showSeconds) card.classList.add('hide-seconds');
+            if (!currentSettings.showLabels) card.classList.add('hide-labels');
+
+            // Card background is handled by widget compose transparent setting
+
+            // Orientation (default to horizontal)
+            if (currentSettings.orientation === 'vertical') {
+                document.body.classList.remove('layout-horizontal');
+            } else {
+                document.body.classList.add('layout-horizontal');
+            }
+
+            wrapper.className = 'widget-spacing-wrapper';
+            wrapper.classList.add(`align-h-${currentSettings.horizontalAlignment || 'center'}`);
+        }
+
+        function onHomeyReady(Homey) {
+            currentSettings = Homey.getSettings();
+            createGrid();
+            updateStyles();
+            updateClock();
+
+            Homey.on('settings.set', (key, value) => {
+                currentSettings[key] = value;
+                // Recreate grid if format changes (to add/remove AM/PM)
+                if (key === 'clockFormat' || key === 'orientation') {
+                    createGrid();
+                }
+                updateStyles();
+                updateClock();
+                requestAnimationFrame(() => {
+                    Homey.setHeight(calculateTotalHeight());
+                });
+            });
+
+            setInterval(updateClock, 1000);
+
+            const updateHeight = () => {
+                Homey.ready({ height: calculateTotalHeight() });
+                if (Homey.setHeight) Homey.setHeight(calculateTotalHeight());
+            };
+
+            const ro = new ResizeObserver(updateHeight);
+            ro.observe(document.body);
+
+            setTimeout(updateHeight, 0);
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,12 @@
+{
+  "name": {
+    "en": "Five-Day Radar",
+    "nl": "5-Daagse Radar"
+  },
+  "description": {
+    "en": "5-day precipitation forecast from Buienradar",
+    "nl": "5-daagse neerslagverwachting van Buienradar"
+  },
+  "height": 406,
+  "settings": []
+}

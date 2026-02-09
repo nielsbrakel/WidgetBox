@@ -1,0 +1,37 @@
+{
+    "id": "com.nielsvanbrakel.widgetbox-windy",
+    "version": "1.0.0",
+    "compatibility": ">=5.0.0",
+    "sdk": 3,
+    "platforms": [
+        "local",
+        "cloud"
+    ],
+    "name": {
+        "en": "WidgetBox Windy",
+        "nl": "WidgetBox Windy"
+    },
+    "description": {
+        "en": "Windy weather map widget for your dashboard",
+        "nl": "Windy weerskaart widget voor je dashboard"
+    },
+    "category": [
+        "tools"
+    ],
+    "brandColor": "#4A90A4",
+    "permissions": [],
+    "images": {
+        "small": "/assets/images/small.png",
+        "large": "/assets/images/large.png",
+        "xlarge": "/assets/images/xlarge.png"
+    },
+    "author": {
+        "name": "Niels van Brakel",
+        "email": "niels@nielsvanbrakel.com"
+    },
+    "bugs": {
+        "url": "https://github.com/nielsvanbrakel/widgetbox/issues"
+    },
+    "source": "https://github.com/nielsvanbrakel/widgetbox",
+    "homepage": "https://nielsvanbrakel.com"
+}

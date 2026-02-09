@@ -1,0 +1,145 @@
+{
+    "name": {
+        "en": "Word Clock Grid",
+        "nl": "Woorden Klok Raster"
+    },
+    "description": {
+        "en": "Time displayed as a word matrix with highlighted letters",
+        "nl": "Tijd weergegeven als een woordenraster met gemarkeerde letters"
+    },
+    "height": 500,
+    "transparent": false,
+    "settings": [
+        {
+            "id": "color",
+            "type": "dropdown",
+            "label": {
+                "en": "Highlight Color",
+                "nl": "Markeerkleur"
+            },
+            "value": "default",
+            "values": [
+                {
+                    "id": "default",
+                    "label": {
+                        "en": "Default",
+                        "nl": "Standaard"
+                    }
+                },
+                {
+                    "id": "blue",
+                    "label": {
+                        "en": "Blue",
+                        "nl": "Blauw"
+                    }
+                },
+                {
+                    "id": "green",
+                    "label": {
+                        "en": "Green",
+                        "nl": "Groen"
+                    }
+                },
+                {
+                    "id": "orange",
+                    "label": {
+                        "en": "Orange",
+                        "nl": "Oranje"
+                    }
+                },
+                {
+                    "id": "red",
+                    "label": {
+                        "en": "Red",
+                        "nl": "Rood"
+                    }
+                },
+                {
+                    "id": "purple",
+                    "label": {
+                        "en": "Purple",
+                        "nl": "Paars"
+                    }
+                }
+            ]
+        },
+        {
+            "id": "horizontalAlignment",
+            "type": "dropdown",
+            "label": {
+                "en": "Horizontal Alignment",
+                "nl": "Horizontale Uitlijning"
+            },
+            "value": "center",
+            "values": [
+                {
+                    "id": "left",
+                    "label": {
+                        "en": "Left",
+                        "nl": "Links"
+                    }
+                },
+                {
+                    "id": "center",
+                    "label": {
+                        "en": "Center",
+                        "nl": "Midden"
+                    }
+                },
+                {
+                    "id": "right",
+                    "label": {
+                        "en": "Right",
+                        "nl": "Rechts"
+                    }
+                }
+            ]
+        },
+        {
+            "id": "size",
+            "type": "dropdown",
+            "label": {
+                "en": "Size",
+                "nl": "Grootte"
+            },
+            "value": "medium",
+            "values": [
+                {
+                    "id": "xsmall",
+                    "label": {
+                        "en": "Extra Small",
+                        "nl": "Extra Klein"
+                    }
+                },
+                {
+                    "id": "small",
+                    "label": {
+                        "en": "Small",
+                        "nl": "Klein"
+                    }
+                },
+                {
+                    "id": "medium",
+                    "label": {
+                        "en": "Medium",
+                        "nl": "Gemiddeld"
+                    }
+                },
+                {
+                    "id": "large",
+                    "label": {
+                        "en": "Large",
+                        "nl": "Groot"
+                    }
+                },
+                {
+                    "id": "xlarge",
+                    "label": {
+                        "en": "Extra Large",
+                        "nl": "Extra Groot"
+                    }
+                }
+            ]
+        }
+    ]
+}

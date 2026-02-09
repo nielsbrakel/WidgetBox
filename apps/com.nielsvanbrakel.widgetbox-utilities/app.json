@@ -1,0 +1,210 @@
+{
+  "id": "com.nielsvanbrakel.widgetbox-utilities",
+  "version": "1.0.0",
+  "compatibility": ">=12.3.0",
+  "sdk": 3,
+  "platforms": [
+    "local"
+  ],
+  "name": {
+    "en": "WidgetBox Utilities",
+    "nl": "WidgetBox Hulpmiddelen"
+  },
+  "description": {
+    "en": "Utility widgets for your Homey dashboard",
+    "nl": "Hulpmiddel widgets voor je Homey dashboard"
+  },
+  "category": [
+    "tools"
+  ],
+  "permissions": [],
+  "images": {
+    "small": "/assets/images/small.png",
+    "large": "/assets/images/large.png",
+    "xlarge": "/assets/images/xlarge.png"
+  },
+  "author": {
+    "name": "Niels van Brakel",
+    "email": "niels@nielsvanbrakel.com"
+  },
+  "brandColor": "#9E9E9E",
+  "widgets": {
+    "spacer": {
+      "name": {
+        "en": "Spacer",
+        "nl": "Ruimte"
+      },
+      "description": {
+        "en": "Add empty space between widgets",
+        "nl": "Voeg lege ruimte toe tussen widgets"
+      },
+      "height": 40,
+      "transparent": true,
+      "settings": [
+        {
+          "id": "heightMultiplier",
+          "type": "number",
+          "label": {
+            "en": "Height Multiplier",
+            "nl": "Hoogte Vermenigvuldiger"
+          },
+          "min": 1,
+          "max": 1000,
+          "step": 1,
+          "value": 10
+        }
+      ],
+      "id": "spacer"
+    },
+    "stopwatch": {
+      "name": {
+        "en": "Stopwatch",
+        "nl": "Stopwatch"
+      },
+      "description": {
+        "en": "Stopwatch with lap timing",
+        "nl": "Stopwatch met rondetijden"
+      },
+      "height": 200,
+      "transparent": true,
+      "settings": [
+        {
+          "id": "allowAddingStopwatches",
+          "type": "checkbox",
+          "label": {
+            "en": "Allow adding stopwatches",
+            "nl": "Stopwatches toevoegen toestaan"
+          },
+          "value": false
+        },
+        {
+          "id": "debugMode",
+          "type": "checkbox",
+          "label": {
+            "en": "Debug Mode",
+            "nl": "Debug Modus"
+          },
+          "value": false
+        },
+        {
+          "id": "maxStopwatches",
+          "type": "number",
+          "label": {
+            "en": "Maximum stopwatches",
+            "nl": "Maximaal aantal stopwatches"
+          },
+          "min": 1,
+          "max": 5,
+          "value": 3
+        },
+        {
+          "id": "showLaps",
+          "type": "checkbox",
+          "label": {
+            "en": "Show lap times",
+            "nl": "Toon rondetijden"
+          },
+          "value": false
+        },
+        {
+          "id": "showMilliseconds",
+          "type": "checkbox",
+          "label": {
+            "en": "Show milliseconds",
+            "nl": "Toon milliseconden"
+          },
+          "value": true
+        }
+      ],
+      "id": "stopwatch"
+    },
+    "timer": {
+      "name": {
+        "en": "Timer",
+        "nl": "Timer"
+      },
+      "description": {
+        "en": "Countdown timer with multiple support",
+        "nl": "Afteltimer met ondersteuning voor meerdere timers"
+      },
+      "height": 200,
+      "transparent": true,
+      "settings": [
+        {
+          "id": "allowAddingTimers",
+          "type": "checkbox",
+          "label": {
+            "en": "Allow adding new timers",
+            "nl": "Nieuwe timers toevoegen toestaan"
+          },
+          "value": true
+        },
+        {
+          "id": "debugMode",
+          "type": "checkbox",
+          "label": {
+            "en": "Debug Mode",
+            "nl": "Debug Modus"
+          },
+          "value": false
+        },
+        {
+          "id": "defaultHours",
+          "type": "number",
+          "label": {
+            "en": "Default timer hours",
+            "nl": "Standaard timer uren"
+          },
+          "min": 0,
+          "max": 23,
+          "value": 0
+        },
+        {
+          "id": "defaultMinutes",
+          "type": "number",
+          "label": {
+            "en": "Default timer minutes",
+            "nl": "Standaard timer minuten"
+          },
+          "min": 0,
+          "max": 59,
+          "value": 5
+        },
+        {
+          "id": "defaultSeconds",
+          "type": "number",
+          "label": {
+            "en": "Default timer seconds",
+            "nl": "Standaard timer seconden"
+          },
+          "min": 0,
+          "max": 59,
+          "value": 0
+        },
+        {
+          "id": "initialTimers",
+          "type": "number",
+          "label": {
+            "en": "Number of timers to start with",
+            "nl": "Aantal timers bij starten"
+          },
+          "min": 1,
+          "max": 10,
+          "value": 1
+        },
+        {
+          "id": "maxTimers",
+          "type": "number",
+          "label": {
+            "en": "Maximum number of timers",
+            "nl": "Maximaal aantal timers"
+          },
+          "min": 1,
+          "max": 10,
+          "value": 5
+        }
+      ],
+      "id": "timer"
+    }
+  }
+}

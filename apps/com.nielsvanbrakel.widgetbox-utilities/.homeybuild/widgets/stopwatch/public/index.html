@@ -1,0 +1,682 @@
+<html>
+
+<head>
+  <style>
+    /* Reset & Base */
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    html {
+      overflow: hidden;
+    }
+
+    /* Stopwatch List */
+    .stopwatch-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--homey-su-3);
+      padding: 0;
+    }
+
+    /* Stopwatch Item */
+    .stopwatch-item {
+      display: flex;
+      align-items: center;
+      gap: var(--homey-su-4);
+      padding: var(--homey-su-4);
+      border: var(--homey-line-light);
+      border-radius: var(--homey-border-radius-default);
+      background: var(--homey-background-color);
+      position: relative;
+      overflow: hidden;
+      height: 120px;
+      box-sizing: border-box;
+    }
+
+    .stopwatch-item.fade-in {
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .stopwatch-item.running::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, rgba(34, 197, 94, 0.15), rgba(34, 197, 94, 0.05));
+    }
+
+    /* Controls & Display */
+    .stopwatch-controls {
+      display: flex;
+      flex-direction: row;
+      gap: var(--homey-su-2);
+      z-index: 1;
+      padding-left: var(--homey-su-2);
+    }
+
+    .stopwatch-display {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 1;
+      margin-right: 24px;
+      overflow: hidden;
+      min-height: 0;
+    }
+
+    /* Close Button */
+    .stopwatch-close {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      border: none;
+      border-radius: 50%;
+      background: var(--homey-color-mono-100);
+      color: var(--homey-text-color);
+      font-size: 16px;
+      font-weight: bold;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 2;
+    }
+
+    .stopwatch-close:hover {
+      background: var(--homey-color-mono-200);
+    }
+
+    /* Round Icon Button */
+    .btn-round {
+      width: 56px;
+      height: 56px;
+      padding: 0;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-round:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-round.btn-primary {
+      background-color: var(--homey-color-orange-500);
+    }
+
+    .btn-round.btn-primary:hover:not(:disabled) {
+      background-color: var(--homey-color-orange-500);
+      filter: brightness(0.9);
+    }
+
+    .btn-round.btn-secondary {
+      background-color: var(--homey-color-mono-200);
+    }
+
+    .btn-round.btn-secondary:hover {
+      background-color: var(--homey-color-mono-300);
+    }
+
+    /* Icon */
+    .icon {
+      width: 24px;
+      height: 24px;
+      background: white;
+      -webkit-mask-size: contain;
+      mask-size: contain;
+      -webkit-mask-repeat: no-repeat;
+      mask-repeat: no-repeat;
+      -webkit-mask-position: center;
+      mask-position: center;
+    }
+
+    .btn-secondary .icon {
+      background: var(--homey-text-color);
+    }
+
+    .icon-play {
+      -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>');
+      mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>');
+    }
+
+    .icon-pause {
+      -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/></svg>');
+      mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/></svg>');
+    }
+
+    .icon-reset {
+      -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>');
+      mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>');
+    }
+
+    .icon-lap {
+      -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>');
+      mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>');
+    }
+
+    /* Text Buttons */
+    .btn {
+      padding: var(--homey-su-2) var(--homey-su-3);
+      border: none;
+      border-radius: var(--homey-border-radius-default);
+      font-size: var(--homey-font-size-default);
+      font-weight: var(--homey-font-weight-bold);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-add {
+      width: 100%;
+      padding: var(--homey-su-3);
+      background: var(--homey-color-blue-400);
+      color: white;
+    }
+
+    .btn-add:hover {
+      background: var(--homey-color-blue-500);
+    }
+
+    /* Time Display */
+    .time-display {
+      font-size: 44px;
+      font-weight: 200;
+      color: var(--homey-text-color);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .time-display .milliseconds {
+      font-size: 24px;
+      opacity: 0.7;
+    }
+
+    /* Laps */
+    .laps-container {
+      width: 100%;
+      max-height: 40px;
+      overflow-y: auto;
+      margin-top: var(--homey-su-1);
+      background: var(--homey-color-mono-50);
+      border-radius: var(--homey-border-radius-small);
+    }
+
+    .laps-empty {
+      height: 100%;
+      min-height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--homey-text-color-secondary);
+      font-size: 12px;
+      opacity: 0.5;
+    }
+
+    .lap-item {
+      display: flex;
+      justify-content: space-between;
+      padding: var(--homey-su-1) var(--homey-su-2);
+      font-size: 12px;
+      color: var(--homey-text-color-secondary);
+      border-bottom: var(--homey-line-light);
+    }
+
+    .lap-item:last-child {
+      border-bottom: none;
+    }
+
+    .lap-number {
+      font-weight: var(--homey-font-weight-bold);
+    }
+
+    .lap-time {
+      font-variant-numeric: tabular-nums;
+    }
+
+    .lap-diff {
+      color: var(--homey-text-color);
+      opacity: 0.6;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app"></div>
+
+  <script>
+    // Config defaults (will be overridden by settings)
+    const CONFIG = {
+      STOPWATCH_HEIGHT: 120,
+      DEBUG_HEIGHT: 100,
+      GAP: 12,
+      BTN_HEIGHT: 44,
+      PADDING: 0,
+      CHECKPOINT_INTERVAL: 3000, // Save checkpoint every 3s when running
+      // Settings defaults
+      MAX_STOPWATCHES: 1,
+      ALLOW_ADDING: false,
+      SHOW_MILLISECONDS: true,
+      SHOW_LAPS: false,
+      DEBUG_MODE: false
+    };
+
+    // State
+    let Homey;
+    let widgetId = null;
+    let stopwatches = [];
+    let tickInterval = null;
+    let checkpointInterval = null;
+    let settings = {};
+    let restoreReason = 'cold start';
+    let lastSaveTimestamp = null;
+    let lastSavePayload = null;
+
+    // Translation helper
+    const __ = (key) => Homey?.__(`widgets.stopwatch.${key}`) ?? key;
+
+    // --- Utilities ---
+    const $ = (sel, ctx = document) => ctx.querySelector(sel);
+    const pad = n => String(n).padStart(2, '0');
+    const debugLog = (...args) => CONFIG.DEBUG_MODE && console.log('[Stopwatch]', ...args);
+
+    const formatTime = (ms, showMs = true) => {
+      const totalSeconds = Math.floor(ms / 1000);
+      const h = Math.floor(totalSeconds / 3600);
+      const m = Math.floor((totalSeconds % 3600) / 60);
+      const s = totalSeconds % 60;
+      const msVal = Math.floor((ms % 1000) / 10);
+
+      let timeStr = h > 0 ? `${pad(h)}:${pad(m)}:${pad(s)}` : `${pad(m)}:${pad(s)}`;
+      if (showMs) {
+        timeStr += `<span class="milliseconds">.${pad(msVal)}</span>`;
+      }
+      return timeStr;
+    };
+
+    const calcHeight = () => {
+      const { STOPWATCH_HEIGHT, GAP, BTN_HEIGHT, PADDING, MAX_STOPWATCHES, ALLOW_ADDING, DEBUG_MODE, DEBUG_HEIGHT } = CONFIG;
+      const total = stopwatches.length * STOPWATCH_HEIGHT + Math.max(0, stopwatches.length - 1) * GAP;
+      const canAdd = ALLOW_ADDING && stopwatches.length < MAX_STOPWATCHES;
+      const btnHeight = canAdd ? BTN_HEIGHT + GAP : 0;
+      const debugHeight = DEBUG_MODE ? DEBUG_HEIGHT + GAP : 0;
+      return PADDING + total + btnHeight + debugHeight;
+    };
+
+    const setHeight = () => Homey?.setHeight?.(calcHeight());
+
+    // --- Persistence ---
+
+    /**
+     * Build the state object for persistence
+     * We store START TIMESTAMPS, not current elapsed values!
+     */
+    const buildPersistState = () => {
+      return {
+        stopwatches: stopwatches.map(sw => ({
+          id: sw.id,
+          isRunning: sw.isRunning,
+          // Accumulated time BEFORE current run session
+          elapsedBeforeLastStart: sw.isRunning ? sw.elapsed : sw.elapsed + (sw.startTime ? Date.now() - sw.startTime : 0),
+          // Epoch timestamp when Start was pressed (null if paused)
+          lastStartEpochMs: sw.isRunning ? sw.startTime : null,
+          laps: sw.laps
+        })),
+        updatedAtEpochMs: Date.now()
+      };
+    };
+
+    /**
+     * Save state via Homey API
+     */
+    const saveState = async () => {
+      if (!widgetId) return;
+
+      const state = buildPersistState();
+      lastSavePayload = state;
+      lastSaveTimestamp = Date.now();
+
+      debugLog('Saving state:', state);
+
+      try {
+        await Homey.api('PUT', `/state?widgetId=${encodeURIComponent(widgetId)}`, state);
+      } catch (err) {
+        console.error('Failed to save stopwatch state:', err);
+      }
+    };
+
+    /**
+     * Load state via Homey API
+     */
+    const loadState = async () => {
+      if (!widgetId) return null;
+
+      try {
+        const state = await Homey.api('GET', `/state?widgetId=${encodeURIComponent(widgetId)}`);
+        debugLog('Loaded state:', state);
+        return state;
+      } catch (err) {
+        console.error('Failed to load stopwatch state:', err);
+        return null;
+      }
+    };
+
+    /**
+     * Restore stopwatches from saved state
+     * Calculates elapsed time using timestamps (handles screen-off time!)
+     */
+    const restoreFromState = (savedState) => {
+      if (!savedState || !savedState.stopwatches || savedState.stopwatches.length === 0) {
+        return false;
+      }
+
+      restoreReason = 'restored from persistence';
+      const now = Date.now();
+
+      stopwatches = savedState.stopwatches.map(saved => {
+        if (saved.isRunning && saved.lastStartEpochMs) {
+          // Was running - calculate how much time passed since we started
+          const timeSinceStart = now - saved.lastStartEpochMs;
+          return {
+            id: saved.id,
+            elapsed: saved.elapsedBeforeLastStart, // Keep original accumulated
+            startTime: saved.lastStartEpochMs,     // Keep original start time!
+            isRunning: true,
+            laps: saved.laps || [],
+            isNew: false
+          };
+        } else {
+          // Was paused - just restore the frozen elapsed time
+          return {
+            id: saved.id,
+            elapsed: saved.elapsedBeforeLastStart,
+            startTime: null,
+            isRunning: false,
+            laps: saved.laps || [],
+            isNew: false
+          };
+        }
+      });
+
+      debugLog('Restored stopwatches:', stopwatches);
+      return true;
+    };
+
+    /**
+     * Start periodic checkpoint saves (only when running)
+     */
+    const startCheckpoint = () => {
+      if (!checkpointInterval) {
+        checkpointInterval = setInterval(() => {
+          if (stopwatches.some(sw => sw.isRunning)) {
+            saveState();
+          }
+        }, CONFIG.CHECKPOINT_INTERVAL);
+      }
+    };
+
+    const stopCheckpoint = () => {
+      if (checkpointInterval) {
+        clearInterval(checkpointInterval);
+        checkpointInterval = null;
+      }
+    };
+
+    // --- Stopwatch CRUD ---
+    const createStopwatch = () => ({
+      id: crypto.randomUUID(),
+      elapsed: 0,
+      startTime: null,
+      isRunning: false,
+      laps: [],
+      isNew: true
+    });
+
+    const getStopwatch = id => stopwatches.find(s => s.id === id);
+
+    const toggleStopwatch = (id) => {
+      const sw = getStopwatch(id);
+      if (!sw) return;
+
+      if (sw.isRunning) {
+        // Pause
+        sw.elapsed += Date.now() - sw.startTime;
+        sw.startTime = null;
+        sw.isRunning = false;
+      } else {
+        // Start
+        sw.startTime = Date.now();
+        sw.isRunning = true;
+        startTick();
+        startCheckpoint();
+      }
+
+      render();
+      saveState(); // Save on state transition
+    };
+
+    const resetStopwatch = (id) => {
+      const sw = getStopwatch(id);
+      if (!sw) return;
+
+      Object.assign(sw, {
+        elapsed: 0,
+        startTime: null,
+        isRunning: false,
+        laps: []
+      });
+
+      render();
+      setHeight();
+      saveState(); // Save on reset
+    };
+
+    const lapStopwatch = (id) => {
+      const sw = getStopwatch(id);
+      if (!sw || !sw.isRunning) return;
+
+      const currentTime = sw.elapsed + (Date.now() - sw.startTime);
+      const lastLapTime = sw.laps.length > 0 ? sw.laps[0].total : 0;
+
+      sw.laps.unshift({
+        number: sw.laps.length + 1,
+        time: currentTime - lastLapTime,
+        total: currentTime
+      });
+
+      render();
+      saveState(); // Save on lap
+    };
+
+    const removeStopwatch = (id) => {
+      stopwatches = stopwatches.filter(s => s.id !== id);
+      render();
+      setHeight();
+      saveState(); // Save on remove
+    };
+
+    const addStopwatch = () => {
+      if (stopwatches.length >= CONFIG.MAX_STOPWATCHES) return;
+      stopwatches.push(createStopwatch());
+      render();
+      setHeight();
+      saveState(); // Save on add
+    };
+
+    // --- Tick Loop ---
+    const tick = () => {
+      let anyRunning = false;
+
+      for (const sw of stopwatches) {
+        if (!sw.isRunning) continue;
+        anyRunning = true;
+        updateDisplay(sw);
+      }
+
+      if (!anyRunning && tickInterval) {
+        clearInterval(tickInterval);
+        tickInterval = null;
+        stopCheckpoint();
+      }
+    };
+
+    const startTick = () => {
+      if (!tickInterval) tickInterval = setInterval(tick, 50);
+    };
+
+    const updateDisplay = (sw) => {
+      const el = $(`[data-stopwatch="${sw.id}"]`);
+      if (!el) return;
+
+      const timeEl = $('.time-display', el);
+      if (timeEl) {
+        const currentTime = sw.elapsed + (sw.startTime ? Date.now() - sw.startTime : 0);
+        timeEl.innerHTML = formatTime(currentTime, CONFIG.SHOW_MILLISECONDS);
+      }
+    };
+
+    // --- Debug Panel ---
+    const renderDebugPanel = () => {
+      if (!CONFIG.DEBUG_MODE) return '';
+
+      const payload = lastSavePayload ? JSON.stringify(lastSavePayload, null, 2) : 'No saves yet';
+      const timestamp = lastSaveTimestamp ? new Date(lastSaveTimestamp).toLocaleTimeString() : 'Never';
+
+      return `
+        <div class="debug-panel" style="background: var(--homey-color-mono-100); padding: 8px; border-radius: 8px; font-size: 10px; font-family: monospace; margin-top: 8px;">
+          <div><strong>Widget ID:</strong> ${widgetId}</div>
+          <div><strong>Restore Reason:</strong> ${restoreReason}</div>
+          <div><strong>Last Save:</strong> ${timestamp}</div>
+          <details>
+            <summary>Last Payload</summary>
+            <pre style="font-size: 9px; overflow: auto; max-height: 60px;">${payload}</pre>
+          </details>
+        </div>
+      `;
+    };
+
+    // --- Rendering ---
+    const renderLaps = (sw) => {
+      if (sw.laps.length === 0) {
+        return `<div class="laps-container"><div class="laps-empty">${__('noLaps')}</div></div>`;
+      }
+
+      const lapsHtml = sw.laps.map(lap => `
+        <div class="lap-item">
+          <span class="lap-number">${__('lap')} ${lap.number}</span>
+          <span class="lap-diff">+${formatTime(lap.time, CONFIG.SHOW_MILLISECONDS)}</span>
+          <span class="lap-time">${formatTime(lap.total, CONFIG.SHOW_MILLISECONDS)}</span>
+        </div>
+      `).join('');
+
+      return `<div class="laps-container">${lapsHtml}</div>`;
+    };
+
+    const renderStopwatch = (sw) => {
+      const { isRunning, id, isNew, elapsed, startTime } = sw;
+      const isPaused = !isRunning && elapsed > 0;
+      const currentTime = elapsed + (startTime ? Date.now() - startTime : 0);
+
+      if (isNew) sw.isNew = false;
+
+      const classes = ['stopwatch-item', isNew && 'fade-in', isRunning && 'running'].filter(Boolean).join(' ');
+
+      // Determine which buttons to show
+      let controlBtn = `<button class="btn-round btn-primary" onclick="toggleStopwatch('${id}')"><div class="icon ${isRunning ? 'icon-pause' : 'icon-play'}"></div></button>`;
+      let secondBtn = '';
+
+      if (isRunning && CONFIG.SHOW_LAPS) {
+        secondBtn = `<button class="btn-round btn-secondary" onclick="lapStopwatch('${id}')"><div class="icon icon-lap"></div></button>`;
+      } else if (isPaused) {
+        secondBtn = `<button class="btn-round btn-secondary" onclick="resetStopwatch('${id}')"><div class="icon icon-reset"></div></button>`;
+      }
+
+      return `
+        <div class="${classes}" data-stopwatch="${id}">
+          ${stopwatches.length > 1 ? `<button class="stopwatch-close" onclick="removeStopwatch('${id}')">×</button>` : ''}
+          <div class="stopwatch-controls">
+            ${controlBtn}
+            ${secondBtn}
+          </div>
+          <div class="stopwatch-display">
+            <div class="time-display">${formatTime(currentTime, CONFIG.SHOW_MILLISECONDS)}</div>
+            ${CONFIG.SHOW_LAPS ? renderLaps(sw) : ''}
+          </div>
+        </div>`;
+    };
+
+    const render = () => {
+      const content = stopwatches.map(renderStopwatch).join('');
+      const canAdd = CONFIG.ALLOW_ADDING && stopwatches.length < CONFIG.MAX_STOPWATCHES;
+      const addBtn = canAdd
+        ? `<button class="btn btn-add" onclick="addStopwatch()">${__('addStopwatch')}</button>`
+        : '';
+      $('#app').innerHTML = `<div class="stopwatch-list">${content}${addBtn}</div>${renderDebugPanel()}`;
+    };
+
+    // --- Init ---
+    window.onHomeyReady = async (homey) => {
+      Homey = homey;
+      settings = Homey.getSettings() || {};
+
+      // Get widget instance ID from Homey
+      widgetId = Homey.getWidgetInstanceId();
+      debugLog('Widget ID:', widgetId);
+
+      // Apply settings to CONFIG
+      CONFIG.MAX_STOPWATCHES = settings.maxStopwatches ?? CONFIG.MAX_STOPWATCHES;
+      CONFIG.ALLOW_ADDING = settings.allowAddingStopwatches ?? CONFIG.ALLOW_ADDING;
+      CONFIG.SHOW_MILLISECONDS = settings.showMilliseconds ?? CONFIG.SHOW_MILLISECONDS;
+      CONFIG.SHOW_LAPS = settings.showLaps ?? CONFIG.SHOW_LAPS;
+      CONFIG.DEBUG_MODE = settings.debugMode ?? CONFIG.DEBUG_MODE;
+
+      // Try to restore from persistence
+      const savedState = await loadState();
+      const restored = restoreFromState(savedState);
+
+      if (!restored) {
+        // No saved state - create initial stopwatch
+        const sw = createStopwatch();
+        sw.isNew = false;
+        stopwatches.push(sw);
+      }
+
+      // If any stopwatch is running, start the tick loop
+      if (stopwatches.some(sw => sw.isRunning)) {
+        startTick();
+        startCheckpoint();
+      }
+
+      render();
+      Homey.ready({ height: calcHeight() });
+    };
+  </script>
+</body>
+
+</html>

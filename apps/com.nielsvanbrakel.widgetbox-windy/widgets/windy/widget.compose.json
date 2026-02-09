@@ -1,0 +1,360 @@
+{
+  "name": {
+    "en": "Windy",
+    "nl": "Windy"
+  },
+  "description": {
+    "en": "Interactive weather map with wind and weather data",
+    "nl": "Interactieve weerskaart met wind- en weergegevens"
+  },
+  "height": 250,
+  "settings": [
+    {
+      "id": "aspectRatio",
+      "type": "dropdown",
+      "label": {
+        "en": "Aspect Ratio",
+        "nl": "Beeldverhouding"
+      },
+      "value": "16:9",
+      "values": [
+        {
+          "id": "1:1",
+          "label": {
+            "en": "Square (1:1)",
+            "nl": "Vierkant (1:1)"
+          }
+        },
+        {
+          "id": "4:3",
+          "label": {
+            "en": "4:3",
+            "nl": "4:3"
+          }
+        },
+        {
+          "id": "16:9",
+          "label": {
+            "en": "16:9 (Default)",
+            "nl": "16:9 (Standaard)"
+          }
+        },
+        {
+          "id": "21:9",
+          "label": {
+            "en": "Ultrawide (21:9)",
+            "nl": "Ultrabreed (21:9)"
+          }
+        },
+        {
+          "id": "3:1",
+          "label": {
+            "en": "Panoramic (3:1)",
+            "nl": "Panoramisch (3:1)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "detail",
+      "type": "checkbox",
+      "label": {
+        "en": "Show Detail View",
+        "nl": "Toon Detailweergave"
+      },
+      "value": false
+    },
+    {
+      "id": "detailLatitude",
+      "type": "text",
+      "label": {
+        "en": "Detail Latitude (leave blank to use main latitude)",
+        "nl": "Detail Breedtegraad (leeg laten voor hoofd breedtegraad)"
+      },
+      "value": ""
+    },
+    {
+      "id": "detailLongitude",
+      "type": "text",
+      "label": {
+        "en": "Detail Longitude (leave blank to use main longitude)",
+        "nl": "Detail Lengtegraad (leeg laten voor hoofd lengtegraad)"
+      },
+      "value": ""
+    },
+    {
+      "id": "latitude",
+      "type": "text",
+      "label": {
+        "en": "Latitude",
+        "nl": "Breedtegraad"
+      },
+      "value": "52.22"
+    },
+    {
+      "id": "level",
+      "type": "dropdown",
+      "label": {
+        "en": "Height Level",
+        "nl": "Hoogtestadium"
+      },
+      "value": "surface",
+      "values": [
+        {
+          "id": "surface",
+          "label": {
+            "en": "Surface",
+            "nl": "Oppervlak"
+          }
+        },
+        {
+          "id": "10m",
+          "label": {
+            "en": "10m",
+            "nl": "10m"
+          }
+        },
+        {
+          "id": "100m",
+          "label": {
+            "en": "100m",
+            "nl": "100m"
+          }
+        }
+      ]
+    },
+    {
+      "id": "longitude",
+      "type": "text",
+      "label": {
+        "en": "Longitude",
+        "nl": "Lengtegraad"
+      },
+      "value": "6.01"
+    },
+    {
+      "id": "marker",
+      "type": "checkbox",
+      "label": {
+        "en": "Show Location Marker",
+        "nl": "Toon Locatiemarkering"
+      },
+      "value": true
+    },
+    {
+      "id": "message",
+      "type": "checkbox",
+      "label": {
+        "en": "Hide promo message",
+        "nl": "Verberg promotie Bericht"
+      },
+      "value": true
+    },
+    {
+      "id": "metricRain",
+      "type": "dropdown",
+      "label": {
+        "en": "Rain Metric",
+        "nl": "Regenmetriek"
+      },
+      "value": "default",
+      "values": [
+        {
+          "id": "default",
+          "label": {
+            "en": "Default",
+            "nl": "Standaard"
+          }
+        },
+        {
+          "id": "mm",
+          "label": {
+            "en": "Millimeters",
+            "nl": "Millimeters"
+          }
+        },
+        {
+          "id": "in",
+          "label": {
+            "en": "Inches",
+            "nl": "Inches"
+          }
+        }
+      ]
+    },
+    {
+      "id": "metricTemp",
+      "type": "dropdown",
+      "label": {
+        "en": "Temperature Metric",
+        "nl": "Temperatuurmetriek"
+      },
+      "value": "default",
+      "values": [
+        {
+          "id": "default",
+          "label": {
+            "en": "Default",
+            "nl": "Standaard"
+          }
+        },
+        {
+          "id": "°C",
+          "label": {
+            "en": "Celsius",
+            "nl": "Celsius"
+          }
+        },
+        {
+          "id": "°F",
+          "label": {
+            "en": "Fahrenheit",
+            "nl": "Fahrenheit"
+          }
+        }
+      ]
+    },
+    {
+      "id": "metricWind",
+      "type": "dropdown",
+      "label": {
+        "en": "Wind Metric",
+        "nl": "Windmetriek"
+      },
+      "value": "default",
+      "values": [
+        {
+          "id": "default",
+          "label": {
+            "en": "Default",
+            "nl": "Standaard"
+          }
+        },
+        {
+          "id": "kmh",
+          "label": {
+            "en": "Km/h",
+            "nl": "Km/h"
+          }
+        },
+        {
+          "id": "mph",
+          "label": {
+            "en": "Mph",
+            "nl": "Mph"
+          }
+        },
+        {
+          "id": "ms",
+          "label": {
+            "en": "M/s",
+            "nl": "M/s"
+          }
+        },
+        {
+          "id": "knots",
+          "label": {
+            "en": "Knots",
+            "nl": "Knopen"
+          }
+        }
+      ]
+    },
+    {
+      "id": "overlay",
+      "type": "dropdown",
+      "label": {
+        "en": "Overlay",
+        "nl": "Overlay"
+      },
+      "value": "wind",
+      "values": [
+        {
+          "id": "wind",
+          "label": {
+            "en": "Wind",
+            "nl": "Wind"
+          }
+        },
+        {
+          "id": "temp",
+          "label": {
+            "en": "Temperature",
+            "nl": "Temperatuur"
+          }
+        },
+        {
+          "id": "rain",
+          "label": {
+            "en": "Rain",
+            "nl": "Regen"
+          }
+        },
+        {
+          "id": "clouds",
+          "label": {
+            "en": "Clouds",
+            "nl": "Wolken"
+          }
+        },
+        {
+          "id": "pressure",
+          "label": {
+            "en": "Pressure",
+            "nl": "Luchtdruk"
+          }
+        }
+      ]
+    },
+    {
+      "id": "pressure",
+      "type": "checkbox",
+      "label": {
+        "en": "Show Pressure",
+        "nl": "Toon Luchtdruk"
+      },
+      "value": false
+    },
+    {
+      "id": "product",
+      "type": "dropdown",
+      "label": {
+        "en": "Forecast Model",
+        "nl": "Voorspellingsmodel"
+      },
+      "value": "ecmwf",
+      "values": [
+        {
+          "id": "ecmwf",
+          "label": {
+            "en": "ECMWF",
+            "nl": "ECMWF"
+          }
+        },
+        {
+          "id": "gfs",
+          "label": {
+            "en": "GFS",
+            "nl": "GFS"
+          }
+        },
+        {
+          "id": "nam",
+          "label": {
+            "en": "NAM",
+            "nl": "NAM"
+          }
+        }
+      ]
+    },
+    {
+      "id": "zoom",
+      "type": "number",
+      "label": {
+        "en": "Zoom Level",
+        "nl": "Zoomniveau"
+      },
+      "value": 5
+    }
+  ]
+}

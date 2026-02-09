@@ -1,0 +1,21 @@
+<html>
+  <body>
+    <script type="text/javascript">
+      // State of the widget
+      let currentSettings = {};
+
+      function getHeightPixels() {
+        const baseHeight = 4;
+        const multiplier = currentSettings.heightMultiplier;
+        return baseHeight * multiplier;
+      }
+
+      async function onHomeyReady(Homey) {
+        currentSettings = Homey.getSettings();
+        const heightPx = getHeightPixels();
+
+        Homey.ready({ height: heightPx });
+      }
+    </script>
+  </body>
+</html>

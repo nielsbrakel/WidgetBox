@@ -1,0 +1,895 @@
+<html>
+
+<head>
+  <style>
+    /* Reset & Base */
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    html {
+      overflow: hidden;
+    }
+
+    /* Timer List */
+    .timer-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--homey-su-3);
+      padding: 0;
+    }
+
+    /* Timer Item */
+    .timer-item {
+      display: flex;
+      align-items: center;
+      gap: var(--homey-su-4);
+      padding: var(--homey-su-4);
+      border: var(--homey-line-light);
+      border-radius: var(--homey-border-radius-default);
+      background: var(--homey-background-color);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .timer-item.fade-in {
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .timer-item::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      right: auto;
+      width: var(--progress, 0%);
+      background: linear-gradient(90deg, rgba(96, 165, 250, 0.15), rgba(96, 165, 250, 0.05));
+      transition: width 0.2s linear;
+    }
+
+    .timer-item.finished::before {
+      background: linear-gradient(90deg, rgba(239, 68, 68, 0.3), rgba(239, 68, 68, 0.15));
+      width: 100%;
+    }
+
+    .timer-item.shake {
+      animation: shake 0.15s ease-in-out 20;
+    }
+
+    @keyframes shake {
+
+      0%,
+      100% {
+        transform: translateX(0);
+      }
+
+      25% {
+        transform: translateX(-3px);
+      }
+
+      75% {
+        transform: translateX(3px);
+      }
+    }
+
+    /* Controls & Display */
+    .timer-controls {
+      display: flex;
+      flex-direction: row;
+      gap: var(--homey-su-2);
+      z-index: 1;
+      padding-left: var(--homey-su-2);
+    }
+
+    .timer-display {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1;
+      height: 86px;
+      margin-right: 24px;
+    }
+
+    /* Close Button */
+    .timer-close {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      border: none;
+      border-radius: 50%;
+      background: var(--homey-color-mono-100);
+      color: var(--homey-text-color);
+      font-size: 16px;
+      font-weight: bold;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 2;
+    }
+
+    .timer-close:hover {
+      background: var(--homey-color-mono-200);
+    }
+
+    /* Round Icon Button */
+    .btn-round {
+      width: 56px;
+      height: 56px;
+      padding: 0;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-round:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-round.btn-primary {
+      background-color: var(--homey-color-orange-500);
+    }
+
+    .btn-round.btn-primary:hover:not(:disabled) {
+      background-color: var(--homey-color-orange-500);
+      filter: brightness(0.9);
+    }
+
+    .btn-round.btn-secondary {
+      background-color: var(--homey-color-mono-200);
+    }
+
+    .btn-round.btn-secondary:hover {
+      background-color: var(--homey-color-mono-300);
+    }
+
+    /* Icon */
+    .icon {
+      width: 24px;
+      height: 24px;
+      background: white;
+      -webkit-mask-size: contain;
+      mask-size: contain;
+      -webkit-mask-repeat: no-repeat;
+      mask-repeat: no-repeat;
+      -webkit-mask-position: center;
+      mask-position: center;
+    }
+
+    .btn-secondary .icon {
+      background: var(--homey-text-color);
+    }
+
+    .icon-play {
+      -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>');
+      mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>');
+    }
+
+    .icon-pause {
+      -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/></svg>');
+      mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/></svg>');
+    }
+
+    .icon-reset {
+      -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>');
+      mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>');
+    }
+
+    /* Text Buttons */
+    .btn {
+      padding: var(--homey-su-2) var(--homey-su-3);
+      border: none;
+      border-radius: var(--homey-border-radius-default);
+      font-size: var(--homey-font-size-default);
+      font-weight: var(--homey-font-weight-bold);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn.btn-primary {
+      background: var(--homey-color-green-400);
+      color: white;
+    }
+
+    .btn.btn-primary:hover:not(:disabled) {
+      background: var(--homey-color-green-500);
+    }
+
+    .btn.btn-secondary {
+      background: var(--homey-color-mono-200);
+      color: var(--homey-text-color);
+    }
+
+    .btn.btn-secondary:hover {
+      background: var(--homey-color-mono-300);
+    }
+
+    .btn-add {
+      width: 100%;
+      padding: var(--homey-su-3);
+      background: var(--homey-color-blue-400);
+      color: white;
+    }
+
+    .btn-add:hover {
+      background: var(--homey-color-blue-500);
+    }
+
+    /* Time Picker */
+    .picker {
+      display: flex;
+      align-items: center;
+      gap: var(--homey-su-2);
+    }
+
+    .picker-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .picker-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--homey-text-color-secondary);
+      opacity: 0.7;
+    }
+
+    .picker-scroll {
+      height: 66px;
+      width: 48px;
+      overflow: hidden;
+      background: var(--homey-color-mono-100);
+      border-radius: 10px;
+      cursor: grab;
+      position: relative;
+    }
+
+    .picker-scroll::before,
+    .picker-scroll::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 16px;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .picker-scroll::before {
+      top: 0;
+      background: linear-gradient(to bottom, var(--homey-color-mono-100), transparent);
+    }
+
+    .picker-scroll::after {
+      bottom: 0;
+      background: linear-gradient(to top, var(--homey-color-mono-100), transparent);
+    }
+
+    .picker-scroll:active {
+      cursor: grabbing;
+    }
+
+    .picker-values {
+      position: absolute;
+      width: 100%;
+      transition: transform 0.15s ease-out;
+    }
+
+    .picker-val {
+      height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: var(--homey-text-color-secondary);
+      opacity: 0.4;
+      transition: all 0.15s ease;
+    }
+
+    .picker-val.active {
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--homey-text-color);
+      opacity: 1;
+    }
+
+    .picker-sep {
+      font-size: 24px;
+      font-weight: 300;
+      color: var(--homey-text-color);
+      opacity: 0.5;
+      align-self: flex-end;
+      margin-bottom: 22px;
+    }
+
+    /* Countdown */
+    .countdown {
+      font-size: 44px;
+      font-weight: 200;
+      color: var(--homey-text-color);
+    }
+
+    .countdown.finished {
+      color: var(--homey-color-red-500);
+    }
+
+    /* Debug Button Styles */
+    .debug-indicator {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(255, 0, 0, 0.7);
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: bold;
+      z-index: 100;
+      cursor: pointer;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+
+    .debug-indicator.visible {
+      opacity: 1;
+      pointer-events: all;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app"></div>
+
+  <script>
+    // Config defaults (will be overridden by settings)
+    const CONFIG = {
+      ITEM_HEIGHT: 22,
+      MAX_TIMERS: 5,
+      TIMER_HEIGHT: 120,
+      DEBUG_HEIGHT: 100,
+      GAP: 12,
+      BTN_HEIGHT: 44,
+      PADDING: 0,
+      CHECKPOINT_INTERVAL: 3000, // Save checkpoint every 3s when running
+      LIMITS: { hours: 23, minutes: 59, seconds: 59 },
+      // Settings defaults
+      INITIAL_TIMERS: 1,
+      ALLOW_ADDING: true,
+      DEFAULT_HOURS: 0,
+      DEFAULT_MINUTES: 5,
+      DEFAULT_SECONDS: 0,
+      DEBUG_MODE: false
+    };
+
+    // State
+    let Homey;
+    let widgetId = null;
+    let timers = [];
+    let tickInterval = null;
+    let checkpointInterval = null;
+    let settings = {};
+    let restoreReason = 'cold start';
+    let lastSaveTimestamp = null;
+    let lastSavePayload = null;
+
+    // Translation helper
+    const __ = (key) => Homey?.__(`widgets.timer.${key}`) ?? key;
+
+    // --- Utilities ---
+    const $ = (sel, ctx = document) => ctx.querySelector(sel);
+    const $$ = (sel, ctx = document) => ctx.querySelectorAll(sel);
+    const pad = n => String(n).padStart(2, '0');
+    const clamp = (val, min, max) => Math.max(min, Math.min(max, val));
+    const debugLog = (...args) => CONFIG.DEBUG_MODE && console.log('[Timer]', ...args);
+
+    const formatTime = (secs) => {
+      const h = Math.floor(secs / 3600);
+      const m = Math.floor((secs % 3600) / 60);
+      const s = secs % 60;
+      return h > 0 ? `${pad(h)}:${pad(m)}:${pad(s)}` : `${pad(m)}:${pad(s)}`;
+    };
+
+    const vibrate = () => navigator.vibrate?.([200, 100, 200]);
+
+    const calcHeight = () => {
+      const { TIMER_HEIGHT, GAP, BTN_HEIGHT, PADDING, MAX_TIMERS, ALLOW_ADDING, DEBUG_MODE, DEBUG_HEIGHT } = CONFIG;
+      const timerTotal = timers.length * TIMER_HEIGHT + Math.max(0, timers.length - 1) * GAP;
+      const canAdd = ALLOW_ADDING && timers.length < MAX_TIMERS;
+      const btnHeight = canAdd ? BTN_HEIGHT + GAP : 0;
+      const debugHeight = DEBUG_MODE ? DEBUG_HEIGHT + GAP : 0;
+      return PADDING + timerTotal + btnHeight + debugHeight;
+    };
+
+    const setHeight = () => Homey?.setHeight?.(calcHeight());
+
+    // --- Persistence ---
+
+    /**
+     * Build the state object for persistence
+     */
+    const buildPersistState = () => {
+      return {
+        timers: timers.map(t => ({
+          id: t.id,
+          hours: t.hours,
+          minutes: t.minutes,
+          seconds: t.seconds,
+          duration: t.duration,
+          isRunning: t.isRunning,
+          isSetup: t.isSetup,
+          shakeShown: t.shakeShown,
+          remainingAtLastStart: t.isRunning ? t.pausedTime : t.remaining,
+          lastStartEpochMs: t.isRunning ? t.startTime : null
+        })),
+        updatedAtEpochMs: Date.now()
+      };
+    };
+
+    /**
+     * Save state via LocalStorage (Homey API fallback)
+     */
+    const saveState = async () => {
+      if (!widgetId) return;
+
+      const state = buildPersistState();
+      lastSavePayload = state;
+      lastSaveTimestamp = Date.now();
+
+      debugLog('Saving state:', state);
+
+      try {
+        // Use LocalStorage prefixed with widgetId
+        localStorage.setItem(`dashy_timer_${widgetId}`, JSON.stringify(state));
+
+        // Optionally try Homey API too if needed, but LocalStorage is reliable for this view
+        // await Homey.api('PUT', `/state?widgetId=${encodeURIComponent(widgetId)}`, state);
+      } catch (err) {
+        console.error('Failed to save timer state:', err);
+      }
+    };
+
+    /**
+     * Load state via LocalStorage
+     */
+    const loadState = async () => {
+      if (!widgetId) return null;
+
+      try {
+        const raw = localStorage.getItem(`dashy_timer_${widgetId}`);
+        if (!raw) return null;
+
+        const state = JSON.parse(raw);
+        debugLog('Loaded state:', state);
+        return state;
+      } catch (err) {
+        console.error('Failed to load timer state:', err);
+        return null;
+      }
+    };
+
+    /**
+     * Restore timers from saved state
+     */
+    const restoreFromState = (savedState) => {
+      if (!savedState || !savedState.timers || savedState.timers.length === 0) {
+        return false;
+      }
+
+      restoreReason = 'restored from storage';
+      const now = Date.now();
+
+      timers = savedState.timers.map(saved => {
+        const timer = {
+          id: saved.id,
+          hours: saved.hours,
+          minutes: saved.minutes,
+          seconds: saved.seconds,
+          duration: saved.duration,
+          isSetup: saved.isSetup,
+          shakeShown: saved.shakeShown || false,
+          isNew: false
+        };
+
+        if (saved.isRunning && saved.lastStartEpochMs) {
+          const timeSinceStartMs = now - saved.lastStartEpochMs;
+          const timeSinceStartSecs = Math.floor(timeSinceStartMs / 1000);
+
+          timer.remaining = Math.max(0, saved.remainingAtLastStart - timeSinceStartSecs);
+
+          if (timer.remaining > 0) {
+            timer.isRunning = true;
+            timer.startTime = now;
+            timer.pausedTime = timer.remaining;
+          } else {
+            timer.isRunning = false;
+            timer.remaining = 0;
+            debugLog('Timer finished while gone:', timer.id);
+          }
+        } else {
+          timer.remaining = saved.remainingAtLastStart ?? saved.duration;
+          timer.isRunning = false;
+          timer.startTime = null;
+          timer.pausedTime = timer.remaining;
+        }
+
+        return timer;
+      });
+
+      debugLog('Restored timers:', timers);
+      return true;
+    };
+
+    /**
+     * Start periodic checkpoint saves (only when running)
+     */
+    const startCheckpoint = () => {
+      if (!checkpointInterval) {
+        checkpointInterval = setInterval(() => {
+          if (timers.some(t => t.isRunning)) {
+            saveState();
+          }
+        }, CONFIG.CHECKPOINT_INTERVAL);
+      }
+    };
+
+    const stopCheckpoint = () => {
+      if (checkpointInterval) {
+        clearInterval(checkpointInterval);
+        checkpointInterval = null;
+      }
+    };
+
+    // --- Timer CRUD ---
+    const createTimer = () => {
+      const hours = settings.defaultHours ?? CONFIG.DEFAULT_HOURS;
+      const minutes = settings.defaultMinutes ?? CONFIG.DEFAULT_MINUTES;
+      const seconds = settings.defaultSeconds ?? CONFIG.DEFAULT_SECONDS;
+      const duration = hours * 3600 + minutes * 60 + seconds;
+      return {
+        id: crypto.randomUUID(),
+        hours, minutes, seconds,
+        duration, remaining: duration,
+        isRunning: false, isSetup: true,
+        shakeShown: false,
+        isNew: true
+      };
+    };
+
+    const getTimer = id => timers.find(t => t.id === id);
+
+    const updatePicker = (id, field, delta) => {
+      const timer = getTimer(id);
+      if (!timer?.isSetup) return;
+
+      timer[field] = clamp(timer[field] + delta, 0, CONFIG.LIMITS[field]);
+      timer.duration = timer.remaining = timer.hours * 3600 + timer.minutes * 60 + timer.seconds;
+      render();
+      saveState(); // Save on picker change
+    };
+
+    const toggleTimer = (id) => {
+      const timer = getTimer(id);
+      if (!timer) return;
+
+      if (timer.isSetup) {
+        if (timer.duration === 0) return;
+        timer.isSetup = false;
+        timer.isRunning = true;
+      } else {
+        timer.isRunning = !timer.isRunning;
+      }
+
+      if (timer.isRunning) {
+        timer.startTime = Date.now();
+        timer.pausedTime = timer.remaining;
+        startTick();
+        startCheckpoint();
+      } else {
+        // Saving pause state explicitly
+        timer.pausedTime = timer.remaining;
+      }
+
+      render();
+      setHeight();
+      saveState(); // Save on toggle
+    };
+
+    const resetTimer = (id) => {
+      const timer = getTimer(id);
+      if (!timer) return;
+
+      Object.assign(timer, {
+        isRunning: false,
+        isSetup: true,
+        remaining: timer.duration,
+        shakeShown: false
+      });
+
+      render();
+      setHeight();
+      saveState(); // Save on reset
+    };
+
+    const removeTimer = (id) => {
+      timers = timers.filter(t => t.id !== id);
+      render();
+      setHeight();
+      saveState(); // Save on remove
+    };
+
+    const addTimer = () => {
+      if (timers.length >= CONFIG.MAX_TIMERS) return;
+      timers.push(createTimer());
+      render();
+      setHeight();
+      saveState(); // Save on add
+    };
+
+    // --- Tick Loop ---
+    const tick = () => {
+      let anyRunning = false;
+
+      for (const timer of timers) {
+        if (!timer.isRunning) continue;
+        anyRunning = true;
+
+        const wasActive = timer.remaining > 0;
+        timer.remaining = Math.max(0, timer.pausedTime - Math.floor((Date.now() - timer.startTime) / 1000));
+
+        if (timer.remaining === 0 && wasActive) {
+          timer.isRunning = false;
+          vibrate();
+          saveState(); // Save when timer finishes
+          render();
+        } else {
+          updateDisplay(timer);
+        }
+      }
+
+      if (!anyRunning && tickInterval) {
+        clearInterval(tickInterval);
+        tickInterval = null;
+        stopCheckpoint();
+      }
+    };
+
+    const startTick = () => {
+      if (!tickInterval) tickInterval = setInterval(tick, 100);
+    };
+
+    const updateDisplay = (timer) => {
+      const el = $(`[data-timer="${timer.id}"]`);
+      if (!el) return;
+
+      const countdown = $('.countdown', el);
+      const finished = timer.remaining <= 0;
+
+      if (countdown) {
+        countdown.textContent = formatTime(timer.remaining);
+        countdown.classList.toggle('finished', finished);
+      }
+
+      el.style.setProperty('--progress', `${(timer.remaining / timer.duration) * 100}%`);
+      el.classList.toggle('finished', finished);
+    };
+
+    // --- Debug Panel ---
+    const renderDebugPanel = () => {
+      if (!CONFIG.DEBUG_MODE) return '';
+
+      const payload = lastSavePayload ? JSON.stringify(lastSavePayload, null, 2) : 'No saves yet';
+      const timestamp = lastSaveTimestamp ? new Date(lastSaveTimestamp).toLocaleTimeString() : 'Never';
+
+      return `
+        <div class="debug-panel" style="background: var(--homey-color-mono-100); padding: 8px; border-radius: 8px; font-size: 10px; font-family: monospace; margin-top: 8px;">
+          <div><strong>Widget ID:</strong> ${widgetId}</div>
+          <div><strong>Restore Reason:</strong> ${restoreReason}</div>
+          <div><strong>Last Save:</strong> ${timestamp}</div>
+          <details>
+            <summary>Last Payload</summary>
+            <pre style="font-size: 9px; overflow: auto; max-height: 60px;">${payload}</pre>
+          </details>
+        </div>
+      `;
+    };
+
+    // --- Rendering ---
+    const renderPickerCol = (timer, field, labelKey, max) => {
+      const value = timer[field];
+      const offset = CONFIG.ITEM_HEIGHT * (1 - value);
+      const items = Array.from({ length: max + 1 }, (_, i) =>
+        `<div class="picker-val${i === value ? ' active' : ''}" 
+              onclick="updatePicker('${timer.id}','${field}',${i - value})">${pad(i)}</div>`
+      ).join('');
+
+      return `
+        <div class="picker-col">
+          <div class="picker-label">${__(labelKey)}</div>
+          <div class="picker-scroll" data-id="${timer.id}" data-field="${field}">
+            <div class="picker-values" style="transform:translateY(${offset}px)">${items}</div>
+          </div>
+        </div>`;
+    };
+
+    const renderTimer = (timer) => {
+      const { isSetup, isRunning, duration, remaining, id, shakeShown, isNew } = timer;
+      const finished = !isSetup && remaining <= 0;
+      const showShake = finished && !shakeShown;
+
+      if (showShake) timer.shakeShown = true;
+
+      const classes = ['timer-item', finished && 'finished', showShake && 'shake', isNew && 'fade-in'].filter(Boolean).join(' ');
+      if (isNew) timer.isNew = false;
+      const progress = !isSetup && duration > 0 ? (remaining / duration) * 100 : 0;
+      const canStart = isSetup ? duration > 0 : true;
+
+      // Determine which buttons to show
+      const isPaused = !isSetup && !isRunning && !finished;
+      let controlBtn;
+      let resetBtn = '';
+
+      if (finished) {
+        controlBtn = `<button class="btn-round btn-secondary" onclick="resetTimer('${id}')"><div class="icon icon-reset"></div></button>`;
+      } else if (isSetup) {
+        controlBtn = `<button class="btn-round btn-primary" onclick="toggleTimer('${id}')" ${canStart ? '' : 'disabled'}><div class="icon icon-play"></div></button>`;
+      } else {
+        controlBtn = `<button class="btn-round btn-primary" onclick="toggleTimer('${id}')"><div class="icon ${isRunning ? 'icon-pause' : 'icon-play'}"></div></button>`;
+        if (isPaused) {
+          resetBtn = `<button class="btn-round btn-secondary" onclick="resetTimer('${id}')"><div class="icon icon-reset"></div></button>`;
+        }
+      }
+
+      return `
+        <div class="${classes}" data-timer="${id}" style="--progress:${progress}%">
+          ${timers.length > 1 ? `<button class="timer-close" onclick="removeTimer('${id}')">×</button>` : ''}
+          <div class="timer-controls">
+            ${controlBtn}
+            ${resetBtn}
+          </div>
+          <div class="timer-display">
+            ${isSetup ? `
+              <div class="picker">
+                ${renderPickerCol(timer, 'hours', 'hours', 23)}
+                <span class="picker-sep">:</span>
+                ${renderPickerCol(timer, 'minutes', 'minutes', 59)}
+                <span class="picker-sep">:</span>
+                ${renderPickerCol(timer, 'seconds', 'seconds', 59)}
+              </div>
+            ` : `<div class="countdown${finished ? ' finished' : ''}">${formatTime(remaining)}</div>`}
+          </div>
+        </div>`;
+    };
+
+    const render = () => {
+      const content = timers.map(renderTimer).join('');
+      const canAdd = settings.allowAddingTimers !== false && timers.length < CONFIG.MAX_TIMERS;
+
+      const addBtn = canAdd
+        ? `<button class="btn btn-add" onclick="addTimer()">+ Add Timer</button>`
+        : '';
+
+      const debugModeEnabled = settings.debugMode === true;
+      const debugBtn = debugModeEnabled
+        ? `<div class="debug-indicator visible" onclick="event.stopPropagation(); document.querySelector('.debug-panel').classList.toggle('visible');">Debug Menu</div>`
+        : '';
+
+      const app = document.getElementById('app');
+      // Ensure we don't wipe out the app container itself if previously we were targeting #app logic differently
+      // The original code targeted $('#app').innerHTML.
+
+      app.innerHTML = `
+        ${debugBtn}
+        <div class="timer-list">${content}${addBtn}</div>
+        ${renderDebugPanel()}
+      `;
+
+      // Re-attach listeners or rely on inline onclicks as established
+      // attachScrollListeners is called after render
+      attachScrollListeners();
+    };
+
+    // --- Scroll/Drag Handling ---
+    const attachScrollListeners = () => {
+      $$('.picker-scroll').forEach(el => {
+        const id = el.dataset.id;
+        const field = el.dataset.field;
+        let startY = 0, dragging = false;
+
+        const onDelta = (delta) => updatePicker(id, field, delta > 0 ? 1 : -1);
+
+        el.onwheel = (e) => { e.preventDefault(); onDelta(e.deltaY); };
+
+        el.onmousedown = (e) => { dragging = true; startY = e.clientY; };
+        el.ontouchstart = (e) => { dragging = true; startY = e.touches[0].clientY; };
+
+        const onMove = (y) => {
+          if (!dragging) return;
+          const delta = y - startY;
+          if (Math.abs(delta) > 20) {
+            onDelta(-delta);
+            startY = y;
+          }
+        };
+
+        el.onmousemove = (e) => onMove(e.clientY);
+        el.ontouchmove = (e) => { e.preventDefault(); onMove(e.touches[0].clientY); };
+        el.onmouseup = el.onmouseleave = el.ontouchend = () => dragging = false;
+      });
+    };
+
+    // --- Init ---
+    window.onHomeyReady = async (homey) => {
+      Homey = homey;
+      settings = Homey.getSettings() || {};
+
+      // Get widget instance ID from Homey
+      widgetId = Homey.getWidgetInstanceId();
+      debugLog('Widget ID:', widgetId);
+
+      // Apply settings to CONFIG
+      CONFIG.MAX_TIMERS = settings.maxTimers ?? CONFIG.MAX_TIMERS;
+      CONFIG.INITIAL_TIMERS = settings.initialTimers ?? CONFIG.INITIAL_TIMERS;
+      CONFIG.ALLOW_ADDING = settings.allowAddingTimers ?? CONFIG.ALLOW_ADDING;
+      CONFIG.DEFAULT_HOURS = settings.defaultHours ?? CONFIG.DEFAULT_HOURS;
+      CONFIG.DEFAULT_MINUTES = settings.defaultMinutes ?? CONFIG.DEFAULT_MINUTES;
+      CONFIG.DEFAULT_SECONDS = settings.defaultSeconds ?? CONFIG.DEFAULT_SECONDS;
+      CONFIG.DEBUG_MODE = settings.debugMode ?? CONFIG.DEBUG_MODE;
+
+      // Try to restore from persistence
+      const savedState = await loadState();
+      const restored = restoreFromState(savedState);
+
+      if (!restored) {
+        // No saved state - create initial timers
+        const initialCount = Math.min(CONFIG.INITIAL_TIMERS, CONFIG.MAX_TIMERS);
+        for (let i = 0; i < initialCount; i++) {
+          const timer = createTimer();
+          timer.isNew = false;
+          timers.push(timer);
+        }
+      }
+
+      // If any timer is running, start the tick loop
+      if (timers.some(t => t.isRunning)) {
+        startTick();
+        startCheckpoint();
+      }
+
+      render();
+      Homey.ready({ height: calcHeight() });
+    };
+  </script>
+</body>
+
+</html>

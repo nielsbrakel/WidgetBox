@@ -1,0 +1,217 @@
+{
+  "name": {
+    "en": "Precipitation Forecast",
+    "nl": "Neerslagvoorspelling"
+  },
+  "description": {
+    "en": "Hourly precipitation forecast graph",
+    "nl": "Uurlijkse neerslagvoorspellingsgrafiek"
+  },
+  "height": 250,
+  "settings": [
+    {
+      "id": "aspectRatio",
+      "type": "dropdown",
+      "label": {
+        "en": "Aspect Ratio",
+        "nl": "Beeldverhouding"
+      },
+      "value": "16:9",
+      "values": [
+        {
+          "id": "1:1",
+          "label": {
+            "en": "Square (1:1)",
+            "nl": "Vierkant (1:1)"
+          }
+        },
+        {
+          "id": "4:3",
+          "label": {
+            "en": "4:3",
+            "nl": "4:3"
+          }
+        },
+        {
+          "id": "16:9",
+          "label": {
+            "en": "16:9 (Default)",
+            "nl": "16:9 (Standaard)"
+          }
+        },
+        {
+          "id": "21:9",
+          "label": {
+            "en": "Ultrawide (21:9)",
+            "nl": "Ultrabreed (21:9)"
+          }
+        },
+        {
+          "id": "3:1",
+          "label": {
+            "en": "Panoramic (3:1)",
+            "nl": "Panoramisch (3:1)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "chartColor",
+      "type": "dropdown",
+      "label": {
+        "en": "Chart Color",
+        "nl": "Grafiek Kleur"
+      },
+      "value": "blue",
+      "values": [
+        {
+          "id": "blue",
+          "label": {
+            "en": "Blue",
+            "nl": "Blauw"
+          }
+        },
+        {
+          "id": "red",
+          "label": {
+            "en": "Red",
+            "nl": "Rood"
+          }
+        },
+        {
+          "id": "green",
+          "label": {
+            "en": "Green",
+            "nl": "Groen"
+          }
+        },
+        {
+          "id": "orange",
+          "label": {
+            "en": "Orange",
+            "nl": "Oranje"
+          }
+        },
+        {
+          "id": "purple",
+          "label": {
+            "en": "Purple",
+            "nl": "Paars"
+          }
+        },
+        {
+          "id": "mono",
+          "label": {
+            "en": "Monochrome",
+            "nl": "Monochroom"
+          }
+        }
+      ]
+    },
+    {
+      "id": "debugMode",
+      "type": "checkbox",
+      "label": {
+        "en": "Debug Mode",
+        "nl": "Debug Modus"
+      },
+      "value": false
+    },
+    {
+      "id": "graphStyle",
+      "type": "dropdown",
+      "label": {
+        "en": "Graph Style",
+        "nl": "Grafieken Stijl"
+      },
+      "value": "bars",
+      "values": [
+        {
+          "id": "bars",
+          "label": {
+            "en": "Bars",
+            "nl": "Staven"
+          }
+        },
+        {
+          "id": "line",
+          "label": {
+            "en": "Line",
+            "nl": "Lijn"
+          }
+        },
+        {
+          "id": "smooth",
+          "label": {
+            "en": "Smooth Line",
+            "nl": "Vloeiende Lijn"
+          }
+        }
+      ]
+    },
+    {
+      "id": "lat",
+      "type": "text",
+      "label": {
+        "en": "Latitude",
+        "nl": "Breedtegraad"
+      },
+      "value": "52.1326"
+    },
+    {
+      "id": "lon",
+      "type": "text",
+      "label": {
+        "en": "Longitude",
+        "nl": "Lengtegraad"
+      },
+      "value": "5.2913"
+    },
+    {
+      "id": "refreshInterval",
+      "type": "dropdown",
+      "label": {
+        "en": "Auto Refresh",
+        "nl": "Automatisch Verversen"
+      },
+      "value": "300",
+      "values": [
+        {
+          "id": "60",
+          "label": {
+            "en": "Every Minute",
+            "nl": "Elke Minuut"
+          }
+        },
+        {
+          "id": "300",
+          "label": {
+            "en": "Every 5 Minutes",
+            "nl": "Elke 5 Minuten"
+          }
+        },
+        {
+          "id": "900",
+          "label": {
+            "en": "Every 15 Minutes",
+            "nl": "Elke 15 Minuten"
+          }
+        },
+        {
+          "id": "1800",
+          "label": {
+            "en": "Every 30 Minutes",
+            "nl": "Elke 30 Minuten"
+          }
+        },
+        {
+          "id": "3600",
+          "label": {
+            "en": "Every Hour",
+            "nl": "Elk Uur"
+          }
+        }
+      ]
+    }
+  ]
+}

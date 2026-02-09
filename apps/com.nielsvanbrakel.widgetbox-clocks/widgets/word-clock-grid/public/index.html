@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../../_shared/shared-styles.css">
+    <style>
+        /* Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            background: transparent;
+            overflow: visible;
+        }
+
+        /* Wrapper provides space for shadow */
+        .wrapper {
+            padding: 4px;
+        }
+
+        .wrapper.no-padding {
+            padding: 0;
+        }
+
+        /* Card - full width, handles background */
+        .card {
+            display: flex;
+            width: 100%;
+            background: var(--homey-background-color);
+            border-radius: var(--homey-border-radius, 12px);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
+            padding: 16px;
+        }
+
+        .card.transparent {
+            background: transparent;
+            box-shadow: none;
+            padding: 0;
+        }
+
+        /* Alignment within the card */
+        .card.align-left {
+            justify-content: flex-start;
+        }
+
+        .card.align-center {
+            justify-content: center;
+        }
+
+        .card.align-right {
+            justify-content: flex-end;
+        }
+
+        /* Word Matrix Grid */
+        .matrix {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            aspect-ratio: 1;
+            font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+            line-height: 1;
+        }
+
+        .matrix span {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--homey-text-color);
+            opacity: 0.15;
+            transition: opacity 0.3s, color 0.3s;
+            aspect-ratio: 1;
+        }
+
+        .matrix span.active {
+            opacity: 1;
+            font-weight: 600;
+        }
+
+        /* Size variants - width determines everything, capped at available space */
+        .size-xsmall .matrix {
+            width: min(140px, 100%);
+            font-size: 10px;
+        }
+
+        .size-small .matrix {
+            width: min(200px, 100%);
+            font-size: 14px;
+        }
+
+        .size-medium .matrix {
+            width: min(260px, 100%);
+            font-size: 18px;
+        }
+
+        .size-large .matrix {
+            width: min(340px, 100%);
+            font-size: 24px;
+        }
+
+        .size-xlarge .matrix {
+            width: 100%;
+            font-size: clamp(14px, 4vw, 30px);
+        }
+
+        /* Color variants */
+        .color-default .matrix span.active {
+            color: var(--homey-text-color);
+        }
+
+        .color-blue .matrix span.active {
+            color: #3B82F6;
+        }
+
+        .color-green .matrix span.active {
+            color: #22C55E;
+        }
+
+        .color-orange .matrix span.active {
+            color: #F97316;
+        }
+
+        .color-red .matrix span.active {
+            color: #EF4444;
+        }
+
+        .color-purple .matrix span.active {
+            color: #A855F7;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrapper" id="wrapper">
+        <div class="card" id="card">
+            <div class="matrix" id="matrix"></div>
+        </div>
+    </div>
+
+    <script>
+        // ===== Configuration =====
+        let settings = {};
+
+        // ===== Language Data =====
+        const LANGUAGES = {
+            en: {
+                matrix: [
+                    ['I', 'T', 'L', 'I', 'S', 'H', 'A', 'L', 'F', 'M'],
+                    ['T', 'E', 'N', 'Q', 'U', 'A', 'R', 'T', 'E', 'R'],
+                    ['T', 'W', 'E', 'N', 'T', 'Y', 'F', 'I', 'V', 'E'],
+                    ['M', 'I', 'N', 'U', 'T', 'E', 'S', 'T', 'O', 'R'],
+                    ['P', 'A', 'S', 'T', 'O', 'N', 'E', 'T', 'W', 'O'],
+                    ['T', 'H', 'R', 'E', 'E', 'F', 'O', 'U', 'R', 'K'],
+                    ['F', 'I', 'V', 'E', 'S', 'I', 'X', 'T', 'E', 'N'],
+                    ['S', 'E', 'V', 'E', 'N', 'E', 'I', 'G', 'H', 'T'],
+                    ['N', 'I', 'N', 'E', 'L', 'E', 'V', 'E', 'N', 'R'],
+                    ['T', 'W', 'E', 'L', 'V', 'E', 'O', 'C', 'L', 'K']
+                ],
+                words: {
+                    IT: [0, 0, 1], IS: [0, 3, 4], HALF: [0, 5, 8],
+                    TEN_MIN: [1, 0, 2], QUARTER: [1, 3, 9],
+                    TWENTY: [2, 0, 5], FIVE_MIN: [2, 6, 9],
+                    MINUTES: [3, 0, 6], TO: [3, 7, 8],
+                    PAST: [4, 0, 3], ONE: [4, 4, 6], TWO: [4, 7, 9],
+                    THREE: [5, 0, 4], FOUR: [5, 5, 8],
+                    FIVE: [6, 0, 3], SIX: [6, 4, 6], TEN: [6, 7, 9],
+                    SEVEN: [7, 0, 4], EIGHT: [7, 5, 9],
+                    NINE: [8, 0, 3], ELEVEN: [8, 3, 8],
+                    TWELVE: [9, 0, 5], OCLOCK: [9, 6, 9]
+                },
+                hours: ['TWELVE', 'ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN', 'EIGHT', 'NINE', 'TEN', 'ELEVEN', 'TWELVE'],
+                getActiveWords: (h, m) => {
+                    const h12 = h % 12;
+                    const next = (h12 + 1) % 12 || 12;
+                    const m5 = Math.round(m / 5) * 5;
+                    const hours = LANGUAGES.en.hours;
+                    const active = ['IT', 'IS'];
+
+                    if (m5 === 0 || m5 === 60) return [...active, hours[m5 === 60 ? next : h12 || 12], 'OCLOCK'];
+                    if (m5 === 15) return [...active, 'QUARTER', 'PAST', hours[h12 || 12]];
+                    if (m5 === 30) return [...active, 'HALF', 'PAST', hours[h12 || 12]];
+                    if (m5 === 45) return [...active, 'QUARTER', 'TO', hours[next]];
+                    if (m5 < 30) {
+                        const minMap = { 5: ['FIVE_MIN'], 10: ['TEN_MIN'], 20: ['TWENTY'], 25: ['TWENTY', 'FIVE_MIN'] };
+                        return [...active, ...minMap[m5], 'MINUTES', 'PAST', hours[h12 || 12]];
+                    }
+                    const minMap = { 35: ['TWENTY', 'FIVE_MIN'], 40: ['TWENTY'], 50: ['TEN_MIN'], 55: ['FIVE_MIN'] };
+                    return [...active, ...minMap[m5], 'MINUTES', 'TO', hours[next]];
+                }
+            },
+            nl: {
+                matrix: [
+                    ['H', 'E', 'T', 'K', 'I', 'S', 'V', 'I', 'J', 'F'],
+                    ['T', 'I', 'E', 'N', 'A', 'K', 'W', 'A', 'R', 'T'],
+                    ['V', 'O', 'O', 'R', 'O', 'V', 'E', 'R', 'H', 'M'],
+                    ['H', 'A', 'L', 'F', 'T', 'W', 'E', 'E', 'E', 'N'],
+                    ['D', 'R', 'I', 'E', 'V', 'I', 'E', 'R', 'M', 'K'],
+                    ['V', 'I', 'J', 'F', 'Z', 'E', 'S', 'R', 'T', 'U'],
+                    ['Z', 'E', 'V', 'E', 'N', 'A', 'C', 'H', 'T', 'R'],
+                    ['N', 'E', 'G', 'E', 'N', 'T', 'I', 'E', 'N', 'S'],
+                    ['E', 'L', 'F', 'T', 'W', 'A', 'A', 'L', 'F', 'D'],
+                    ['O', 'N', 'E', 'D', 'R', 'I', 'E', 'U', 'U', 'R']
+                ],
+                words: {
+                    HET: [0, 0, 2], IS: [0, 4, 5], VIJF_MIN: [0, 6, 9],
+                    TIEN_MIN: [1, 0, 3], KWART: [1, 5, 9],
+                    VOOR: [2, 0, 3], OVER: [2, 4, 7],
+                    HALF: [3, 0, 3], TWEE: [3, 4, 7], EEN: [3, 7, 9],
+                    DRIE: [4, 0, 3], VIER: [4, 4, 7],
+                    VIJF: [5, 0, 3], ZES: [5, 4, 6],
+                    ZEVEN: [6, 0, 4], ACHT: [6, 5, 8],
+                    NEGEN: [7, 0, 4], TIEN: [7, 5, 8],
+                    ELF: [8, 0, 2], TWAALF: [8, 3, 8],
+                    UUR: [9, 7, 9]
+                },
+                hours: ['TWAALF', 'EEN', 'TWEE', 'DRIE', 'VIER', 'VIJF', 'ZES', 'ZEVEN', 'ACHT', 'NEGEN', 'TIEN', 'ELF', 'TWAALF'],
+                getActiveWords: (h, m) => {
+                    const h12 = h % 12;
+                    const next = (h12 + 1) % 12 || 12;
+                    const m5 = Math.round(m / 5) * 5;
+                    const hours = LANGUAGES.nl.hours;
+                    const active = ['HET', 'IS'];
+
+                    if (m5 === 0 || m5 === 60) return [...active, hours[m5 === 60 ? next : h12 || 12], 'UUR'];
+                    if (m5 === 5) return [...active, 'VIJF_MIN', 'OVER', hours[h12 || 12]];
+                    if (m5 === 10) return [...active, 'TIEN_MIN', 'OVER', hours[h12 || 12]];
+                    if (m5 === 15) return [...active, 'KWART', 'OVER', hours[h12 || 12]];
+                    if (m5 === 20) return [...active, 'TIEN_MIN', 'VOOR', 'HALF', hours[next]];
+                    if (m5 === 25) return [...active, 'VIJF_MIN', 'VOOR', 'HALF', hours[next]];
+                    if (m5 === 30) return [...active, 'HALF', hours[next]];
+                    if (m5 === 35) return [...active, 'VIJF_MIN', 'OVER', 'HALF', hours[next]];
+                    if (m5 === 40) return [...active, 'TIEN_MIN', 'OVER', 'HALF', hours[next]];
+                    if (m5 === 45) return [...active, 'KWART', 'VOOR', hours[next]];
+                    if (m5 === 50) return [...active, 'TIEN_MIN', 'VOOR', hours[next]];
+                    if (m5 === 55) return [...active, 'VIJF_MIN', 'VOOR', hours[next]];
+                    return active;
+                }
+            }
+        };
+
+        // ===== Core Functions =====
+        function getLanguage() {
+            return (navigator.language || 'en').startsWith('nl') ? 'nl' : 'en';
+        }
+
+        function renderMatrix(lang, activeWords) {
+            const data = LANGUAGES[lang];
+            return data.matrix.map((row, r) =>
+                row.map((letter, c) => {
+                    const isActive = activeWords.some(word => {
+                        const pos = data.words[word];
+                        return pos && pos[0] === r && c >= pos[1] && c <= pos[2];
+                    });
+                    return `<span class="${isActive ? 'active' : ''}">${letter}</span>`;
+                }).join('')
+            ).join('');
+        }
+
+        function updateClock() {
+            const now = new Date();
+            const lang = getLanguage();
+            const activeWords = LANGUAGES[lang].getActiveWords(now.getHours(), now.getMinutes());
+            document.getElementById('matrix').innerHTML = renderMatrix(lang, activeWords);
+        }
+
+        function applyStyles() {
+            const wrapper = document.getElementById('wrapper');
+            const card = document.getElementById('card');
+
+            // Reset classes
+            card.className = 'card';
+            wrapper.className = 'wrapper';
+
+            // Alignment
+            card.classList.add('align-' + (settings.horizontalAlignment || 'center'));
+
+            // Size & Color
+            card.classList.add('size-' + (settings.size || 'medium'));
+            card.classList.add('color-' + (settings.color || 'default'));
+
+            // Card background is handled by widget compose transparent setting
+        }
+
+        function updateHeight() {
+            const wrapper = document.getElementById('wrapper');
+            const height = wrapper.offsetHeight;
+            if (window.Homey) {
+                Homey.ready({ height });
+                if (Homey.setHeight) Homey.setHeight(height);
+            }
+        }
+
+        // ===== Initialization =====
+        function onHomeyReady(Homey) {
+            settings = Homey.getSettings();
+
+            Homey.on('settings.set', (key, value) => {
+                settings[key] = value;
+                applyStyles();
+                updateClock();
+            });
+
+            applyStyles();
+            updateClock();
+            setInterval(updateClock, 1000);
+
+            // Height observer
+            new ResizeObserver(updateHeight).observe(document.body);
+            setTimeout(updateHeight, 0);
+        }
+    </script>
+</body>
+
+</html>

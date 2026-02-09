@@ -1,0 +1,26 @@
+{
+  "name": {
+    "en": "Spacer",
+    "nl": "Ruimte"
+  },
+  "description": {
+    "en": "Add empty space between widgets",
+    "nl": "Voeg lege ruimte toe tussen widgets"
+  },
+  "height": 40,
+  "transparent": true,
+  "settings": [
+    {
+      "id": "heightMultiplier",
+      "type": "number",
+      "label": {
+        "en": "Height Multiplier",
+        "nl": "Hoogte Vermenigvuldiger"
+      },
+      "min": 1,
+      "max": 1000,
+      "step": 1,
+      "value": 10
+    }
+  ]
+}

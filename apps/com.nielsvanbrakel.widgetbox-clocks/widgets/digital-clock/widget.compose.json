@@ -1,0 +1,241 @@
+{
+    "name": {
+        "en": "Digital Clock",
+        "nl": "Digitale Klok"
+    },
+    "description": {
+        "en": "Clean digital clock with date and time.",
+        "nl": "Strakke digitale klok met tijd en datum."
+    },
+    "height": 64,
+    "transparent": false,
+    "settings": [
+        {
+            "id": "clockFormat",
+            "type": "dropdown",
+            "label": {
+                "en": "Time Format",
+                "nl": "Tijdformaat"
+            },
+            "value": "24",
+            "values": [
+                {
+                    "id": "24",
+                    "label": {
+                        "en": "24-hour",
+                        "nl": "24-uur"
+                    }
+                },
+                {
+                    "id": "12",
+                    "label": {
+                        "en": "12-hour (AM/PM)",
+                        "nl": "12-uur (AM/PM)"
+                    }
+                }
+            ]
+        },
+        {
+            "id": "dateFormat",
+            "type": "dropdown",
+            "label": {
+                "en": "Date Format",
+                "nl": "Datumformaat"
+            },
+            "value": "weekday-short",
+            "values": [
+                {
+                    "id": "dmy",
+                    "label": {
+                        "en": "DD/MM/YYYY",
+                        "nl": "DD/MM/JJJJ"
+                    }
+                },
+                {
+                    "id": "mdy",
+                    "label": {
+                        "en": "MM/DD/YYYY",
+                        "nl": "MM/DD/JJJJ"
+                    }
+                },
+                {
+                    "id": "ymd",
+                    "label": {
+                        "en": "YYYY-MM-DD",
+                        "nl": "JJJJ-MM-DD"
+                    }
+                },
+                {
+                    "id": "long",
+                    "label": {
+                        "en": "January 28, 2026",
+                        "nl": "28 januari 2026"
+                    }
+                },
+                {
+                    "id": "short",
+                    "label": {
+                        "en": "Jan 28, 2026",
+                        "nl": "28 jan 2026"
+                    }
+                },
+                {
+                    "id": "weekday-long",
+                    "label": {
+                        "en": "Wednesday, January 28",
+                        "nl": "Woensdag 28 januari"
+                    }
+                },
+                {
+                    "id": "weekday-short",
+                    "label": {
+                        "en": "Wed, Jan 28",
+                        "nl": "Wo 28 jan"
+                    }
+                },
+                {
+                    "id": "weekday-only",
+                    "label": {
+                        "en": "Wednesday",
+                        "nl": "Woensdag"
+                    }
+                },
+                {
+                    "id": "day-month",
+                    "label": {
+                        "en": "28 January",
+                        "nl": "28 januari"
+                    }
+                }
+            ]
+        },
+        {
+            "id": "fontWeight",
+            "type": "dropdown",
+            "label": {
+                "en": "Font Weight",
+                "nl": "Letterdikte"
+            },
+            "value": "normal",
+            "values": [
+                {
+                    "id": "thin",
+                    "label": {
+                        "en": "Thin",
+                        "nl": "Dun"
+                    }
+                },
+                {
+                    "id": "normal",
+                    "label": {
+                        "en": "Normal",
+                        "nl": "Normaal"
+                    }
+                },
+                {
+                    "id": "bold",
+                    "label": {
+                        "en": "Bold",
+                        "nl": "Vetgedrukt"
+                    }
+                }
+            ]
+        },
+        {
+            "id": "horizontalAlignment",
+            "type": "dropdown",
+            "label": {
+                "en": "Horizontal Alignment",
+                "nl": "Horizontale Uitlijning"
+            },
+            "value": "center",
+            "values": [
+                {
+                    "id": "left",
+                    "label": {
+                        "en": "Left",
+                        "nl": "Links"
+                    }
+                },
+                {
+                    "id": "center",
+                    "label": {
+                        "en": "Center",
+                        "nl": "Midden"
+                    }
+                },
+                {
+                    "id": "right",
+                    "label": {
+                        "en": "Right",
+                        "nl": "Rechts"
+                    }
+                }
+            ]
+        },
+        {
+            "id": "showDate",
+            "type": "checkbox",
+            "label": {
+                "en": "Show Date",
+                "nl": "Toon Datum"
+            },
+            "value": true
+        },
+        {
+            "id": "showSeconds",
+            "type": "checkbox",
+            "label": {
+                "en": "Show Seconds",
+                "nl": "Toon Seconden"
+            },
+            "value": false
+        },
+        {
+            "id": "size",
+            "type": "dropdown",
+            "label": {
+                "en": "Size",
+                "nl": "Grootte"
+            },
+            "value": "medium",
+            "values": [
+                {
+                    "id": "xsmall",
+                    "label": {
+                        "en": "Extra Small",
+                        "nl": "Extra Klein"
+                    }
+                },
+                {
+                    "id": "small",
+                    "label": {
+                        "en": "Small",
+                        "nl": "Klein"
+                    }
+                },
+                {
+                    "id": "medium",
+                    "label": {
+                        "en": "Medium",
+                        "nl": "Gemiddeld"
+                    }
+                },
+                {
+                    "id": "large",
+                    "label": {
+                        "en": "Large",
+                        "nl": "Groot"
+                    }
+                },
+                {
+                    "id": "xlarge",
+                    "label": {
+                        "en": "Extra Large",
+                        "nl": "Extra Groot"
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,181 @@
+{
+    "name": {
+        "en": "Flip Clock",
+        "nl": "Flip Klok"
+    },
+    "description": {
+        "en": "Retro style flip clock with animation",
+        "nl": "Retro stijl flip klok met animatie"
+    },
+    "height": 128,
+    "transparent": false,
+    "settings": [
+        {
+            "id": "clockFormat",
+            "type": "dropdown",
+            "label": {
+                "en": "Time Format",
+                "nl": "Tijdformaat"
+            },
+            "value": "24",
+            "values": [
+                {
+                    "id": "24",
+                    "label": {
+                        "en": "24-hour",
+                        "nl": "24-uur"
+                    }
+                },
+                {
+                    "id": "12",
+                    "label": {
+                        "en": "12-hour (AM/PM)",
+                        "nl": "12-uur (AM/PM)"
+                    }
+                }
+            ]
+        },
+        {
+            "id": "color",
+            "type": "dropdown",
+            "label": {
+                "en": "Color",
+                "nl": "Kleur"
+            },
+            "value": "default",
+            "values": [
+                {
+                    "id": "default",
+                    "label": {
+                        "en": "Default (Auto)",
+                        "nl": "Standaard (Auto)"
+                    }
+                },
+                {
+                    "id": "blue",
+                    "label": {
+                        "en": "Blue",
+                        "nl": "Blauw"
+                    }
+                },
+                {
+                    "id": "green",
+                    "label": {
+                        "en": "Green",
+                        "nl": "Groen"
+                    }
+                },
+                {
+                    "id": "orange",
+                    "label": {
+                        "en": "Orange",
+                        "nl": "Oranje"
+                    }
+                },
+                {
+                    "id": "red",
+                    "label": {
+                        "en": "Red",
+                        "nl": "Rood"
+                    }
+                }
+            ]
+        },
+        {
+            "id": "horizontalAlignment",
+            "type": "dropdown",
+            "label": {
+                "en": "Horizontal Alignment",
+                "nl": "Horizontale Uitlijning"
+            },
+            "value": "center",
+            "values": [
+                {
+                    "id": "left",
+                    "label": {
+                        "en": "Left",
+                        "nl": "Links"
+                    }
+                },
+                {
+                    "id": "center",
+                    "label": {
+                        "en": "Center",
+                        "nl": "Midden"
+                    }
+                },
+                {
+                    "id": "right",
+                    "label": {
+                        "en": "Right",
+                        "nl": "Rechts"
+                    }
+                }
+            ]
+        },
+        {
+            "id": "showColons",
+            "type": "checkbox",
+            "label": {
+                "en": "Show Colons",
+                "nl": "Toon Dubbele Punt"
+            },
+            "value": false
+        },
+        {
+            "id": "showSeconds",
+            "type": "checkbox",
+            "label": {
+                "en": "Show Seconds",
+                "nl": "Toon Seconden"
+            },
+            "value": true
+        },
+        {
+            "id": "size",
+            "type": "dropdown",
+            "label": {
+                "en": "Size",
+                "nl": "Grootte"
+            },
+            "value": "medium",
+            "values": [
+                {
+                    "id": "xsmall",
+                    "label": {
+                        "en": "Extra Small",
+                        "nl": "Extra Klein"
+                    }
+                },
+                {
+                    "id": "small",
+                    "label": {
+                        "en": "Small",
+                        "nl": "Klein"
+                    }
+                },
+                {
+                    "id": "medium",
+                    "label": {
+                        "en": "Medium",
+                        "nl": "Gemiddeld"
+                    }
+                },
+                {
+                    "id": "large",
+                    "label": {
+                        "en": "Large",
+                        "nl": "Groot"
+                    }
+                },
+                {
+                    "id": "xlarge",
+                    "label": {
+                        "en": "Extra Large",
+                        "nl": "Extra Groot"
+                    }
+                }
+            ]
+        }
+    ]
+}

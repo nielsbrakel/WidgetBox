@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../../_shared/shared-styles.css">
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            background: transparent;
+            overflow: hidden;
+        }
+
+        /* Outer spacing wrapper */
+        .widget-spacing-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            width: 100%;
+            box-sizing: border-box;
+            transition: none;
+        }
+
+        /* Inner card handles background */
+        .widget-card {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            border-radius: var(--homey-border-radius, 12px);
+            /* Ensure shadow and background are here */
+            background: var(--homey-background-color);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
+            padding: 16px;
+        }
+
+        .bg-transparent .widget-card {
+            background: transparent;
+            box-shadow: none;
+        }
+
+        /* Access to SVG */
+        svg {
+            display: block;
+        }
+
+        /* Alignment */
+        .align-h-left {
+            justify-content: flex-start;
+        }
+
+        .align-h-center {
+            justify-content: center;
+        }
+
+        .align-h-right {
+            justify-content: flex-end;
+        }
+
+        .align-v-top {
+            align-items: flex-start;
+        }
+
+        .align-v-center {
+            align-items: center;
+        }
+
+        .align-v-bottom {
+            align-items: flex-end;
+        }
+
+        /* Color Themes via CSS Variables */
+        :root {
+            --clock-color: var(--homey-text-color);
+            --clock-bg: transparent;
+            --hand-color: var(--clock-color);
+            --second-hand-color: var(--homey-color-red-500);
+        }
+
+
+
+        .color-blue {
+            --second-hand-color: var(--homey-color-blue-500);
+        }
+
+        .color-green {
+            --second-hand-color: var(--homey-color-green-500);
+        }
+
+        .color-orange {
+            --second-hand-color: var(--homey-color-orange-500);
+        }
+
+        .color-red {
+            --second-hand-color: var(--homey-color-red-500);
+        }
+
+        .color-black {
+            --second-hand-color: #000;
+        }
+
+        .color-white {
+            --second-hand-color: #fff;
+        }
+
+        /* SVG Elements */
+        .face {
+            fill: none;
+            stroke: var(--clock-color);
+            stroke-width: 2;
+        }
+
+        .marker {
+            stroke: var(--clock-color);
+            stroke-width: 2;
+            fill: none;
+        }
+
+        .marker.thin {
+            stroke-width: 1;
+            opacity: 0.6;
+        }
+
+        .no-card {
+            background: transparent !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+        }
+
+        .hand {
+            stroke: var(--clock-color);
+            stroke-linecap: round;
+        }
+
+        .hand.hour {
+            stroke-width: 4;
+        }
+
+        .hand.minute {
+            stroke-width: 3;
+        }
+
+        .hand.second {
+            stroke: var(--second-hand-color);
+            stroke-width: 1.5;
+        }
+
+        .center-dot {
+            fill: var(--clock-color);
+        }
+
+        .style-swiss .hand.hour {
+            stroke-width: 5;
+            stroke-linecap: square;
+        }
+
+        .style-swiss .hand.minute {
+            stroke-width: 4;
+            stroke-linecap: square;
+        }
+
+        .style-swiss .hand.second {
+            stroke: #d00;
+            stroke-width: 2;
+        }
+
+        .style-swiss .second-tip {
+            fill: #d00;
+        }
+
+        .number {
+            fill: var(--clock-color);
+            font-family: -apple-system, system-ui, sans-serif;
+            font-size: 11px;
+            text-anchor: middle;
+            dominant-baseline: middle;
+            font-weight: 600;
+        }
+
+        .date-box {
+            fill: var(--homey-background-color, #fff);
+            stroke: var(--clock-color);
+            stroke-width: 1;
+        }
+
+        .date-text {
+            fill: var(--clock-color);
+            font-size: 5px;
+            font-family: -apple-system, system-ui, sans-serif;
+            text-anchor: middle;
+            dominant-baseline: middle;
+            font-weight: 700;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="widget-spacing-wrapper" id="app-container">
+        <div class="widget-card" id="widget-card">
+            <svg viewBox="0 0 100 100" id="clock-svg">
+                <!-- Markers Group -->
+                <g id="markers"></g>
+
+                <!-- Numbers Group (Classic only) -->
+                <g id="numbers"></g>
+
+                <!-- Date Group -->
+                <g id="date-group" style="display: none;">
+                    <rect x="70" y="46.5" width="14" height="7" rx="1" class="date-box" />
+                    <text id="date-text" x="77" y="50.5" class="date-text">1</text>
+                </g>
+
+                <!-- Hands -->
+                <line id="hour-hand" class="hand hour" x1="50" y1="50" x2="50" y2="25" />
+                <line id="minute-hand" class="hand minute" x1="50" y1="50" x2="50" y2="15" />
+                <g id="second-hand-group" style="display: none;">
+                    <line id="second-hand" class="hand second" x1="50" y1="60" x2="50" y2="15" />
+                    <circle id="second-tip" class="second-tip" cx="50" cy="15" r="0" />
+                </g>
+
+                <!-- Center Cap -->
+                <circle class="center-dot" cx="50" cy="50" r="2.5" />
+            </svg>
+        </div>
+    </div>
+
+    <script>
+        let currentSettings = {};
+
+        function toRad(deg) { return deg * Math.PI / 180; }
+
+        function updateClock() {
+            const now = new Date();
+            const h = now.getHours() % 12;
+            const m = now.getMinutes();
+            const s = now.getSeconds();
+            const d = now.getDate();
+
+            // Calculate angles
+            const hAngle = (h * 30) + (m * 0.5);
+            const mAngle = m * 6;
+            const sAngle = s * 6;
+
+            const hourHand = document.getElementById('hour-hand');
+            const minuteHand = document.getElementById('minute-hand');
+            const secondHandGroup = document.getElementById('second-hand-group');
+            const dateText = document.getElementById('date-text');
+
+            // Rotate via transform with explicit center point (50, 50)
+            hourHand.setAttribute('transform', `rotate(${hAngle}, 50, 50)`);
+            minuteHand.setAttribute('transform', `rotate(${mAngle}, 50, 50)`);
+
+            // Update Date
+            if (currentSettings.showDate) {
+                dateText.textContent = d;
+            }
+
+            if (currentSettings.showSeconds) {
+                secondHandGroup.style.display = 'block';
+                secondHandGroup.setAttribute('transform', `rotate(${sAngle}, 50, 50)`);
+            } else {
+                secondHandGroup.style.display = 'none';
+            }
+        }
+
+        function drawFace() {
+            const markersGroup = document.getElementById('markers');
+            const numbersGroup = document.getElementById('numbers');
+            const secondTip = document.getElementById('second-tip');
+            const appContainer = document.getElementById('app-container');
+            const widgetCard = document.getElementById('widget-card');
+            const dateGroup = document.getElementById('date-group');
+            const svg = document.getElementById('clock-svg');
+
+            // Reset
+            markersGroup.innerHTML = '';
+            numbersGroup.innerHTML = '';
+            secondTip.setAttribute('r', '0');
+
+            // Apply Widget Classes
+            document.body.className = `style-${currentSettings.style || 'modern'} color-${currentSettings.color || 'red'}`;
+
+            // Alignment (on outer wrapper)
+            appContainer.className = 'widget-spacing-wrapper';
+            widgetCard.classList.add(`align-h-${currentSettings.horizontalAlignment || 'center'}`);
+
+
+
+
+            // Size (set on SVG or Card)
+            const size = getWidgetSize(currentSettings.size || 'medium');
+            svg.style.width = `${size}px`;
+            svg.style.height = `${size}px`;
+
+            // Card background is handled by widget compose transparent setting
+
+            // Show/Hide Date
+            if (currentSettings.showDate) {
+                dateGroup.style.display = 'block';
+            } else {
+                dateGroup.style.display = 'none';
+            }
+
+            const style = currentSettings.style || 'modern';
+
+            // Helper to check if we should skip marker at 3 o'clock
+            const skipPosition = (val, max) => {
+                if (!currentSettings.showDate) return false;
+                if (max === 4 && val === 1) return true; // 90 deg
+                if (max === 12 && val === 3) return true; // 3 o'clock
+                if (max === 60 && val === 15) return true; // 15 mins
+                return false;
+            };
+
+            if (style === 'minimal') {
+                for (let i = 0; i < 4; i++) {
+                    if (skipPosition(i, 4)) continue;
+                    const angle = i * 90;
+                    markersGroup.appendChild(createLine(angle, 45, 40, 'marker'));
+                }
+            } else if (style === 'classic' || style === 'classic-no-numbers') {
+                if (style === 'classic') {
+                    for (let i = 1; i <= 12; i++) {
+                        if (skipPosition(i, 12)) continue;
+                        const angle = i * 30;
+                        const coords = getCoords(angle, 38);
+                        const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                        text.setAttribute('x', coords.x);
+                        text.setAttribute('y', coords.y + 1);
+                        text.textContent = i;
+                        text.setAttribute('class', 'number');
+                        numbersGroup.appendChild(text);
+                    }
+                }
+                for (let i = 0; i < 60; i++) {
+                    const isHour = i % 5 === 0;
+                    if (style === 'classic' && isHour) continue;
+
+                    if (style === 'classic-no-numbers' && isHour) {
+                        markersGroup.appendChild(createLine(i * 6, 45, 40, 'marker'));
+                    } else {
+                        markersGroup.appendChild(createLine(i * 6, 45, 44, 'marker thin'));
+                    }
+                }
+            } else if (style === 'swiss') {
+                for (let i = 0; i < 60; i++) {
+                    if (skipPosition(i, 60)) continue;
+                    const isHour = i % 5 === 0;
+                    const r2 = isHour ? 35 : 42;
+                    const line = createLine(i * 6, 45, r2, isHour ? 'marker' : 'marker thin');
+                    if (isHour) line.setAttribute('stroke-width', '2.5');
+                    markersGroup.appendChild(line);
+                }
+                secondTip.setAttribute('r', '3.5');
+            } else {
+                for (let i = 0; i < 12; i++) {
+                    if (skipPosition(i, 12)) continue;
+                    markersGroup.appendChild(createLine(i * 30, 45, 35, 'marker'));
+                }
+            }
+        }
+
+        function getCoords(angle, radius) {
+            return {
+                x: 50 + radius * Math.sin(toRad(angle)),
+                y: 50 - radius * Math.cos(toRad(angle))
+            };
+        }
+
+        function createLine(angle, r1, r2, className) {
+            const p1 = getCoords(angle, r1);
+            const p2 = getCoords(angle, r2);
+            const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            line.setAttribute('x1', p1.x);
+            line.setAttribute('y1', p1.y);
+            line.setAttribute('x2', p2.x);
+            line.setAttribute('y2', p2.y);
+            line.setAttribute('class', className);
+            return line;
+        }
+
+        function getWidgetSize(sizeId) {
+            const sizes = { 'xsmall': 48, 'small': 64, 'medium': 128, 'large': 192, 'xlarge': 256 };
+            return sizes[sizeId] || 128;
+        }
+
+
+
+        function calculateTotalHeight() {
+            // Use offsetHeight
+            const appContainer = document.getElementById('app-container');
+            return appContainer.offsetHeight;
+        }
+
+        function onHomeyReady(Homey) {
+            currentSettings = Homey.getSettings();
+
+            Homey.on('settings.set', (key, value) => {
+                currentSettings[key] = value;
+                drawFace();
+                updateClock();
+                // Height update is handled by ResizeObserver
+            });
+
+            drawFace();
+            updateClock();
+
+            setInterval(updateClock, 1000);
+
+            // Dynamic height handling
+            const updateHeight = () => {
+                const h = calculateTotalHeight();
+                Homey.ready({ height: h }); // Initial
+                if (Homey.setHeight) Homey.setHeight(h);
+            };
+
+            const resizeObserver = new ResizeObserver(() => updateHeight());
+            resizeObserver.observe(document.body); // Watch body for changes (padding changes affect size)
+
+            // Initial call
+            setTimeout(updateHeight, 0);
+        }
+    </script>
+</body>
+
+</html>
