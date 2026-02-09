@@ -1,0 +1,29 @@
+{
+  "id": "com.nielsvanbrakel.widgetbox-youtube",
+  "version": "1.0.0",
+  "compatibility": ">=12.3.0",
+  "sdk": 3,
+  "platforms": [
+    "local"
+  ],
+  "name": {
+    "en": "WidgetBox YouTube"
+  },
+  "description": {
+    "en": "YouTube widgets for your Homey dashboard"
+  },
+  "category": [
+    "tools"
+  ],
+  "permissions": [],
+  "images": {
+    "small": "/assets/images/small.png",
+    "large": "/assets/images/large.png",
+    "xlarge": "/assets/images/xlarge.png"
+  },
+  "author": {
+    "name": "Niels van Brakel",
+    "email": "niels@nielsvanbrakel.com"
+  },
+  "brandColor": "#FF0000"
+}
