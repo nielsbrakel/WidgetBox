@@ -17,6 +17,10 @@
         "en": "Height Multiplier",
         "nl": "Hoogte Vermenigvuldiger"
       },
+      "hint": {
+        "en": "Higher values add more vertical space between widgets",
+        "nl": "Hogere waarden voegen meer verticale ruimte toe tussen widgets"
+      },
       "min": 1,
       "max": 1000,
       "step": 1,

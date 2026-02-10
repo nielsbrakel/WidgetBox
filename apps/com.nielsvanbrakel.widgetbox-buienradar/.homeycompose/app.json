@@ -1,0 +1,36 @@
+{
+    "id": "com.nielsvanbrakel.widgetbox-buienradar",
+    "version": "1.0.0",
+    "compatibility": ">=12.3.0",
+    "sdk": 3,
+    "platforms": [
+        "local"
+    ],
+    "name": {
+        "en": "WidgetBox Buienradar",
+        "nl": "WidgetBox Buienradar"
+    },
+    "description": {
+        "en": "Buienradar precipitation widgets for your dashboard",
+        "nl": "Buienradar neerslagwidgets voor je dashboard"
+    },
+    "category": [
+        "tools"
+    ],
+    "brandColor": "#0080FF",
+    "permissions": [],
+    "images": {
+        "small": "/assets/images/small.png",
+        "large": "/assets/images/large.png",
+        "xlarge": "/assets/images/xlarge.png"
+    },
+    "author": {
+        "name": "Niels van Brakel",
+        "email": "niels@nielsvanbrakel.com"
+    },
+    "bugs": {
+        "url": "https://github.com/nielsvanbrakel/widgetbox/issues"
+    },
+    "source": "https://github.com/nielsvanbrakel/widgetbox",
+    "homepage": "https://nielsvanbrakel.com"
+}

@@ -1,5 +1,11 @@
 {
-    "en": {
-        "title": "WidgetBox Clocks"
+    "widgets": {
+        "analog-clock": {},
+        "binary-clock": {},
+        "date": {},
+        "digital-clock": {},
+        "flip-clock": {},
+        "word-clock-grid": {},
+        "word-clock-sentence": {}
     }
 }

@@ -212,89 +212,6 @@
   .chart-interaction-zone.active .indicator-dot {
     opacity: 1;
   }
-
-  /* Debug Panel Styles */
-  .debug-panel {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: rgba(0, 0, 0, 0.85);
-    backdrop-filter: blur(10px);
-    padding: 8px 12px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    align-items: center;
-    z-index: 1000;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    transform: translateY(100%);
-    transition: transform 0.2s ease;
-  }
-
-  .debug-panel.visible {
-    transform: translateY(0);
-  }
-
-  .debug-panel-label {
-    color: var(--homey-color-orange-400);
-    font-size: 10px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-right: 4px;
-  }
-
-  .debug-btn {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: white;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 10px;
-    cursor: pointer;
-    transition: all 0.15s ease;
-    white-space: nowrap;
-  }
-
-  .debug-btn:hover {
-    background: rgba(255, 255, 255, 0.2);
-    border-color: rgba(255, 255, 255, 0.3);
-  }
-
-  .debug-btn.active {
-    background: var(--homey-color-orange-500);
-    border-color: var(--homey-color-orange-600);
-  }
-
-  .debug-btn.real-data {
-    background: var(--homey-color-green-500);
-    border-color: var(--homey-color-green-600);
-  }
-
-  .debug-btn.real-data:hover {
-    background: var(--homey-color-green-400);
-  }
-
-  .debug-indicator {
-    position: absolute;
-    top: 4px;
-    right: 4px;
-    background: var(--homey-color-orange-500);
-    color: white;
-    font-size: 8px;
-    font-weight: 600;
-    padding: 2px 6px;
-    border-radius: 3px;
-    text-transform: uppercase;
-    z-index: 100;
-    opacity: 0;
-    transition: opacity 0.2s ease;
-  }
-
-  .debug-indicator.visible {
-    opacity: 1;
-  }
 </style>
 </head>
 
@@ -399,96 +316,6 @@
 
     }
 
-    /**
-     * Mock Data Service for Debug Panel
-     * Generates fake precipitation data for testing visualization
-     */
-    class MockDataService {
-      static PATTERNS = {
-        noRain: {
-          label: 'No Rain',
-          generate: () => MockDataService.generatePattern(() => 0)
-        },
-        lightDrizzle: {
-          label: 'Light Drizzle',
-          generate: () => MockDataService.generatePattern((i, len) => {
-            // Gentle variation between 0.1 and 0.4 mm/h
-            return 0.1 + Math.sin(i * 0.5) * 0.15 + Math.random() * 0.1;
-          })
-        },
-        normalRain: {
-          label: 'Normal Rain',
-          generate: () => MockDataService.generatePattern((i, len) => {
-            // Bell curve peaking in the middle around 1.5-2.5 mm/h
-            const mid = len / 2;
-            const dist = Math.abs(i - mid) / mid;
-            const base = (1 - dist * dist) * 2.5;
-            return Math.max(0, base + (Math.random() - 0.5) * 0.4);
-          })
-        },
-        heavyRain: {
-          label: 'Heavy Rain',
-          generate: () => MockDataService.generatePattern((i, len) => {
-            // Sustained heavy rain 3-5 mm/h with variations
-            const base = 4 + Math.sin(i * 0.3) * 1.5;
-            return Math.max(0, base + (Math.random() - 0.5) * 0.8);
-          })
-        },
-        extremeRain: {
-          label: 'Extreme Rain',
-          generate: () => MockDataService.generatePattern((i, len) => {
-            // Very intense rainfall 7-12 mm/h
-            const base = 9 + Math.sin(i * 0.4) * 2;
-            return Math.max(0, base + (Math.random() - 0.5) * 1.5);
-          })
-        },
-        passingShower: {
-          label: 'Passing Shower',
-          generate: () => MockDataService.generatePattern((i, len) => {
-            // Quick spike in the middle, mostly dry
-            const mid = len / 2;
-            const dist = Math.abs(i - mid);
-            if (dist <= 2) {
-              return 3 + (2 - dist) * 1.5 + Math.random() * 0.5;
-            }
-            return Math.random() * 0.1;
-          })
-        }
-      };
-
-      static generatePattern(valueGenerator) {
-        const now = new Date();
-        const data = [];
-        const numPoints = 24; // ~2 hours of 5-min intervals
-
-        for (let i = 0; i < numPoints; i++) {
-          const time = new Date(now.getTime() + i * 5 * 60 * 1000);
-          const timeStr = `${String(time.getHours()).padStart(2, '0')}:${String(time.getMinutes()).padStart(2, '0')}`;
-          const mm = valueGenerator(i, numPoints);
-
-          data.push({
-            time: timeStr,
-            val: 0,
-            mm: Math.max(0, mm)
-          });
-        }
-
-        return data;
-      }
-
-      static getPatternList() {
-        return Object.entries(this.PATTERNS).map(([key, pattern]) => ({
-          key,
-          label: pattern.label
-        }));
-      }
-
-      static getData(patternKey) {
-        const pattern = this.PATTERNS[patternKey];
-        if (!pattern) return null;
-        return pattern.generate();
-      }
-    }
 
     /**
      * Handles Chart Rendering
@@ -935,12 +762,6 @@
         this.refreshInterval = null;
         this.renderer = new ChartRenderer(root);
 
-        // Debug mode state
-        this.debugMode = false;
-        this.debugPattern = null;
-        this.debugPanelVisible = false;
-        this.clickCount = 0;
-        this.clickTimer = null;
       }
 
       init(Homey) {
@@ -973,129 +794,15 @@
       }
 
       renderUI() {
-        const debugModeEnabled = this.settings.debugMode === true;
-
         this.root.innerHTML = `
           <div id="chart-mount" class="chart-container"></div>
-          ${debugModeEnabled ? '<div class="debug-indicator visible" id="debug-toggle-btn" style="cursor:pointer; pointer-events:all;">Debug Menu</div>' : '<div class="debug-indicator" id="debug-indicator">Debug</div>'}
-          <div class="debug-panel" id="debug-panel">
-            <span class="debug-panel-label">Mock Data:</span>
-            ${MockDataService.getPatternList().map(p =>
-          `<button class="debug-btn" data-pattern="${p.key}">${p.label}</button>`
-        ).join('')}
-            <button class="debug-btn real-data" id="debug-real-data">Use Real Data</button>
-          </div>
         `;
         this.mountPoint = this.root.querySelector('#chart-mount');
-        this.debugPanel = this.root.querySelector('#debug-panel');
-        this.debugIndicator = this.root.querySelector('#debug-indicator');
-
-        if (debugModeEnabled) {
-          const btn = this.root.querySelector('#debug-toggle-btn');
-          if (btn) {
-            this.debugToggleBtn = btn;
-            this.debugToggleBtn.addEventListener('click', (e) => {
-              e.stopPropagation();
-              this.toggleDebugPanel();
-            });
-          }
-        }
-
-        this.setupDebugHandlers();
       }
 
-      setupDebugHandlers() {
-        // Triple-click handler on the root container using capture to bypass stopPropagation
-        this.root.addEventListener('click', (e) => {
-          // If debug mode setting is ON, we use the button instead of triple click
-          if (this.settings.debugMode) return;
 
-          this.clickCount++;
-
-          if (this.clickTimer) clearTimeout(this.clickTimer);
-
-          this.clickTimer = setTimeout(() => {
-            if (this.clickCount >= 3) {
-              this.toggleDebugPanel();
-            }
-            this.clickCount = 0;
-          }, 400);
-        }, { capture: true });
-
-        // Debug panel button handlers
-        this.debugPanel.querySelectorAll('.debug-btn[data-pattern]').forEach(btn => {
-          btn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const pattern = btn.dataset.pattern;
-            this.setDebugPattern(pattern);
-
-            // Update active state
-            this.debugPanel.querySelectorAll('.debug-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-          });
-        });
-
-        // Real data button
-        this.root.querySelector('#debug-real-data').addEventListener('click', (e) => {
-          e.stopPropagation();
-          this.exitDebugMode();
-        });
-
-        // Click outside to close debug panel
-        document.addEventListener('click', (e) => {
-          if (this.debugPanelVisible && !this.debugPanel.contains(e.target) && !this.mountPoint.contains(e.target)) {
-            this.hideDebugPanel();
-          }
-        });
-      }
-
-      toggleDebugPanel() {
-        this.debugPanelVisible = !this.debugPanelVisible;
-        this.debugPanel.classList.toggle('visible', this.debugPanelVisible);
-      }
-
-      hideDebugPanel() {
-        this.debugPanelVisible = false;
-        this.debugPanel.classList.remove('visible');
-      }
-
-      setDebugPattern(patternKey) {
-        this.debugMode = true;
-        this.debugPattern = patternKey;
-        // Indicator handles visibility via renderUI or toggle
-        if (this.debugToggleBtn) this.debugToggleBtn.classList.add('visible');
-
-        // Stop auto-refresh while in debug mode
-        if (this.refreshInterval) {
-          clearInterval(this.refreshInterval);
-          this.refreshInterval = null;
-        }
-
-        // Generate and render mock data
-        this.data = MockDataService.getData(patternKey);
-        this.renderData();
-      }
-
-      exitDebugMode() {
-        this.debugMode = false;
-        this.debugPattern = null;
-        // Keep button visible if debug setting is on
-        if (!this.settings.debugMode && this.debugToggleBtn) {
-          this.debugToggleBtn.classList.remove('visible');
-        }
-        this.hideDebugPanel();
-
-        // Clear active states
-        this.debugPanel.querySelectorAll('.debug-btn').forEach(b => b.classList.remove('active'));
-
-        // Resume normal operation
-        this.fetch();
-        this.setupAutoRefresh();
-      }
 
       async fetch() {
-        // Skip fetch if in debug mode
-        if (this.debugMode) return;
 
         // If we have no data, show loading overlay (not full replacement)
         if (!this.data.length) this.renderer.setLoading(true);
@@ -1175,8 +882,6 @@
       setupAutoRefresh() {
         if (this.refreshInterval) clearInterval(this.refreshInterval);
 
-        // Don't setup refresh if in debug mode
-        if (this.debugMode) return;
 
         const sec = parseInt(this.settings.refreshInterval, 10);
         if (sec > 0) {

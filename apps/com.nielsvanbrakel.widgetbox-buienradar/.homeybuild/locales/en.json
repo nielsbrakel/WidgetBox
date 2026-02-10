@@ -2,6 +2,16 @@
     "widgets": {
         "buienradar": {},
         "buienradar-map": {},
-        "buientabel": {}
+        "buientabel": {
+            "light": "Light",
+            "moderate": "Moderate",
+            "heavy": "Heavy",
+            "noRain": "No rain expected",
+            "loading": "Loading...",
+            "noData": "No data available",
+            "now": "Now",
+            "error": "Something went wrong",
+            "locationError": "Location is outside the coverage area"
+        }
     }
 }

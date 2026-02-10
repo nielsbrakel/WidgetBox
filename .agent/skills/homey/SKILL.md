@@ -403,9 +403,41 @@ homey app validate --level verified
 
 ---
 
-## App Manifest (app.json)
+## Homey Compose
 
-Ensure compatibility for widgets:
+Homey Compose splits the app manifest into modular files that get merged into the root `app.json` during pre-processing.
+
+### How it works
+
+1. **`.homeycompose/app.json`** — The **source** manifest with base app metadata (id, name, description, compatibility, etc.)
+2. **`widgets/<id>/widget.compose.json`** — Individual widget definitions
+3. **Root `app.json`** — The **generated** output, merged from the above files
+
+> **IMPORTANT**: Both `.homeycompose/app.json` AND root `app.json` must exist. The CLI reads `.homeycompose/app.json` as the source and writes the merged result (with widgets, drivers, etc.) to root `app.json`. Deleting root `app.json` causes errors.
+
+> **WARNING**: If `.homeycompose/app.json` is missing but root `app.json` exists, the CLI shows:
+> `Warning: Could not find a Homey Compose app.json manifest!`
+> Always create `.homeycompose/app.json` with the base metadata.
+
+### Creating a Compose app
+
+```
+my-app/
+├── .homeycompose/
+│   └── app.json          # Source manifest (base metadata only, no widgets)
+├── app.json              # Generated (copy of .homeycompose/app.json + merged widgets)
+├── app.js                # App entry point
+├── package.json
+├── widgets/
+│   └── my-widget/
+│       ├── widget.compose.json
+│       └── public/
+│           └── index.html
+└── locales/
+    └── en.json
+```
+
+### .homeycompose/app.json example
 
 ```json
 {
@@ -418,9 +450,64 @@ Ensure compatibility for widgets:
   "description": { "en": "App description" },
   "category": ["tools"],
   "brandColor": "#00B8FF",
+  "permissions": [],
+  "images": {
+    "small": "/assets/images/small.png",
+    "large": "/assets/images/large.png",
+    "xlarge": "/assets/images/xlarge.png"
+  },
   "author": { "name": "Your Name", "email": "you@example.com" }
 }
 ```
+
+**Key rules:**
+- Widget apps require `"compatibility": ">=12.3.0"` (widgets need SDK 12.3+)
+- Widget apps must use `"platforms": ["local"]` (widgets are not available on Homey Cloud)
+- Do NOT include `"widgets"` in `.homeycompose/app.json` — they are auto-merged from `widget.compose.json` files
+
+---
+
+## Translations (Locales)
+
+Homey uses per-language JSON files in `locales/` for runtime translations.
+
+### File structure
+
+```
+locales/
+├── en.json    # English (required)
+└── nl.json    # Dutch (or any other language)
+```
+
+### Format rules
+
+- Each file contains translations for **one language** — the filename IS the language
+- Do NOT nest under a language key (wrong: `{"en": {"title": "..."}}`)
+- Widget translations go under `widgets.<widgetId>.<key>`
+
+```json
+{
+  "widgets": {
+    "my-widget": {
+      "loading": "Loading...",
+      "error": "Something went wrong"
+    }
+  }
+}
+```
+
+### Usage in widgets
+
+```javascript
+// Direct call
+const text = Homey.__('widgets.my-widget.loading');
+
+// Helper pattern (recommended)
+const __ = (key) => Homey.__(`widgets.my-widget.${key}`) ?? key;
+const text = __('loading');
+```
+
+> **IMPORTANT**: If a translation key is missing, `Homey.__()` returns the key path as a string. Always populate both `en.json` and `nl.json` with all keys used in widget code.
 
 ---
 
@@ -456,9 +543,10 @@ setInterval(refresh, 5 * 60 * 1000);
 ### Listen for Setting Changes
 
 ```javascript
-// Settings are fetched once at init
-// User must re-add widget for new settings
-const settings = await Homey.getSettings();
+Homey.on('settings.set', (key, value) => {
+  settings[key] = value;
+  renderWidget();
+});
 ```
 
 ---
@@ -471,8 +559,11 @@ When building multiple Homey apps in a monorepo:
 my-monorepo/
 ├── apps/
 │   ├── com.example.app-one/
-│   │   ├── app.json
+│   │   ├── .homeycompose/
+│   │   │   └── app.json       # Source manifest
+│   │   ├── app.json            # Generated manifest
 │   │   ├── app.js
+│   │   ├── package.json
 │   │   └── widgets/
 │   │       └── my-widget/
 │   └── com.example.app-two/
@@ -482,3 +573,43 @@ my-monorepo/
 ```
 
 Each Homey app is a standalone package that can be developed and published independently.
+
+### Turbo Integration
+
+Add these scripts to each app's `package.json`:
+
+```json
+{
+  "scripts": {
+    "homey:run": "echo 'Only one app can run in dev mode at a time. Run directly: homey app run'",
+    "homey:install": "homey app install",
+    "homey:build": "homey app build",
+    "homey:publish": "homey app publish"
+  }
+}
+```
+
+Add matching tasks to `turbo.json`:
+
+```json
+{
+  "tasks": {
+    "homey:run": { "cache": false, "persistent": true },
+    "homey:install": { "cache": false },
+    "homey:build": {},
+    "homey:publish": { "cache": false }
+  }
+}
+```
+
+Usage:
+```bash
+turbo run homey:install   # Install all apps to Homey
+turbo run homey:build     # Build all apps
+turbo run homey:publish   # Publish all apps
+```
+
+> **WARNING**: `homey app run` (dev mode) uses port 9229 for debugging.
+> Only ONE app can run in dev mode at a time. Running multiple apps
+> simultaneously causes a port conflict. Use `homey:install` to deploy
+> all apps, and `homey app run` directly for single-app debugging.

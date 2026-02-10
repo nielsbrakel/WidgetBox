@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "main": "app.js",
     "scripts": {
-        "homey:run": "homey app run",
+        "homey:run": "echo 'Only one app can run in dev mode at a time. Run directly: homey app run'",
         "homey:install": "homey app install",
         "homey:build": "homey app build",
         "homey:publish": "homey app publish"

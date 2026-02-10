@@ -109,15 +109,6 @@
       ]
     },
     {
-      "id": "debugMode",
-      "type": "checkbox",
-      "label": {
-        "en": "Debug Mode",
-        "nl": "Debug Modus"
-      },
-      "value": false
-    },
-    {
       "id": "graphStyle",
       "type": "dropdown",
       "label": {
@@ -156,6 +147,10 @@
         "en": "Latitude",
         "nl": "Breedtegraad"
       },
+      "hint": {
+        "en": "Enter the latitude of your location (e.g. 52.1326)",
+        "nl": "Voer de breedtegraad van je locatie in (bijv. 52.1326)"
+      },
       "value": "52.1326"
     },
     {
@@ -164,6 +159,10 @@
       "label": {
         "en": "Longitude",
         "nl": "Lengtegraad"
+      },
+      "hint": {
+        "en": "Enter the longitude of your location (e.g. 5.2913)",
+        "nl": "Voer de lengtegraad van je locatie in (bijv. 5.2913)"
       },
       "value": "5.2913"
     },

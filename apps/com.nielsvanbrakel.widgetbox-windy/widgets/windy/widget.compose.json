@@ -71,6 +71,10 @@
         "en": "Detail Latitude (leave blank to use main latitude)",
         "nl": "Detail Breedtegraad (leeg laten voor hoofd breedtegraad)"
       },
+      "hint": {
+        "en": "Latitude for the detail view (e.g. 52.22)",
+        "nl": "Breedtegraad voor de detailweergave (bijv. 52.22)"
+      },
       "value": ""
     },
     {
@@ -80,6 +84,10 @@
         "en": "Detail Longitude (leave blank to use main longitude)",
         "nl": "Detail Lengtegraad (leeg laten voor hoofd lengtegraad)"
       },
+      "hint": {
+        "en": "Longitude for the detail view (e.g. 6.01)",
+        "nl": "Lengtegraad voor de detailweergave (bijv. 6.01)"
+      },
       "value": ""
     },
     {
@@ -88,6 +96,10 @@
       "label": {
         "en": "Latitude",
         "nl": "Breedtegraad"
+      },
+      "hint": {
+        "en": "Enter the latitude of your location (e.g. 52.22)",
+        "nl": "Voer de breedtegraad van je locatie in (bijv. 52.22)"
       },
       "value": "52.22"
     },
@@ -129,6 +141,10 @@
       "label": {
         "en": "Longitude",
         "nl": "Lengtegraad"
+      },
+      "hint": {
+        "en": "Enter the longitude of your location (e.g. 6.01)",
+        "nl": "Voer de lengtegraad van je locatie in (bijv. 6.01)"
       },
       "value": "6.01"
     },
@@ -353,6 +369,10 @@
       "label": {
         "en": "Zoom Level",
         "nl": "Zoomniveau"
+      },
+      "hint": {
+        "en": "Map zoom level (higher = closer, e.g. 5 for country view)",
+        "nl": "Kaart zoomniveau (hoger = dichterbij, bijv. 5 voor landweergave)"
       },
       "value": 5
     }

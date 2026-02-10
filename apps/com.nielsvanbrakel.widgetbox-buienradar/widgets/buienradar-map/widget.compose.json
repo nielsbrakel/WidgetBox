@@ -16,6 +16,10 @@
                 "en": "Location (City or Postal Code)",
                 "nl": "Locatie (Stad of Postcode)"
             },
+            "hint": {
+                "en": "Enter a city name or postal code (e.g. Amsterdam, 1012AB)",
+                "nl": "Voer een stadsnaam of postcode in (bijv. Amsterdam, 1012AB)"
+            },
             "value": "Amsterdam"
         },
         {

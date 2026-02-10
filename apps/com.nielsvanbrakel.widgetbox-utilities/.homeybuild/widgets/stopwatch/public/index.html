@@ -274,7 +274,6 @@
     // Config defaults (will be overridden by settings)
     const CONFIG = {
       STOPWATCH_HEIGHT: 120,
-      DEBUG_HEIGHT: 100,
       GAP: 12,
       BTN_HEIGHT: 44,
       PADDING: 0,
@@ -283,8 +282,7 @@
       MAX_STOPWATCHES: 1,
       ALLOW_ADDING: false,
       SHOW_MILLISECONDS: true,
-      SHOW_LAPS: false,
-      DEBUG_MODE: false
+      SHOW_LAPS: false
     };
 
     // State
@@ -304,7 +302,7 @@
     // --- Utilities ---
     const $ = (sel, ctx = document) => ctx.querySelector(sel);
     const pad = n => String(n).padStart(2, '0');
-    const debugLog = (...args) => CONFIG.DEBUG_MODE && console.log('[Stopwatch]', ...args);
+
 
     const formatTime = (ms, showMs = true) => {
       const totalSeconds = Math.floor(ms / 1000);
@@ -321,12 +319,11 @@
     };
 
     const calcHeight = () => {
-      const { STOPWATCH_HEIGHT, GAP, BTN_HEIGHT, PADDING, MAX_STOPWATCHES, ALLOW_ADDING, DEBUG_MODE, DEBUG_HEIGHT } = CONFIG;
+      const { STOPWATCH_HEIGHT, GAP, BTN_HEIGHT, PADDING, MAX_STOPWATCHES, ALLOW_ADDING } = CONFIG;
       const total = stopwatches.length * STOPWATCH_HEIGHT + Math.max(0, stopwatches.length - 1) * GAP;
       const canAdd = ALLOW_ADDING && stopwatches.length < MAX_STOPWATCHES;
       const btnHeight = canAdd ? BTN_HEIGHT + GAP : 0;
-      const debugHeight = DEBUG_MODE ? DEBUG_HEIGHT + GAP : 0;
-      return PADDING + total + btnHeight + debugHeight;
+      return PADDING + total + btnHeight;
     };
 
     const setHeight = () => Homey?.setHeight?.(calcHeight());
@@ -362,7 +359,7 @@
       lastSavePayload = state;
       lastSaveTimestamp = Date.now();
 
-      debugLog('Saving state:', state);
+
 
       try {
         await Homey.api('PUT', `/state?widgetId=${encodeURIComponent(widgetId)}`, state);
@@ -379,7 +376,6 @@
 
       try {
         const state = await Homey.api('GET', `/state?widgetId=${encodeURIComponent(widgetId)}`);
-        debugLog('Loaded state:', state);
         return state;
       } catch (err) {
         console.error('Failed to load stopwatch state:', err);
@@ -424,7 +420,7 @@
         }
       });
 
-      debugLog('Restored stopwatches:', stopwatches);
+
       return true;
     };
 
@@ -561,25 +557,7 @@
       }
     };
 
-    // --- Debug Panel ---
-    const renderDebugPanel = () => {
-      if (!CONFIG.DEBUG_MODE) return '';
 
-      const payload = lastSavePayload ? JSON.stringify(lastSavePayload, null, 2) : 'No saves yet';
-      const timestamp = lastSaveTimestamp ? new Date(lastSaveTimestamp).toLocaleTimeString() : 'Never';
-
-      return `
-        <div class="debug-panel" style="background: var(--homey-color-mono-100); padding: 8px; border-radius: 8px; font-size: 10px; font-family: monospace; margin-top: 8px;">
-          <div><strong>Widget ID:</strong> ${widgetId}</div>
-          <div><strong>Restore Reason:</strong> ${restoreReason}</div>
-          <div><strong>Last Save:</strong> ${timestamp}</div>
-          <details>
-            <summary>Last Payload</summary>
-            <pre style="font-size: 9px; overflow: auto; max-height: 60px;">${payload}</pre>
-          </details>
-        </div>
-      `;
-    };
 
     // --- Rendering ---
     const renderLaps = (sw) => {
@@ -637,7 +615,7 @@
       const addBtn = canAdd
         ? `<button class="btn btn-add" onclick="addStopwatch()">${__('addStopwatch')}</button>`
         : '';
-      $('#app').innerHTML = `<div class="stopwatch-list">${content}${addBtn}</div>${renderDebugPanel()}`;
+      $('#app').innerHTML = `<div class="stopwatch-list">${content}${addBtn}</div>`;
     };
 
     // --- Init ---
@@ -647,14 +625,14 @@
 
       // Get widget instance ID from Homey
       widgetId = Homey.getWidgetInstanceId();
-      debugLog('Widget ID:', widgetId);
+
 
       // Apply settings to CONFIG
       CONFIG.MAX_STOPWATCHES = settings.maxStopwatches ?? CONFIG.MAX_STOPWATCHES;
       CONFIG.ALLOW_ADDING = settings.allowAddingStopwatches ?? CONFIG.ALLOW_ADDING;
       CONFIG.SHOW_MILLISECONDS = settings.showMilliseconds ?? CONFIG.SHOW_MILLISECONDS;
       CONFIG.SHOW_LAPS = settings.showLaps ?? CONFIG.SHOW_LAPS;
-      CONFIG.DEBUG_MODE = settings.debugMode ?? CONFIG.DEBUG_MODE;
+
 
       // Try to restore from persistence
       const savedState = await loadState();

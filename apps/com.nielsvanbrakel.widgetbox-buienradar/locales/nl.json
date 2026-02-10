@@ -1,0 +1,17 @@
+{
+    "widgets": {
+        "buienradar": {},
+        "buienradar-map": {},
+        "buientabel": {
+            "light": "Licht",
+            "moderate": "Matig",
+            "heavy": "Zwaar",
+            "noRain": "Geen regen verwacht",
+            "loading": "Laden...",
+            "noData": "Geen gegevens beschikbaar",
+            "now": "Nu",
+            "error": "Er is iets misgegaan",
+            "locationError": "Locatie valt buiten het dekkingsgebied"
+        }
+    }
+}

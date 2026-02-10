@@ -342,29 +342,6 @@
     .countdown.finished {
       color: var(--homey-color-red-500);
     }
-
-    /* Debug Button Styles */
-    .debug-indicator {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      background: rgba(255, 0, 0, 0.7);
-      color: white;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 10px;
-      font-weight: bold;
-      z-index: 100;
-      cursor: pointer;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s;
-    }
-
-    .debug-indicator.visible {
-      opacity: 1;
-      pointer-events: all;
-    }
   </style>
 </head>
 
@@ -377,7 +354,6 @@
       ITEM_HEIGHT: 22,
       MAX_TIMERS: 5,
       TIMER_HEIGHT: 120,
-      DEBUG_HEIGHT: 100,
       GAP: 12,
       BTN_HEIGHT: 44,
       PADDING: 0,
@@ -388,8 +364,7 @@
       ALLOW_ADDING: true,
       DEFAULT_HOURS: 0,
       DEFAULT_MINUTES: 5,
-      DEFAULT_SECONDS: 0,
-      DEBUG_MODE: false
+      DEFAULT_SECONDS: 0
     };
 
     // State
@@ -411,7 +386,7 @@
     const $$ = (sel, ctx = document) => ctx.querySelectorAll(sel);
     const pad = n => String(n).padStart(2, '0');
     const clamp = (val, min, max) => Math.max(min, Math.min(max, val));
-    const debugLog = (...args) => CONFIG.DEBUG_MODE && console.log('[Timer]', ...args);
+
 
     const formatTime = (secs) => {
       const h = Math.floor(secs / 3600);
@@ -423,12 +398,11 @@
     const vibrate = () => navigator.vibrate?.([200, 100, 200]);
 
     const calcHeight = () => {
-      const { TIMER_HEIGHT, GAP, BTN_HEIGHT, PADDING, MAX_TIMERS, ALLOW_ADDING, DEBUG_MODE, DEBUG_HEIGHT } = CONFIG;
+      const { TIMER_HEIGHT, GAP, BTN_HEIGHT, PADDING, MAX_TIMERS, ALLOW_ADDING } = CONFIG;
       const timerTotal = timers.length * TIMER_HEIGHT + Math.max(0, timers.length - 1) * GAP;
       const canAdd = ALLOW_ADDING && timers.length < MAX_TIMERS;
       const btnHeight = canAdd ? BTN_HEIGHT + GAP : 0;
-      const debugHeight = DEBUG_MODE ? DEBUG_HEIGHT + GAP : 0;
-      return PADDING + timerTotal + btnHeight + debugHeight;
+      return PADDING + timerTotal + btnHeight;
     };
 
     const setHeight = () => Homey?.setHeight?.(calcHeight());
@@ -466,7 +440,7 @@
       lastSavePayload = state;
       lastSaveTimestamp = Date.now();
 
-      debugLog('Saving state:', state);
+
 
       try {
         // Use LocalStorage prefixed with widgetId
@@ -490,7 +464,6 @@
         if (!raw) return null;
 
         const state = JSON.parse(raw);
-        debugLog('Loaded state:', state);
         return state;
       } catch (err) {
         console.error('Failed to load timer state:', err);
@@ -534,7 +507,7 @@
           } else {
             timer.isRunning = false;
             timer.remaining = 0;
-            debugLog('Timer finished while gone:', timer.id);
+
           }
         } else {
           timer.remaining = saved.remainingAtLastStart ?? saved.duration;
@@ -546,7 +519,7 @@
         return timer;
       });
 
-      debugLog('Restored timers:', timers);
+
       return true;
     };
 
@@ -704,25 +677,7 @@
       el.classList.toggle('finished', finished);
     };
 
-    // --- Debug Panel ---
-    const renderDebugPanel = () => {
-      if (!CONFIG.DEBUG_MODE) return '';
 
-      const payload = lastSavePayload ? JSON.stringify(lastSavePayload, null, 2) : 'No saves yet';
-      const timestamp = lastSaveTimestamp ? new Date(lastSaveTimestamp).toLocaleTimeString() : 'Never';
-
-      return `
-        <div class="debug-panel" style="background: var(--homey-color-mono-100); padding: 8px; border-radius: 8px; font-size: 10px; font-family: monospace; margin-top: 8px;">
-          <div><strong>Widget ID:</strong> ${widgetId}</div>
-          <div><strong>Restore Reason:</strong> ${restoreReason}</div>
-          <div><strong>Last Save:</strong> ${timestamp}</div>
-          <details>
-            <summary>Last Payload</summary>
-            <pre style="font-size: 9px; overflow: auto; max-height: 60px;">${payload}</pre>
-          </details>
-        </div>
-      `;
-    };
 
     // --- Rendering ---
     const renderPickerCol = (timer, field, labelKey, max) => {
@@ -796,22 +751,13 @@
       const canAdd = settings.allowAddingTimers !== false && timers.length < CONFIG.MAX_TIMERS;
 
       const addBtn = canAdd
-        ? `<button class="btn btn-add" onclick="addTimer()">+ Add Timer</button>`
-        : '';
-
-      const debugModeEnabled = settings.debugMode === true;
-      const debugBtn = debugModeEnabled
-        ? `<div class="debug-indicator visible" onclick="event.stopPropagation(); document.querySelector('.debug-panel').classList.toggle('visible');">Debug Menu</div>`
+        ? `<button class="btn btn-add" onclick="addTimer()">${__('addTimer')}</button>`
         : '';
 
       const app = document.getElementById('app');
-      // Ensure we don't wipe out the app container itself if previously we were targeting #app logic differently
-      // The original code targeted $('#app').innerHTML.
 
       app.innerHTML = `
-        ${debugBtn}
         <div class="timer-list">${content}${addBtn}</div>
-        ${renderDebugPanel()}
       `;
 
       // Re-attach listeners or rely on inline onclicks as established
@@ -855,7 +801,7 @@
 
       // Get widget instance ID from Homey
       widgetId = Homey.getWidgetInstanceId();
-      debugLog('Widget ID:', widgetId);
+
 
       // Apply settings to CONFIG
       CONFIG.MAX_TIMERS = settings.maxTimers ?? CONFIG.MAX_TIMERS;
@@ -864,7 +810,7 @@
       CONFIG.DEFAULT_HOURS = settings.defaultHours ?? CONFIG.DEFAULT_HOURS;
       CONFIG.DEFAULT_MINUTES = settings.defaultMinutes ?? CONFIG.DEFAULT_MINUTES;
       CONFIG.DEFAULT_SECONDS = settings.defaultSeconds ?? CONFIG.DEFAULT_SECONDS;
-      CONFIG.DEBUG_MODE = settings.debugMode ?? CONFIG.DEBUG_MODE;
+
 
       // Try to restore from persistence
       const savedState = await loadState();

@@ -105,6 +105,10 @@
         "en": "Playlist ID (leave blank to use Video ID)",
         "nl": "Afspeellijst ID (leeg laten om Video ID te gebruiken)"
       },
+      "hint": {
+        "en": "YouTube playlist ID from the URL (e.g. PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf)",
+        "nl": "YouTube afspeellijst-ID uit de URL (bijv. PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf)"
+      },
       "value": ""
     },
     {
@@ -114,6 +118,10 @@
         "en": "Start at (seconds)",
         "nl": "Start op (seconden)"
       },
+      "hint": {
+        "en": "Start playback at this position in seconds (0 = beginning)",
+        "nl": "Start afspelen op deze positie in seconden (0 = begin)"
+      },
       "value": 0
     },
     {
@@ -122,6 +130,10 @@
       "label": {
         "en": "Video ID",
         "nl": "Video ID"
+      },
+      "hint": {
+        "en": "YouTube video ID from the URL (e.g. dQw4w9WgXcQ)",
+        "nl": "YouTube video-ID uit de URL (bijv. dQw4w9WgXcQ)"
       },
       "value": ""
     }

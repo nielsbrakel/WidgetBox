@@ -20,20 +20,15 @@
       "value": true
     },
     {
-      "id": "debugMode",
-      "type": "checkbox",
-      "label": {
-        "en": "Debug Mode",
-        "nl": "Debug Modus"
-      },
-      "value": false
-    },
-    {
       "id": "defaultHours",
       "type": "number",
       "label": {
         "en": "Default timer hours",
         "nl": "Standaard timer uren"
+      },
+      "hint": {
+        "en": "Hours for new timers (0-23)",
+        "nl": "Uren voor nieuwe timers (0-23)"
       },
       "min": 0,
       "max": 23,
@@ -46,6 +41,10 @@
         "en": "Default timer minutes",
         "nl": "Standaard timer minuten"
       },
+      "hint": {
+        "en": "Minutes for new timers (0-59)",
+        "nl": "Minuten voor nieuwe timers (0-59)"
+      },
       "min": 0,
       "max": 59,
       "value": 5
@@ -56,6 +55,10 @@
       "label": {
         "en": "Default timer seconds",
         "nl": "Standaard timer seconden"
+      },
+      "hint": {
+        "en": "Seconds for new timers (0-59)",
+        "nl": "Seconden voor nieuwe timers (0-59)"
       },
       "min": 0,
       "max": 59,
@@ -68,6 +71,10 @@
         "en": "Number of timers to start with",
         "nl": "Aantal timers bij starten"
       },
+      "hint": {
+        "en": "How many timers to show when the widget first loads",
+        "nl": "Hoeveel timers worden getoond wanneer de widget wordt geladen"
+      },
       "min": 1,
       "max": 10,
       "value": 1
@@ -78,6 +85,10 @@
       "label": {
         "en": "Maximum number of timers",
         "nl": "Maximaal aantal timers"
+      },
+      "hint": {
+        "en": "Maximum number of timers that can be active at once (1-10)",
+        "nl": "Maximaal aantal timers dat tegelijk actief kan zijn (1-10)"
       },
       "min": 1,
       "max": 10,

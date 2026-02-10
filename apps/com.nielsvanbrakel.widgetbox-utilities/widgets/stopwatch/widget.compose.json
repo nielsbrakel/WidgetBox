@@ -20,20 +20,15 @@
       "value": false
     },
     {
-      "id": "debugMode",
-      "type": "checkbox",
-      "label": {
-        "en": "Debug Mode",
-        "nl": "Debug Modus"
-      },
-      "value": false
-    },
-    {
       "id": "maxStopwatches",
       "type": "number",
       "label": {
         "en": "Maximum stopwatches",
         "nl": "Maximaal aantal stopwatches"
+      },
+      "hint": {
+        "en": "Maximum number of stopwatches that can run simultaneously (1-5)",
+        "nl": "Maximaal aantal stopwatches dat tegelijk kan draaien (1-5)"
       },
       "min": 1,
       "max": 5,
