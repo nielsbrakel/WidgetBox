@@ -1,6 +1,5 @@
 {
     "widgets": {
-        "spacer": {},
         "stopwatch": {
             "addStopwatch": "Stopwatch Toevoegen",
             "lap": "Ronde",

@@ -48,16 +48,20 @@
 
       if (currentSettings.autoplay) {
         params.append('autoplay', '1');
-      }
-      if (currentSettings.mute) {
+        // Autoplay usually requires the video to be muted
+        params.append('mute', '1');
+      } else if (currentSettings.mute) {
         params.append('mute', '1');
       }
+
       if (!currentSettings.controls) {
         params.append('controls', '0');
       }
       if (currentSettings.loop) {
         params.append('loop', '1');
       }
+
+      params.append('playsinline', '1');
       if (currentSettings.start > 0) {
         params.append('start', String(currentSettings.start));
       }

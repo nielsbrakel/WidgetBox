@@ -1,0 +1,31 @@
+{
+    "id": "com.nielsvanbrakel.widgetbox-layout",
+    "version": "0.1.0",
+    "compatibility": ">=12.3.0",
+    "sdk": 3,
+    "platforms": [
+        "local"
+    ],
+    "name": {
+        "en": "WidgetBox Layout",
+        "nl": "WidgetBox Lay-out"
+    },
+    "description": {
+        "en": "Tools to organize your dashboard layout",
+        "nl": "Hulpmiddelen om je dashboard te organiseren"
+    },
+    "category": [
+        "tools"
+    ],
+    "permissions": [],
+    "images": {
+        "small": "/assets/images/small.png",
+        "large": "/assets/images/large.png",
+        "xlarge": "/assets/images/xlarge.png"
+    },
+    "author": {
+        "name": "Niels van Brakel",
+        "email": "niels@nielsvanbrakel.com"
+    },
+    "brandColor": "#9E9E9E"
+}

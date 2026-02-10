@@ -15,7 +15,8 @@ WidgetBox is organized as a monorepo with separate Homey apps, each focused on a
 | **WidgetBox Clocks** | Analog Clock, Digital Clock, Flip Clock, Binary Clock, Word Clock Grid, Word Clock Sentence, Date | Seven distinct clock and date styles with size, color, alignment, and format options |
 | **WidgetBox Buienradar** | Five-Day Radar, Location Zoom Map, Precipitation Forecast | Dutch precipitation data from Buienradar with charts, animated maps, and customizable locations |
 | **WidgetBox Windy** | Windy | Interactive Windy.com weather map with overlays for wind, temperature, rain, clouds, and pressure |
-| **WidgetBox Utilities** | Spacer, Stopwatch, Timer | Dashboard layout control and timing tools with multi-instance support |
+| **WidgetBox Utilities** | Stopwatch, Timer | Dashboard timing tools with multi-instance support |
+| **WidgetBox Layout** | Spacer | Dashboard layout control and spacing tools |
 | **WidgetBox YouTube** | YouTube | Embed YouTube videos, livestreams, and playlists directly on your dashboard |
 
 ## Monorepo Structure
@@ -27,7 +28,8 @@ WidgetBox/
 │   ├── com.nielsvanbrakel.widgetbox-buienradar/
 │   ├── com.nielsvanbrakel.widgetbox-windy/
 │   ├── com.nielsvanbrakel.widgetbox-utilities/
-│   └── com.nielsvanbrakel.widgetbox-youtube/
+│   ├── com.nielsvanbrakel.widgetbox-youtube/
+│   └── com.nielsvanbrakel.widgetbox-layout/
 ├── packages/                # Shared packages (if any)
 ├── turbo.json               # Turborepo task definitions
 ├── pnpm-workspace.yaml      # pnpm workspace configuration

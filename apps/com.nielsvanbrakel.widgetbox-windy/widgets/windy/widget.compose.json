@@ -56,11 +56,15 @@
       ]
     },
     {
-      "id": "detail",
+      "id": "openDetailsByDefault",
       "type": "checkbox",
       "label": {
-        "en": "Show Detail View",
-        "nl": "Toon Detailweergave"
+        "en": "Open Details by Default",
+        "nl": "Details Standaard Openen"
+      },
+      "hint": {
+        "en": "If enabled, the widget will show the detail view (forecast) on load instead of the map.",
+        "nl": "Indien ingeschakeld, toont de widget de detailweergave (voorspelling) bij het laden in plaats van de kaart."
       },
       "value": false
     },
@@ -68,12 +72,12 @@
       "id": "detailLatitude",
       "type": "text",
       "label": {
-        "en": "Detail Latitude (leave blank to use main latitude)",
-        "nl": "Detail Breedtegraad (leeg laten voor hoofd breedtegraad)"
+        "en": "Detail Latitude",
+        "nl": "Detail Breedtegraad"
       },
       "hint": {
-        "en": "Latitude for the detail view (e.g. 52.22)",
-        "nl": "Breedtegraad voor de detailweergave (bijv. 52.22)"
+        "en": "Leave blank to use main latitude. Latitude for the detail view (e.g. 52.22)",
+        "nl": "Leeg laten voor hoofd breedtegraad. Breedtegraad voor de detailweergave (bijv. 52.22)"
       },
       "value": ""
     },
@@ -81,12 +85,12 @@
       "id": "detailLongitude",
       "type": "text",
       "label": {
-        "en": "Detail Longitude (leave blank to use main longitude)",
-        "nl": "Detail Lengtegraad (leeg laten voor hoofd lengtegraad)"
+        "en": "Detail Longitude",
+        "nl": "Detail Lengtegraad"
       },
       "hint": {
-        "en": "Longitude for the detail view (e.g. 6.01)",
-        "nl": "Lengtegraad voor de detailweergave (bijv. 6.01)"
+        "en": "Leave blank to use main longitude. Longitude for the detail view (e.g. 6.01)",
+        "nl": "Leeg laten voor hoofd lengtegraad. Lengtegraad voor de detailweergave (bijv. 6.01)"
       },
       "value": ""
     },

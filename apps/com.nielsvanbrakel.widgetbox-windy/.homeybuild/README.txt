@@ -1,4 +1,4 @@
-WidgetBox brings premium, beautifully designed widgets to your Homey dashboard. Every widget is crafted to feel right at home on Homey, respecting its design language and adapting seamlessly to light and dark mode. WidgetBox fills the gaps that the default dashboard leaves open, giving you more ways to personalize and enhance your smart home experience.
+WidgetBox adds clean, native-looking widgets to your Homey dashboard. Designed to fit perfectly with Homey's style, these widgets help you customize your dashboard just the way you like it.
 
 WidgetBox Windy embeds an interactive Windy.com weather map directly on your Homey dashboard.
 
@@ -8,4 +8,4 @@ Choose between forecast models including ECMWF, GFS, and NAM. Configure the heig
 
 Enable the detail view for an in-depth weather breakdown at a specific location, with separately configurable coordinates if needed.
 
-The widget supports multiple aspect ratios from panoramic to square, so it fits perfectly into any dashboard arrangement.
+The widget supports multiple aspect ratios from panoramic to square, so it fits well into any dashboard arrangement.

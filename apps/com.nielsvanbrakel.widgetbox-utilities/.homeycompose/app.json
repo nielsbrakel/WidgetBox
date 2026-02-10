@@ -1,6 +1,6 @@
 {
     "id": "com.nielsvanbrakel.widgetbox-utilities",
-    "version": "1.0.0",
+    "version": "0.1.0",
     "compatibility": ">=12.3.0",
     "sdk": 3,
     "platforms": [
@@ -11,8 +11,8 @@
         "nl": "WidgetBox Hulpmiddelen"
     },
     "description": {
-        "en": "Timers, stopwatches, and layout tools for your dashboard",
-        "nl": "Timers, stopwatches en lay-outhulpmiddelen voor je dashboard"
+        "en": "Timers and stopwatches for your dashboard",
+        "nl": "Timers en stopwatches voor je dashboard"
     },
     "category": [
         "tools"

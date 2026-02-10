@@ -1,6 +1,5 @@
 {
     "widgets": {
-        "spacer": {},
         "stopwatch": {
             "addStopwatch": "Add Stopwatch",
             "lap": "Lap",

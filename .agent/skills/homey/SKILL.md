@@ -366,11 +366,11 @@ A refresh button appears to reload `index.html` without full restart.
 
 | Asset | Size | Format |
 |-------|------|--------|
-| App icon | 1024x1024 | PNG (transparent bg) |
-| App image small | 250x175 | JPG/PNG |
-| App image large | 500x350 | JPG/PNG |
-| App image xlarge | 1000x700 | JPG/PNG |
-| Widget preview | 1024x1024 | PNG (transparent bg) |
+| App icon | 1024x1024 | PNG (transparent bg) | Required for install |
+| App image small | 250x175 | JPG/PNG | **Required for publish validation** |
+| App image large | 500x350 | JPG/PNG | **Required for publish validation** |
+| App image xlarge | 1000x700 | JPG/PNG | Optional but recommended |
+| Widget preview | 1024x1024 | PNG (transparent bg) | Required for widget list |
 
 ### Validation Levels
 
@@ -387,8 +387,10 @@ homey app validate --level verified
 
 ### Publishing Process
 
-1. Validate app: `homey app validate`
+1. Validate app: `homey app validate --level publish`
 2. Publish: `homey app publish`
+    - **Interactive**: This command will prompt you to select a new version (Patch/Minor/Major) or confirm the current one.
+    - **Monorepo**: In a script, you may need to handle this interactivity (e.g. via `turbo` with concurrency 1).
 3. Go to [tools.developer.homey.app](https://tools.developer.homey.app)
 4. Submit for Test or Live certification
 5. Wait for Athom review
@@ -410,6 +412,7 @@ The `README.txt` file is a **plain-text story** displayed on the App Store page 
 - Do not repeat the app name (it already shows above the README on the store)
 - Describe the app's possibilities, not its technical implementation
 - Write in a friendly, engaging tone aimed at end users
+- **Avoid specific counts**: Use "multiple" or "various" instead of exact numbers (e.g. "7 widgets") so the text stays accurate long-term
 
 **Description field (`app.json`):**
 - The `description` field is a short, catchy tagline shown below the app name

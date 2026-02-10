@@ -1,6 +1,6 @@
 {
     "id": "com.nielsvanbrakel.widgetbox-clocks",
-    "version": "1.0.0",
+    "version": "0.1.0",
     "compatibility": ">=12.3.0",
     "sdk": 3,
     "platforms": [
@@ -10,8 +10,8 @@
         "en": "WidgetBox Clocks"
     },
     "description": {
-        "en": "Seven stunning ways to tell time on your dashboard",
-        "nl": "Zeven prachtige manieren om de tijd op je dashboard te tonen"
+        "en": "Multiple ways to tell time on your dashboard",
+        "nl": "Meerdere manieren om de tijd op je dashboard te tonen"
     },
     "category": [
         "tools"

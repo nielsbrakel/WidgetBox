@@ -35,6 +35,10 @@
       border-bottom: none;
     }
 
+    .timer-list.has-add-btn .timer-item:last-child {
+      border-bottom: var(--homey-line-light);
+    }
+
     .timer-item.fade-in {
       animation: fadeIn 0.3s ease-out;
     }
@@ -233,16 +237,34 @@
     }
 
     .btn-add {
-      width: 100%;
-      padding: var(--homey-su-3);
-      background: var(--homey-color-mono-100);
-      color: var(--homey-text-color);
-      border-top: var(--homey-line-light);
-      border-radius: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: auto;
+      max-width: 200px;
+      height: 36px;
+      box-sizing: border-box;
+      margin: 12px auto;
+      padding: 0 20px;
+      background: var(--homey-color-blue-500);
+      color: white;
+      border: none;
+      border-radius: 99px;
+      font-weight: 600;
+      font-size: 14px;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+      transition: transform 0.1s, box-shadow 0.2s;
     }
 
     .btn-add:hover {
-      background: var(--homey-color-mono-200);
+      background: var(--homey-color-blue-600);
+      box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+      transform: translateY(-1px);
+    }
+
+    .btn-add:active {
+      transform: translateY(1px);
+      box-shadow: 0 2px 6px rgba(59, 130, 246, 0.2);
     }
 
     /* Time Picker */
@@ -357,7 +379,7 @@
       ITEM_HEIGHT: 22,
       MAX_TIMERS: 5,
       TIMER_HEIGHT: 120,
-      GAP: 12,
+      GAP: 0,
       BTN_HEIGHT: 44,
       PADDING: 0,
       CHECKPOINT_INTERVAL: 3000, // Save checkpoint every 3s when running
@@ -401,11 +423,12 @@
     const vibrate = () => navigator.vibrate?.([200, 100, 200]);
 
     const calcHeight = () => {
-      const { TIMER_HEIGHT, GAP, BTN_HEIGHT, PADDING, MAX_TIMERS, ALLOW_ADDING } = CONFIG;
+      const { TIMER_HEIGHT, GAP, MAX_TIMERS, ALLOW_ADDING } = CONFIG;
       const timerTotal = timers.length * TIMER_HEIGHT + Math.max(0, timers.length - 1) * GAP;
       const canAdd = ALLOW_ADDING && timers.length < MAX_TIMERS;
-      const btnHeight = canAdd ? BTN_HEIGHT + GAP : 0;
-      return PADDING + timerTotal + btnHeight;
+      // Button height (36px) + margins (12px top + 12px bottom) = 60px
+      const btnHeight = canAdd ? 60 : 0;
+      return timerTotal + btnHeight;
     };
 
     const setHeight = () => Homey?.setHeight?.(calcHeight());
@@ -754,13 +777,13 @@
       const canAdd = settings.allowAddingTimers !== false && timers.length < CONFIG.MAX_TIMERS;
 
       const addBtn = canAdd
-        ? `<button class="btn btn-add" onclick="addTimer()">${__('addTimer')}</button>`
+        ? `<button class="btn btn-add" onclick="addTimer()">+ ${__('addTimer')}</button>`
         : '';
-
       const app = document.getElementById('app');
 
       app.innerHTML = `
-        <div class="timer-list">${content}${addBtn}</div>
+        <div class="timer-list ${canAdd ? 'has-add-btn' : ''}">${content}</div>
+        ${addBtn}
       `;
 
       // Re-attach listeners or rely on inline onclicks as established

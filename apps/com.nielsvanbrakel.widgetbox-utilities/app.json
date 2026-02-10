@@ -12,8 +12,8 @@
     "nl": "WidgetBox Hulpmiddelen"
   },
   "description": {
-    "en": "Timers, stopwatches, and layout tools for your dashboard",
-    "nl": "Timers, stopwatches en lay-outhulpmiddelen voor je dashboard"
+    "en": "Timers and stopwatches for your dashboard",
+    "nl": "Timers en stopwatches voor je dashboard"
   },
   "category": [
     "tools"
@@ -30,37 +30,6 @@
   },
   "brandColor": "#9E9E9E",
   "widgets": {
-    "spacer": {
-      "name": {
-        "en": "Spacer",
-        "nl": "Ruimte"
-      },
-      "description": {
-        "en": "Add empty space between widgets",
-        "nl": "Voeg lege ruimte toe tussen widgets"
-      },
-      "height": 40,
-      "transparent": true,
-      "settings": [
-        {
-          "id": "heightMultiplier",
-          "type": "number",
-          "label": {
-            "en": "Height Multiplier",
-            "nl": "Hoogte Vermenigvuldiger"
-          },
-          "hint": {
-            "en": "Higher values add more vertical space between widgets",
-            "nl": "Hogere waarden voegen meer verticale ruimte toe tussen widgets"
-          },
-          "min": 1,
-          "max": 1000,
-          "step": 1,
-          "value": 10
-        }
-      ],
-      "id": "spacer"
-    },
     "stopwatch": {
       "name": {
         "en": "Stopwatch",
@@ -80,7 +49,7 @@
             "en": "Allow adding stopwatches",
             "nl": "Stopwatches toevoegen toestaan"
           },
-          "value": false
+          "value": true
         },
         {
           "id": "maxStopwatches",
@@ -94,8 +63,23 @@
             "nl": "Maximaal aantal stopwatches dat tegelijk kan draaien (1-5)"
           },
           "min": 1,
-          "max": 5,
+          "max": 10,
           "value": 3
+        },
+        {
+          "id": "initialStopwatches",
+          "type": "number",
+          "label": {
+            "en": "Number of stopwatches to start with",
+            "nl": "Aantal stopwatches bij starten"
+          },
+          "hint": {
+            "en": "How many stopwatches to show when the widget first loads",
+            "nl": "Hoeveel stopwatches worden getoond wanneer de widget wordt geladen"
+          },
+          "min": 1,
+          "max": 5,
+          "value": 1
         },
         {
           "id": "showLaps",
@@ -203,8 +187,8 @@
           "id": "maxTimers",
           "type": "number",
           "label": {
-            "en": "Maximum number of timers",
-            "nl": "Maximaal aantal timers"
+            "en": "Maximum count",
+            "nl": "Aantal timers"
           },
           "hint": {
             "en": "Maximum number of timers that can be active at once (1-10)",
@@ -212,7 +196,7 @@
           },
           "min": 1,
           "max": 10,
-          "value": 5
+          "value": 3
         }
       ],
       "id": "timer"

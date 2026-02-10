@@ -226,7 +226,7 @@
       API_URL: 'https://gpsgadget.buienradar.nl/data/raintext/',
       DEFAULT_LAT: '52.0907',
       DEFAULT_LON: '5.1214',
-      DEFAULT_MAX_MM: 3.0, // Lowered to zoom into typical rain amounts
+      DEFAULT_MAX_MM: 5,
       ASPECT_RATIOS: {
         '1:1': '100%',
         '4:3': '75%',
@@ -235,21 +235,23 @@
         '3:1': '33.33%'
       },
       LEVELS: [
-        { val: 0.1, key: 'light' },    // Lowered so drizzle (0.1-0.3mm) is above this line
-        { val: 1.0, key: 'moderate' },  // Lowered so typical rain is clearly in this zone
-        { val: 2.5, key: 'heavy' }      // Lowered so heavy rain is easier to distinguish
+        { val: 1 key: 'light' },
+        { val: 4, key: 'moderate' },
+        { val: 8, key: 'heavy' }
       ]
     };
 
-    /**
-     * Scale helper: uses square-root scaling to amplify light rain visibility.
-     * With linear scaling, 0.2mm at max 3.0mm = 6.7% height (barely visible).
-     * With sqrt scaling, 0.2mm at max 3.0mm = sqrt(0.2)/sqrt(3.0) = 25.8% height.
-     */
     const Scale = {
-      /** Convert mm value to a 0-1 ratio using sqrt scale */
-      toRatio: (mm, maxMm) => Math.sqrt(mm) / Math.sqrt(maxMm),
-      /** Convert mm value to percentage (0-100) using sqrt scale */
+      /** Convert mm value to a 0-1 ratio using power scale (0.7) */
+      // Power 0.7 chosen to distinguish 0.1mm (drizzle) from 0.2mm+ effectively.
+      // 0.1mm @ 5mm max: ~6.4% height (vs ~14% with sqrt)
+      // 0.2mm @ 5mm max: ~10.5% height (vs ~20% with sqrt)
+      toRatio: (mm, maxMm) => {
+        if (maxMm <= 0) return 0;
+        const ratio = Math.min(Math.max(mm / maxMm, 0), 1);
+        return Math.pow(ratio, 0.7);
+      },
+      /** Convert mm value to percentage (0-100) using scaled ratio */
       toPct: (mm, maxMm) => Scale.toRatio(mm, maxMm) * 100,
     };
 

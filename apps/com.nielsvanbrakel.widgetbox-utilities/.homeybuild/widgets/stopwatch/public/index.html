@@ -37,6 +37,10 @@
       border-bottom: none;
     }
 
+    .stopwatch-list.has-add-btn .stopwatch-item:last-child {
+      border-bottom: var(--homey-line-light);
+    }
+
     .stopwatch-item.fade-in {
       animation: fadeIn 0.3s ease-out;
     }
@@ -196,16 +200,34 @@
     }
 
     .btn-add {
-      width: 100%;
-      padding: var(--homey-su-3);
-      background: var(--homey-color-mono-100);
-      color: var(--homey-text-color);
-      border-top: var(--homey-line-light);
-      border-radius: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: auto;
+      max-width: 200px;
+      height: 36px;
+      box-sizing: border-box;
+      margin: 12px auto;
+      padding: 0 20px;
+      background: var(--homey-color-blue-500);
+      color: white;
+      border: none;
+      border-radius: 99px;
+      font-weight: 600;
+      font-size: 14px;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+      transition: transform 0.1s, box-shadow 0.2s;
     }
 
     .btn-add:hover {
-      background: var(--homey-color-mono-200);
+      background: var(--homey-color-blue-600);
+      box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+      transform: translateY(-1px);
+    }
+
+    .btn-add:active {
+      transform: translateY(1px);
+      box-shadow: 0 2px 6px rgba(59, 130, 246, 0.2);
     }
 
     /* Time Display */
@@ -277,7 +299,7 @@
     // Config defaults (will be overridden by settings)
     const CONFIG = {
       STOPWATCH_HEIGHT: 120,
-      GAP: 12,
+      GAP: 0,
       BTN_HEIGHT: 44,
       PADDING: 0,
       CHECKPOINT_INTERVAL: 3000, // Save checkpoint every 3s when running
@@ -322,11 +344,12 @@
     };
 
     const calcHeight = () => {
-      const { STOPWATCH_HEIGHT, GAP, BTN_HEIGHT, PADDING, MAX_STOPWATCHES, ALLOW_ADDING } = CONFIG;
+      const { STOPWATCH_HEIGHT, GAP, MAX_STOPWATCHES, ALLOW_ADDING } = CONFIG;
       const total = stopwatches.length * STOPWATCH_HEIGHT + Math.max(0, stopwatches.length - 1) * GAP;
       const canAdd = ALLOW_ADDING && stopwatches.length < MAX_STOPWATCHES;
-      const btnHeight = canAdd ? BTN_HEIGHT + GAP : 0;
-      return PADDING + total + btnHeight;
+      // Button height (36px) + margins (12px top + 12px bottom) = 60px
+      const btnHeight = canAdd ? 60 : 0;
+      return total + btnHeight;
     };
 
     const setHeight = () => Homey?.setHeight?.(calcHeight());
@@ -616,9 +639,9 @@
       const content = stopwatches.map(renderStopwatch).join('');
       const canAdd = CONFIG.ALLOW_ADDING && stopwatches.length < CONFIG.MAX_STOPWATCHES;
       const addBtn = canAdd
-        ? `<button class="btn btn-add" onclick="addStopwatch()">${__('addStopwatch')}</button>`
+        ? `<button class="btn btn-add" onclick="addStopwatch()">+ ${__('addStopwatch')}</button>`
         : '';
-      $('#app').innerHTML = `<div class="stopwatch-list">${content}${addBtn}</div>`;
+      $('#app').innerHTML = `<div class="stopwatch-list ${canAdd ? 'has-add-btn' : ''}">${content}</div>${addBtn}`;
     };
 
     // --- Init ---

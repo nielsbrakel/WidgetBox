@@ -17,7 +17,7 @@
         "en": "Allow adding stopwatches",
         "nl": "Stopwatches toevoegen toestaan"
       },
-      "value": false
+      "value": true
     },
     {
       "id": "maxStopwatches",
@@ -31,8 +31,23 @@
         "nl": "Maximaal aantal stopwatches dat tegelijk kan draaien (1-5)"
       },
       "min": 1,
-      "max": 5,
+      "max": 10,
       "value": 3
+    },
+    {
+      "id": "initialStopwatches",
+      "type": "number",
+      "label": {
+        "en": "Number of stopwatches to start with",
+        "nl": "Aantal stopwatches bij starten"
+      },
+      "hint": {
+        "en": "How many stopwatches to show when the widget first loads",
+        "nl": "Hoeveel stopwatches worden getoond wanneer de widget wordt geladen"
+      },
+      "min": 1,
+      "max": 5,
+      "value": 1
     },
     {
       "id": "showLaps",

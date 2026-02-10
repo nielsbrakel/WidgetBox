@@ -22,8 +22,47 @@ Standards and patterns for all WidgetBox Homey dashboard widgets. This skill ext
 | Clocks | `com.nielsvanbrakel.widgetbox-clocks` | analog-clock, digital-clock, binary-clock, flip-clock, date, word-clock-grid, word-clock-sentence |
 | Buienradar | `com.nielsvanbrakel.widgetbox-buienradar` | buienradar, buienradar-map, buientabel |
 | Windy | `com.nielsvanbrakel.widgetbox-windy` | windy |
-| Utilities | `com.nielsvanbrakel.widgetbox-utilities` | spacer, stopwatch, timer |
+| Utilities | `com.nielsvanbrakel.widgetbox-utilities` | stopwatch, timer |
+| Layout | `com.nielsvanbrakel.widgetbox-layout` | spacer |
 | YouTube | `com.nielsvanbrakel.widgetbox-youtube` | youtube |
+
+---
+
+## Publishing & Versioning
+
+### Workflow
+
+We use **Turbo** to publish all apps interactively.
+
+1. **Ensure Versions Match**: All apps should share the same version number (e.g. `0.1.0`) across `package.json`, `app.json`, and `.homeycompose/app.json`.
+2. **Run Publish Command**:
+   ```bash
+   turbo run homey:publish --concurrency 1
+   ```
+   - **`--concurrency 1`** is required to run the interactive prompts sequentially.
+   - **`interactive: true`** is set in `turbo.json` to enable TTY.
+
+3. **Handle Prompts**:
+   - The CLI will ask: `? Do you want to update your app's version number?`
+   - Answer **No** if you have already set the version in the files (recommended).
+   - Answer **Yes** to let the CLI bump the version (verifying it updates all files correctly).
+
+### Asset Standards
+
+To pass validation (`homey app validate --level publish`), every app MUST have:
+
+- `assets/images/small.png` (250x175)
+- `assets/images/large.png` (500x350)
+- `assets/icon.svg` (Source for icons)
+
+**Generation**: Use the `icon.svg` to generate the PNGs if missing.
+```bash
+sips -s format png icon.svg --out small.png
+sips -Z 96 small.png # Or standard app icon size
+# Resize mainly for store assets:
+sips -z 175 250 small.png
+sips -z 350 500 large.png
+```
 
 ---
 
@@ -355,7 +394,7 @@ const __ = (key) => Homey.__(`widgets.my-widget.${key}`) ?? key;
 Every app's `README.txt` must start with this exact paragraph:
 
 ```
-WidgetBox brings premium, beautifully designed widgets to your Homey dashboard. Every widget is crafted to feel right at home on Homey, respecting its design language and adapting seamlessly to light and dark mode. WidgetBox fills the gaps that the default dashboard leaves open, giving you more ways to personalize and enhance your smart home experience.
+WidgetBox adds clean, native-looking widgets to your Homey dashboard. Designed to fit perfectly with Homey's style, these widgets help you customize your dashboard just the way you like it.
 ```
 
 After the intro, add a blank line and then the app-specific description.
@@ -366,6 +405,14 @@ The `description` field in `.homeycompose/app.json` is a catchy tagline shown be
 - Be specific about what the app does (avoid generic "adds support for X")
 - Keep it short — one sentence
 - Always provide both `en` and `nl` translations
+
+---
+
+### Writing Guidelines
+
+- **Tone**: Friendly, functional, and humble. Avoid salesy or hyperbolic words like "premium", "stunning", "ultimate", "perfectly".
+- **Generic Counts**: Use terms like "multiple", "various", or "collection of" instead of specific numbers (e.g., "7 widgets", "6 styles"). This ensures descriptions remain accurate as features are added or removed.
+- **Shared Intro**: Always use the standard intro paragraph defined above.
 
 ---
 
