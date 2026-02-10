@@ -1,7 +1,7 @@
 {
   "_comment": "This file is generated. Please edit .homeycompose/app.json instead.",
   "id": "com.nielsvanbrakel.widgetbox-buienradar",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "compatibility": ">=12.3.0",
   "sdk": 3,
   "platforms": [
@@ -12,8 +12,8 @@
     "nl": "WidgetBox Buienradar"
   },
   "description": {
-    "en": "Buienradar precipitation widgets for your dashboard",
-    "nl": "Buienradar neerslagwidgets voor je dashboard"
+    "en": "Live rain forecasts, charts, and radar maps at a glance",
+    "nl": "Live regenvoorspellingen, grafieken en radarkaarten in één oogopslag"
   },
   "category": [
     "tools"

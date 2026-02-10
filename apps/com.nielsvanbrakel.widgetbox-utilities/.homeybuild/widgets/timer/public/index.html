@@ -17,7 +17,6 @@
     .timer-list {
       display: flex;
       flex-direction: column;
-      gap: var(--homey-su-3);
       padding: 0;
     }
 
@@ -27,11 +26,13 @@
       align-items: center;
       gap: var(--homey-su-4);
       padding: var(--homey-su-4);
-      border: var(--homey-line-light);
-      border-radius: var(--homey-border-radius-default);
-      background: var(--homey-background-color);
+      border-bottom: var(--homey-line-light);
       position: relative;
       overflow: hidden;
+    }
+
+    .timer-item:last-child {
+      border-bottom: none;
     }
 
     .timer-item.fade-in {
@@ -56,12 +57,12 @@
       inset: 0;
       right: auto;
       width: var(--progress, 0%);
-      background: linear-gradient(90deg, rgba(96, 165, 250, 0.15), rgba(96, 165, 250, 0.05));
+      background: linear-gradient(90deg, rgba(96, 165, 250, 0.10), rgba(96, 165, 250, 0.03));
       transition: width 0.2s linear;
     }
 
     .timer-item.finished::before {
-      background: linear-gradient(90deg, rgba(239, 68, 68, 0.3), rgba(239, 68, 68, 0.15));
+      background: linear-gradient(90deg, rgba(239, 68, 68, 0.20), rgba(239, 68, 68, 0.08));
       width: 100%;
     }
 
@@ -234,12 +235,14 @@
     .btn-add {
       width: 100%;
       padding: var(--homey-su-3);
-      background: var(--homey-color-blue-400);
-      color: white;
+      background: var(--homey-color-mono-100);
+      color: var(--homey-text-color);
+      border-top: var(--homey-line-light);
+      border-radius: 0;
     }
 
     .btn-add:hover {
-      background: var(--homey-color-blue-500);
+      background: var(--homey-color-mono-200);
     }
 
     /* Time Picker */

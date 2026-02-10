@@ -8,7 +8,7 @@
     "nl": "Afteltimer met ondersteuning voor meerdere timers"
   },
   "height": 200,
-  "transparent": true,
+  "transparent": false,
   "settings": [
     {
       "id": "allowAddingTimers",

@@ -2,7 +2,6 @@
     "widgets": {
         "analog-clock": {},
         "binary-clock": {},
-        "date": {},
         "digital-clock": {},
         "flip-clock": {},
         "word-clock-grid": {},

@@ -271,7 +271,8 @@ Always use `var(--homey-*)` variables for colors, fonts, and spacing.
 | Widget Type | `transparent` | Rationale |
 |------------|--------------|-----------|
 | Clock widgets | `false` | Card background for readability |
-| Utility widgets (spacer, stopwatch, timer) | `true` | Blend with dashboard |
+| Stopwatch, Timer | `false` | Card background for readability |
+| Spacer | `true` | Invisible spacing element, blends with dashboard |
 | Embed widgets (buienradar, windy, youtube) | not set | Iframe handles its own background |
 
 ---
@@ -330,6 +331,44 @@ const __ = (key) => Homey.__(`widgets.my-widget.${key}`) ?? key;
 
 ---
 
+## Documentation Maintenance
+
+### When to update
+
+| Trigger | What to update |
+|---------|----------------|
+| New widget added | App's `README.txt`, monorepo `README.md` apps table, this skill's Apps Overview table |
+| Widget removed | App's `README.txt`, monorepo `README.md` apps table, this skill's Apps Overview table |
+| Major feature change to a widget | App's `README.txt` (update feature description) |
+| New app added to monorepo | New `README.txt`, monorepo `README.md`, this skill's Apps Overview table |
+| App removed from monorepo | Remove `README.txt`, update monorepo `README.md`, this skill's Apps Overview table |
+
+### README.txt format rules
+
+- **Plain text only** — no markdown, no URLs, no changelogs
+- **No app name** in the text — it already appears above the README on the store page
+- **Describe possibilities** — write a friendly story, not a technical spec
+- Every `README.txt` starts with the **shared WidgetBox intro paragraph** (see below)
+
+### Shared intro paragraph
+
+Every app's `README.txt` must start with this exact paragraph:
+
+```
+WidgetBox brings premium, beautifully designed widgets to your Homey dashboard. Every widget is crafted to feel right at home on Homey, respecting its design language and adapting seamlessly to light and dark mode. WidgetBox fills the gaps that the default dashboard leaves open, giving you more ways to personalize and enhance your smart home experience.
+```
+
+After the intro, add a blank line and then the app-specific description.
+
+### Description one-liners
+
+The `description` field in `.homeycompose/app.json` is a catchy tagline shown below the app name on the store. Rules:
+- Be specific about what the app does (avoid generic "adds support for X")
+- Keep it short — one sentence
+- Always provide both `en` and `nl` translations
+
+---
+
 ## New Widget Checklist
 
 When creating a new WidgetBox widget:
@@ -346,3 +385,4 @@ When creating a new WidgetBox widget:
 10. **Add `ResizeObserver`** if height depends on content
 11. **Use Homey CSS variables** for all colors, fonts, spacing
 12. **Add preview images**: `preview-dark.png` and `preview-light.png` (1024x1024)
+13. **Update documentation**: update the app's `README.txt`, monorepo `README.md`, and this skill's Apps Overview table

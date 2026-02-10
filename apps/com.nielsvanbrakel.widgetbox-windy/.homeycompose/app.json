@@ -11,8 +11,8 @@
         "nl": "WidgetBox Windy"
     },
     "description": {
-        "en": "Windy weather map widget for your dashboard",
-        "nl": "Windy weerskaart widget voor je dashboard"
+        "en": "Interactive weather maps with wind, rain, and temperature layers",
+        "nl": "Interactieve weerkaarten met wind-, regen- en temperatuurlagen"
     },
     "category": [
         "tools"

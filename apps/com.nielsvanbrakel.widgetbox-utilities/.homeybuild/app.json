@@ -12,8 +12,8 @@
     "nl": "WidgetBox Hulpmiddelen"
   },
   "description": {
-    "en": "Utility widgets for your Homey dashboard",
-    "nl": "Hulpmiddel widgets voor je Homey dashboard"
+    "en": "Timers, stopwatches, and layout tools for your dashboard",
+    "nl": "Timers, stopwatches en lay-outhulpmiddelen voor je dashboard"
   },
   "category": [
     "tools"
@@ -71,7 +71,7 @@
         "nl": "Stopwatch met rondetijden"
       },
       "height": 200,
-      "transparent": true,
+      "transparent": false,
       "settings": [
         {
           "id": "allowAddingStopwatches",
@@ -128,7 +128,7 @@
         "nl": "Afteltimer met ondersteuning voor meerdere timers"
       },
       "height": 200,
-      "transparent": true,
+      "transparent": false,
       "settings": [
         {
           "id": "allowAddingTimers",

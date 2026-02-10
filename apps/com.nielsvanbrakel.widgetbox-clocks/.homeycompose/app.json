@@ -10,7 +10,8 @@
         "en": "WidgetBox Clocks"
     },
     "description": {
-        "en": "Beautiful clock widgets for your Homey dashboard"
+        "en": "Seven stunning ways to tell time on your dashboard",
+        "nl": "Zeven prachtige manieren om de tijd op je dashboard te tonen"
     },
     "category": [
         "tools"

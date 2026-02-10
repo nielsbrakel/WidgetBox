@@ -401,6 +401,21 @@ homey app validate --level verified
 - Both light and dark versions
 - 1024x1024 dimensions
 
+### README.txt (Store Page Description)
+
+The `README.txt` file is a **plain-text story** displayed on the App Store page below the app name and description. It describes what the app does in a friendly, non-technical way.
+
+**Format rules:**
+- Plain text only — **no markdown**, no URLs, no changelogs
+- Do not repeat the app name (it already shows above the README on the store)
+- Describe the app's possibilities, not its technical implementation
+- Write in a friendly, engaging tone aimed at end users
+
+**Description field (`app.json`):**
+- The `description` field is a short, catchy tagline shown below the app name
+- Be specific (avoid generic phrases like "adds support for X")
+- Always include both `en` and `nl` translations
+
 ---
 
 ## Homey Compose

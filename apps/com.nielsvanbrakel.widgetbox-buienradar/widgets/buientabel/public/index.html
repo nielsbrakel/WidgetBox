@@ -226,7 +226,7 @@
       API_URL: 'https://gpsgadget.buienradar.nl/data/raintext/',
       DEFAULT_LAT: '52.0907',
       DEFAULT_LON: '5.1214',
-      DEFAULT_MAX_MM: 6.0, // Reduced from 8.0 to zoom in, but kept > 5.0 to show heavy line
+      DEFAULT_MAX_MM: 3.0, // Lowered to zoom into typical rain amounts
       ASPECT_RATIOS: {
         '1:1': '100%',
         '4:3': '75%',
@@ -235,10 +235,22 @@
         '3:1': '33.33%'
       },
       LEVELS: [
-        { val: 0.5, key: 'light' },    // Reverted to original
-        { val: 2.5, key: 'moderate' }, // Reverted to original
-        { val: 5.0, key: 'heavy' }     // Reduced from 7.6 to focus on smaller values
+        { val: 0.1, key: 'light' },    // Lowered so drizzle (0.1-0.3mm) is above this line
+        { val: 1.0, key: 'moderate' },  // Lowered so typical rain is clearly in this zone
+        { val: 2.5, key: 'heavy' }      // Lowered so heavy rain is easier to distinguish
       ]
+    };
+
+    /**
+     * Scale helper: uses square-root scaling to amplify light rain visibility.
+     * With linear scaling, 0.2mm at max 3.0mm = 6.7% height (barely visible).
+     * With sqrt scaling, 0.2mm at max 3.0mm = sqrt(0.2)/sqrt(3.0) = 25.8% height.
+     */
+    const Scale = {
+      /** Convert mm value to a 0-1 ratio using sqrt scale */
+      toRatio: (mm, maxMm) => Math.sqrt(mm) / Math.sqrt(maxMm),
+      /** Convert mm value to percentage (0-100) using sqrt scale */
+      toPct: (mm, maxMm) => Scale.toRatio(mm, maxMm) * 100,
     };
 
     /**
@@ -440,7 +452,7 @@
       drawGrid(maxMm) {
         CONFIG.LEVELS.forEach(lvl => {
           if (lvl.val < maxMm) {
-            const yPct = 100 - ((lvl.val / maxMm) * 100);
+            const yPct = 100 - Scale.toPct(lvl.val, maxMm);
             const line = document.createElement('div');
             line.className = 'grid-line';
             line.style.top = `${yPct}%`;
@@ -491,7 +503,7 @@
           const bar = this.barElements[i];
           if (!bar) return;
 
-          const heightPct = (d.mm / maxMm) * 100;
+          const heightPct = Scale.toPct(d.mm, maxMm);
           // Ensure we always render something if data exists, but 0.5% min is good for visual
           bar.style.height = `${Math.max(d.mm > 0 ? heightPct : 0.5, 0)}%`;
 
@@ -600,10 +612,10 @@
       }
 
       updateLineChart(data, maxMm, smooth) {
-        // Points
+        // Points - using sqrt scale for better light rain visibility
         const points = data.map((d, i) => {
           const x = (i / (data.length - 1)) * 100;
-          let y = 100 - ((d.mm / maxMm) * 100);
+          let y = 100 - Scale.toPct(d.mm, maxMm);
           y = Math.max(0, Math.min(100, y)); // Clamp Y to [0,100]
           return [x, y];
         });
@@ -625,9 +637,8 @@
           const inter = this.interactions[i];
           if (!inter) return;
 
-          // Calculate Y position as percentage from TOP (matches SVG coordinate system)
-          // SVG Y: 0=top, 100=bottom. Higher mm = lower Y = higher on chart
-          const yPct = 100 - ((d.mm / maxMm) * 100);
+          // Calculate Y position using sqrt scale (matches chart rendering)
+          const yPct = 100 - Scale.toPct(d.mm, maxMm);
           const clampedPct = Math.max(0, Math.min(100, yPct));
           inter.dot.style.top = `${clampedPct}%`;
         });

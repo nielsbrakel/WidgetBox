@@ -8,7 +8,7 @@
     "nl": "Stopwatch met rondetijden"
   },
   "height": 200,
-  "transparent": true,
+  "transparent": false,
   "settings": [
     {
       "id": "allowAddingStopwatches",

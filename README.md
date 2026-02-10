@@ -1,135 +1,75 @@
-# Turborepo starter
+# WidgetBox
 
-This Turborepo starter is maintained by the Turborepo core team.
+**Premium dashboard widgets for Homey Pro.**
 
-## Using this example
+WidgetBox is a collection of beautifully crafted, highly customizable widgets that extend the Homey dashboard beyond its built-in capabilities. Every widget is designed to feel native to Homey — respecting its design language, light/dark mode, and spacing conventions — while adding functionality that the default dashboard doesn't offer.
 
-Run the following command:
+Whether you want a stylish clock face, a live precipitation forecast, an interactive weather map, or handy utilities like timers and stopwatches, WidgetBox has you covered.
 
-```sh
-npx create-turbo@latest
-```
+## Apps
 
-## What's inside?
+WidgetBox is organized as a monorepo with separate Homey apps, each focused on a specific category of widgets:
 
-This Turborepo includes the following packages/apps:
+| App | Widgets | Description |
+|-----|---------|-------------|
+| **WidgetBox Clocks** | Analog Clock, Digital Clock, Flip Clock, Binary Clock, Word Clock Grid, Word Clock Sentence, Date | Seven distinct clock and date styles with size, color, alignment, and format options |
+| **WidgetBox Buienradar** | Five-Day Radar, Location Zoom Map, Precipitation Forecast | Dutch precipitation data from Buienradar with charts, animated maps, and customizable locations |
+| **WidgetBox Windy** | Windy | Interactive Windy.com weather map with overlays for wind, temperature, rain, clouds, and pressure |
+| **WidgetBox Utilities** | Spacer, Stopwatch, Timer | Dashboard layout control and timing tools with multi-instance support |
+| **WidgetBox YouTube** | YouTube | Embed YouTube videos, livestreams, and playlists directly on your dashboard |
 
-### Apps and Packages
-
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
+## Monorepo Structure
 
 ```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
-
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
+WidgetBox/
+├── apps/
+│   ├── com.nielsvanbrakel.widgetbox-clocks/
+│   ├── com.nielsvanbrakel.widgetbox-buienradar/
+│   ├── com.nielsvanbrakel.widgetbox-windy/
+│   ├── com.nielsvanbrakel.widgetbox-utilities/
+│   └── com.nielsvanbrakel.widgetbox-youtube/
+├── packages/                # Shared packages (if any)
+├── turbo.json               # Turborepo task definitions
+├── pnpm-workspace.yaml      # pnpm workspace configuration
+└── biome.json               # Code formatting & linting
 ```
 
-You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+Each app is a standalone Homey app that can be developed, validated, and published independently. The monorepo uses [Turborepo](https://turborepo.dev/) with [pnpm](https://pnpm.io/) workspaces.
 
-```
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
+## Development
 
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
+### Prerequisites
 
-### Develop
+- **Node.js** v18+
+- **pnpm** (`npm install -g pnpm`)
+- **Homey CLI** (`pnpm add -g homey`)
 
-To develop all apps and packages, run the following command:
+### Running an app
 
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
-
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
+```bash
+# Navigate to the app directory and run in dev mode
+cd apps/com.nielsvanbrakel.widgetbox-clocks
+homey app run
 ```
 
-You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+> **Note:** Only one app can run in dev mode at a time (port 9229 conflict). Use `homey app install` to deploy multiple apps simultaneously.
 
-```
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
+### Publishing
 
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
+```bash
+# Validate before publishing
+homey app validate --level publish
 
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
-
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
+# Publish to the Homey App Store
+homey app publish
 ```
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+## Philosophy
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
+WidgetBox widgets are built on three principles:
 
-```
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
+1. **Native feel** — Every widget uses Homey's design tokens (colors, fonts, spacing) and respects light/dark mode automatically. Widgets should look and feel like they belong on the Homey dashboard.
 
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
-```
+2. **Customizable, not complicated** — Widgets offer meaningful settings (size, color, alignment, format) without overwhelming the user. Sensible defaults mean widgets look great out of the box.
 
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.dev/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.dev/docs/reference/configuration)
-- [CLI Usage](https://turborepo.dev/docs/reference/command-line-reference)
+3. **Quality over quantity** — Each widget is polished and purposeful. No filler widgets — every addition should solve a real dashboard need.

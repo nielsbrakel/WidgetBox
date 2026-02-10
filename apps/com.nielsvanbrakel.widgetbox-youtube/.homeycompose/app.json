@@ -10,7 +10,8 @@
         "en": "WidgetBox YouTube"
     },
     "description": {
-        "en": "YouTube widgets for your Homey dashboard"
+        "en": "Watch videos, livestreams, and playlists right on your dashboard",
+        "nl": "Bekijk video's, livestreams en afspeellijsten direct op je dashboard"
     },
     "category": [
         "tools"

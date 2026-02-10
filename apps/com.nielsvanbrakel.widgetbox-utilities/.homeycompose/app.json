@@ -11,8 +11,8 @@
         "nl": "WidgetBox Hulpmiddelen"
     },
     "description": {
-        "en": "Utility widgets for your Homey dashboard",
-        "nl": "Hulpmiddel widgets voor je Homey dashboard"
+        "en": "Timers, stopwatches, and layout tools for your dashboard",
+        "nl": "Timers, stopwatches en lay-outhulpmiddelen voor je dashboard"
     },
     "category": [
         "tools"
