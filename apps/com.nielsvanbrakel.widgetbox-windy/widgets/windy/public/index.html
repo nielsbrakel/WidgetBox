@@ -109,6 +109,13 @@
       render();
 
       Homey.ready({ height: heightPercentage });
+
+      Homey.on('settings.set', (key, value) => {
+        currentSettings[key] = value;
+        const newHeightPercentage = getAspectRatioPercentage(currentSettings.aspectRatio || '16:9');
+        render();
+        Homey.setHeight(newHeightPercentage);
+      });
     }
   </script>
 </body>

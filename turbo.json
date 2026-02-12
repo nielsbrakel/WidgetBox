@@ -40,6 +40,9 @@
     "homey:publish": {
       "cache": false,
       "interactive": true
+    },
+    "test": {
+      "cache": false
     }
   }
 }

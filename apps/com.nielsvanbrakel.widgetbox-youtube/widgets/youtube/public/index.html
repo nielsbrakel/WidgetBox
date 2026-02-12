@@ -92,6 +92,14 @@
       render();
 
       Homey.ready({ height: heightPercentage });
+
+      Homey.on('settings.set', (key, value) => {
+        console.log('YouTube: settings.set', key, value);
+        currentSettings[key] = value;
+        const newHeightPercentage = getAspectRatioPercentage(currentSettings.aspectRatio);
+        render();
+        Homey.setHeight(newHeightPercentage);
+      });
     }
   </script>
 </body>

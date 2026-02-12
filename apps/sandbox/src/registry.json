@@ -1,0 +1,2231 @@
+[
+  {
+    "id": "youtube",
+    "app": "com.nielsvanbrakel.widgetbox-youtube",
+    "name": {
+      "en": "YouTube",
+      "nl": "YouTube"
+    },
+    "settings": [
+      {
+        "id": "aspectRatio",
+        "type": "dropdown",
+        "label": {
+          "en": "Aspect Ratio",
+          "nl": "Beeldverhouding"
+        },
+        "value": "16:9",
+        "values": [
+          {
+            "id": "1:1",
+            "label": {
+              "en": "Square (1:1)",
+              "nl": "Vierkant (1:1)"
+            }
+          },
+          {
+            "id": "4:3",
+            "label": {
+              "en": "4:3",
+              "nl": "4:3"
+            }
+          },
+          {
+            "id": "16:9",
+            "label": {
+              "en": "16:9 (Default)",
+              "nl": "16:9 (Standaard)"
+            }
+          },
+          {
+            "id": "9:16",
+            "label": {
+              "en": "Portrait (9:16)",
+              "nl": "Portrait (9:16)"
+            }
+          },
+          {
+            "id": "21:9",
+            "label": {
+              "en": "Ultrawide (21:9)",
+              "nl": "Ultrabreed (21:9)"
+            }
+          },
+          {
+            "id": "3:1",
+            "label": {
+              "en": "Panoramic (3:1)",
+              "nl": "Panoramisch (3:1)"
+            }
+          }
+        ]
+      },
+      {
+        "id": "autoplay",
+        "type": "checkbox",
+        "label": {
+          "en": "Autoplay",
+          "nl": "Automatisch Afspelen"
+        },
+        "value": true
+      },
+      {
+        "id": "controls",
+        "type": "checkbox",
+        "label": {
+          "en": "Show Controls",
+          "nl": "Toon Bediening"
+        },
+        "value": false
+      },
+      {
+        "id": "loop",
+        "type": "checkbox",
+        "label": {
+          "en": "Loop",
+          "nl": "Herhalen"
+        },
+        "value": false
+      },
+      {
+        "id": "mute",
+        "type": "checkbox",
+        "label": {
+          "en": "Muted",
+          "nl": "Gedempt"
+        },
+        "value": false
+      },
+      {
+        "id": "playlistId",
+        "type": "text",
+        "label": {
+          "en": "Playlist ID (leave blank to use Video ID)",
+          "nl": "Afspeellijst ID (leeg laten om Video ID te gebruiken)"
+        },
+        "hint": {
+          "en": "YouTube playlist ID from the URL (e.g. PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf)",
+          "nl": "YouTube afspeellijst-ID uit de URL (bijv. PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf)"
+        },
+        "value": ""
+      },
+      {
+        "id": "start",
+        "type": "number",
+        "label": {
+          "en": "Start at (seconds)",
+          "nl": "Start op (seconden)"
+        },
+        "hint": {
+          "en": "Start playback at this position in seconds (0 = beginning)",
+          "nl": "Start afspelen op deze positie in seconden (0 = begin)"
+        },
+        "value": 0
+      },
+      {
+        "id": "videoId",
+        "type": "text",
+        "label": {
+          "en": "Video ID",
+          "nl": "Video ID"
+        },
+        "hint": {
+          "en": "YouTube video ID from the URL (e.g. dQw4w9WgXcQ)",
+          "nl": "YouTube video-ID uit de URL (bijv. dQw4w9WgXcQ)"
+        },
+        "value": ""
+      }
+    ],
+    "isTransparent": false,
+    "height": 250,
+    "path": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-youtube/widgets/youtube/public/index.html",
+    "absolutePath": "/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-youtube/widgets/youtube"
+  },
+  {
+    "id": "windy",
+    "app": "com.nielsvanbrakel.widgetbox-windy",
+    "name": {
+      "en": "Windy",
+      "nl": "Windy"
+    },
+    "settings": [
+      {
+        "id": "aspectRatio",
+        "type": "dropdown",
+        "label": {
+          "en": "Aspect Ratio",
+          "nl": "Beeldverhouding"
+        },
+        "value": "16:9",
+        "values": [
+          {
+            "id": "1:1",
+            "label": {
+              "en": "Square (1:1)",
+              "nl": "Vierkant (1:1)"
+            }
+          },
+          {
+            "id": "4:3",
+            "label": {
+              "en": "4:3",
+              "nl": "4:3"
+            }
+          },
+          {
+            "id": "16:9",
+            "label": {
+              "en": "16:9 (Default)",
+              "nl": "16:9 (Standaard)"
+            }
+          },
+          {
+            "id": "21:9",
+            "label": {
+              "en": "Ultrawide (21:9)",
+              "nl": "Ultrabreed (21:9)"
+            }
+          },
+          {
+            "id": "3:1",
+            "label": {
+              "en": "Panoramic (3:1)",
+              "nl": "Panoramisch (3:1)"
+            }
+          }
+        ]
+      },
+      {
+        "id": "openDetailsByDefault",
+        "type": "checkbox",
+        "label": {
+          "en": "Open Details by Default",
+          "nl": "Details Standaard Openen"
+        },
+        "hint": {
+          "en": "If enabled, the widget will show the detail view (forecast) on load instead of the map.",
+          "nl": "Indien ingeschakeld, toont de widget de detailweergave (voorspelling) bij het laden in plaats van de kaart."
+        },
+        "value": false
+      },
+      {
+        "id": "detailLatitude",
+        "type": "text",
+        "label": {
+          "en": "Detail Latitude",
+          "nl": "Detail Breedtegraad"
+        },
+        "hint": {
+          "en": "Leave blank to use main latitude. Latitude for the detail view (e.g. 52.22)",
+          "nl": "Leeg laten voor hoofd breedtegraad. Breedtegraad voor de detailweergave (bijv. 52.22)"
+        },
+        "value": ""
+      },
+      {
+        "id": "detailLongitude",
+        "type": "text",
+        "label": {
+          "en": "Detail Longitude",
+          "nl": "Detail Lengtegraad"
+        },
+        "hint": {
+          "en": "Leave blank to use main longitude. Longitude for the detail view (e.g. 6.01)",
+          "nl": "Leeg laten voor hoofd lengtegraad. Lengtegraad voor de detailweergave (bijv. 6.01)"
+        },
+        "value": ""
+      },
+      {
+        "id": "latitude",
+        "type": "text",
+        "label": {
+          "en": "Latitude",
+          "nl": "Breedtegraad"
+        },
+        "hint": {
+          "en": "Enter the latitude of your location (e.g. 52.22)",
+          "nl": "Voer de breedtegraad van je locatie in (bijv. 52.22)"
+        },
+        "value": "52.22"
+      },
+      {
+        "id": "level",
+        "type": "dropdown",
+        "label": {
+          "en": "Height Level",
+          "nl": "Hoogtestadium"
+        },
+        "value": "surface",
+        "values": [
+          {
+            "id": "surface",
+            "label": {
+              "en": "Surface",
+              "nl": "Oppervlak"
+            }
+          },
+          {
+            "id": "10m",
+            "label": {
+              "en": "10m",
+              "nl": "10m"
+            }
+          },
+          {
+            "id": "100m",
+            "label": {
+              "en": "100m",
+              "nl": "100m"
+            }
+          }
+        ]
+      },
+      {
+        "id": "longitude",
+        "type": "text",
+        "label": {
+          "en": "Longitude",
+          "nl": "Lengtegraad"
+        },
+        "hint": {
+          "en": "Enter the longitude of your location (e.g. 6.01)",
+          "nl": "Voer de lengtegraad van je locatie in (bijv. 6.01)"
+        },
+        "value": "6.01"
+      },
+      {
+        "id": "marker",
+        "type": "checkbox",
+        "label": {
+          "en": "Show Location Marker",
+          "nl": "Toon Locatiemarkering"
+        },
+        "value": true
+      },
+      {
+        "id": "message",
+        "type": "checkbox",
+        "label": {
+          "en": "Hide promo message",
+          "nl": "Verberg promotie Bericht"
+        },
+        "value": true
+      },
+      {
+        "id": "metricRain",
+        "type": "dropdown",
+        "label": {
+          "en": "Rain Metric",
+          "nl": "Regenmetriek"
+        },
+        "value": "default",
+        "values": [
+          {
+            "id": "default",
+            "label": {
+              "en": "Default",
+              "nl": "Standaard"
+            }
+          },
+          {
+            "id": "mm",
+            "label": {
+              "en": "Millimeters",
+              "nl": "Millimeters"
+            }
+          },
+          {
+            "id": "in",
+            "label": {
+              "en": "Inches",
+              "nl": "Inches"
+            }
+          }
+        ]
+      },
+      {
+        "id": "metricTemp",
+        "type": "dropdown",
+        "label": {
+          "en": "Temperature Metric",
+          "nl": "Temperatuurmetriek"
+        },
+        "value": "default",
+        "values": [
+          {
+            "id": "default",
+            "label": {
+              "en": "Default",
+              "nl": "Standaard"
+            }
+          },
+          {
+            "id": "°C",
+            "label": {
+              "en": "Celsius",
+              "nl": "Celsius"
+            }
+          },
+          {
+            "id": "°F",
+            "label": {
+              "en": "Fahrenheit",
+              "nl": "Fahrenheit"
+            }
+          }
+        ]
+      },
+      {
+        "id": "metricWind",
+        "type": "dropdown",
+        "label": {
+          "en": "Wind Metric",
+          "nl": "Windmetriek"
+        },
+        "value": "default",
+        "values": [
+          {
+            "id": "default",
+            "label": {
+              "en": "Default",
+              "nl": "Standaard"
+            }
+          },
+          {
+            "id": "kmh",
+            "label": {
+              "en": "Km/h",
+              "nl": "Km/h"
+            }
+          },
+          {
+            "id": "mph",
+            "label": {
+              "en": "Mph",
+              "nl": "Mph"
+            }
+          },
+          {
+            "id": "ms",
+            "label": {
+              "en": "M/s",
+              "nl": "M/s"
+            }
+          },
+          {
+            "id": "knots",
+            "label": {
+              "en": "Knots",
+              "nl": "Knopen"
+            }
+          }
+        ]
+      },
+      {
+        "id": "overlay",
+        "type": "dropdown",
+        "label": {
+          "en": "Overlay",
+          "nl": "Overlay"
+        },
+        "value": "wind",
+        "values": [
+          {
+            "id": "wind",
+            "label": {
+              "en": "Wind",
+              "nl": "Wind"
+            }
+          },
+          {
+            "id": "temp",
+            "label": {
+              "en": "Temperature",
+              "nl": "Temperatuur"
+            }
+          },
+          {
+            "id": "rain",
+            "label": {
+              "en": "Rain",
+              "nl": "Regen"
+            }
+          },
+          {
+            "id": "clouds",
+            "label": {
+              "en": "Clouds",
+              "nl": "Wolken"
+            }
+          },
+          {
+            "id": "pressure",
+            "label": {
+              "en": "Pressure",
+              "nl": "Luchtdruk"
+            }
+          }
+        ]
+      },
+      {
+        "id": "pressure",
+        "type": "checkbox",
+        "label": {
+          "en": "Show Pressure",
+          "nl": "Toon Luchtdruk"
+        },
+        "value": false
+      },
+      {
+        "id": "product",
+        "type": "dropdown",
+        "label": {
+          "en": "Forecast Model",
+          "nl": "Voorspellingsmodel"
+        },
+        "value": "ecmwf",
+        "values": [
+          {
+            "id": "ecmwf",
+            "label": {
+              "en": "ECMWF",
+              "nl": "ECMWF"
+            }
+          },
+          {
+            "id": "gfs",
+            "label": {
+              "en": "GFS",
+              "nl": "GFS"
+            }
+          },
+          {
+            "id": "nam",
+            "label": {
+              "en": "NAM",
+              "nl": "NAM"
+            }
+          }
+        ]
+      },
+      {
+        "id": "zoom",
+        "type": "number",
+        "label": {
+          "en": "Zoom Level",
+          "nl": "Zoomniveau"
+        },
+        "hint": {
+          "en": "Map zoom level (higher = closer, e.g. 5 for country view)",
+          "nl": "Kaart zoomniveau (hoger = dichterbij, bijv. 5 voor landweergave)"
+        },
+        "value": 5
+      }
+    ],
+    "isTransparent": false,
+    "height": 250,
+    "path": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-windy/widgets/windy/public/index.html",
+    "absolutePath": "/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-windy/widgets/windy"
+  },
+  {
+    "id": "timer",
+    "app": "com.nielsvanbrakel.widgetbox-utilities",
+    "name": {
+      "en": "Timer",
+      "nl": "Timer"
+    },
+    "settings": [
+      {
+        "id": "allowAddingTimers",
+        "type": "checkbox",
+        "label": {
+          "en": "Allow adding new timers",
+          "nl": "Nieuwe timers toevoegen toestaan"
+        },
+        "value": true
+      },
+      {
+        "id": "defaultHours",
+        "type": "number",
+        "label": {
+          "en": "Default timer hours",
+          "nl": "Standaard timer uren"
+        },
+        "hint": {
+          "en": "Hours for new timers (0-23)",
+          "nl": "Uren voor nieuwe timers (0-23)"
+        },
+        "min": 0,
+        "max": 23,
+        "value": 0
+      },
+      {
+        "id": "defaultMinutes",
+        "type": "number",
+        "label": {
+          "en": "Default timer minutes",
+          "nl": "Standaard timer minuten"
+        },
+        "hint": {
+          "en": "Minutes for new timers (0-59)",
+          "nl": "Minuten voor nieuwe timers (0-59)"
+        },
+        "min": 0,
+        "max": 59,
+        "value": 5
+      },
+      {
+        "id": "defaultSeconds",
+        "type": "number",
+        "label": {
+          "en": "Default timer seconds",
+          "nl": "Standaard timer seconden"
+        },
+        "hint": {
+          "en": "Seconds for new timers (0-59)",
+          "nl": "Seconden voor nieuwe timers (0-59)"
+        },
+        "min": 0,
+        "max": 59,
+        "value": 0
+      },
+      {
+        "id": "initialTimers",
+        "type": "number",
+        "label": {
+          "en": "Number of timers to start with",
+          "nl": "Aantal timers bij starten"
+        },
+        "hint": {
+          "en": "How many timers to show when the widget first loads",
+          "nl": "Hoeveel timers worden getoond wanneer de widget wordt geladen"
+        },
+        "min": 1,
+        "max": 10,
+        "value": 1
+      },
+      {
+        "id": "maxTimers",
+        "type": "number",
+        "label": {
+          "en": "Maximum count",
+          "nl": "Aantal timers"
+        },
+        "hint": {
+          "en": "Maximum number of timers that can be active at once (1-10)",
+          "nl": "Maximaal aantal timers dat tegelijk actief kan zijn (1-10)"
+        },
+        "min": 1,
+        "max": 10,
+        "value": 3
+      }
+    ],
+    "isTransparent": false,
+    "height": 200,
+    "path": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-utilities/widgets/timer/public/index.html",
+    "absolutePath": "/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-utilities/widgets/timer"
+  },
+  {
+    "id": "stopwatch",
+    "app": "com.nielsvanbrakel.widgetbox-utilities",
+    "name": {
+      "en": "Stopwatch",
+      "nl": "Stopwatch"
+    },
+    "settings": [
+      {
+        "id": "allowAddingStopwatches",
+        "type": "checkbox",
+        "label": {
+          "en": "Allow adding stopwatches",
+          "nl": "Stopwatches toevoegen toestaan"
+        },
+        "value": true
+      },
+      {
+        "id": "maxStopwatches",
+        "type": "number",
+        "label": {
+          "en": "Maximum stopwatches",
+          "nl": "Maximaal aantal stopwatches"
+        },
+        "hint": {
+          "en": "Maximum number of stopwatches that can run simultaneously (1-5)",
+          "nl": "Maximaal aantal stopwatches dat tegelijk kan draaien (1-5)"
+        },
+        "min": 1,
+        "max": 10,
+        "value": 3
+      },
+      {
+        "id": "initialStopwatches",
+        "type": "number",
+        "label": {
+          "en": "Number of stopwatches to start with",
+          "nl": "Aantal stopwatches bij starten"
+        },
+        "hint": {
+          "en": "How many stopwatches to show when the widget first loads",
+          "nl": "Hoeveel stopwatches worden getoond wanneer de widget wordt geladen"
+        },
+        "min": 1,
+        "max": 5,
+        "value": 1
+      },
+      {
+        "id": "showLaps",
+        "type": "checkbox",
+        "label": {
+          "en": "Show lap times",
+          "nl": "Toon rondetijden"
+        },
+        "value": false
+      },
+      {
+        "id": "showMilliseconds",
+        "type": "checkbox",
+        "label": {
+          "en": "Show milliseconds",
+          "nl": "Toon milliseconden"
+        },
+        "value": true
+      }
+    ],
+    "isTransparent": false,
+    "height": 200,
+    "path": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-utilities/widgets/stopwatch/public/index.html",
+    "absolutePath": "/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-utilities/widgets/stopwatch"
+  },
+  {
+    "id": "spacer",
+    "app": "com.nielsvanbrakel.widgetbox-layout",
+    "name": {
+      "en": "Spacer",
+      "nl": "Ruimte"
+    },
+    "settings": [
+      {
+        "id": "heightMultiplier",
+        "type": "number",
+        "label": {
+          "en": "Height Multiplier",
+          "nl": "Hoogte Vermenigvuldiger"
+        },
+        "hint": {
+          "en": "Higher values add more vertical space between widgets",
+          "nl": "Hogere waarden voegen meer verticale ruimte toe tussen widgets"
+        },
+        "min": 1,
+        "max": 1000,
+        "step": 1,
+        "value": 10
+      }
+    ],
+    "isTransparent": true,
+    "height": 40,
+    "path": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-layout/widgets/spacer/public/index.html",
+    "absolutePath": "/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-layout/widgets/spacer"
+  },
+  {
+    "id": "word-clock-sentence",
+    "app": "com.nielsvanbrakel.widgetbox-clocks",
+    "name": {
+      "en": "Word Clock Sentence",
+      "nl": "Woorden Klok Zin"
+    },
+    "settings": [
+      {
+        "id": "color",
+        "type": "dropdown",
+        "label": {
+          "en": "Highlight Color",
+          "nl": "Markeerkleur"
+        },
+        "value": "default",
+        "values": [
+          {
+            "id": "default",
+            "label": {
+              "en": "Default",
+              "nl": "Standaard"
+            }
+          },
+          {
+            "id": "blue",
+            "label": {
+              "en": "Blue",
+              "nl": "Blauw"
+            }
+          },
+          {
+            "id": "green",
+            "label": {
+              "en": "Green",
+              "nl": "Groen"
+            }
+          },
+          {
+            "id": "orange",
+            "label": {
+              "en": "Orange",
+              "nl": "Oranje"
+            }
+          },
+          {
+            "id": "red",
+            "label": {
+              "en": "Red",
+              "nl": "Rood"
+            }
+          },
+          {
+            "id": "purple",
+            "label": {
+              "en": "Purple",
+              "nl": "Paars"
+            }
+          }
+        ]
+      },
+      {
+        "id": "horizontalAlignment",
+        "type": "dropdown",
+        "label": {
+          "en": "Horizontal Alignment",
+          "nl": "Horizontale Uitlijning"
+        },
+        "value": "center",
+        "values": [
+          {
+            "id": "left",
+            "label": {
+              "en": "Left",
+              "nl": "Links"
+            }
+          },
+          {
+            "id": "center",
+            "label": {
+              "en": "Center",
+              "nl": "Midden"
+            }
+          },
+          {
+            "id": "right",
+            "label": {
+              "en": "Right",
+              "nl": "Rechts"
+            }
+          }
+        ]
+      },
+      {
+        "id": "size",
+        "type": "dropdown",
+        "label": {
+          "en": "Size",
+          "nl": "Grootte"
+        },
+        "value": "medium",
+        "values": [
+          {
+            "id": "xsmall",
+            "label": {
+              "en": "Extra Small",
+              "nl": "Extra Klein"
+            }
+          },
+          {
+            "id": "small",
+            "label": {
+              "en": "Small",
+              "nl": "Klein"
+            }
+          },
+          {
+            "id": "medium",
+            "label": {
+              "en": "Medium",
+              "nl": "Gemiddeld"
+            }
+          },
+          {
+            "id": "large",
+            "label": {
+              "en": "Large",
+              "nl": "Groot"
+            }
+          },
+          {
+            "id": "xlarge",
+            "label": {
+              "en": "Extra Large",
+              "nl": "Extra Groot"
+            }
+          }
+        ]
+      }
+    ],
+    "isTransparent": false,
+    "height": 200,
+    "path": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-clocks/widgets/word-clock-sentence/public/index.html",
+    "absolutePath": "/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-clocks/widgets/word-clock-sentence"
+  },
+  {
+    "id": "word-clock-grid",
+    "app": "com.nielsvanbrakel.widgetbox-clocks",
+    "name": {
+      "en": "Word Clock Grid",
+      "nl": "Woorden Klok Raster"
+    },
+    "settings": [
+      {
+        "id": "color",
+        "type": "dropdown",
+        "label": {
+          "en": "Highlight Color",
+          "nl": "Markeerkleur"
+        },
+        "value": "default",
+        "values": [
+          {
+            "id": "default",
+            "label": {
+              "en": "Default",
+              "nl": "Standaard"
+            }
+          },
+          {
+            "id": "blue",
+            "label": {
+              "en": "Blue",
+              "nl": "Blauw"
+            }
+          },
+          {
+            "id": "green",
+            "label": {
+              "en": "Green",
+              "nl": "Groen"
+            }
+          },
+          {
+            "id": "orange",
+            "label": {
+              "en": "Orange",
+              "nl": "Oranje"
+            }
+          },
+          {
+            "id": "red",
+            "label": {
+              "en": "Red",
+              "nl": "Rood"
+            }
+          },
+          {
+            "id": "purple",
+            "label": {
+              "en": "Purple",
+              "nl": "Paars"
+            }
+          }
+        ]
+      },
+      {
+        "id": "horizontalAlignment",
+        "type": "dropdown",
+        "label": {
+          "en": "Horizontal Alignment",
+          "nl": "Horizontale Uitlijning"
+        },
+        "value": "center",
+        "values": [
+          {
+            "id": "left",
+            "label": {
+              "en": "Left",
+              "nl": "Links"
+            }
+          },
+          {
+            "id": "center",
+            "label": {
+              "en": "Center",
+              "nl": "Midden"
+            }
+          },
+          {
+            "id": "right",
+            "label": {
+              "en": "Right",
+              "nl": "Rechts"
+            }
+          }
+        ]
+      },
+      {
+        "id": "size",
+        "type": "dropdown",
+        "label": {
+          "en": "Size",
+          "nl": "Grootte"
+        },
+        "value": "medium",
+        "values": [
+          {
+            "id": "xsmall",
+            "label": {
+              "en": "Extra Small",
+              "nl": "Extra Klein"
+            }
+          },
+          {
+            "id": "small",
+            "label": {
+              "en": "Small",
+              "nl": "Klein"
+            }
+          },
+          {
+            "id": "medium",
+            "label": {
+              "en": "Medium",
+              "nl": "Gemiddeld"
+            }
+          },
+          {
+            "id": "large",
+            "label": {
+              "en": "Large",
+              "nl": "Groot"
+            }
+          },
+          {
+            "id": "xlarge",
+            "label": {
+              "en": "Extra Large",
+              "nl": "Extra Groot"
+            }
+          }
+        ]
+      }
+    ],
+    "isTransparent": false,
+    "height": 500,
+    "path": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-clocks/widgets/word-clock-grid/public/index.html",
+    "absolutePath": "/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-clocks/widgets/word-clock-grid"
+  },
+  {
+    "id": "flip-clock",
+    "app": "com.nielsvanbrakel.widgetbox-clocks",
+    "name": {
+      "en": "Flip Clock",
+      "nl": "Flip Klok"
+    },
+    "settings": [
+      {
+        "id": "clockFormat",
+        "type": "dropdown",
+        "label": {
+          "en": "Time Format",
+          "nl": "Tijdformaat"
+        },
+        "value": "24",
+        "values": [
+          {
+            "id": "24",
+            "label": {
+              "en": "24-hour",
+              "nl": "24-uur"
+            }
+          },
+          {
+            "id": "12",
+            "label": {
+              "en": "12-hour (AM/PM)",
+              "nl": "12-uur (AM/PM)"
+            }
+          }
+        ]
+      },
+      {
+        "id": "color",
+        "type": "dropdown",
+        "label": {
+          "en": "Color",
+          "nl": "Kleur"
+        },
+        "value": "default",
+        "values": [
+          {
+            "id": "default",
+            "label": {
+              "en": "Default (Auto)",
+              "nl": "Standaard (Auto)"
+            }
+          },
+          {
+            "id": "blue",
+            "label": {
+              "en": "Blue",
+              "nl": "Blauw"
+            }
+          },
+          {
+            "id": "green",
+            "label": {
+              "en": "Green",
+              "nl": "Groen"
+            }
+          },
+          {
+            "id": "orange",
+            "label": {
+              "en": "Orange",
+              "nl": "Oranje"
+            }
+          },
+          {
+            "id": "red",
+            "label": {
+              "en": "Red",
+              "nl": "Rood"
+            }
+          }
+        ]
+      },
+      {
+        "id": "horizontalAlignment",
+        "type": "dropdown",
+        "label": {
+          "en": "Horizontal Alignment",
+          "nl": "Horizontale Uitlijning"
+        },
+        "value": "center",
+        "values": [
+          {
+            "id": "left",
+            "label": {
+              "en": "Left",
+              "nl": "Links"
+            }
+          },
+          {
+            "id": "center",
+            "label": {
+              "en": "Center",
+              "nl": "Midden"
+            }
+          },
+          {
+            "id": "right",
+            "label": {
+              "en": "Right",
+              "nl": "Rechts"
+            }
+          }
+        ]
+      },
+      {
+        "id": "showColons",
+        "type": "checkbox",
+        "label": {
+          "en": "Show Colons",
+          "nl": "Toon Dubbele Punt"
+        },
+        "value": false
+      },
+      {
+        "id": "showSeconds",
+        "type": "checkbox",
+        "label": {
+          "en": "Show Seconds",
+          "nl": "Toon Seconden"
+        },
+        "value": true
+      },
+      {
+        "id": "size",
+        "type": "dropdown",
+        "label": {
+          "en": "Size",
+          "nl": "Grootte"
+        },
+        "value": "medium",
+        "values": [
+          {
+            "id": "xsmall",
+            "label": {
+              "en": "Extra Small",
+              "nl": "Extra Klein"
+            }
+          },
+          {
+            "id": "small",
+            "label": {
+              "en": "Small",
+              "nl": "Klein"
+            }
+          },
+          {
+            "id": "medium",
+            "label": {
+              "en": "Medium",
+              "nl": "Gemiddeld"
+            }
+          },
+          {
+            "id": "large",
+            "label": {
+              "en": "Large",
+              "nl": "Groot"
+            }
+          },
+          {
+            "id": "xlarge",
+            "label": {
+              "en": "Extra Large",
+              "nl": "Extra Groot"
+            }
+          }
+        ]
+      }
+    ],
+    "isTransparent": false,
+    "height": 128,
+    "path": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-clocks/widgets/flip-clock/public/index.html",
+    "absolutePath": "/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-clocks/widgets/flip-clock"
+  },
+  {
+    "id": "digital-clock",
+    "app": "com.nielsvanbrakel.widgetbox-clocks",
+    "name": {
+      "en": "Digital Clock",
+      "nl": "Digitale Klok"
+    },
+    "settings": [
+      {
+        "id": "clockFormat",
+        "type": "dropdown",
+        "label": {
+          "en": "Time Format",
+          "nl": "Tijdformaat"
+        },
+        "value": "24",
+        "values": [
+          {
+            "id": "24",
+            "label": {
+              "en": "24-hour",
+              "nl": "24-uur"
+            }
+          },
+          {
+            "id": "12",
+            "label": {
+              "en": "12-hour (AM/PM)",
+              "nl": "12-uur (AM/PM)"
+            }
+          }
+        ]
+      },
+      {
+        "id": "dateFormat",
+        "type": "dropdown",
+        "label": {
+          "en": "Date Format",
+          "nl": "Datumformaat"
+        },
+        "value": "weekday-short",
+        "values": [
+          {
+            "id": "dmy",
+            "label": {
+              "en": "DD/MM/YYYY",
+              "nl": "DD/MM/JJJJ"
+            }
+          },
+          {
+            "id": "mdy",
+            "label": {
+              "en": "MM/DD/YYYY",
+              "nl": "MM/DD/JJJJ"
+            }
+          },
+          {
+            "id": "ymd",
+            "label": {
+              "en": "YYYY-MM-DD",
+              "nl": "JJJJ-MM-DD"
+            }
+          },
+          {
+            "id": "long",
+            "label": {
+              "en": "January 28, 2026",
+              "nl": "28 januari 2026"
+            }
+          },
+          {
+            "id": "short",
+            "label": {
+              "en": "Jan 28, 2026",
+              "nl": "28 jan 2026"
+            }
+          },
+          {
+            "id": "weekday-long",
+            "label": {
+              "en": "Wednesday, January 28",
+              "nl": "Woensdag 28 januari"
+            }
+          },
+          {
+            "id": "weekday-short",
+            "label": {
+              "en": "Wed, Jan 28",
+              "nl": "Wo 28 jan"
+            }
+          },
+          {
+            "id": "weekday-only",
+            "label": {
+              "en": "Wednesday",
+              "nl": "Woensdag"
+            }
+          },
+          {
+            "id": "day-month",
+            "label": {
+              "en": "28 January",
+              "nl": "28 januari"
+            }
+          }
+        ]
+      },
+      {
+        "id": "fontWeight",
+        "type": "dropdown",
+        "label": {
+          "en": "Font Weight",
+          "nl": "Letterdikte"
+        },
+        "value": "normal",
+        "values": [
+          {
+            "id": "thin",
+            "label": {
+              "en": "Thin",
+              "nl": "Dun"
+            }
+          },
+          {
+            "id": "normal",
+            "label": {
+              "en": "Normal",
+              "nl": "Normaal"
+            }
+          },
+          {
+            "id": "bold",
+            "label": {
+              "en": "Bold",
+              "nl": "Vetgedrukt"
+            }
+          }
+        ]
+      },
+      {
+        "id": "horizontalAlignment",
+        "type": "dropdown",
+        "label": {
+          "en": "Horizontal Alignment",
+          "nl": "Horizontale Uitlijning"
+        },
+        "value": "center",
+        "values": [
+          {
+            "id": "left",
+            "label": {
+              "en": "Left",
+              "nl": "Links"
+            }
+          },
+          {
+            "id": "center",
+            "label": {
+              "en": "Center",
+              "nl": "Midden"
+            }
+          },
+          {
+            "id": "right",
+            "label": {
+              "en": "Right",
+              "nl": "Rechts"
+            }
+          }
+        ]
+      },
+      {
+        "id": "showDate",
+        "type": "checkbox",
+        "label": {
+          "en": "Show Date",
+          "nl": "Toon Datum"
+        },
+        "value": true
+      },
+      {
+        "id": "showSeconds",
+        "type": "checkbox",
+        "label": {
+          "en": "Show Seconds",
+          "nl": "Toon Seconden"
+        },
+        "value": false
+      },
+      {
+        "id": "size",
+        "type": "dropdown",
+        "label": {
+          "en": "Size",
+          "nl": "Grootte"
+        },
+        "value": "medium",
+        "values": [
+          {
+            "id": "xsmall",
+            "label": {
+              "en": "Extra Small",
+              "nl": "Extra Klein"
+            }
+          },
+          {
+            "id": "small",
+            "label": {
+              "en": "Small",
+              "nl": "Klein"
+            }
+          },
+          {
+            "id": "medium",
+            "label": {
+              "en": "Medium",
+              "nl": "Gemiddeld"
+            }
+          },
+          {
+            "id": "large",
+            "label": {
+              "en": "Large",
+              "nl": "Groot"
+            }
+          },
+          {
+            "id": "xlarge",
+            "label": {
+              "en": "Extra Large",
+              "nl": "Extra Groot"
+            }
+          }
+        ]
+      }
+    ],
+    "isTransparent": false,
+    "height": 64,
+    "path": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-clocks/widgets/digital-clock/public/index.html",
+    "absolutePath": "/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-clocks/widgets/digital-clock"
+  },
+  {
+    "id": "binary-clock",
+    "app": "com.nielsvanbrakel.widgetbox-clocks",
+    "name": {
+      "en": "Binary Clock",
+      "nl": "Binaire Klok"
+    },
+    "settings": [
+      {
+        "id": "clockFormat",
+        "type": "dropdown",
+        "label": {
+          "en": "Time Format",
+          "nl": "Tijdformaat"
+        },
+        "value": "24",
+        "values": [
+          {
+            "id": "24",
+            "label": {
+              "en": "24-hour",
+              "nl": "24-uur"
+            }
+          },
+          {
+            "id": "12",
+            "label": {
+              "en": "12-hour",
+              "nl": "12-uur"
+            }
+          }
+        ]
+      },
+      {
+        "id": "color",
+        "type": "dropdown",
+        "label": {
+          "en": "Color",
+          "nl": "Kleur"
+        },
+        "value": "orange",
+        "values": [
+          {
+            "id": "default",
+            "label": {
+              "en": "Default",
+              "nl": "Standaard"
+            }
+          },
+          {
+            "id": "blue",
+            "label": {
+              "en": "Blue",
+              "nl": "Blauw"
+            }
+          },
+          {
+            "id": "green",
+            "label": {
+              "en": "Green",
+              "nl": "Groen"
+            }
+          },
+          {
+            "id": "orange",
+            "label": {
+              "en": "Orange",
+              "nl": "Oranje"
+            }
+          },
+          {
+            "id": "red",
+            "label": {
+              "en": "Red",
+              "nl": "Rood"
+            }
+          },
+          {
+            "id": "purple",
+            "label": {
+              "en": "Purple",
+              "nl": "Paars"
+            }
+          }
+        ]
+      },
+      {
+        "id": "horizontalAlignment",
+        "type": "dropdown",
+        "label": {
+          "en": "Horizontal Alignment",
+          "nl": "Horizontale Uitlijning"
+        },
+        "value": "center",
+        "values": [
+          {
+            "id": "left",
+            "label": {
+              "en": "Left",
+              "nl": "Links"
+            }
+          },
+          {
+            "id": "center",
+            "label": {
+              "en": "Center",
+              "nl": "Midden"
+            }
+          },
+          {
+            "id": "right",
+            "label": {
+              "en": "Right",
+              "nl": "Rechts"
+            }
+          }
+        ]
+      },
+      {
+        "id": "orientation",
+        "type": "dropdown",
+        "label": {
+          "en": "Orientation",
+          "nl": "Oriëntatie"
+        },
+        "value": "horizontal",
+        "values": [
+          {
+            "id": "vertical",
+            "label": {
+              "en": "Vertical",
+              "nl": "Verticaal"
+            }
+          },
+          {
+            "id": "horizontal",
+            "label": {
+              "en": "Horizontal",
+              "nl": "Horizontaal"
+            }
+          }
+        ]
+      },
+      {
+        "id": "showLabels",
+        "type": "checkbox",
+        "label": {
+          "en": "Show H/M/S Labels",
+          "nl": "Toon U/M/S Labels"
+        },
+        "value": true
+      },
+      {
+        "id": "showSeconds",
+        "type": "checkbox",
+        "label": {
+          "en": "Show Seconds",
+          "nl": "Toon Seconden"
+        },
+        "value": true
+      },
+      {
+        "id": "size",
+        "type": "dropdown",
+        "label": {
+          "en": "Size",
+          "nl": "Grootte"
+        },
+        "value": "medium",
+        "values": [
+          {
+            "id": "xsmall",
+            "label": {
+              "en": "Extra Small",
+              "nl": "Extra Klein"
+            }
+          },
+          {
+            "id": "small",
+            "label": {
+              "en": "Small",
+              "nl": "Klein"
+            }
+          },
+          {
+            "id": "medium",
+            "label": {
+              "en": "Medium",
+              "nl": "Gemiddeld"
+            }
+          },
+          {
+            "id": "large",
+            "label": {
+              "en": "Large",
+              "nl": "Groot"
+            }
+          },
+          {
+            "id": "xlarge",
+            "label": {
+              "en": "Extra Large",
+              "nl": "Extra Groot"
+            }
+          }
+        ]
+      }
+    ],
+    "isTransparent": false,
+    "height": 128,
+    "path": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-clocks/widgets/binary-clock/public/index.html",
+    "absolutePath": "/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-clocks/widgets/binary-clock"
+  },
+  {
+    "id": "analog-clock",
+    "app": "com.nielsvanbrakel.widgetbox-clocks",
+    "name": {
+      "en": "Analog Clock",
+      "nl": "Analoge Klok"
+    },
+    "settings": [
+      {
+        "id": "color",
+        "type": "dropdown",
+        "label": {
+          "en": "Second Hand Color",
+          "nl": "Kleur Secondewijzer"
+        },
+        "value": "red",
+        "values": [
+          {
+            "id": "blue",
+            "label": {
+              "en": "Blue",
+              "nl": "Blauw"
+            }
+          },
+          {
+            "id": "green",
+            "label": {
+              "en": "Green",
+              "nl": "Groen"
+            }
+          },
+          {
+            "id": "orange",
+            "label": {
+              "en": "Orange",
+              "nl": "Oranje"
+            }
+          },
+          {
+            "id": "red",
+            "label": {
+              "en": "Red",
+              "nl": "Rood"
+            }
+          },
+          {
+            "id": "black",
+            "label": {
+              "en": "Black",
+              "nl": "Zwart"
+            }
+          },
+          {
+            "id": "white",
+            "label": {
+              "en": "White",
+              "nl": "Wit"
+            }
+          }
+        ]
+      },
+      {
+        "id": "horizontalAlignment",
+        "type": "dropdown",
+        "label": {
+          "en": "Horizontal Alignment",
+          "nl": "Horizontale Uitlijning"
+        },
+        "value": "center",
+        "values": [
+          {
+            "id": "left",
+            "label": {
+              "en": "Left",
+              "nl": "Links"
+            }
+          },
+          {
+            "id": "center",
+            "label": {
+              "en": "Center",
+              "nl": "Midden"
+            }
+          },
+          {
+            "id": "right",
+            "label": {
+              "en": "Right",
+              "nl": "Rechts"
+            }
+          }
+        ]
+      },
+      {
+        "id": "showDate",
+        "type": "checkbox",
+        "label": {
+          "en": "Show Date",
+          "nl": "Toon Datum"
+        },
+        "value": true
+      },
+      {
+        "id": "showSeconds",
+        "type": "checkbox",
+        "label": {
+          "en": "Show Second Hand",
+          "nl": "Toon Secondewijzer"
+        },
+        "value": true
+      },
+      {
+        "id": "size",
+        "type": "dropdown",
+        "label": {
+          "en": "Size",
+          "nl": "Grootte"
+        },
+        "value": "medium",
+        "values": [
+          {
+            "id": "xsmall",
+            "label": {
+              "en": "Extra Small",
+              "nl": "Extra Klein"
+            }
+          },
+          {
+            "id": "small",
+            "label": {
+              "en": "Small",
+              "nl": "Klein"
+            }
+          },
+          {
+            "id": "medium",
+            "label": {
+              "en": "Medium",
+              "nl": "Gemiddeld"
+            }
+          },
+          {
+            "id": "large",
+            "label": {
+              "en": "Large",
+              "nl": "Groot"
+            }
+          },
+          {
+            "id": "xlarge",
+            "label": {
+              "en": "Extra Large",
+              "nl": "Extra Groot"
+            }
+          }
+        ]
+      },
+      {
+        "id": "style",
+        "type": "dropdown",
+        "label": {
+          "en": "Style",
+          "nl": "Stijl"
+        },
+        "value": "modern",
+        "values": [
+          {
+            "id": "minimal",
+            "label": {
+              "en": "Minimal (No Numbers)",
+              "nl": "Minimalistisch (Geen Cijfers)"
+            }
+          },
+          {
+            "id": "modern",
+            "label": {
+              "en": "Modern (Markers)",
+              "nl": "Modern (Markeringen)"
+            }
+          },
+          {
+            "id": "classic",
+            "label": {
+              "en": "Classic (Numbers)",
+              "nl": "Klassiek (Cijfers)"
+            }
+          },
+          {
+            "id": "classic-no-numbers",
+            "label": {
+              "en": "Classic (No Numbers)",
+              "nl": "Klassiek (Geen Cijfers)"
+            }
+          },
+          {
+            "id": "swiss",
+            "label": {
+              "en": "Swiss Railway",
+              "nl": "Zwitserse Spoorwegen"
+            }
+          }
+        ]
+      }
+    ],
+    "isTransparent": false,
+    "height": 128,
+    "path": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-clocks/widgets/analog-clock/public/index.html",
+    "absolutePath": "/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-clocks/widgets/analog-clock"
+  },
+  {
+    "id": "buientabel",
+    "app": "com.nielsvanbrakel.widgetbox-buienradar",
+    "name": {
+      "en": "Precipitation Forecast",
+      "nl": "Neerslagvoorspelling"
+    },
+    "settings": [
+      {
+        "id": "aspectRatio",
+        "type": "dropdown",
+        "label": {
+          "en": "Aspect Ratio",
+          "nl": "Beeldverhouding"
+        },
+        "value": "16:9",
+        "values": [
+          {
+            "id": "1:1",
+            "label": {
+              "en": "Square (1:1)",
+              "nl": "Vierkant (1:1)"
+            }
+          },
+          {
+            "id": "4:3",
+            "label": {
+              "en": "4:3",
+              "nl": "4:3"
+            }
+          },
+          {
+            "id": "16:9",
+            "label": {
+              "en": "16:9 (Default)",
+              "nl": "16:9 (Standaard)"
+            }
+          },
+          {
+            "id": "21:9",
+            "label": {
+              "en": "Ultrawide (21:9)",
+              "nl": "Ultrabreed (21:9)"
+            }
+          },
+          {
+            "id": "3:1",
+            "label": {
+              "en": "Panoramic (3:1)",
+              "nl": "Panoramisch (3:1)"
+            }
+          }
+        ]
+      },
+      {
+        "id": "chartColor",
+        "type": "dropdown",
+        "label": {
+          "en": "Chart Color",
+          "nl": "Grafiek Kleur"
+        },
+        "value": "blue",
+        "values": [
+          {
+            "id": "blue",
+            "label": {
+              "en": "Blue",
+              "nl": "Blauw"
+            }
+          },
+          {
+            "id": "red",
+            "label": {
+              "en": "Red",
+              "nl": "Rood"
+            }
+          },
+          {
+            "id": "green",
+            "label": {
+              "en": "Green",
+              "nl": "Groen"
+            }
+          },
+          {
+            "id": "orange",
+            "label": {
+              "en": "Orange",
+              "nl": "Oranje"
+            }
+          },
+          {
+            "id": "purple",
+            "label": {
+              "en": "Purple",
+              "nl": "Paars"
+            }
+          },
+          {
+            "id": "mono",
+            "label": {
+              "en": "Monochrome",
+              "nl": "Monochroom"
+            }
+          }
+        ]
+      },
+      {
+        "id": "graphStyle",
+        "type": "dropdown",
+        "label": {
+          "en": "Graph Style",
+          "nl": "Grafieken Stijl"
+        },
+        "value": "bars",
+        "values": [
+          {
+            "id": "bars",
+            "label": {
+              "en": "Bars",
+              "nl": "Staven"
+            }
+          },
+          {
+            "id": "line",
+            "label": {
+              "en": "Line",
+              "nl": "Lijn"
+            }
+          },
+          {
+            "id": "smooth",
+            "label": {
+              "en": "Smooth Line",
+              "nl": "Vloeiende Lijn"
+            }
+          }
+        ]
+      },
+      {
+        "id": "lat",
+        "type": "text",
+        "label": {
+          "en": "Latitude",
+          "nl": "Breedtegraad"
+        },
+        "hint": {
+          "en": "Enter the latitude of your location (e.g. 52.1326)",
+          "nl": "Voer de breedtegraad van je locatie in (bijv. 52.1326)"
+        },
+        "value": "52.1326"
+      },
+      {
+        "id": "lon",
+        "type": "text",
+        "label": {
+          "en": "Longitude",
+          "nl": "Lengtegraad"
+        },
+        "hint": {
+          "en": "Enter the longitude of your location (e.g. 5.2913)",
+          "nl": "Voer de lengtegraad van je locatie in (bijv. 5.2913)"
+        },
+        "value": "5.2913"
+      },
+      {
+        "id": "refreshInterval",
+        "type": "dropdown",
+        "label": {
+          "en": "Auto Refresh",
+          "nl": "Automatisch Verversen"
+        },
+        "value": "300",
+        "values": [
+          {
+            "id": "60",
+            "label": {
+              "en": "Every Minute",
+              "nl": "Elke Minuut"
+            }
+          },
+          {
+            "id": "300",
+            "label": {
+              "en": "Every 5 Minutes",
+              "nl": "Elke 5 Minuten"
+            }
+          },
+          {
+            "id": "900",
+            "label": {
+              "en": "Every 15 Minutes",
+              "nl": "Elke 15 Minuten"
+            }
+          },
+          {
+            "id": "1800",
+            "label": {
+              "en": "Every 30 Minutes",
+              "nl": "Elke 30 Minuten"
+            }
+          },
+          {
+            "id": "3600",
+            "label": {
+              "en": "Every Hour",
+              "nl": "Elk Uur"
+            }
+          }
+        ]
+      }
+    ],
+    "isTransparent": false,
+    "height": 250,
+    "path": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-buienradar/widgets/buientabel/public/index.html",
+    "absolutePath": "/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-buienradar/widgets/buientabel"
+  },
+  {
+    "id": "buienradar-map",
+    "app": "com.nielsvanbrakel.widgetbox-buienradar",
+    "name": {
+      "en": "Location Zoom Map",
+      "nl": "Locatie Zoom Kaart"
+    },
+    "settings": [
+      {
+        "id": "location",
+        "type": "text",
+        "label": {
+          "en": "Location (City or Postal Code)",
+          "nl": "Locatie (Stad of Postcode)"
+        },
+        "hint": {
+          "en": "Enter a city name or postal code (e.g. Amsterdam, 1012AB)",
+          "nl": "Voer een stadsnaam of postcode in (bijv. Amsterdam, 1012AB)"
+        },
+        "value": "Amsterdam"
+      },
+      {
+        "id": "showName",
+        "type": "checkbox",
+        "label": {
+          "en": "Show Location Name",
+          "nl": "Toon Locatienaam"
+        },
+        "value": true
+      },
+      {
+        "id": "timePeriod",
+        "type": "dropdown",
+        "label": {
+          "en": "Time Period",
+          "nl": "Tijdsperiode"
+        },
+        "value": "0",
+        "values": [
+          {
+            "id": "0",
+            "label": {
+              "en": "Past Hour",
+              "nl": "Afgelopen Uur"
+            }
+          },
+          {
+            "id": "2",
+            "label": {
+              "en": "Coming 3 Hours",
+              "nl": "Komende 3 Uur"
+            }
+          }
+        ]
+      },
+      {
+        "id": "widgetSize",
+        "type": "dropdown",
+        "label": {
+          "en": "Size",
+          "nl": "Grootte"
+        },
+        "value": "medium",
+        "values": [
+          {
+            "id": "small",
+            "label": {
+              "en": "Small (120x220)",
+              "nl": "Klein (120x220)"
+            }
+          },
+          {
+            "id": "medium",
+            "label": {
+              "en": "Medium (256x256)",
+              "nl": "Gemiddeld (256x256)"
+            }
+          },
+          {
+            "id": "large",
+            "label": {
+              "en": "Large (330x330)",
+              "nl": "Groot (330x330)"
+            }
+          },
+          {
+            "id": "xlarge",
+            "label": {
+              "en": "Extra Large (550x512)",
+              "nl": "Extra Groot (550x512)"
+            }
+          }
+        ]
+      },
+      {
+        "id": "zoomLevel",
+        "type": "dropdown",
+        "label": {
+          "en": "Zoom Level",
+          "nl": "Zoomniveau"
+        },
+        "value": "provincia",
+        "values": [
+          {
+            "id": "land",
+            "label": {
+              "en": "Country",
+              "nl": "Land"
+            }
+          },
+          {
+            "id": "provincia",
+            "label": {
+              "en": "Province",
+              "nl": "Provincie"
+            }
+          },
+          {
+            "id": "regio",
+            "label": {
+              "en": "Region",
+              "nl": "Regio"
+            }
+          },
+          {
+            "id": "stad",
+            "label": {
+              "en": "City/Municipality",
+              "nl": "Stad/Gemeente"
+            }
+          }
+        ]
+      }
+    ],
+    "isTransparent": false,
+    "height": 300,
+    "path": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-buienradar/widgets/buienradar-map/public/index.html",
+    "absolutePath": "/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-buienradar/widgets/buienradar-map"
+  },
+  {
+    "id": "buienradar",
+    "app": "com.nielsvanbrakel.widgetbox-buienradar",
+    "name": {
+      "en": "Five-Day Radar",
+      "nl": "5-Daagse Radar"
+    },
+    "settings": [],
+    "isTransparent": false,
+    "height": 406,
+    "path": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-buienradar/widgets/buienradar/public/index.html",
+    "absolutePath": "/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-buienradar/widgets/buienradar"
+  }
+]
