@@ -5,12 +5,15 @@
     .windy-container {
       width: 100%;
       height: 100%;
+      touch-action: none;
     }
 
     .windy-container iframe {
       border: none;
       width: 100%;
       height: 100%;
+      pointer-events: auto;
+      /* Ensure iframe receives events */
     }
   </style>
 </head>
@@ -42,9 +45,17 @@
       params.append('location', 'coordinates');
 
       // Metrics settings
+      const windMetricMap = {
+        'default': 'default',
+        'kmh': 'km/h',
+        'mph': 'mph',
+        'ms': 'm/s',
+        'knots': 'kt'
+      };
+
       params.append('metricRain', currentSettings.metricRain);
       params.append('metricTemp', currentSettings.metricTemp);
-      params.append('metricWind', currentSettings.metricWind);
+      params.append('metricWind', windMetricMap[currentSettings.metricWind] || currentSettings.metricWind);
 
       // Location settings
       params.append('lat', currentSettings.latitude);
@@ -55,7 +66,7 @@
       params.append('detailLon', currentSettings.detailLongitude || currentSettings.longitude);
 
       // Detail view
-      params.append('detail', currentSettings.detail ? 'true' : 'false');
+      params.append('detail', currentSettings.openDetailsByDefault ? 'true' : 'false');
 
       // Map settings
       params.append('zoom', currentSettings.zoom);
@@ -82,6 +93,11 @@
       iframe.src = iframeUrl;
       iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
       iframe.setAttribute('frameborder', '0');
+
+      // Stop touch event propagation to prevent dashboard scrolling while interacting with map
+      content.addEventListener('touchstart', (e) => e.stopPropagation(), { passive: true });
+      content.addEventListener('touchmove', (e) => e.stopPropagation(), { passive: true });
+      content.addEventListener('touchend', (e) => e.stopPropagation(), { passive: true });
 
       content.innerHTML = '';
       content.appendChild(iframe);
