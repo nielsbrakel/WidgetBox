@@ -7,12 +7,12 @@
 *{margin:0;padding:0;box-sizing:border-box}
 body,html{overflow:hidden;touch-action:manipulation;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#1a2332;width:100%;height:100%}
 .widget-container{position:relative;width:100%;height:100%;overflow:hidden;display:flex;align-items:center;justify-content:center;transition:background 0.4s,opacity 0.3s ease}
-.widget-container[data-tier="1"]{background:#E8D8C4}
-.widget-container[data-tier="2"]{background:#D6CCB8}
+.widget-container[data-tier="1"]{background:#6ea8c9}
+.widget-container[data-tier="2"]{background:#6ea8c9}
 .widget-container[data-tier="3"]{background:#1a2332}
 .desk-surface{position:absolute;bottom:0;left:0;right:0;display:none;z-index:1}
-.widget-container[data-tier="1"] .desk-surface{display:block;height:18%;background:#8B7355;border-top:3px solid #6B5335}
-.widget-container[data-tier="2"] .desk-surface{display:block;height:22%;background:#7B6345;border-top:3px solid #5B4325}
+.widget-container[data-tier="1"] .desk-surface{display:block;height:33.3%;background:#8a5a2b;border-top:2px solid #6a3a1b}
+.widget-container[data-tier="2"] .desk-surface{display:block;height:33.3%;background:#8a5a2b;border-top:2px solid #6a3a1b}
 .widget-container[data-tier="3"] .desk-surface{display:block;height:12%;background:#263238;border-top:2px solid #37474F}
 .desk-items{position:absolute;bottom:0;left:0;right:0;height:30%;z-index:3;pointer-events:none;display:none}
 .widget-container[data-tier="1"] .desk-items,.widget-container[data-tier="2"] .desk-items{display:block}
@@ -22,12 +22,12 @@ body,html{overflow:hidden;touch-action:manipulation;font-family:-apple-system,Bl
 canvas#tank{display:block;width:100%;height:100%;image-rendering:pixelated}
 #dirtCanvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:5;opacity:0.85;border-radius:inherit}
 .tank-wrap.cleaning #dirtCanvas{pointer-events:auto}
-.widget-container[data-tier="1"] .tank-wrap{width:52%;aspect-ratio:1;left:50%;transform:translateX(-50%);top:8%;border-radius:44%;overflow:visible;border:none;background:linear-gradient(180deg,#B8E4F0 0%,#8DD0E4 20%,#6DBDD8 45%,#5AADCC 70%,#4A9DBD 100%)}
+.widget-container[data-tier="1"] .tank-wrap{width:52%;aspect-ratio:1;left:50%;transform:translateX(-50%);top:8%;border-radius:44%;overflow:visible;border:none;background:#4fb3d8}
 .widget-container[data-tier="1"] .tank-wrap canvas{clip-path:inset(0 round 44%)}
 .widget-container[data-tier="1"] .tank-wrap::after{content:none}
 .widget-container[data-tier="1"] .tank-wrap::before{content:none}
-.widget-container[data-tier="2"] .tank-wrap{border-radius:0;width:72%;height:52%;left:50%;transform:translateX(-50%);top:4%;overflow:hidden;border:none;background:linear-gradient(180deg,#5BC8E8 0%,#38B2DC 15%,#1E98C8 35%,#1580B0 55%,#0D6A98 80%,#085880 100%)}
-.widget-container[data-tier="3"] .tank-wrap{border-radius:0;width:92%;height:78%;left:4%;top:4%;border:none;overflow:hidden;background:linear-gradient(180deg,#0288D1 0%,#01579B 15%,#014D85 35%,#006064 55%,#004D40 75%,#003D33 100%)}
+.widget-container[data-tier="2"] .tank-wrap{border-radius:0;width:72%;height:52%;left:50%;transform:translateX(-50%);top:4%;overflow:hidden;border:none;background:linear-gradient(180deg,#5fd3ff 0%,#2a8db8 100%)}
+.widget-container[data-tier="3"] .tank-wrap{border-radius:0;width:92%;height:78%;left:4%;top:4%;border:none;overflow:hidden;background:linear-gradient(180deg,#5fd3ff 0%,#2a8db8 100%)}
 .pixel-frame{position:absolute;pointer-events:none;z-index:4;image-rendering:pixelated}
 .hud{position:absolute;top:0;left:0;right:0;z-index:10;pointer-events:none}
 .coin-display{position:absolute;top:8px;left:8px;display:flex;align-items:center;gap:4px;background:rgba(0,0,0,0.45);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);padding:3px 8px;border-radius:10px;color:#FFD54F;font-size:12px;font-weight:700;pointer-events:auto;cursor:pointer;font-variant-numeric:tabular-nums}
@@ -220,82 +220,92 @@ var FOOD_PRIORITY = { flakes:1, pellets:2, premium_flakes:3 };
 
 var FISH_PX = {
   guppy: { w:13, h:8, eye:[3,10], px:[
-    [0,0,2,2,0,0,0,0,0,1,0,0,0],
-    [0,2,2,2,0,1,1,1,1,1,1,0,0],
-    [2,2,2,2,1,1,1,1,1,1,1,1,0],
+    [0,0,2,2,0,0,0,0,0,3,0,0,0],
+    [0,2,2,2,0,3,3,1,1,1,1,0,0],
+    [2,2,2,2,3,1,1,1,1,1,1,1,0],
     [2,2,2,1,1,1,1,1,1,1,1,1,0],
     [2,2,2,1,1,1,1,1,1,1,1,1,0],
-    [2,2,2,2,1,1,1,1,1,1,1,1,0],
-    [0,2,2,2,0,1,1,1,1,1,1,0,0],
+    [2,2,2,2,1,1,1,1,4,1,1,1,0],
+    [0,2,2,2,0,1,1,1,1,4,1,0,0],
     [0,0,2,2,0,0,0,0,0,1,0,0,0]] },
   goldfish: { w:14, h:10, eye:[4,10], px:[
-    [0,0,0,0,0,0,0,1,1,0,0,0,0,0],
-    [0,0,2,0,0,1,1,1,1,1,1,0,0,0],
-    [0,2,2,2,1,1,1,1,1,1,1,1,0,0],
-    [2,2,0,1,1,1,1,1,1,1,1,1,0,0],
+    [0,0,0,0,0,0,0,3,3,0,0,0,0,0],
+    [0,0,2,0,0,3,3,1,1,1,1,0,0,0],
+    [0,2,2,2,3,1,1,1,1,1,1,1,0,0],
+    [2,2,0,3,1,1,1,1,1,1,1,1,0,0],
     [2,2,1,1,1,1,1,1,1,1,1,1,1,0],
     [2,2,1,1,1,1,1,1,1,1,1,1,1,0],
-    [2,2,0,1,1,1,1,1,1,1,1,1,0,0],
-    [0,2,2,2,1,1,1,1,1,1,1,1,0,0],
+    [2,2,0,1,1,1,1,1,4,1,1,1,0,0],
+    [0,2,2,2,1,1,1,4,1,4,1,1,0,0],
     [0,0,2,0,0,1,1,1,1,1,1,0,0,0],
     [0,0,0,0,0,0,0,1,1,0,0,0,0,0]] },
   neon_tetra: { w:11, h:6, eye:[2,8], px:[
-    [0,0,0,0,1,1,1,0,0,0,0],
-    [0,0,1,1,1,1,1,1,1,0,0],
-    [0,1,1,1,1,1,1,1,1,1,0],
+    [0,0,0,0,3,3,3,0,0,0,0],
+    [0,0,3,3,1,1,1,1,1,0,0],
+    [0,3,1,1,1,1,1,1,1,1,0],
     [0,2,2,2,2,2,2,2,2,1,0],
-    [0,0,2,2,2,2,2,2,2,0,0],
+    [0,0,2,2,4,2,4,2,2,0,0],
     [0,0,0,0,2,2,2,0,0,0,0]] },
   betta: { w:14, h:11, eye:[5,10], px:[
-    [0,0,2,2,2,0,0,0,0,1,0,0,0,0],
-    [0,2,2,2,2,2,1,1,1,1,0,0,0,0],
-    [2,2,2,2,2,1,1,1,1,1,1,0,0,0],
+    [0,0,2,2,2,0,0,0,0,3,0,0,0,0],
+    [0,2,2,2,2,2,3,3,1,1,0,0,0,0],
+    [2,2,2,2,2,3,1,1,1,1,1,0,0,0],
     [2,2,2,2,1,1,1,1,1,1,1,0,0,0],
     [0,2,2,1,1,1,1,1,1,1,1,1,0,0],
     [0,0,2,1,1,1,1,1,1,1,1,1,0,0],
     [0,2,2,1,1,1,1,1,1,1,1,1,0,0],
-    [2,2,2,2,1,1,1,1,1,1,1,0,0,0],
-    [2,2,2,2,2,1,1,1,1,1,1,0,0,0],
+    [2,2,2,2,1,1,1,4,1,1,1,0,0,0],
+    [2,2,2,2,2,1,4,1,4,1,1,0,0,0],
     [0,2,2,2,2,2,1,1,1,1,0,0,0,0],
     [0,0,2,2,2,0,0,0,0,1,0,0,0,0]] },
   angelfish: { w:10, h:13, eye:[5,7], px:[
     [0,0,0,0,0,2,0,0,0,0],
-    [0,0,0,0,2,1,2,0,0,0],
-    [0,0,0,2,1,1,1,0,0,0],
-    [0,0,2,1,1,1,1,1,0,0],
-    [0,2,1,1,1,1,1,1,0,0],
+    [0,0,0,0,2,3,2,0,0,0],
+    [0,0,0,2,3,1,3,0,0,0],
+    [0,0,2,3,1,1,1,1,0,0],
+    [0,2,3,1,1,1,1,1,0,0],
+    [2,3,1,1,1,1,1,1,1,0],
     [2,1,1,1,1,1,1,1,1,0],
-    [2,1,1,1,1,1,1,1,1,0],
-    [0,2,1,1,1,1,1,1,0,0],
-    [0,0,2,1,1,1,1,1,0,0],
+    [0,2,1,1,1,4,1,1,0,0],
+    [0,0,2,1,1,1,4,1,0,0],
     [0,0,0,2,1,1,1,0,0,0],
     [0,0,0,0,2,1,2,0,0,0],
     [0,0,0,0,0,2,0,0,0,0],
     [0,0,0,0,0,2,0,0,0,0]] },
   clownfish: { w:12, h:8, eye:[3,9], px:[
-    [0,0,0,0,1,0,0,0,1,0,0,0],
-    [0,0,1,2,1,1,2,1,1,1,0,0],
-    [0,1,1,2,1,1,2,1,1,1,1,0],
+    [0,0,0,0,1,0,0,0,3,0,0,0],
+    [0,0,3,2,3,1,2,1,1,1,0,0],
+    [0,3,1,2,1,1,2,1,1,1,1,0],
     [1,1,1,2,1,1,2,1,1,1,1,0],
     [1,1,1,2,1,1,2,1,1,1,1,0],
-    [0,1,1,2,1,1,2,1,1,1,1,0],
+    [0,1,1,2,4,1,2,1,4,1,1,0],
     [0,0,1,2,1,1,2,1,1,1,0,0],
     [0,0,0,0,1,0,0,0,1,0,0,0]] }
 };
 
-var SNAIL_PX = [[0,0,2,0],[0,2,2,2],[1,1,2,2],[1,1,1,1]];
-var GRAVEL_COLORS = ['#5D4037','#6D4C41','#795548','#8D6E63','#4E342E','#3E2723'];
-var PLANT_COLORS  = ['#2E7D32','#388E3C','#43A047','#1B5E20','#4CAF50'];
+var SNAIL_PX = [[0,0,2,0],[0,2,3,2],[1,1,2,2],[1,1,1,1]];
+var GRAVEL_COLORS = ['#c8b07a','#bfa56e','#d4bc86','#b89a62','#a89060','#c0a878','#d6c490','#b0945a'];
+var PLANT_COLORS  = ['#3fa34d','#2fa36d','#1f6a4a','#2E7D32','#4CAF50'];
+
+// ── Grid layout system (64×48 base grid) ─────────────────────────────────────
+var GRID_W = 64, GRID_H = 48;
+var DIRT_GRID_W = 16, DIRT_GRID_H = 12;
+
+var SWIM_ZONES = {
+  1: { minX: 0.10, maxX: 0.90, minY: 0.10, maxY: 0.75 },
+  2: { minX: 0.05, maxX: 0.95, minY: 0.05, maxY: 0.82 },
+  3: { minX: 0.05, maxX: 0.95, minY: 0.05, maxY: 0.88 }
+};
 
 var DECO_PX = {
-  plant_fern:    { w:5, h:9, c:['#2E7D32','#43A047'], px:[[0,0,1,0,0],[0,1,1,0,0],[0,1,1,1,0],[1,1,1,0,0],[0,2,1,1,0],[0,1,1,0,0],[0,0,1,0,0],[0,0,2,0,0],[0,0,2,0,0]] },
-  plant_grass:   { w:3, h:10, c:['#388E3C','#66BB6A'], px:[[0,1,0],[1,0,1],[0,1,0],[1,0,1],[0,1,0],[0,1,0],[0,1,0],[0,2,0],[0,2,0],[0,2,0]] },
-  plant_anubias: { w:7, h:6, c:['#1B5E20','#4CAF50'], px:[[0,1,1,0,1,1,0],[1,1,1,1,1,1,1],[0,1,1,1,1,1,0],[0,0,1,1,1,0,0],[0,0,0,2,0,0,0],[0,0,0,2,0,0,0]] },
-  shipwreck:     { w:9, h:7, c:['#5D4037','#8D6E63'], px:[[0,0,0,1,0,0,0,0,0],[0,0,1,1,1,0,0,0,0],[0,1,1,2,1,1,0,0,0],[1,1,2,2,2,1,1,0,0],[1,2,2,2,2,2,1,0,0],[1,1,1,2,2,2,1,1,1],[0,0,0,1,1,1,0,0,0]] },
-  bubbler:       { w:3, h:7, c:['#78909C','#B0BEC5'], px:[[0,1,0],[1,1,1],[1,2,1],[1,2,1],[1,1,1],[0,2,0],[2,0,2]] },
-  castle:        { w:7, h:8, c:['#9E9E9E','#BDBDBD'], px:[[1,0,1,0,1,0,1],[1,0,1,1,1,0,1],[1,1,1,2,1,1,1],[0,1,2,2,2,1,0],[0,1,2,0,2,1,0],[0,1,1,0,1,1,0],[0,1,1,1,1,1,0],[1,1,1,1,1,1,1]] },
-  treasure:      { w:7, h:5, c:['#6D4C41','#FFD54F'], px:[[0,1,1,1,1,1,0],[1,2,2,2,2,2,1],[1,1,1,1,1,1,1],[1,2,1,2,1,2,1],[1,1,1,1,1,1,1]] },
-  coral_rock:    { w:7, h:6, c:['#E91E63','#F48FB1'], px:[[0,0,1,0,1,0,0],[0,1,1,1,1,1,0],[1,2,1,2,1,2,1],[1,1,2,1,2,1,1],[0,1,1,1,1,1,0],[0,0,1,1,1,0,0]] }
+  plant_fern:    { w:5, h:9, c:['#2E7D32','#43A047','#66BB6A'], px:[[0,0,3,0,0],[0,3,1,0,0],[0,1,1,3,0],[3,1,1,0,0],[0,2,1,3,0],[0,1,1,0,0],[0,0,1,0,0],[0,0,2,0,0],[0,0,2,0,0]] },
+  plant_grass:   { w:3, h:10, c:['#388E3C','#66BB6A','#81C784'], px:[[0,3,0],[3,0,3],[0,1,0],[1,0,3],[0,1,0],[0,1,0],[0,1,0],[0,2,0],[0,2,0],[0,2,0]] },
+  plant_anubias: { w:7, h:6, c:['#1B5E20','#4CAF50','#81C784'], px:[[0,3,3,0,3,3,0],[3,1,1,3,1,1,3],[0,1,1,1,1,1,0],[0,0,1,1,1,0,0],[0,0,0,2,0,0,0],[0,0,0,2,0,0,0]] },
+  shipwreck:     { w:9, h:7, c:['#5D4037','#8D6E63','#A1887F'], px:[[0,0,0,3,0,0,0,0,0],[0,0,3,1,1,0,0,0,0],[0,3,1,2,1,1,0,0,0],[1,1,2,2,2,1,1,0,0],[1,2,2,2,2,2,1,0,0],[1,1,1,2,2,2,1,1,1],[0,0,0,1,1,1,0,0,0]] },
+  bubbler:       { w:3, h:7, c:['#78909C','#B0BEC5','#CFD8DC'], px:[[0,3,0],[3,1,1],[1,2,1],[1,2,1],[1,1,1],[0,2,0],[2,0,2]] },
+  castle:        { w:7, h:8, c:['#9E9E9E','#BDBDBD','#E0E0E0'], px:[[3,0,3,0,3,0,3],[1,0,1,3,1,0,1],[1,1,1,2,1,1,1],[0,1,2,2,2,1,0],[0,1,2,0,2,1,0],[0,1,1,0,1,1,0],[0,1,1,1,1,1,0],[1,1,1,1,1,1,1]] },
+  treasure:      { w:7, h:5, c:['#5D4037','#FFD54F','#FFF176'], px:[[0,1,1,1,1,1,0],[1,3,2,3,2,3,1],[1,1,1,1,1,1,1],[1,2,1,3,1,2,1],[1,1,1,1,1,1,1]] },
+  coral_rock:    { w:7, h:6, c:['#E91E63','#F48FB1','#F8BBD0'], px:[[0,0,3,0,3,0,0],[0,3,1,3,1,3,0],[3,2,1,2,1,2,3],[1,1,2,1,2,1,1],[0,1,1,1,1,1,0],[0,0,1,1,1,0,0]] }
 };
 
 // ── Room pixel art per tier ──────────────────────────────────────────────────
@@ -321,6 +331,8 @@ var schoolAnchor = { x: 150, y: 120, vx: 12, vy: 6, timer: 0 };
 var dirtMaskCanvas = null, dirtMaskCtx = null;
 var dirtMaskGenerated = false;
 
+var ambientParticles = [];
+
 var currentTool = 'none';
 var selectedFoodId = 'flakes';
 var laserPos = { x: 0, y: 0 };
@@ -338,6 +350,23 @@ function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
 function lerp(a, b, t) { return a + (b - a) * clamp(t, 0, 1); }
 function rnd(a, b) { return a + Math.random() * (b - a); }
 function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+function hexToRgb(hex) {
+  hex = hex.replace('#', '');
+  if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+  return { r: parseInt(hex.substr(0,2),16), g: parseInt(hex.substr(2,2),16), b: parseInt(hex.substr(4,2),16) };
+}
+function rgbToHex(r, g, b) {
+  return '#' + [r,g,b].map(function(c) { var h = clamp(Math.round(c),0,255).toString(16); return h.length < 2 ? '0'+h : h; }).join('');
+}
+function lightenColor(hex, amt) {
+  var c = hexToRgb(hex);
+  return rgbToHex(c.r + amt, c.g + amt, c.b + amt);
+}
+function darkenColor(hex, amt) {
+  var c = hexToRgb(hex);
+  return rgbToHex(c.r - amt, c.g - amt, c.b - amt);
+}
 function xpToNext(lv) { return 30 + 14 * (lv - 1); }
 function lifeStage(fish) {
   var d = (Date.now() - fish.bornAt) / 86400000;
@@ -412,52 +441,305 @@ function hideHudTooltip() {
   clearTimeout(hudTooltipTimer);
 }
 
-// ── Environment ──────────────────────────────────────────────────────────────
+// ── Environment (grid-based per tier) ────────────────────────────────────────
 
 function initEnvironment() {
   var tier = getActiveTier();
   gravelData = [];
-  var rows = tier === 1 ? 2 : tier === 2 ? 3 : 4;
-  var cols = Math.ceil(W / PIXEL);
-  for (var r = 0; r < rows; r++) {
-    for (var c = 0; c < cols; c++) {
-      gravelData.push({ x: c * PIXEL, y: H - (rows - r) * PIXEL, color: pick(GRAVEL_COLORS) });
+  plants = [];
+
+  if (tier === 1) {
+    // Fishbowl: sandy ellipse gravel at bottom of bowl (grid y32→36 mapped to canvas)
+    var gravelTop = H * 0.72;
+    var gravelBot = H * 0.92;
+    var gravelCx = W / 2;
+    var gravelRx = W * 0.38;
+    for (var gy = gravelTop; gy < gravelBot; gy += PIXEL) {
+      var ratio = (gy - gravelTop) / (gravelBot - gravelTop);
+      var rowRx = gravelRx * (0.6 + ratio * 0.4);
+      for (var gx = gravelCx - rowRx; gx < gravelCx + rowRx; gx += PIXEL) {
+        var col = pick(GRAVEL_COLORS);
+        if (Math.random() < 0.15) col = '#a89060'; // darker speckle
+        gravelData.push({ x: gx, y: gy, color: col });
+      }
+    }
+    // Small plant at ~center-left (spec: base at grid 30,32)
+    var plantX = W * 0.42;
+    plants.push({ x: plantX, stemH: 6, leaves: [
+      { y: 2, dir: -1, len: 2 }, { y: 4, dir: 1, len: 2 }, { y: 5, dir: -1, len: 1 }
+    ], color: '#3fa34d' });
+
+  } else if (tier === 2) {
+    // Small aquarium: substrate rectangle at bottom (grid y30→34)
+    var subTop = H * 0.70;
+    var cols = Math.ceil(W / PIXEL);
+    var subRows = Math.ceil((H - subTop) / PIXEL);
+    for (var r = 0; r < subRows; r++) {
+      for (var c = 0; c < cols; c++) {
+        var col2 = pick(GRAVEL_COLORS);
+        if (Math.random() < 0.12) col2 = '#a89060';
+        gravelData.push({ x: c * PIXEL, y: subTop + r * PIXEL, color: col2 });
+      }
+    }
+    // Several plants at decoration anchor positions
+    var anchors = [0.20, 0.40, 0.60, 0.75];
+    for (var ai = 0; ai < anchors.length; ai++) {
+      var px = W * anchors[ai];
+      var stemH = 5 + Math.floor(Math.random() * 4);
+      var lvs = [];
+      for (var j = 1; j < stemH; j += 2) {
+        if (Math.random() > 0.25) lvs.push({ y: j, dir: Math.random() > 0.5 ? 1 : -1, len: 2 + Math.floor(Math.random() * 3) });
+      }
+      plants.push({ x: px, stemH: stemH, leaves: lvs, color: pick(PLANT_COLORS) });
+    }
+
+  } else {
+    // Big tank: layered depth — back plants, mid plants, foreground rocks + substrate
+    var subTop3 = H * 0.80;
+    var cols3 = Math.ceil(W / PIXEL);
+    var subRows3 = Math.ceil((H - subTop3) / PIXEL);
+    for (var r3 = 0; r3 < subRows3; r3++) {
+      for (var c3 = 0; c3 < cols3; c3++) {
+        gravelData.push({ x: c3 * PIXEL, y: subTop3 + r3 * PIXEL, color: pick(GRAVEL_COLORS) });
+      }
+    }
+    // Back layer plants — dark green silhouettes (spec #1f6a4a)
+    for (var bi = 0; bi < 8; bi++) {
+      var bpx = 10 + Math.random() * (W - 20);
+      var bstem = 8 + Math.floor(Math.random() * 6);
+      var blvs = [];
+      for (var bj = 1; bj < bstem; bj += 2) {
+        blvs.push({ y: bj, dir: Math.random() > 0.5 ? 1 : -1, len: 3 + Math.floor(Math.random() * 3) });
+      }
+      plants.push({ x: bpx, stemH: bstem, leaves: blvs, color: '#1f6a4a', layer: 'back' });
+    }
+    // Mid layer plants — brighter green (spec #2fa36d)
+    for (var mi = 0; mi < 6; mi++) {
+      var mpx = 15 + Math.random() * (W - 30);
+      var mstem = 5 + Math.floor(Math.random() * 5);
+      var mlvs = [];
+      for (var mj = 1; mj < mstem; mj += 2) {
+        if (Math.random() > 0.3) mlvs.push({ y: mj, dir: Math.random() > 0.5 ? 1 : -1, len: 2 + Math.floor(Math.random() * 3) });
+      }
+      plants.push({ x: mpx, stemH: mstem, leaves: mlvs, color: '#2fa36d', layer: 'mid' });
     }
   }
-  plants = [];
-  var pCount = tier === 1 ? 2 : tier === 2 ? 5 : 10;
-  for (var i = 0; i < pCount; i++) {
-    var x = 15 + Math.random() * (W - 30);
-    var stemH = 5 + Math.floor(Math.random() * (tier * 3));
-    var leaves = [];
-    for (var j = 1; j < stemH; j += 2) {
-      if (Math.random() > 0.3) leaves.push({ y: j, dir: Math.random() > 0.5 ? 1 : -1, len: 2 + Math.floor(Math.random() * 3) });
+}
+
+// Rock clusters for tier 3 foreground
+var rockClusters = [];
+
+function initRockClusters() {
+  rockClusters = [];
+  if (getActiveTier() !== 3) return;
+  var clusterCount = 3 + Math.floor(Math.random() * 2);
+  for (var i = 0; i < clusterCount; i++) {
+    var cx = W * (0.1 + (i / clusterCount) * 0.8);
+    var cy = H * 0.82;
+    var rocks = [];
+    var rCount = 2 + Math.floor(Math.random() * 3);
+    for (var j = 0; j < rCount; j++) {
+      rocks.push({
+        dx: (Math.random() - 0.5) * PIXEL * 4,
+        dy: Math.random() * PIXEL * 2,
+        w: PIXEL * (2 + Math.floor(Math.random() * 2)),
+        h: PIXEL * (1 + Math.floor(Math.random() * 2)),
+        color: '#546E7A',
+        highlight: '#78909C'
+      });
     }
-    plants.push({ x: x, stemH: stemH, leaves: leaves, color: pick(PLANT_COLORS) });
+    rockClusters.push({ x: cx, y: cy, rocks: rocks });
   }
 }
 
 function drawEnvironment() {
-  for (var i = 0; i < gravelData.length; i++) { var g = gravelData[i]; ctx.fillStyle = g.color; ctx.fillRect(g.x, g.y, PIXEL, PIXEL); }
-  for (var pi = 0; pi < plants.length; pi++) {
-    var p = plants[pi]; ctx.fillStyle = p.color;
-    var by = H - gravelData.length / Math.ceil(W / PIXEL) * PIXEL - PIXEL;
-    for (var j = 0; j < p.stemH; j++) ctx.fillRect(p.x, by - j * PIXEL, PIXEL, PIXEL);
-    for (var li = 0; li < p.leaves.length; li++) { var l = p.leaves[li]; for (var k = 1; k <= l.len; k++) { ctx.fillRect(p.x + l.dir * k * PIXEL, by - l.y * PIXEL - k * PIXEL * 0.5, PIXEL, PIXEL); } }
+  var tier = getActiveTier();
+  var time = Date.now() / 2500;
+
+  // ── Water background gradient (drawn on canvas for depth) ──
+  var grad = ctx.createLinearGradient(0, 0, 0, H);
+  if (tier === 1) {
+    grad.addColorStop(0, '#5ad0ec');
+    grad.addColorStop(0.5, '#3aadcc');
+    grad.addColorStop(1, '#2690aa');
+  } else if (tier === 2) {
+    grad.addColorStop(0, '#50c8e8');
+    grad.addColorStop(0.4, '#359ec0');
+    grad.addColorStop(1, '#1d7a98');
+  } else {
+    grad.addColorStop(0, '#45bcd8');
+    grad.addColorStop(0.35, '#2e92b2');
+    grad.addColorStop(0.75, '#1d6e8a');
+    grad.addColorStop(1, '#155a72');
   }
-  // Light rays from top
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+
+  // ── Subtle animated caustic light pattern ──
   ctx.save();
-  ctx.globalAlpha = 0.04;
   ctx.fillStyle = '#ffffff';
-  for (var ri = 0; ri < 3; ri++) {
-    var rx = W * (0.18 + ri * 0.32);
+  var cStep = PIXEL * 4;
+  for (var ccy = 0; ccy < H * 0.82; ccy += cStep) {
+    var depthFade = 1.0 - (ccy / (H * 0.82)) * 0.6;
+    ctx.globalAlpha = 0.035 * depthFade;
+    for (var ccx = 0; ccx < W; ccx += cStep) {
+      var v1 = Math.sin(ccx * 0.022 + time) * Math.cos(ccy * 0.028 - time * 0.6);
+      var v2 = Math.sin((ccx + ccy) * 0.015 + time * 1.3) * 0.4;
+      if (v1 + v2 > 0.35) {
+        ctx.fillRect(ccx, ccy, PIXEL * 2, PIXEL);
+      }
+    }
+  }
+  ctx.restore();
+
+  // ── Water surface shimmer ──
+  ctx.save();
+  for (var sx = 0; sx < W; sx += PIXEL) {
+    var waveY = 1 + Math.sin(sx * 0.06 + time * 2.2) * 1.5 + Math.sin(sx * 0.12 + time * 3.1) * 0.5;
+    ctx.globalAlpha = 0.12;
+    ctx.fillStyle = '#bef0ff';
+    ctx.fillRect(sx, waveY, PIXEL, PIXEL);
+    ctx.globalAlpha = 0.06;
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(sx, waveY + PIXEL, PIXEL, Math.round(PIXEL * 0.6));
+  }
+  ctx.restore();
+
+  // Gravel / substrate with pixel-art depth
+  for (var i = 0; i < gravelData.length; i++) {
+    var g = gravelData[i];
+    ctx.fillStyle = g.color;
+    ctx.fillRect(g.x, g.y, PIXEL, PIXEL);
+  }
+  // Gravel highlight and shadow detail
+  ctx.save();
+  for (var gi = 0; gi < gravelData.length; gi += 3) {
+    var gg = gravelData[gi];
+    // Subtle highlight on some top-left corners
+    ctx.globalAlpha = 0.1;
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(gg.x, gg.y, Math.round(PIXEL * 0.5), Math.round(PIXEL * 0.5));
+  }
+  for (var gi2 = 1; gi2 < gravelData.length; gi2 += 5) {
+    var gg2 = gravelData[gi2];
+    // Subtle shadow on some bottom-right corners
+    ctx.globalAlpha = 0.08;
+    ctx.fillStyle = '#000';
+    ctx.fillRect(gg2.x + PIXEL * 0.5, gg2.y + PIXEL * 0.5, Math.round(PIXEL * 0.5), Math.round(PIXEL * 0.5));
+  }
+  ctx.restore();
+
+  // Back-layer plants (tier 3 depth) — with organic leaf clusters
+  var time2 = Date.now() / 3000;
+  for (var pi = 0; pi < plants.length; pi++) {
+    var p = plants[pi];
+    if (p.layer === 'mid') continue; // draw mid later
+    var baseY;
+    if (tier === 1) baseY = H * 0.72 - PIXEL;
+    else if (tier === 2) baseY = H * 0.70 - PIXEL;
+    else baseY = H * 0.80 - PIXEL;
+    // Subtle sway
+    var sway = Math.sin(time2 + p.x * 0.01) * 1.2;
+    // Stem — 2px wide for larger plants
+    var stemW = p.stemH > 6 ? PIXEL * 2 : PIXEL;
+    ctx.fillStyle = darkenColor(p.color, 20);
+    for (var j = 0; j < p.stemH; j++) {
+      var sx = p.x + sway * (j / p.stemH);
+      ctx.fillRect(sx, baseY - j * PIXEL, stemW, PIXEL);
+    }
+    // Leaves — clusters of 2-3 pixels
+    ctx.fillStyle = p.color;
+    for (var li = 0; li < p.leaves.length; li++) {
+      var l = p.leaves[li];
+      for (var k = 1; k <= l.len; k++) {
+        var lx = p.x + l.dir * k * PIXEL + sway * (l.y / p.stemH);
+        var ly = baseY - l.y * PIXEL - k * PIXEL * 0.5;
+        ctx.fillRect(lx, ly, PIXEL, PIXEL);
+        // Leaf cluster: extra pixel above or below for fullness
+        if (k > 1) {
+          ctx.fillRect(lx, ly - PIXEL, PIXEL, PIXEL);
+        }
+      }
+    }
+    // Leaf tips — lighter highlight
+    ctx.fillStyle = lightenColor(p.color, 25);
+    for (var li2 = 0; li2 < p.leaves.length; li2++) {
+      var l2 = p.leaves[li2];
+      var tipX = p.x + l2.dir * l2.len * PIXEL + sway * (l2.y / p.stemH);
+      var tipY = baseY - l2.y * PIXEL - l2.len * PIXEL * 0.5;
+      ctx.fillRect(tipX, tipY, PIXEL, PIXEL);
+    }
+  }
+
+  // Mid-layer plants (tier 3) — with sway and clusters
+  for (var pi2 = 0; pi2 < plants.length; pi2++) {
+    var p2 = plants[pi2];
+    if (p2.layer !== 'mid') continue;
+    var by2 = H * 0.80 - PIXEL;
+    var sway2 = Math.sin(time2 * 1.2 + p2.x * 0.015) * 1.0;
+    ctx.fillStyle = darkenColor(p2.color, 15);
+    for (var j2 = 0; j2 < p2.stemH; j2++) {
+      ctx.fillRect(p2.x + sway2 * (j2 / p2.stemH), by2 - j2 * PIXEL, PIXEL, PIXEL);
+    }
+    ctx.fillStyle = p2.color;
+    for (var li2m = 0; li2m < p2.leaves.length; li2m++) {
+      var l2m = p2.leaves[li2m];
+      for (var k2 = 1; k2 <= l2m.len; k2++) {
+        var lx2 = p2.x + l2m.dir * k2 * PIXEL + sway2 * (l2m.y / p2.stemH);
+        var ly2 = by2 - l2m.y * PIXEL - k2 * PIXEL * 0.5;
+        ctx.fillRect(lx2, ly2, PIXEL, PIXEL);
+        if (k2 > 1) ctx.fillRect(lx2, ly2 - PIXEL, PIXEL, PIXEL);
+      }
+    }
+  }
+
+  // Foreground rock clusters (tier 3) — with shading
+  for (var ri = 0; ri < rockClusters.length; ri++) {
+    var cl = rockClusters[ri];
+    for (var rj = 0; rj < cl.rocks.length; rj++) {
+      var rock = cl.rocks[rj];
+      // Shadow
+      ctx.fillStyle = 'rgba(0,0,0,0.1)';
+      ctx.fillRect(cl.x + rock.dx + PIXEL, cl.y + rock.dy + PIXEL, rock.w, rock.h);
+      // Rock body
+      ctx.fillStyle = rock.color;
+      ctx.fillRect(cl.x + rock.dx, cl.y + rock.dy, rock.w, rock.h);
+      // Highlight pixels — top edge
+      ctx.fillStyle = rock.highlight;
+      ctx.fillRect(cl.x + rock.dx, cl.y + rock.dy, rock.w, PIXEL);
+      // Specular highlight
+      ctx.fillStyle = 'rgba(255,255,255,0.15)';
+      ctx.fillRect(cl.x + rock.dx + PIXEL, cl.y + rock.dy, PIXEL, PIXEL);
+    }
+  }
+
+  // Light rays from top — wider, animated
+  ctx.save();
+  var rayAlpha = 0.055 + Math.sin(time * 0.4) * 0.012;
+  ctx.globalAlpha = rayAlpha;
+  ctx.fillStyle = '#ffffff';
+  var rayCount = tier === 1 ? 2 : tier === 2 ? 3 : 4;
+  for (var rri = 0; rri < rayCount; rri++) {
+    var rrx = W * (0.14 + rri * (0.72 / rayCount));
+    var drift = Math.sin(time * 0.25 + rri * 1.8) * 6;
     ctx.beginPath();
-    ctx.moveTo(rx - 5, 0);
-    ctx.lineTo(rx + 12, 0);
-    ctx.lineTo(rx + 28 + ri * 10, H);
-    ctx.lineTo(rx - 8 + ri * 10, H);
+    ctx.moveTo(rrx - 6 + drift, 0);
+    ctx.lineTo(rrx + 16 + drift, 0);
+    ctx.lineTo(rrx + 40 + rri * 10 + drift, H);
+    ctx.lineTo(rrx - 6 + rri * 10 + drift, H);
     ctx.fill();
   }
+  ctx.restore();
+
+  // ── Depth shadow at gravel line ──
+  var grLineY = tier === 1 ? H * 0.72 : tier === 2 ? H * 0.70 : H * 0.80;
+  ctx.save();
+  var shGrad = ctx.createLinearGradient(0, grLineY - PIXEL * 2, 0, grLineY + PIXEL * 2);
+  shGrad.addColorStop(0, 'rgba(0,0,0,0)');
+  shGrad.addColorStop(0.5, 'rgba(0,30,50,0.12)');
+  shGrad.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = shGrad;
+  ctx.fillRect(0, grLineY - PIXEL * 2, W, PIXEL * 4);
   ctx.restore();
 }
 
@@ -466,8 +748,8 @@ function drawEnvironment() {
 function drawDecorations() {
   var decos = getActiveDecorations();
   if (!decos || decos.length === 0) return;
-  var gravelH = (getActiveTier() === 1 ? 2 : getActiveTier() === 2 ? 3 : 4) * PIXEL;
-  var baseY = H - gravelH;
+  var tier = getActiveTier();
+  var baseY = tier === 1 ? H * 0.72 : tier === 2 ? H * 0.70 : H * 0.80;
 
   for (var di = 0; di < decos.length; di++) {
     var deco = decos[di];
@@ -475,6 +757,10 @@ function drawDecorations() {
     if (!art) continue;
     var dx = deco.x * (W - art.w * PIXEL);
     var dy = baseY - art.h * PIXEL;
+
+    // Drop shadow under decoration
+    ctx.fillStyle = 'rgba(0,0,0,0.08)';
+    ctx.fillRect(dx + PIXEL, dy + art.h * PIXEL - PIXEL, art.w * PIXEL, PIXEL * 2);
 
     for (var r = 0; r < art.px.length; r++) {
       for (var c = 0; c < art.px[r].length; c++) {
@@ -491,30 +777,88 @@ function drawDecorations() {
 
 function drawEquipment() {
   var upg = getActiveUpgrades();
-  // Filter: right side of tank
+  var tier = getActiveTier();
+
+  // Filter: right side of tank — improved with detail
   if (upg.filterLevel > 0) {
-    var fx = W - PIXEL * 4;
-    var fy = Math.floor(H * 0.3);
-    ctx.fillStyle = '#546E7A';
+    var fx = tier === 1 ? W - PIXEL * 4 : W - PIXEL * 5;
+    var fy = Math.floor(H * 0.25);
+    // Filter shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.06)';
+    ctx.fillRect(fx + PIXEL, fy + PIXEL, PIXEL * 3, PIXEL * 6);
+    // Filter body
+    ctx.fillStyle = '#455A64';
     ctx.fillRect(fx, fy, PIXEL * 3, PIXEL * 6);
-    ctx.fillStyle = '#78909C';
+    // Filter front panel
+    ctx.fillStyle = '#607D8B';
     ctx.fillRect(fx + PIXEL, fy + PIXEL, PIXEL, PIXEL * 4);
+    // Filter highlight edge
+    ctx.fillStyle = '#78909C';
+    ctx.fillRect(fx, fy, PIXEL * 3, PIXEL);
     if (upg.filterLevel >= 2) {
-      ctx.fillStyle = 'rgba(200,230,255,0.3)';
+      // Outlet water flow
+      ctx.fillStyle = 'rgba(180,225,255,0.3)';
       ctx.fillRect(fx - PIXEL, fy + PIXEL, PIXEL, PIXEL);
+      ctx.fillRect(fx - PIXEL * 2, fy + PIXEL * 2, PIXEL, PIXEL);
       ctx.fillRect(fx - PIXEL, fy + PIXEL * 3, PIXEL, PIXEL);
     }
   }
-  // Auto-feeder: top right
+
+  // Heater: left side — with indicator glow
+  if (tier >= 2 && upg.filterLevel > 0) {
+    var hx = PIXEL * 3;
+    var hy = Math.floor(H * 0.25);
+    var hh = PIXEL * 8;
+    // Heater body
+    ctx.fillStyle = '#455A64';
+    ctx.fillRect(hx, hy, PIXEL * 2, hh);
+    // Heater panel detail
+    ctx.fillStyle = '#546E7A';
+    ctx.fillRect(hx, hy, PIXEL, hh);
+    // Red indicator with glow
+    ctx.fillStyle = '#FF1744';
+    ctx.fillRect(hx, hy + PIXEL, PIXEL, PIXEL);
+    ctx.fillStyle = 'rgba(255,23,68,0.15)';
+    ctx.fillRect(hx - PIXEL, hy, PIXEL * 4, PIXEL * 3);
+    // Cap
+    ctx.fillStyle = '#37474F';
+    ctx.fillRect(hx, hy - PIXEL, PIXEL * 2, PIXEL);
+  }
+
+  // Auto-feeder: top right — improved detail
   if (upg.autoFeederLevel > 0) {
     var ax = W - PIXEL * 6;
-    ctx.fillStyle = '#FF8A65';
+    // Body
+    ctx.fillStyle = '#D84315';
     ctx.fillRect(ax, 0, PIXEL * 4, PIXEL * 2);
-    ctx.fillStyle = '#4E342E';
+    // Highlight top
+    ctx.fillStyle = '#FF5722';
+    ctx.fillRect(ax, 0, PIXEL * 4, PIXEL);
+    // Dispenser nozzle
+    ctx.fillStyle = '#3E2723';
     ctx.fillRect(ax + PIXEL, PIXEL * 2, PIXEL * 2, PIXEL);
     if (upg.autoFeederLevel >= 2) {
+      // LED indicator
       ctx.fillStyle = '#FFD54F';
       ctx.fillRect(ax + PIXEL * 4, PIXEL, PIXEL, PIXEL);
+    }
+  }
+
+  // Bubble maker: tier 3 bottom-right — with animated bubble hint
+  if (tier === 3 && upg.filterLevel > 0) {
+    var bx = W - PIXEL * 6;
+    var bby = H * 0.80;
+    ctx.fillStyle = '#607D8B';
+    ctx.fillRect(bx, bby, PIXEL * 3, PIXEL * 2);
+    ctx.fillStyle = '#78909C';
+    ctx.fillRect(bx, bby, PIXEL * 3, PIXEL);
+    // Bubble column — animated
+    var btime = Date.now() / 600;
+    for (var bi = 1; bi < 6; bi++) {
+      var bAlpha = 0.15 + Math.sin(btime + bi * 1.2) * 0.08;
+      ctx.fillStyle = 'rgba(200,230,255,' + bAlpha + ')';
+      var bxOff = Math.sin(btime * 0.5 + bi) * PIXEL * 0.4;
+      ctx.fillRect(bx + PIXEL + bxOff, bby - bi * PIXEL * 2, PIXEL, PIXEL);
     }
   }
 }
@@ -564,7 +908,7 @@ function addFrameCanvas(w, h, css) {
   return c;
 }
 
-// ── Tier 1: Fishbowl with chunky pixel art outline ─────────────────────────
+// ── Tier 1: Fishbowl with pixel art outline ─────────────────────────────────
 
 function buildBowlFrame(cw, ch, P) {
   var bowlSize = Math.round(cw * 0.52);
@@ -584,16 +928,16 @@ function buildBowlFrame(cw, ch, P) {
   var rx = bowlSize / 2;
   var ry = bowlSize / 2;
 
-  // Layer 1: Outermost dark outline fill
-  ctx.fillStyle = '#3A4A3E';
+  // Layer 1: Outermost outline — darker cyan (#2c6f88)
+  ctx.fillStyle = '#2c6f88';
   fillPixelEllipse(ctx, cx, cy, rx + P * 3, ry + P * 3, P);
 
-  // Layer 2: Glass body (light gray/white)
-  ctx.fillStyle = '#D8D8D0';
+  // Layer 2: Glass body — lighter aqua tint
+  ctx.fillStyle = '#80d4ec';
   fillPixelEllipse(ctx, cx, cy, rx + P * 1, ry + P * 1, P);
 
-  // Layer 3: Inner dark edge
-  ctx.fillStyle = '#6A7A65';
+  // Layer 3: Inner edge — dark cyan
+  ctx.fillStyle = '#1f5f78';
   fillPixelEllipse(ctx, cx, cy, rx - P * 1, ry - P * 1, P);
 
   // Layer 4: Clear inside so fish canvas shows through
@@ -602,33 +946,42 @@ function buildBowlFrame(cw, ch, P) {
   fillPixelEllipse(ctx, cx, cy, rx - P * 2, ry - P * 2, P);
   ctx.globalCompositeOperation = 'source-over';
 
-  // Glass highlight streak (top-left area)
-  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  // Glass highlight — white at 30% opacity (spec: 2px stripe)
+  ctx.fillStyle = 'rgba(255,255,255,0.3)';
   var hlX = cx - rx * 0.3;
   var hlY = cy - ry * 0.5;
   ctx.fillRect(Math.round(hlX / P) * P, Math.round(hlY / P) * P, P, P * 3);
   ctx.fillRect(Math.round(hlX / P) * P - P, Math.round(hlY / P) * P + P, P, P * 2);
 
-  // Top rim / opening - flat wide rectangle across the top of the bowl
+  // Waterline highlight — light cyan (#9fe8ff)
+  var wlY = cy - ry * 0.6;
+  var wlX1 = cx - rx * 0.75;
+  var wlX2 = cx + rx * 0.75;
+  ctx.fillStyle = '#9fe8ff';
+  for (var wx = Math.round(wlX1 / P) * P; wx <= wlX2; wx += P) {
+    ctx.fillRect(wx, Math.round(wlY / P) * P, P, P);
+  }
+
+  // Top rim / opening
   var rimW = Math.round(bowlSize * 0.62);
   var rimX = cx - rimW / 2;
   var rimTop = cy - ry - P * 2;
-  // Dark outline rim
-  drawPixelRect(ctx, Math.round(rimX / P) * P - P, rimTop - P, rimW + P * 2, P * 5, '#3A4A3E');
-  // White rim body
-  drawPixelRect(ctx, Math.round(rimX / P) * P, rimTop, rimW, P * 3, '#E8E8E0');
+  // Rim outline
+  drawPixelRect(ctx, Math.round(rimX / P) * P - P, rimTop - P, rimW + P * 2, P * 5, '#2c6f88');
+  // Rim body
+  drawPixelRect(ctx, Math.round(rimX / P) * P, rimTop, rimW, P * 3, '#d0e8f0');
   // Rim highlight
-  drawPixelRect(ctx, Math.round(rimX / P) * P, rimTop, rimW, P, '#F5F5F0');
+  drawPixelRect(ctx, Math.round(rimX / P) * P, rimTop, rimW, P, '#e0f0f8');
   // Rim shadow line
-  drawPixelRect(ctx, Math.round(rimX / P) * P, rimTop + P * 2, rimW, P, '#B8B8B0');
+  drawPixelRect(ctx, Math.round(rimX / P) * P, rimTop + P * 2, rimW, P, '#5a8a9a');
 
   // Bowl base / flat bottom
   var baseY = cy + ry + P;
   var baseW = Math.round(bowlSize * 0.5);
   var baseX = cx - baseW / 2;
-  drawPixelRect(ctx, Math.round(baseX / P) * P - P, baseY, baseW + P * 2, P * 2, '#3A4A3E');
-  drawPixelRect(ctx, Math.round(baseX / P) * P, baseY + P * 2, baseW, P * 2, '#6A6A60');
-  drawPixelRect(ctx, Math.round(baseX / P) * P + P, baseY + P * 2, baseW - P * 2, P, '#8A8A80');
+  drawPixelRect(ctx, Math.round(baseX / P) * P - P, baseY, baseW + P * 2, P * 2, '#2c6f88');
+  drawPixelRect(ctx, Math.round(baseX / P) * P, baseY + P * 2, baseW, P * 2, '#4a7a8a');
+  drawPixelRect(ctx, Math.round(baseX / P) * P + P, baseY + P * 2, baseW - P * 2, P, '#6a9aaa');
 
   addTablePixelArt(cw, ch, P, 1);
 }
@@ -655,54 +1008,42 @@ function buildAquariumFrame(cw, ch, P) {
   // ── Hood / light fixture ──
   var hoodW = tw + P * 6;
   var hoodX = ix - P * 3;
-  // Hood outer
-  drawPixelRect(ctx, hoodX - P, iy - P * 7, hoodW + P * 2, P * 5, '#2A2A3A');
-  // Hood body cream
-  drawPixelRect(ctx, hoodX, iy - P * 6, hoodW, P * 3, '#E8E0D0');
-  // Hood highlight top
-  drawPixelRect(ctx, hoodX + P, iy - P * 6, hoodW - P * 2, P, '#F5EFE5');
-  // Hood bottom accent
-  drawPixelRect(ctx, hoodX, iy - P * 3, hoodW, P, '#C8C0B0');
-  // Hood shadow line
-  drawPixelRect(ctx, hoodX, iy - P * 2, hoodW, P, '#8A8478');
+  drawPixelRect(ctx, hoodX - P, iy - P * 7, hoodW + P * 2, P * 5, '#2b3a42');
+  drawPixelRect(ctx, hoodX, iy - P * 6, hoodW, P * 3, '#D8D0C0');
+  drawPixelRect(ctx, hoodX + P, iy - P * 6, hoodW - P * 2, P, '#E5DFD5');
+  drawPixelRect(ctx, hoodX, iy - P * 3, hoodW, P, '#B8B0A0');
+  drawPixelRect(ctx, hoodX, iy - P * 2, hoodW, P, '#7A746A');
 
-  // ── Tank frame (thick dark border around glass) ──
-  var frameT = P * 3; // frame thickness
-  // Top bar
-  drawPixelRect(ctx, ix - frameT, iy - P, tw + frameT * 2, frameT, '#1A1A2E');
-  // Bottom bar
-  drawPixelRect(ctx, ix - frameT, iy + th - P, tw + frameT * 2, frameT, '#1A1A2E');
-  // Left bar
-  drawPixelRect(ctx, ix - frameT, iy - P, frameT, th + frameT - P, '#1A1A2E');
-  // Right bar
-  drawPixelRect(ctx, ix + tw, iy - P, frameT, th + frameT - P, '#1A1A2E');
+  // ── Tank frame — dark slate (#2b3a42) ──
+  var frameT = P * 3;
+  drawPixelRect(ctx, ix - frameT, iy - P, tw + frameT * 2, frameT, '#2b3a42');
+  drawPixelRect(ctx, ix - frameT, iy + th - P, tw + frameT * 2, frameT, '#2b3a42');
+  drawPixelRect(ctx, ix - frameT, iy - P, frameT, th + frameT - P, '#2b3a42');
+  drawPixelRect(ctx, ix + tw, iy - P, frameT, th + frameT - P, '#2b3a42');
 
-  // Inner frame accent (lighter)
-  drawPixelRect(ctx, ix - P, iy + frameT - P * 2, P, th - frameT * 2 + P * 2, '#2A3A5E');
-  drawPixelRect(ctx, ix + tw - P, iy + frameT - P * 2, P, th - frameT * 2 + P * 2, '#2A3A5E');
+  // Inner frame accent
+  drawPixelRect(ctx, ix - P, iy + frameT - P * 2, P, th - frameT * 2 + P * 2, '#3b4a52');
+  drawPixelRect(ctx, ix + tw - P, iy + frameT - P * 2, P, th - frameT * 2 + P * 2, '#3b4a52');
+
+  // ── Waterline highlight — light cyan (#9fe8ff) ──
+  var wlY2 = iy + Math.round(th * 0.08);
+  drawPixelRect(ctx, ix, wlY2, tw, P, 'rgba(159,232,255,0.4)');
 
   // ── Wooden stand / cabinet ──
   var standY = iy + th + frameT - P;
   var standW = tw + frameT * 2;
   var standX = ix - frameT;
   var standH = P * 8;
-  // Stand top surface
   drawPixelRect(ctx, standX - P, standY, standW + P * 2, P * 2, '#6B4D2E');
   drawPixelRect(ctx, standX, standY, standW, P, '#A08060');
-  // Stand body
   drawPixelRect(ctx, standX, standY + P * 2, standW, standH, '#5D3E1E');
-  // Wood grain detail
   drawPixelRect(ctx, standX + P * 2, standY + P * 4, standW - P * 4, P, '#7B5D3E');
   drawPixelRect(ctx, standX + P * 3, standY + P * 6, standW - P * 6, P, '#7B5D3E');
-  // Cabinet door line (center split)
   drawPixelRect(ctx, standX + Math.round(standW / 2) - P / 2, standY + P * 3, P, standH - P * 3, '#4D2E0E');
-  // Knobs
   var kY = standY + Math.round(standH / 2);
   drawPixelRect(ctx, standX + Math.round(standW * 0.3), kY, P, P, '#C0A080');
   drawPixelRect(ctx, standX + Math.round(standW * 0.7), kY, P, P, '#C0A080');
-  // Bottom edge
   drawPixelRect(ctx, standX - P, standY + P * 2 + standH, standW + P * 2, P, '#3D1E0E');
-  // Feet
   drawPixelRect(ctx, standX + P, standY + P * 3 + standH, P * 2, P * 2, '#4D2E0E');
   drawPixelRect(ctx, standX + standW - P * 3, standY + P * 3 + standH, P * 2, P * 2, '#4D2E0E');
 
@@ -735,36 +1076,40 @@ function buildBigTankFrame(cw, ch, P) {
   // ── Modern light bar ──
   var barW = tw + P * 4;
   var barX = ix - P * 2;
-  drawPixelRect(ctx, barX, iy - P * 4, barW, P * 3, '#1A2A3E');
-  drawPixelRect(ctx, barX + P, iy - P * 3, barW - P * 2, P, '#2A3A5E');
+  drawPixelRect(ctx, barX, iy - P * 4, barW, P * 3, '#1f2a30');
+  drawPixelRect(ctx, barX + P, iy - P * 3, barW - P * 2, P, '#2a3a40');
   // LED indicators
   drawPixelRect(ctx, barX + Math.round(barW * 0.4), iy - P * 4, P * 2, P, '#4FC3F7');
   drawPixelRect(ctx, barX + Math.round(barW * 0.6), iy - P * 4, P * 2, P, '#4FC3F7');
 
-  // ── Frame ──
+  // ── Frame — dark (#1f2a30) ──
   var frameT = P * 2;
-  drawPixelRect(ctx, ix - frameT, iy - P, tw + frameT * 2, frameT, '#0D0D1A');
-  drawPixelRect(ctx, ix - frameT, iy + th - P, tw + frameT * 2, frameT, '#0D0D1A');
-  drawPixelRect(ctx, ix - frameT, iy - P, frameT, th + frameT, '#0D0D1A');
-  drawPixelRect(ctx, ix + tw, iy - P, frameT, th + frameT, '#0D0D1A');
+  drawPixelRect(ctx, ix - frameT, iy - P, tw + frameT * 2, frameT, '#1f2a30');
+  drawPixelRect(ctx, ix - frameT, iy + th - P, tw + frameT * 2, frameT, '#1f2a30');
+  drawPixelRect(ctx, ix - frameT, iy - P, frameT, th + frameT, '#1f2a30');
+  drawPixelRect(ctx, ix + tw, iy - P, frameT, th + frameT, '#1f2a30');
   // Inner accent
-  drawPixelRect(ctx, ix - P, iy + P, P, th - P * 3, '#1A2A3E');
-  drawPixelRect(ctx, ix + tw - P, iy + P, P, th - P * 3, '#1A2A3E');
+  drawPixelRect(ctx, ix - P, iy + P, P, th - P * 3, '#2a3a40');
+  drawPixelRect(ctx, ix + tw - P, iy + P, P, th - P * 3, '#2a3a40');
+
+  // ── Waterline highlight — light cyan (#9fe8ff) ──
+  var wlY3 = iy + Math.round(th * 0.06);
+  drawPixelRect(ctx, ix, wlY3, tw, P, 'rgba(159,232,255,0.35)');
 
   // ── Sleek stand ──
   var standY = iy + th + frameT - P;
   var standW = tw + frameT * 2;
   var standX = ix - frameT;
-  drawPixelRect(ctx, standX - P, standY, standW + P * 2, P * 2, '#0D1A2E');
-  drawPixelRect(ctx, standX, standY, standW, P, '#1A2A3E');
-  drawPixelRect(ctx, standX, standY + P * 2, standW, P * 3, '#0D1A2E');
-  drawPixelRect(ctx, standX + P * 2, standY + P * 3, standW - P * 4, P, '#1A2A3E');
+  drawPixelRect(ctx, standX - P, standY, standW + P * 2, P * 2, '#1a2530');
+  drawPixelRect(ctx, standX, standY, standW, P, '#2a3a40');
+  drawPixelRect(ctx, standX, standY + P * 2, standW, P * 3, '#1a2530');
+  drawPixelRect(ctx, standX + P * 2, standY + P * 3, standW - P * 4, P, '#2a3a40');
   // Feet
-  drawPixelRect(ctx, standX + P, standY + P * 5, P * 3, P * 2, '#0D1A2E');
-  drawPixelRect(ctx, standX + standW - P * 4, standY + P * 5, P * 3, P * 2, '#0D1A2E');
+  drawPixelRect(ctx, standX + P, standY + P * 5, P * 3, P * 2, '#1a2530');
+  drawPixelRect(ctx, standX + standW - P * 4, standY + P * 5, P * 3, P * 2, '#1a2530');
 }
 
-// ── Table decorations per tier ──────────────────────────────────────────────
+// ── Table decorations per tier (with wall & desk textures) ──────────────────
 
 function addTablePixelArt(cw, ch, P, tier) {
   var c = document.createElement('canvas');
@@ -773,6 +1118,25 @@ function addTablePixelArt(cw, ch, P, tier) {
   c.style.cssText = 'position:absolute;left:0;top:0;width:' + cw + 'px;height:' + ch + 'px;pointer-events:none;image-rendering:pixelated;z-index:3';
   widgetContainer.appendChild(c);
   var ctx = c.getContext('2d');
+
+  // ── Wall texture: subtle horizontal darker stripes every 6 grid units ──
+  var gu = ch / GRID_H;
+  var wallBottomPx = Math.round(ch * 0.667);
+  var stripeH = Math.max(1, Math.round(gu * 0.4));
+  for (var sy = 0; sy < wallBottomPx; sy += Math.round(6 * gu)) {
+    ctx.fillStyle = 'rgba(0,0,0,0.05)';
+    ctx.fillRect(0, sy, cw, stripeH);
+  }
+
+  // ── Desk texture: vertical plank lines every 8 grid units ──
+  var plankLine = Math.max(1, Math.round(gu * 0.3));
+  for (var plx = 0; plx < cw; plx += Math.round(8 * gu)) {
+    ctx.fillStyle = 'rgba(0,0,0,0.07)';
+    ctx.fillRect(plx, wallBottomPx, plankLine, ch - wallBottomPx);
+  }
+  // Desk edge highlight
+  ctx.fillStyle = 'rgba(255,255,255,0.04)';
+  ctx.fillRect(0, wallBottomPx + 2, cw, Math.max(1, Math.round(gu * 0.5)));
 
   if (tier === 1) {
     var tableY = Math.round(ch * 0.82);
@@ -809,13 +1173,13 @@ function addTablePixelArt(cw, ch, P, tier) {
     drawPixelRect(ctx, mx + P, my - P * 6, P * 3, P, '#5D4037');
 
     // Small potted plant (far right)
-    var px = Math.round(cw * 0.90), py = tableY;
-    drawPixelRect(ctx, px, py - P * 4, P * 4, P * 4, '#A1887F');
-    drawPixelRect(ctx, px + P, py - P * 3, P * 2, P * 2, '#795548');
-    drawPixelRect(ctx, px + P, py - P * 6, P * 2, P * 2, '#4CAF50');
-    drawPixelRect(ctx, px, py - P * 7, P, P * 2, '#66BB6A');
-    drawPixelRect(ctx, px + P * 3, py - P * 7, P, P * 2, '#43A047');
-    drawPixelRect(ctx, px + P, py - P * 8, P * 2, P, '#81C784');
+    var ppx = Math.round(cw * 0.90), ppy = tableY;
+    drawPixelRect(ctx, ppx, ppy - P * 4, P * 4, P * 4, '#A1887F');
+    drawPixelRect(ctx, ppx + P, ppy - P * 3, P * 2, P * 2, '#795548');
+    drawPixelRect(ctx, ppx + P, ppy - P * 6, P * 2, P * 2, '#4CAF50');
+    drawPixelRect(ctx, ppx, ppy - P * 7, P, P * 2, '#66BB6A');
+    drawPixelRect(ctx, ppx + P * 3, ppy - P * 7, P, P * 2, '#43A047');
+    drawPixelRect(ctx, ppx + P, ppy - P * 8, P * 2, P, '#81C784');
 
   } else if (tier === 2) {
     var tableY = Math.round(ch * 0.78);
@@ -851,7 +1215,43 @@ function addTablePixelArt(cw, ch, P, tier) {
   }
 }
 
-// ── Bubbles, Snails ──────────────────────────────────────────────────────────
+// ── Bubbles, Snails, Ambient Particles ───────────────────────────────────────
+
+function initAmbientParticles() {
+  ambientParticles = [];
+  var count = 12 + Math.floor(Math.random() * 6);
+  for (var i = 0; i < count; i++) {
+    ambientParticles.push({
+      x: Math.random() * W,
+      y: Math.random() * H * 0.78,
+      vx: (Math.random() - 0.5) * 1.5,
+      vy: -0.2 - Math.random() * 0.4,
+      size: 0.8 + Math.random() * 1.2,
+      alpha: 0.08 + Math.random() * 0.12,
+      phase: Math.random() * 6.28
+    });
+  }
+}
+
+function updateAmbientParticles(dt) {
+  var time = Date.now() / 2000;
+  for (var i = 0; i < ambientParticles.length; i++) {
+    var p = ambientParticles[i];
+    p.x += p.vx * dt + Math.sin(time + p.phase) * 0.08;
+    p.y += p.vy * dt;
+    if (p.y < -5) { p.y = H * 0.78; p.x = Math.random() * W; }
+    if (p.x < -5) p.x = W + 5;
+    if (p.x > W + 5) p.x = -5;
+  }
+}
+
+function drawAmbientParticles() {
+  for (var i = 0; i < ambientParticles.length; i++) {
+    var p = ambientParticles[i];
+    ctx.fillStyle = 'rgba(200,235,255,' + p.alpha + ')';
+    ctx.fillRect(Math.round(p.x), Math.round(p.y), p.size, p.size);
+  }
+}
 
 function updateBubbles(dt) {
   if (Math.random() < 0.02) bubbles.push({ x: rnd(10, W - 10), y: H - 15, speed: rnd(12, 25), size: rnd(1, 2.5), alpha: rnd(0.15, 0.4), wobble: Math.random() * 6.28 });
@@ -859,7 +1259,19 @@ function updateBubbles(dt) {
 }
 
 function drawBubbles() {
-  for (var i = 0; i < bubbles.length; i++) { var b = bubbles[i]; ctx.beginPath(); ctx.arc(b.x, b.y, b.size, 0, 6.28); ctx.fillStyle = 'rgba(200,230,255,' + b.alpha + ')'; ctx.fill(); }
+  for (var i = 0; i < bubbles.length; i++) {
+    var b = bubbles[i];
+    // Bubble body
+    ctx.beginPath(); ctx.arc(b.x, b.y, b.size, 0, 6.28);
+    ctx.fillStyle = 'rgba(180,220,255,' + b.alpha * 0.5 + ')'; ctx.fill();
+    // Bubble outline
+    ctx.strokeStyle = 'rgba(200,235,255,' + b.alpha + ')';
+    ctx.lineWidth = 0.5;
+    ctx.stroke();
+    // Highlight dot
+    ctx.fillStyle = 'rgba(255,255,255,' + (b.alpha * 1.2) + ')';
+    ctx.fillRect(Math.round(b.x - b.size * 0.3), Math.round(b.y - b.size * 0.3), Math.max(1, b.size * 0.4), Math.max(1, b.size * 0.4));
+  }
 }
 
 function initSnails() {
@@ -875,7 +1287,9 @@ function updateSnails(dt) {
 
 function drawSnails() {
   for (var si = 0; si < snailSprites.length; si++) { var s = snailSprites[si]; ctx.save(); ctx.translate(s.x, s.y); if (!s.fr) ctx.scale(-1, 1);
-    for (var r = 0; r < SNAIL_PX.length; r++) { for (var c = 0; c < SNAIL_PX[r].length; c++) { var v = SNAIL_PX[r][c]; if (!v) continue; ctx.fillStyle = v === 2 ? '#795548' : '#A1887F'; ctx.fillRect((c - 2) * PIXEL, (r - 2) * PIXEL, PIXEL, PIXEL); } }
+    for (var r = 0; r < SNAIL_PX.length; r++) { for (var c = 0; c < SNAIL_PX[r].length; c++) { var v = SNAIL_PX[r][c]; if (!v) continue; ctx.fillStyle = v === 3 ? '#C9B896' : v === 2 ? '#795548' : '#A1887F'; ctx.fillRect((c - 2) * PIXEL, (r - 2) * PIXEL, PIXEL, PIXEL); } }
+    // Tiny eye dot
+    ctx.fillStyle = '#111'; ctx.fillRect(PIXEL * 0.5, -PIXEL * 1.5, Math.max(1, PIXEL * 0.4), Math.max(1, PIXEL * 0.4));
     ctx.restore(); }
 }
 
@@ -890,7 +1304,8 @@ function generateDirtMask() {
   var seed = (getActiveTier() * 1000) + Math.floor(getActiveCleanliness());
   var s = seed;
   function seededRnd() { s = (s * 16807 + 0) % 2147483647; return (s & 0x7fffffff) / 2147483647; }
-  // For tier 1 (fishbowl), clip dirt to circular bowl shape so corners stay clean
+
+  // For tier 1 (fishbowl), clip dirt to circular bowl shape
   var isBowl = getActiveTier() === 1;
   if (isBowl) {
     dirtMaskCtx.save();
@@ -898,21 +1313,46 @@ function generateDirtMask() {
     dirtMaskCtx.arc(W / 2, H / 2, Math.min(W, H) * 0.48, 0, 6.28);
     dirtMaskCtx.clip();
   }
-  // Light translucent base — visible on both light and dark backgrounds
-  dirtMaskCtx.fillStyle = 'rgba(120,140,80,' + (dirt * 0.35) + ')';
-  dirtMaskCtx.fillRect(0, 0, W, H);
-  // Edge grime
-  var edgeW = Math.max(8, W * 0.06 * dirt);
-  dirtMaskCtx.fillStyle = 'rgba(100,120,60,' + (dirt * 0.2) + ')';
-  dirtMaskCtx.fillRect(0, 0, edgeW, H); dirtMaskCtx.fillRect(W - edgeW, 0, edgeW, H); dirtMaskCtx.fillRect(0, 0, W, edgeW * 0.7);
-  // Scale blob count with canvas area so bigger tanks look equally dirty
-  var area = W * H;
-  var areaScale = Math.max(1, area / 25000);
-  var blobCount = Math.floor((25 + dirt * 35) * areaScale);
-  // Large algae blobs — clearly visible patches
-  for (var i = 0; i < blobCount; i++) { dirtMaskCtx.beginPath(); dirtMaskCtx.arc(seededRnd() * W, seededRnd() * H, 12 + seededRnd() * 40, 0, 6.28); dirtMaskCtx.fillStyle = 'rgba(90,115,55,' + (0.15 + seededRnd() * 0.2) + ')'; dirtMaskCtx.fill(); }
-  // Small grime speckles
-  for (var j = 0; j < blobCount * 2; j++) { dirtMaskCtx.fillStyle = 'rgba(130,150,80,' + (0.18 + seededRnd() * 0.15) + ')'; dirtMaskCtx.fillRect(seededRnd() * W, seededRnd() * H, 3 + seededRnd() * 6, 3 + seededRnd() * 6); }
+
+  // 16×12 logical cell grid — each cell is independently dirty
+  var cellW = W / DIRT_GRID_W;
+  var cellH = H / DIRT_GRID_H;
+
+  for (var cy = 0; cy < DIRT_GRID_H; cy++) {
+    for (var cx = 0; cx < DIRT_GRID_W; cx++) {
+      // Concentrate more dirt in corners + edges
+      var isEdge = cx === 0 || cy === 0 || cx === DIRT_GRID_W - 1 || cy === DIRT_GRID_H - 1;
+      var isCorner = (cx <= 1 || cx >= DIRT_GRID_W - 2) && (cy <= 1 || cy >= DIRT_GRID_H - 2);
+      var cellDirt = seededRnd();
+      var threshold = isCorner ? 0.25 : isEdge ? 0.40 : 0.55;
+      threshold = threshold * (1 - dirt * 0.6); // dirtier = lower threshold = more cells filled
+      if (cellDirt > threshold) continue;
+
+      var px = cx * cellW;
+      var py = cy * cellH;
+      var alpha = (0.08 + seededRnd() * 0.12) * (1 + dirt * 0.5);
+      if (isCorner) alpha *= 1.5;
+      if (isEdge) alpha *= 1.2;
+
+      // Fill cell with semi-transparent green
+      dirtMaskCtx.fillStyle = 'rgba(90,115,55,' + Math.min(alpha, 0.35) + ')';
+      dirtMaskCtx.fillRect(px, py, cellW, cellH);
+
+      // Add small grime speckle within cell
+      if (seededRnd() < 0.6) {
+        dirtMaskCtx.fillStyle = 'rgba(130,150,80,' + (0.15 + seededRnd() * 0.15) + ')';
+        dirtMaskCtx.fillRect(px + seededRnd() * cellW * 0.7, py + seededRnd() * cellH * 0.7, cellW * 0.3, cellH * 0.3);
+      }
+    }
+  }
+
+  // Additional edge grime overlay
+  var edgeW = Math.max(6, W * 0.04 * dirt);
+  dirtMaskCtx.fillStyle = 'rgba(100,120,60,' + (dirt * 0.15) + ')';
+  dirtMaskCtx.fillRect(0, 0, edgeW, H);
+  dirtMaskCtx.fillRect(W - edgeW, 0, edgeW, H);
+  dirtMaskCtx.fillRect(0, 0, W, edgeW * 0.6);
+
   if (isBowl) { dirtMaskCtx.restore(); }
   dirtMaskGenerated = true;
 }
@@ -999,11 +1439,20 @@ function initFishSprites() {
   fishSprites = [];
   var fish = getActiveFish();
   if (!fish || fish.length === 0) return;
-  var zones = { top: { min: 0.08, max: 0.35 }, middle: { min: 0.25, max: 0.70 }, bottom: { min: 0.60, max: 0.88 }, everywhere: { min: 0.1, max: 0.9 } };
+  var tier = getActiveTier();
+  var sz = SWIM_ZONES[tier] || SWIM_ZONES[1];
+  // Per-species vertical preference within the swim zone
+  var zoneOffsets = {
+    top:    { min: sz.minY, max: sz.minY + (sz.maxY - sz.minY) * 0.4 },
+    middle: { min: sz.minY + (sz.maxY - sz.minY) * 0.2, max: sz.minY + (sz.maxY - sz.minY) * 0.75 },
+    bottom: { min: sz.minY + (sz.maxY - sz.minY) * 0.55, max: sz.maxY },
+    everywhere: { min: sz.minY, max: sz.maxY }
+  };
+  var xMin = sz.minX * W, xMax = sz.maxX * W;
   for (var fi = 0; fi < fish.length; fi++) {
     var f = fish[fi];
-    var z = zones[f.zone] || zones.middle;
-    fishSprites.push({ id: f.id, x: rnd(20, W - 20), y: rnd(z.min * H, z.max * H), vx: 0, vy: 0, right: Math.random() > 0.5, zone: z, t: Math.random() * 8, dartPause: 0, circAngle: Math.random() * 6.28, circCenter: { x: W / 2, y: H / 2 }, schoolOff: { x: rnd(-30, 30), y: rnd(-25, 25) }, selected: false, wigglePhase: 0 });
+    var z = zoneOffsets[f.zone] || zoneOffsets.middle;
+    fishSprites.push({ id: f.id, x: rnd(xMin + 10, xMax - 10), y: rnd(z.min * H, z.max * H), vx: 0, vy: 0, right: Math.random() > 0.5, zone: z, t: Math.random() * 8, dartPause: 0, circAngle: Math.random() * 6.28, circCenter: { x: W / 2, y: H / 2 }, schoolOff: { x: rnd(-30, 30), y: rnd(-25, 25) }, selected: false, wigglePhase: 0 });
   }
 }
 
@@ -1062,11 +1511,15 @@ function updateFish(dt) {
     if (spd > maxSpd) { sp.vx = sp.vx / spd * maxSpd; sp.vy = sp.vy / spd * maxSpd; }
     if (Math.abs(sp.vx) > 1) sp.right = sp.vx > 0;
     sp.x += sp.vx * dt; sp.y += sp.vy * dt;
-    if (sp.x > W - 12) { sp.right = false; sp.x = W - 12; sp.vx *= -0.5; }
-    if (sp.x < 12) { sp.right = true; sp.x = 12; sp.vx *= -0.5; }
+    // Enforce swim zone bounds from SWIM_ZONES — fish never render outside glass
+    var szTier = SWIM_ZONES[getActiveTier()] || SWIM_ZONES[1];
+    var xBoundMin = szTier.minX * W + 8;
+    var xBoundMax = szTier.maxX * W - 8;
+    if (sp.x > xBoundMax) { sp.right = false; sp.x = xBoundMax; sp.vx *= -0.5; }
+    if (sp.x < xBoundMin) { sp.right = true; sp.x = xBoundMin; sp.vx *= -0.5; }
     if (sp.y < sp.zone.min * H) sp.vy += 18 * dt;
     if (sp.y > sp.zone.max * H) sp.vy -= 18 * dt;
-    sp.y = clamp(sp.y, 5, H - 5);
+    sp.y = clamp(sp.y, szTier.minY * H + 5, szTier.maxY * H - 5);
     if (fData.swimPattern !== 'circle' && fData.swimPattern !== 'school' && Math.random() < 0.001) sp.right = !sp.right;
   }
 }
@@ -1103,8 +1556,13 @@ function drawFish() {
     if (!sp.right) ctx.scale(-1, 1);
     if (sp.selected) { ctx.shadowBlur = 10; ctx.shadowColor = 'rgba(255,255,200,0.5)'; }
     ctx.globalAlpha = weakA;
-    for (var r = 0; r < art.px.length; r++) { for (var c = 0; c < art.px[r].length; c++) { var v = art.px[r][c]; if (!v) continue; ctx.fillStyle = v === 1 ? bodyC : tailC; ctx.fillRect((c - art.w / 2) * sc, (r - art.h / 2) * sc, sc, sc); } }
-    ctx.fillStyle = '#111'; ctx.fillRect((art.eye[1] - art.w / 2) * sc, (art.eye[0] - art.h / 2) * sc, sc * 0.6, sc * 0.6);
+    // Compute highlight and shadow colors from body color
+    var hlC = lightenColor(bodyC, 35);
+    var shC = darkenColor(bodyC, 30);
+    for (var r = 0; r < art.px.length; r++) { for (var c = 0; c < art.px[r].length; c++) { var v = art.px[r][c]; if (!v) continue; ctx.fillStyle = v === 1 ? bodyC : v === 2 ? tailC : v === 3 ? hlC : shC; ctx.fillRect((c - art.w / 2) * sc, (r - art.h / 2) * sc, sc, sc); } }
+    // Eye with white highlight
+    ctx.fillStyle = '#111'; ctx.fillRect((art.eye[1] - art.w / 2) * sc, (art.eye[0] - art.h / 2) * sc, sc * 0.7, sc * 0.7);
+    ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.fillRect((art.eye[1] - art.w / 2) * sc + sc * 0.15, (art.eye[0] - art.h / 2) * sc, sc * 0.3, sc * 0.3);
     if (fData.weak) { ctx.globalAlpha = 0.6; ctx.fillStyle = '#FFAB91'; ctx.beginPath(); ctx.arc(0, -art.h / 2 * sc - 5, 3, 0, 6.28); ctx.fill(); }
     ctx.shadowBlur = 0; ctx.restore();
   }
@@ -1128,7 +1586,18 @@ function updateFood(dt) {
 }
 
 function drawFood() {
-  for (var i = 0; i < foodObjects.length; i++) { var f = foodObjects[i]; ctx.fillStyle = f.color; ctx.beginPath(); ctx.arc(f.x, f.y, f.size, 0, 6.28); ctx.fill(); ctx.fillStyle = 'rgba(255,255,255,0.25)'; ctx.beginPath(); ctx.arc(f.x - 1, f.y - 1, f.size * 0.4, 0, 6.28); ctx.fill(); }
+  for (var i = 0; i < foodObjects.length; i++) {
+    var f = foodObjects[i];
+    // Food shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.06)';
+    ctx.beginPath(); ctx.arc(f.x + 1, f.y + 1, f.size, 0, 6.28); ctx.fill();
+    // Food body
+    ctx.fillStyle = f.color;
+    ctx.beginPath(); ctx.arc(f.x, f.y, f.size, 0, 6.28); ctx.fill();
+    // Highlight
+    ctx.fillStyle = 'rgba(255,255,255,0.3)';
+    ctx.beginPath(); ctx.arc(f.x - f.size * 0.3, f.y - f.size * 0.3, f.size * 0.4, 0, 6.28); ctx.fill();
+  }
 }
 
 function checkFoodConsumption() {
@@ -1636,6 +2105,8 @@ function applyState(data) {
 function reinitializeTank() {
   resizeCanvas();
   initEnvironment();
+  initRockClusters();
+  initAmbientParticles();
   initFishSprites();
   initSnails();
   dirtMaskGenerated = false;
@@ -1777,6 +2248,7 @@ function renderLoop(ts) {
   drawEnvironment();
   drawDecorations();
   drawEquipment();
+  updateAmbientParticles(dt); drawAmbientParticles();
   updateBubbles(dt); drawBubbles();
   updateSnails(dt); drawSnails();
   updateFood(dt); drawFood(); checkFoodConsumption();
@@ -1825,7 +2297,7 @@ function initAfterWidgetId() {
     var w2 = document.documentElement.clientWidth || 300;
     var h2 = Math.round(w2 * 0.75);
     homey.setHeight(h2);
-    setTimeout(function() { resizeCanvas(); initEnvironment(); redrawDirt(); buildRoomScene(); }, 100);
+    setTimeout(function() { resizeCanvas(); initEnvironment(); initRockClusters(); initAmbientParticles(); redrawDirt(); buildRoomScene(); }, 100);
   });
 
   if (homey.on) { homey.on('settings.set', function(key, val) { if (key === 'reset_state' && val === true) confirmReset(); }); }
