@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="https://apps-sdk.developer.homey.app/css/homey.widgets.css">
+    <script src="https://apps-sdk.developer.homey.app/js/homey.widgets.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0 12px;
+            /* Transparent bg setting allows card styling from Homey or transparency */
+            background-color: transparent;
+            color: var(--homey-color-text);
+            font-family: var(--homey-font-family);
+            box-sizing: border-box;
+        }
+
+        .forecast-list {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .day-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 4px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: background-color 0.2s;
+        }
+
+        .day-row:last-child {
+            border-bottom: none;
+        }
+
+        .day-row:hover {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
+        .day-name {
+            flex: 1;
+            font-size: 13px;
+            font-weight: 500;
+            text-transform: capitalize;
+            opacity: 0.9;
+            letter-spacing: 0.2px;
+        }
+
+        .icon {
+            flex: 0 0 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .icon img {
+            height: 24px;
+            width: 24px;
+            opacity: 0.9;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+        }
+
+        .temps {
+            flex: 1;
+            text-align: right;
+            font-size: 13px;
+            font-weight: 400;
+            opacity: 0.7;
+            font-feature-settings: "tnum";
+            font-variant-numeric: tabular-nums;
+            letter-spacing: 0.5px;
+        }
+
+        .attribution {
+            text-align: right;
+            font-size: 9px;
+            color: rgba(255, 255, 255, 0.4);
+            margin-top: 8px;
+            padding-right: 4px;
+            padding-bottom: 8px;
+        }
+
+        .attribution a {
+            text-decoration: none;
+            color: inherit;
+            transition: color 0.2s;
+        }
+
+        .attribution:hover {
+            color: rgba(255, 255, 255, 0.8);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="forecast-list" class="forecast-list">
+        <!-- Rows here -->
+    </div>
+    <div class="attribution">
+        <a href="https://www.buienradar.nl" target="_blank">Buienradar.nl</a>
+    </div>
+
+    <script>
+        function onHomeyReady(Homey) {
+            // Keep local copy of settings updated
+            let currentSettings = Homey.getSettings() || {};
+
+            Homey.on('settings.set', (key, value) => {
+                currentSettings[key] = value;
+                refresh();
+            });
+
+            async function refresh() {
+                const attribution = document.querySelector('.attribution');
+                // Check local settings object
+                if (currentSettings.showAttribution === false) {
+                    attribution.style.display = 'none';
+                } else {
+                    attribution.style.display = 'block';
+                }
+
+                try {
+                    const data = await Homey.api('GET', '/');
+                    render(data.forecast);
+                } catch (e) {
+                    console.error(e);
+                }
+            }
+
+            function render(days) {
+                const container = document.getElementById('forecast-list');
+                container.innerHTML = '';
+
+                if (!days) return;
+
+                days.forEach(day => {
+                    const row = document.createElement('div');
+                    row.className = 'day-row';
+
+                    // Simple logic: Day | Icon | Min/Max
+                    row.innerHTML = `
+                        <div class="day-name">${day.day}</div>
+                        <div class="icon"><img src="${day.iconUrl}"></div>
+                        <div class="temps">${day.min}° / ${day.max}°</div>
+                    `;
+                    container.appendChild(row);
+                });
+
+                // Dynamic height?
+                const height = document.body.scrollHeight;
+                if (Homey.setHeight) Homey.setHeight(height);
+            }
+
+            refresh();
+            Homey.ready();
+
+            // Refresh 1 hour (forecast triggers update less often)
+            setInterval(refresh, 60 * 60 * 1000);
+        }
+        window.onHomeyReady = onHomeyReady;
+    </script>
+</body>
+
+</html>

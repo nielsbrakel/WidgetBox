@@ -698,7 +698,7 @@
     "flip-clock": {
       "name": {
         "en": "Flip Clock",
-        "nl": "Flip Klok"
+        "nl": "Flipklok"
       },
       "description": {
         "en": "Retro style flip clock with animation",
@@ -880,7 +880,7 @@
     "word-clock-grid": {
       "name": {
         "en": "Word Clock Grid",
-        "nl": "Woorden Klok Raster"
+        "nl": "Woordenklok (Raster)"
       },
       "description": {
         "en": "Time displayed as a word matrix with highlighted letters",
@@ -1026,7 +1026,7 @@
     "word-clock-sentence": {
       "name": {
         "en": "Word Clock Sentence",
-        "nl": "Woorden Klok Zin"
+        "nl": "Woordenklok (Zin)"
       },
       "description": {
         "en": "Time displayed as a natural language sentence",

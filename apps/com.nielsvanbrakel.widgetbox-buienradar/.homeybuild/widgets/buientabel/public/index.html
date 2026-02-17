@@ -235,7 +235,7 @@
         '3:1': '33.33%'
       },
       LEVELS: [
-        { val: 1 key: 'light' },
+        { val: 1, key: 'light' },
         { val: 4, key: 'moderate' },
         { val: 8, key: 'heavy' }
       ]
@@ -904,8 +904,20 @@
 
       updateHeight() {
         const ratio = this.settings.aspectRatio || '16:9';
-        const heightPct = CONFIG.ASPECT_RATIOS[ratio] || '56.25%';
-        this.Homey.ready({ height: heightPct });
+        const pctStr = CONFIG.ASPECT_RATIOS[ratio] || '56.25%';
+        const pct = parseFloat(pctStr) / 100;
+
+        // Calculate based on current width
+        const width = document.body.clientWidth || window.innerWidth;
+        const height = Math.ceil(width * pct);
+
+        // console.log('Update Height:', ratio, pct, width, height);
+
+        if (this.Homey.setHeight) {
+          this.Homey.setHeight(height);
+        } else {
+          this.Homey.ready({ height });
+        }
       }
     }
 

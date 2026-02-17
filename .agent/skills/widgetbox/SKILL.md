@@ -433,3 +433,103 @@ When creating a new WidgetBox widget:
 11. **Use Homey CSS variables** for all colors, fonts, spacing
 12. **Add preview images**: `preview-dark.png` and `preview-light.png` (1024x1024)
 13. **Update documentation**: update the app's `README.txt`, monorepo `README.md`, and this skill's Apps Overview table
+
+---
+
+## Sandbox Architecture
+
+The sandbox app (`apps/sandbox/`) is a Vite/React application for previewing and testing widgets locally with e2e tests via Playwright.
+
+### File Structure
+
+```
+apps/sandbox/
+├── scripts/
+│   └── generate-registry.js    # Scans widget.compose.json files, outputs src/registry.json
+├── src/
+│   ├── components/
+│   │   ├── Icons.jsx            # SVG icon components
+│   │   ├── Sidebar.jsx          # Widget list grouped by app
+│   │   ├── Toolbar.jsx          # Theme toggle, width presets, reload
+│   │   ├── WidgetPreview.jsx    # Iframe preview with Homey card framing
+│   │   └── SettingsPanel.jsx    # Settings controls + debug scenarios
+│   ├── lib/
+│   │   ├── MockHomey.js         # Mock Homey API (settings, height, translations, events)
+│   │   ├── homeyStyles.js       # Injects Homey CSS variables into iframe
+│   │   ├── scenarios.js         # Debug scenario definitions per widget
+│   │   └── mocks/
+│   │       └── buienradarMocks.js  # Buienradar-specific mock data + real fetch
+│   ├── App.jsx                  # Root component (state + composition only)
+│   ├── index.css                # All styles (no inline styles in components)
+│   ├── main.jsx                 # React entry point
+│   └── registry.json            # Generated (gitignored), do NOT commit
+├── index.html
+├── package.json
+└── vite.config.js
+```
+
+### Adding Widget-Specific Mocks
+
+To add mock data for a new widget:
+
+1. Create `src/lib/mocks/<widgetName>Mocks.js` with a handler function
+2. Import and call from `MockHomey.api()` method
+3. Add debug scenarios in `src/lib/scenarios.js`
+
+### Code Quality Rules
+
+- **No inline styles** in JSX — use CSS classes in `index.css`
+- **No icon SVGs** in component files — add to `Icons.jsx`
+- **No widget-specific logic** in `MockHomey.js` — delegate to `mocks/` modules
+- `registry.json` is **generated** — never edit manually, never commit
+- The sandbox uses **Biome** for linting (no ESLint)
+
+---
+
+## E2E Testing
+
+All widgets are tested via Playwright e2e tests against the sandbox.
+
+### Structure
+
+```
+tests/
+├── e2e/           # Test specs per app/feature
+│   ├── widgets.spec.ts          # Sandbox loading tests
+│   ├── clocks.spec.ts
+│   ├── utilities.spec.ts
+│   ├── windy.spec.ts
+│   ├── youtube.spec.ts
+│   ├── buienradar.spec.ts
+│   ├── layout.spec.ts
+│   └── sandbox-translations.spec.ts
+├── pages/         # Page Object Model
+│   ├── SandboxPage.ts           # Base page (goto, selectWidget, settings helpers)
+│   ├── ClocksPage.ts
+│   ├── UtilitiesPage.ts
+│   ├── WindyPage.ts
+│   ├── YouTubePage.ts
+│   ├── BuienradarPage.ts
+│   └── LayoutPage.ts
+```
+
+### Running Tests
+
+```bash
+# Run all tests
+pnpm test:e2e
+
+# Run specific test file
+npx playwright test tests/e2e/clocks.spec.ts
+```
+
+### Writing Tests
+
+1. **Extend `SandboxPage`** for widget-specific page objects
+2. **Use getters** for element selectors (e.g. `get flipClock()`)
+3. **Use `SandboxPage` helpers** for common interactions:
+   - `selectWidget(name)` — clicks widget in sidebar
+   - `setSettingCheckbox(label, checked)` — toggles checkbox setting
+   - `setSettingSelect(label, option)` — selects dropdown option
+   - `setSettingInput(label, value)` — fills text/number input
+4. **Import only what you need** from `@playwright/test` (avoid unused imports)

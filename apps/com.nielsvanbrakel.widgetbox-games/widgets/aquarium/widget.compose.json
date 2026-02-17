@@ -1,0 +1,33 @@
+{
+    "name": {
+        "en": "Aquarium",
+        "nl": "Aquarium"
+    },
+    "description": {
+        "en": "A cozy ambient aquarium companion",
+        "nl": "Een gezellig ambient aquarium"
+    },
+    "height": 300,
+    "transparent": false,
+    "settings": [
+        {
+            "type": "checkbox",
+            "id": "reset_state",
+            "label": {
+                "en": "Reset Aquarium",
+                "nl": "Aquarium Resetten"
+            },
+            "value": false
+        }
+    ],
+    "api": {
+        "getState": {
+            "method": "GET",
+            "path": "/"
+        },
+        "doAction": {
+            "method": "POST",
+            "path": "/"
+        }
+    }
+}

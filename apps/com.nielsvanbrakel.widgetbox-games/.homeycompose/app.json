@@ -1,0 +1,31 @@
+{
+    "id": "com.nielsvanbrakel.widgetbox-games",
+    "version": "0.1.0",
+    "compatibility": ">=12.3.0",
+    "sdk": 3,
+    "platforms": [
+        "local"
+    ],
+    "name": {
+        "en": "WidgetBox Games",
+        "nl": "WidgetBox Spellen"
+    },
+    "description": {
+        "en": "Cozy idle games living on your dashboard",
+        "nl": "Gezellige idle games op je dashboard"
+    },
+    "category": [
+        "tools"
+    ],
+    "permissions": [],
+    "images": {
+        "small": "/assets/images/small.png",
+        "large": "/assets/images/large.png",
+        "xlarge": "/assets/images/xlarge.png"
+    },
+    "author": {
+        "name": "Niels van Brakel",
+        "email": "niels@nielsvanbrakel.com"
+    },
+    "brandColor": "#4DB6AC"
+}

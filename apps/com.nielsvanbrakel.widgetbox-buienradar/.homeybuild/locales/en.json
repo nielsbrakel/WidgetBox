@@ -12,6 +12,7 @@
             "now": "Now",
             "error": "Something went wrong",
             "locationError": "Location is outside the coverage area"
-        }
+        },
+        "rainradar": {}
     }
 }

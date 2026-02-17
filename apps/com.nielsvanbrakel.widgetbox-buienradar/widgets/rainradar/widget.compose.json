@@ -1,0 +1,23 @@
+{
+    "name": {
+        "en": "Rain Radar",
+        "nl": "Buienradar"
+    },
+    "settings": [
+        {
+            "id": "showAttribution",
+            "type": "checkbox",
+            "label": {
+                "en": "Show Data Attribution",
+                "nl": "Toon Data Bronvermelding"
+            },
+            "value": true,
+            "hint": {
+                "en": "Required for free data usage from Buienradar.",
+                "nl": "Vereist voor gratis gebruik van Buienradar data."
+            }
+        }
+    ],
+    "height": "100%",
+    "transparent": false
+}

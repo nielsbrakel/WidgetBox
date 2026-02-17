@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="https://apps-sdk.developer.homey.app/css/homey.widgets.css">
+    <script src="https://apps-sdk.developer.homey.app/js/homey.widgets.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: transparent;
+            overflow: hidden;
+            position: relative;
+        }
+
+        #widget-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        a.img-link {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            pointer-events: none;
+        }
+
+        .attribution {
+            position: absolute;
+            bottom: 4px;
+            right: 4px;
+            background-color: rgba(255, 255, 255, 0.7);
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-size: 8px;
+            pointer-events: auto;
+            z-index: 10;
+            opacity: 0.7;
+        }
+
+        .attribution a {
+            text-decoration: none;
+            color: #000;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="widget-container">
+        <a href="https://www.buienradar.nl" target="_blank" class="img-link">
+            <img id="radar-image" border="0" src="" alt="Buienradar">
+        </a>
+        <div class="attribution">
+            <a href="https://www.buienradar.nl" target="_blank">Buienradar.nl</a>
+        </div>
+    </div>
+
+    <script>
+        function onHomeyReady(Homey) {
+            let currentSettings = Homey.getSettings() || {};
+            let refreshInterval;
+
+            function updateImage() {
+                const img = document.getElementById('radar-image');
+                if (!img) return;
+
+                const attribution = document.querySelector('.attribution');
+                // Check settings directly or fall back to defaults
+                const showAttribution = (currentSettings.showAttribution !== false); // Default to true if undefined
+
+                if (showAttribution) {
+                    attribution.style.display = 'block';
+                } else {
+                    attribution.style.display = 'none';
+                }
+
+                let url = "https://image.buienradar.nl/2.0/image/single/RadarMapRainNL";
+
+                // Bust cache
+                const timestamp = Date.now();
+
+                // Request a reasonably large image, CSS handles scaling
+                url += "?height=700&width=700";
+                url += "&renderBackground=True&renderBranding=False&renderText=True";
+                url += "&t=" + timestamp;
+
+                img.src = url;
+            }
+
+            function getAspectRatioPercentage(aspectRatio) {
+                const ratios = {
+                    '1:1': '100%',
+                    '4:3': '75%',
+                    '16:9': '56.25%',
+                    '9:16': '177.78%',
+                    '21:9': '42.86%',
+                    '3:1': '33.33%'
+                };
+                return ratios[aspectRatio] || '100%';
+            }
+
+            Homey.on('settings.set', (key, value) => {
+                currentSettings[key] = value;
+                updateImage();
+            });
+
+            // Initial Update
+            updateImage();
+
+            // Set height
+            const aspectRatio = currentSettings.aspectRatio || '1:1';
+            const heightStr = getAspectRatioPercentage(aspectRatio);
+            Homey.ready({ height: heightStr });
+
+            // Refresh every 5 minutes
+            if (refreshInterval) clearInterval(refreshInterval);
+            refreshInterval = setInterval(updateImage, 5 * 60 * 1000);
+        }
+
+        window.onHomeyReady = onHomeyReady;
+    </script>
+</body>
+
+</html>

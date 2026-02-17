@@ -131,27 +131,27 @@
 
     /* Font Weights */
     .weight-thin .time {
-      font-weight: 200;
+      font-weight: 100;
     }
 
     .weight-normal .time {
-      font-weight: 500;
-    }
-
-    .weight-bold .time {
-      font-weight: 800;
-    }
-
-    .weight-thin .date {
       font-weight: 300;
     }
 
+    .weight-bold .time {
+      font-weight: 600;
+    }
+
+    .weight-thin .date {
+      font-weight: 200;
+    }
+
     .weight-normal .date {
-      font-weight: 400;
+      font-weight: 300;
     }
 
     .weight-bold .date {
-      font-weight: 600;
+      font-weight: 500;
     }
 
     /* Colors */
@@ -165,23 +165,29 @@
       white-space: nowrap;
       font-feature-settings: "tnum";
       font-variant-numeric: tabular-nums;
+      letter-spacing: -1px;
+      /* Tighter tracking for large numbers */
     }
 
     .date {
-      opacity: 0.8;
+      opacity: 0.6;
       line-height: 1.2;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
     }
 
     .seconds {
-      font-size: 0.6em;
-      opacity: 0.7;
+      font-size: 0.5em;
+      opacity: 0.6;
+      font-weight: 300;
     }
 
     .period {
       font-size: 0.4em;
-      margin-left: 0.1em;
-      opacity: 0.6;
+      margin-left: 0.2em;
+      opacity: 0.5;
       vertical-align: top;
+      font-weight: 400;
     }
 
     .no-card {

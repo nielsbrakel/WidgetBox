@@ -185,9 +185,9 @@
         }
 
         .date-box {
-            fill: var(--homey-background-color, #fff);
-            stroke: var(--clock-color);
-            stroke-width: 1;
+            fill: var(--clock-color);
+            fill-opacity: 0.1;
+            stroke: none;
         }
 
         .date-text {
@@ -196,7 +196,7 @@
             font-family: -apple-system, system-ui, sans-serif;
             text-anchor: middle;
             dominant-baseline: middle;
-            font-weight: 700;
+            font-weight: 600;
         }
     </style>
 </head>
@@ -205,6 +205,20 @@
     <div class="widget-spacing-wrapper" id="app-container">
         <div class="widget-card" id="widget-card">
             <svg viewBox="0 0 100 100" id="clock-svg">
+                <defs>
+                    <filter id="hand-shadow" x="-50%" y="-50%" width="200%" height="200%">
+                        <feGaussianBlur in="SourceAlpha" stdDeviation="1" />
+                        <feOffset dx="0.5" dy="1" result="offsetblur" />
+                        <feComponentTransfer>
+                            <feFuncA type="linear" slope="0.3" />
+                        </feComponentTransfer>
+                        <feMerge>
+                            <feMergeNode />
+                            <feMergeNode in="SourceGraphic" />
+                        </feMerge>
+                    </filter>
+                </defs>
+
                 <!-- Markers Group -->
                 <g id="markers"></g>
 
@@ -213,20 +227,23 @@
 
                 <!-- Date Group -->
                 <g id="date-group" style="display: none;">
-                    <rect x="70" y="46.5" width="14" height="7" rx="1" class="date-box" />
-                    <text id="date-text" x="77" y="50.5" class="date-text">1</text>
+                    <rect x="68" y="46" width="16" height="8" rx="2" class="date-box" />
+                    <text id="date-text" x="76" y="51" class="date-text">1</text>
                 </g>
 
                 <!-- Hands -->
-                <line id="hour-hand" class="hand hour" x1="50" y1="50" x2="50" y2="25" />
-                <line id="minute-hand" class="hand minute" x1="50" y1="50" x2="50" y2="15" />
-                <g id="second-hand-group" style="display: none;">
-                    <line id="second-hand" class="hand second" x1="50" y1="60" x2="50" y2="15" />
-                    <circle id="second-tip" class="second-tip" cx="50" cy="15" r="0" />
+                <g style="filter: url(#hand-shadow);">
+                    <line id="hour-hand" class="hand hour" x1="50" y1="50" x2="50" y2="25" />
+                    <line id="minute-hand" class="hand minute" x1="50" y1="50" x2="50" y2="15" />
+                    <g id="second-hand-group" style="display: none;">
+                        <line id="second-hand" class="hand second" x1="50" y1="60" x2="50" y2="15" />
+                        <circle id="second-tip" class="second-tip" cx="50" cy="15" r="0" />
+                    </g>
                 </g>
 
                 <!-- Center Cap -->
-                <circle class="center-dot" cx="50" cy="50" r="2.5" />
+                <circle class="center-dot" cx="50" cy="50" r="3" />
+                <circle cx="50" cy="50" r="1.5" fill="var(--homey-background-color)" />
             </svg>
         </div>
     </div>

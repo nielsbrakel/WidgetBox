@@ -1,0 +1,47 @@
+{
+    "name": {
+        "en": "5 Days Forecast",
+        "nl": "5-Daagse Verwachting"
+    },
+    "api": {
+        "getData": {
+            "method": "GET",
+            "path": "/"
+        }
+    },
+    "settings": [
+        {
+            "id": "lat",
+            "type": "text",
+            "label": {
+                "en": "Latitude",
+                "nl": "Breedtegraad"
+            },
+            "value": "52.1"
+        },
+        {
+            "id": "lon",
+            "type": "text",
+            "label": {
+                "en": "Longitude",
+                "nl": "Lengtegraad"
+            },
+            "value": "5.1"
+        },
+        {
+            "id": "showAttribution",
+            "type": "checkbox",
+            "label": {
+                "en": "Show Data Attribution",
+                "nl": "Toon Data Bronvermelding"
+            },
+            "value": true,
+            "hint": {
+                "en": "Required for free data usage from Buienradar.",
+                "nl": "Vereist voor gratis gebruik van Buienradar data."
+            }
+        }
+    ],
+    "height": 200,
+    "transparent": true
+}

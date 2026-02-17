@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="https://apps-sdk.developer.homey.app/css/homey.widgets.css">
+    <script src="https://apps-sdk.developer.homey.app/js/homey.widgets.js"></script>
+    <style>
+        :root {
+            --homey-color-blue: var(--homey-color-blue-500);
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: transparent;
+            color: var(--homey-color-text);
+            font-family: var(--homey-font-family);
+            box-sizing: border-box;
+        }
+
+        .widget-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+            padding: 16px;
+            box-sizing: border-box;
+        }
+
+        .station-header {
+            font-size: 11px;
+            font-weight: 500;
+            opacity: 0.7;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 4px;
+        }
+
+        .main-weather {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            /* Center vertically */
+        }
+
+        .temp-value {
+            font-size: 48px;
+            font-weight: 200;
+            /* Thin premium look */
+            line-height: 1;
+            letter-spacing: -2px;
+        }
+
+        .temp-unit {
+            font-size: 20px;
+            font-weight: 300;
+            margin-top: -16px;
+            /* Align top of number */
+            margin-left: 2px;
+            opacity: 0.6;
+        }
+
+        .details-row {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 4px;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-value {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .detail-label {
+            font-size: 9px;
+            opacity: 0.6;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 1px;
+        }
+
+        .attribution {
+            position: absolute;
+            bottom: 6px;
+            right: 6px;
+            font-size: 9px;
+            color: rgba(255, 255, 255, 0.4);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .attribution:hover {
+            color: rgba(255, 255, 255, 0.8);
+        }
+    </style>
+    <style>
+        /* Alignment Styles */
+        .widget-container.align-center {
+            align-items: center;
+            text-align: center;
+        }
+
+        .widget-container.align-right {
+            align-items: flex-end;
+            text-align: right;
+        }
+
+        .align-center .details-row {
+            justify-content: center;
+        }
+
+        .align-right .details-row {
+            justify-content: flex-end;
+        }
+
+        .align-center .main-weather {
+            justify-content: center;
+        }
+
+        .align-right .main-weather {
+            justify-content: flex-end;
+        }
+
+        /* Style Variants */
+        .style-compact .temp-value {
+            font-size: 32px;
+        }
+
+        .style-compact .station-header {
+            font-size: 10px;
+            margin-bottom: 2px;
+        }
+
+        .style-compact .details-row {
+            gap: 12px;
+        }
+
+        .style-compact .detail-value {
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="widget-container" id="app">
+        <div class="station-header" id="station-name">Loading...</div>
+
+        <div class="main-weather">
+            <span class="temp-value" id="main-temp">--</span>
+            <span class="temp-unit">°C</span>
+        </div>
+
+        <div class="details-row" id="details-row">
+            <!-- Populated by JS -->
+        </div>
+
+        <a href="https://www.buienradar.nl" target="_blank" class="attribution">Buienradar.nl</a>
+    </div>
+
+    <script>
+        function onHomeyReady(Homey) {
+            let currentSettings = Homey.getSettings() || {};
+
+            function updateStyles() {
+                const container = document.getElementById('app');
+                const align = currentSettings.textAlign || 'left';
+                const style = currentSettings.style || 'default';
+
+                container.className = 'widget-container'; // Reset
+                container.classList.add(`align-${align}`);
+                container.classList.add(`style-${style}`);
+
+                const attribution = document.querySelector('.attribution');
+                if (currentSettings.showAttribution === false) {
+                    attribution.style.display = 'none';
+                } else {
+                    attribution.style.display = 'inline';
+                }
+            }
+
+            async function refresh() {
+                const lat = currentSettings.lat || '52.1';
+                const lon = currentSettings.lon || '5.1';
+                const stationId = currentSettings.stationId || '';
+
+                updateStyles();
+
+                try {
+                    const data = await Homey.api('GET', `/?lat=${lat}&lon=${lon}&stationId=${stationId}`);
+                    render(data.station);
+                } catch (e) {
+                    console.error(e);
+                    document.getElementById('station-name').textContent = 'Error';
+                }
+            }
+
+            function render(station) {
+                if (!station) return;
+
+                document.getElementById('station-name').textContent = station.stationname;
+                document.getElementById('main-temp').textContent = station.temperature;
+
+                const details = document.getElementById('details-row');
+                details.innerHTML = '';
+
+                // Define details to show
+                const items = [
+                    { label: 'Wind', value: `${station.windspeedBft} Bft` },
+                    { label: 'Rain 1h', value: `${station.rainFallLastHour || 0} mm` },
+                    { label: 'Hum', value: `${station.humidity}%` }
+                ];
+
+                items.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'detail-item';
+                    div.innerHTML = `
+                        <span class="detail-value">${item.value}</span>
+                        <span class="detail-label">${item.label}</span>
+                    `;
+                    details.appendChild(div);
+                });
+            }
+
+            Homey.on('settings.set', (key, value) => {
+                currentSettings[key] = value;
+                // Immediate style update for responsiveness
+                if (key === 'textAlign' || key === 'style' || key === 'showAttribution') {
+                    updateStyles();
+                } else {
+                    refresh();
+                }
+            });
+
+            refresh();
+            Homey.ready();
+
+            // Refresh 10 mins
+            setInterval(refresh, 10 * 60 * 1000);
+        }
+        window.onHomeyReady = onHomeyReady;
+    </script>
+</body>
+
+</html>

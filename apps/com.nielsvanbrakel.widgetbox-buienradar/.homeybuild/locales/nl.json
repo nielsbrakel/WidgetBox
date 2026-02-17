@@ -12,6 +12,7 @@
             "now": "Nu",
             "error": "Er is iets misgegaan",
             "locationError": "Locatie valt buiten het dekkingsgebied"
-        }
+        },
+        "rainradar": {}
     }
 }

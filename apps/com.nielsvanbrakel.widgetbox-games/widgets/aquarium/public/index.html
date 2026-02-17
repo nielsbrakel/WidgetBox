@@ -1,0 +1,1845 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body,html{overflow:hidden;touch-action:manipulation;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#1a2332;width:100%;height:100%}
+.widget-container{position:relative;width:100%;height:100%;overflow:hidden;display:flex;align-items:center;justify-content:center;transition:background 0.4s,opacity 0.3s ease}
+.widget-container[data-tier="1"]{background:#E8D8C4}
+.widget-container[data-tier="2"]{background:#D6CCB8}
+.widget-container[data-tier="3"]{background:#1a2332}
+.desk-surface{position:absolute;bottom:0;left:0;right:0;display:none;z-index:1}
+.widget-container[data-tier="1"] .desk-surface{display:block;height:18%;background:#8B7355;border-top:3px solid #6B5335}
+.widget-container[data-tier="2"] .desk-surface{display:block;height:22%;background:#7B6345;border-top:3px solid #5B4325}
+.widget-container[data-tier="3"] .desk-surface{display:block;height:12%;background:#263238;border-top:2px solid #37474F}
+.desk-items{position:absolute;bottom:0;left:0;right:0;height:30%;z-index:3;pointer-events:none;display:none}
+.widget-container[data-tier="1"] .desk-items,.widget-container[data-tier="2"] .desk-items{display:block}
+.desk-item{position:absolute;image-rendering:pixelated}
+.room-pixel-item{position:absolute;image-rendering:pixelated;pointer-events:none}
+.tank-wrap{position:absolute;overflow:hidden;z-index:2;transition:all 0.3s ease}
+canvas#tank{display:block;width:100%;height:100%;image-rendering:pixelated}
+#dirtCanvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:5;opacity:0.85;border-radius:inherit}
+.tank-wrap.cleaning #dirtCanvas{pointer-events:auto}
+.widget-container[data-tier="1"] .tank-wrap{width:52%;aspect-ratio:1;left:50%;transform:translateX(-50%);top:8%;border-radius:44%;overflow:visible;border:none;background:linear-gradient(180deg,#B8E4F0 0%,#8DD0E4 20%,#6DBDD8 45%,#5AADCC 70%,#4A9DBD 100%)}
+.widget-container[data-tier="1"] .tank-wrap canvas{clip-path:inset(0 round 44%)}
+.widget-container[data-tier="1"] .tank-wrap::after{content:none}
+.widget-container[data-tier="1"] .tank-wrap::before{content:none}
+.widget-container[data-tier="2"] .tank-wrap{border-radius:0;width:72%;height:52%;left:50%;transform:translateX(-50%);top:4%;overflow:hidden;border:none;background:linear-gradient(180deg,#5BC8E8 0%,#38B2DC 15%,#1E98C8 35%,#1580B0 55%,#0D6A98 80%,#085880 100%)}
+.widget-container[data-tier="3"] .tank-wrap{border-radius:0;width:92%;height:78%;left:4%;top:4%;border:none;overflow:hidden;background:linear-gradient(180deg,#0288D1 0%,#01579B 15%,#014D85 35%,#006064 55%,#004D40 75%,#003D33 100%)}
+.pixel-frame{position:absolute;pointer-events:none;z-index:4;image-rendering:pixelated}
+.hud{position:absolute;top:0;left:0;right:0;z-index:10;pointer-events:none}
+.coin-display{position:absolute;top:8px;left:8px;display:flex;align-items:center;gap:4px;background:rgba(0,0,0,0.45);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);padding:3px 8px;border-radius:10px;color:#FFD54F;font-size:12px;font-weight:700;pointer-events:auto;cursor:pointer;font-variant-numeric:tabular-nums}
+.coin-icon{width:12px;height:12px;background:#FFD54F;border-radius:50%;border:1.5px solid #F9A825;flex-shrink:0}
+.coin-icon-sm{width:10px;height:10px;background:#FFD54F;border-radius:50%;border:1px solid #F9A825}
+.hud-bars{position:absolute;top:8px;right:8px;display:flex;gap:6px;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);padding:4px 8px;border-radius:10px;pointer-events:auto}
+.hud-bar{display:flex;align-items:center;gap:3px;font-size:10px;cursor:pointer}
+.hud-bar-icon{font-size:11px}
+.hud-bar-track{width:36px;height:5px;background:rgba(255,255,255,0.15);border-radius:3px;overflow:hidden}
+.hud-bar-fill{height:100%;border-radius:3px;transition:width 0.5s ease}
+.hud-bar-fill.clean{background:#4fc3f7}
+.hud-bar-fill.hunger{background:#ff7043}
+.hud-tooltip{position:absolute;z-index:55;background:rgba(20,20,30,0.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:8px 12px;color:rgba(255,255,255,0.9);font-size:11px;line-height:1.5;max-width:200px;pointer-events:auto;opacity:0;transition:opacity 0.2s;display:none}
+.hud-tooltip.visible{display:block;opacity:1}
+.hud-tooltip-title{font-weight:700;font-size:12px;margin-bottom:3px;color:#FFD54F}
+.fab{position:absolute;bottom:10px;right:10px;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,0.5);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1.5px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.85);font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:20;transition:transform 0.25s ease,background 0.2s;line-height:1}
+.fab:active{transform:scale(0.9)}
+.fab-icon{display:block;transition:transform 0.3s ease}
+.fab.open .fab-icon{transform:rotate(90deg)}
+.menu-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:15;display:flex;flex-direction:column;justify-content:center;padding:12px;opacity:0;pointer-events:none;transition:opacity 0.2s ease}
+.menu-overlay.visible{opacity:1;pointer-events:auto}
+.menu-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:280px;margin:0 auto;width:100%}
+.menu-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:12px 6px;color:rgba(255,255,255,0.9);font-size:11px;font-weight:600;cursor:pointer;transition:background 0.15s,transform 0.1s}
+.menu-btn:active{transform:scale(0.95);background:rgba(255,255,255,0.15)}
+.menu-btn .mi{font-size:20px;line-height:1}
+.menu-btn.locked{opacity:0.35;pointer-events:none}
+.panel{position:absolute;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);z-index:25;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity 0.2s ease}
+.panel.visible{opacity:1;pointer-events:auto}
+.panel-hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 12px 6px}
+.panel-title{color:#fff;font-size:15px;font-weight:700}
+.panel-cap{color:rgba(255,255,255,0.45);font-size:10px;font-weight:600;margin-left:6px}
+.panel-x{background:none;border:none;color:rgba(255,255,255,0.6);font-size:22px;cursor:pointer;padding:2px 6px;line-height:1}
+.panel-x:active{color:#fff}
+.panel-body{flex:1;overflow-y:auto;padding:4px 12px 12px;-webkit-overflow-scrolling:touch}
+.sec-title{color:rgba(255,255,255,0.5);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;margin:10px 0 5px}
+.sec-title:first-child{margin-top:0}
+.s-item{display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:8px 10px;margin-bottom:5px}
+.s-item.locked{opacity:0.4}
+.s-item.active-tank{border-color:rgba(79,195,247,0.4);background:rgba(79,195,247,0.1)}
+.s-info{display:flex;flex-direction:column;gap:1px;flex:1;min-width:0}
+.s-name{color:#fff;font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.s-desc{color:rgba(255,255,255,0.45);font-size:9px}
+.s-right{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.s-price{display:flex;align-items:center;gap:3px;color:#FFD54F;font-size:12px;font-weight:700}
+.buy-btn{background:rgba(77,182,172,0.3);border:1px solid rgba(77,182,172,0.4);color:#80CBC4;border-radius:8px;padding:5px 10px;font-size:10px;font-weight:700;cursor:pointer;white-space:nowrap}
+.buy-btn:active{background:rgba(77,182,172,0.5)}
+.buy-btn:disabled{opacity:0.35;cursor:default}
+.buy-btn.processing{opacity:0.5;pointer-events:none}
+.fish-bubble{position:absolute;z-index:12;background:rgba(0,0,0,0.65);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:8px 10px;color:#fff;pointer-events:auto;display:none;min-width:120px;max-width:175px}
+.fish-bubble.visible{display:block}
+.fb-name{font-size:12px;font-weight:700;margin-bottom:1px}
+.fb-species{font-size:9px;color:rgba(255,255,255,0.5);margin-bottom:3px}
+.fb-detail{font-size:9px;color:rgba(255,255,255,0.6);line-height:1.5}
+.fb-bar{width:100%;height:3px;background:rgba(255,255,255,0.1);border-radius:2px;margin-top:3px;overflow:hidden}
+.fb-fill{height:100%;border-radius:2px;transition:width 0.3s}
+.fb-fill.hunger-fill{background:#81C784}
+.fb-fill.hunger-fill.low{background:#FFAB91}
+.fb-fill.xp-fill{background:#64B5F6}
+.fb-badges{display:flex;gap:4px;align-items:center;flex-wrap:wrap;margin-top:3px}
+.fb-stage{display:inline-block;background:rgba(100,181,246,0.2);color:#90CAF9;font-size:8px;font-weight:700;padding:1px 5px;border-radius:4px}
+.fb-weak{display:inline-block;background:rgba(255,171,145,0.2);color:#FFAB91;font-size:8px;font-weight:700;padding:1px 5px;border-radius:4px}
+.fb-fav{font-size:9px;color:rgba(255,255,255,0.5);margin-top:2px}
+.fb-btns{display:flex;gap:4px;margin-top:4px;flex-wrap:wrap}
+.sell-btn{background:rgba(255,82,82,0.2);border:1px solid rgba(255,82,82,0.3);color:#FF8A80;border-radius:6px;padding:2px 7px;font-size:9px;font-weight:700;cursor:pointer}
+.sell-btn:active{background:rgba(255,82,82,0.35)}
+.move-btn{background:rgba(100,181,246,0.2);border:1px solid rgba(100,181,246,0.3);color:#90CAF9;border-radius:6px;padding:2px 7px;font-size:9px;font-weight:700;cursor:pointer}
+.move-btn:active{background:rgba(100,181,246,0.35)}
+.bottom-bar{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);z-index:40}
+.tank-nav{display:none;align-items:center;gap:8px;background:rgba(0,0,0,0.5);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,0.15);border-radius:14px;padding:4px 12px}
+.tn-arrow{width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.8);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.tn-arrow:disabled{opacity:0.3;cursor:default}
+.tn-label{color:rgba(255,255,255,0.9);font-size:11px;font-weight:700;min-width:60px;text-align:center}
+.tool-dock{display:none;background:rgba(0,0,0,0.6);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.15);border-radius:14px;padding:6px 12px;align-items:center;gap:8px}
+.tool-dock.visible{display:flex}
+.dock-item{width:40px;height:40px;background:rgba(255,255,255,0.1);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;position:relative;border:2px solid transparent;transition:all 0.15s;font-size:10px;color:rgba(255,255,255,0.7);gap:1px}
+.dock-item.selected{background:rgba(255,255,255,0.2);border-color:#FFD54F}
+.dock-item.disabled{opacity:0.3;pointer-events:none}
+.dock-icon{font-size:18px;line-height:1}
+.dock-count{font-size:9px;font-weight:700}
+.dock-label{color:rgba(255,255,255,0.8);font-size:12px;font-weight:600;padding:0 8px;white-space:nowrap}
+.dock-close{width:32px;height:32px;border-radius:50%;background:rgba(255,82,82,0.2);border:1px solid rgba(255,82,82,0.3);color:#FF8A80;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;margin-left:4px}
+.toast{position:absolute;top:36px;left:50%;transform:translateX(-50%) translateY(-16px);background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:6px 12px;color:rgba(255,255,255,0.9);font-size:11px;font-weight:600;z-index:50;opacity:0;transition:opacity 0.3s,transform 0.3s;pointer-events:none;text-align:center;max-width:200px}
+.toast.visible{opacity:1;transform:translateX(-50%) translateY(0)}
+.help-body{padding:10px 12px;color:rgba(255,255,255,0.85);font-size:11px;line-height:1.7;overflow-y:auto}
+.help-sec{margin-bottom:10px}
+.help-sec-t{font-size:12px;font-weight:700;margin-bottom:3px;color:rgba(255,255,255,0.95)}
+.help-sec p{margin:0 0 4px;color:rgba(255,255,255,0.65);font-size:10px}
+.reset-btn{background:#ef5350;border:none;color:#fff;border-radius:8px;padding:6px 0;font-size:11px;font-weight:700;cursor:pointer;width:100%;margin-top:6px}
+.reset-btn:active{opacity:0.8}
+.tank-wrap.tool-clean{cursor:pointer}
+.tank-wrap.tool-feed{cursor:copy}
+.tank-wrap.tool-laser{cursor:none}
+.loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#1a5276 0%,#1f6f8b 50%,#1a8a7d 100%);z-index:60;color:rgba(255,255,255,0.6);font-size:13px}
+.loading.hidden{display:none}
+.inv-count{background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);padding:3px 8px;border-radius:8px;font-size:13px;font-weight:700;font-variant-numeric:tabular-nums}
+.float-text{position:absolute;color:#FFD54F;font-size:12px;font-weight:700;pointer-events:none;z-index:11;animation:float-up 1.2s ease-out forwards}
+@keyframes float-up{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-30px)}}
+</style>
+</head>
+<body>
+<div class="loading" id="loading">Loading aquarium...</div>
+<div class="widget-container" id="widgetContainer" data-tier="1">
+<div class="desk-surface"></div>
+<div class="tank-wrap" id="tankWrap">
+  <canvas id="tank"></canvas>
+  <canvas id="dirtCanvas"></canvas>
+</div>
+<div class="hud" id="hud">
+  <div class="coin-display" id="coinHud"><div class="coin-icon"></div><span id="coinCount">0</span></div>
+  <div class="hud-bars">
+    <div class="hud-bar" id="cleanHud" title="Cleanliness"><span class="hud-bar-icon">&#x1F9FC;</span><div class="hud-bar-track"><div class="hud-bar-fill clean" id="cleanBar" style="width:100%"></div></div></div>
+    <div class="hud-bar" id="hungerHud" title="Avg Hunger"><span class="hud-bar-icon">&#x1F364;</span><div class="hud-bar-track"><div class="hud-bar-fill hunger" id="hungerBar" style="width:100%"></div></div></div>
+  </div>
+</div>
+<div class="hud-tooltip" id="hudTooltip">
+  <div class="hud-tooltip-title" id="hudTooltipTitle"></div>
+  <div id="hudTooltipBody"></div>
+</div>
+<div class="fish-bubble" id="fishBubble">
+  <div class="fb-name" id="fbName"></div>
+  <div class="fb-species" id="fbSpecies"></div>
+  <div class="fb-detail" id="fbDetail"></div>
+  <div class="fb-bar"><div class="fb-fill hunger-fill" id="fbHunger"></div></div>
+  <div class="fb-bar"><div class="fb-fill xp-fill" id="fbXp"></div></div>
+  <div class="fb-fav" id="fbFav"></div>
+  <div class="fb-badges">
+    <span class="fb-stage" id="fbStage"></span>
+    <span class="fb-weak" id="fbWeak" style="display:none">Weak</span>
+  </div>
+  <div class="fb-btns" id="fbBtns"></div>
+</div>
+<button class="fab" id="fab"><span class="fab-icon">&#x2630;</span></button>
+<div class="menu-overlay" id="menuOverlay">
+  <div class="menu-grid" id="menuGrid">
+    <div class="menu-btn" data-action="feed"><div class="mi">&#x1F35E;</div>Feed</div>
+    <div class="menu-btn" data-action="clean"><div class="mi">&#x1F9F9;</div>Clean</div>
+    <div class="menu-btn" data-action="laser" id="laserBtn"><div class="mi">&#x1F534;</div>Play</div>
+    <div class="menu-btn" data-action="store"><div class="mi">&#x1F6D2;</div>Store</div>
+    <div class="menu-btn" data-action="upgrades"><div class="mi">&#x2B06;&#xFE0F;</div>Upgrades</div>
+    <div class="menu-btn" data-action="inventory"><div class="mi">&#x1F41F;</div>Fish</div>
+    <div class="menu-btn" data-action="tanks"><div class="mi">&#x1F3E0;</div>Tanks</div>
+    <div class="menu-btn" data-action="help"><div class="mi">&#x2753;</div>Help</div>
+  </div>
+</div>
+<div class="panel" id="storePanel">
+  <div class="panel-hdr"><span class="panel-title">Store</span><span class="panel-cap" id="storeCap"></span><button class="panel-x" data-close="storePanel">&#xD7;</button></div>
+  <div class="panel-body" id="storeList"></div>
+</div>
+<div class="panel" id="upgradesPanel">
+  <div class="panel-hdr"><span class="panel-title">Upgrades</span><button class="panel-x" data-close="upgradesPanel">&#xD7;</button></div>
+  <div class="panel-body" id="upgradesList"></div>
+</div>
+<div class="panel" id="inventoryPanel">
+  <div class="panel-hdr"><span class="panel-title">Inventory</span><button class="panel-x" data-close="inventoryPanel">&#xD7;</button></div>
+  <div class="panel-body" id="inventoryList"></div>
+</div>
+<div class="panel" id="tanksPanel">
+  <div class="panel-hdr"><span class="panel-title">Tanks</span><button class="panel-x" data-close="tanksPanel">&#xD7;</button></div>
+  <div class="panel-body" id="tanksList"></div>
+</div>
+<div class="panel" id="helpPanel">
+  <div class="panel-hdr"><span class="panel-title">Help</span><button class="panel-x" data-close="helpPanel">&#xD7;</button></div>
+  <div class="help-body" id="helpBody"></div>
+</div>
+<div class="bottom-bar" id="bottomBar">
+  <div class="tank-nav" id="tankNav">
+    <button class="tn-arrow" id="tnPrev">&#x2039;</button>
+    <div class="tn-label" id="tnLabel">Fishbowl</div>
+    <button class="tn-arrow" id="tnNext">&#x203A;</button>
+  </div>
+  <div class="tool-dock" id="toolDock"></div>
+</div>
+<div class="toast" id="toast"></div>
+</div>
+<script>
+// Aquarium Widget - Frontend (Iteration 5 - Multi-Tank)
+
+var SPECIES = {
+  guppy:      { name:'Guppy',       tier:1, baseCoin:2.5,  spaceCost:1, waterType:'fresh', color:{body:'#FF7043',tail:'#FFB74D'} },
+  goldfish:   { name:'Goldfish',     tier:1, baseCoin:3.8,  spaceCost:2, waterType:'fresh', color:{body:'#FF8F00',tail:'#FFB300'} },
+  neon_tetra: { name:'Neon Tetra',   tier:2, baseCoin:3.2,  spaceCost:1, waterType:'fresh', color:{body:'#29B6F6',tail:'#E53935'} },
+  betta:      { name:'Betta',        tier:2, baseCoin:5.0,  spaceCost:2, waterType:'fresh', color:{body:'#7E57C2',tail:'#B39DDB'} },
+  angelfish:  { name:'Angelfish',    tier:3, baseCoin:6.5,  spaceCost:4, waterType:'fresh', color:{body:'#ECEFF1',tail:'#B0BEC5'} },
+  clownfish:  { name:'Clownfish',    tier:3, baseCoin:5.8,  spaceCost:3, waterType:'salt',  color:{body:'#FF7043',tail:'#FFFFFF'} }
+};
+
+var FOOD_ICONS = { flakes:'\u{1F342}', pellets:'\u{1F7E4}', premium_flakes:'\u2728' };
+var FOOD_COLORS = { flakes:'#d4a373', pellets:'#8d6e63', premium_flakes:'#ffd700' };
+var FOOD_PRIORITY = { flakes:1, pellets:2, premium_flakes:3 };
+
+var FISH_PX = {
+  guppy: { w:13, h:8, eye:[3,10], px:[
+    [0,0,2,2,0,0,0,0,0,1,0,0,0],
+    [0,2,2,2,0,1,1,1,1,1,1,0,0],
+    [2,2,2,2,1,1,1,1,1,1,1,1,0],
+    [2,2,2,1,1,1,1,1,1,1,1,1,0],
+    [2,2,2,1,1,1,1,1,1,1,1,1,0],
+    [2,2,2,2,1,1,1,1,1,1,1,1,0],
+    [0,2,2,2,0,1,1,1,1,1,1,0,0],
+    [0,0,2,2,0,0,0,0,0,1,0,0,0]] },
+  goldfish: { w:14, h:10, eye:[4,10], px:[
+    [0,0,0,0,0,0,0,1,1,0,0,0,0,0],
+    [0,0,2,0,0,1,1,1,1,1,1,0,0,0],
+    [0,2,2,2,1,1,1,1,1,1,1,1,0,0],
+    [2,2,0,1,1,1,1,1,1,1,1,1,0,0],
+    [2,2,1,1,1,1,1,1,1,1,1,1,1,0],
+    [2,2,1,1,1,1,1,1,1,1,1,1,1,0],
+    [2,2,0,1,1,1,1,1,1,1,1,1,0,0],
+    [0,2,2,2,1,1,1,1,1,1,1,1,0,0],
+    [0,0,2,0,0,1,1,1,1,1,1,0,0,0],
+    [0,0,0,0,0,0,0,1,1,0,0,0,0,0]] },
+  neon_tetra: { w:11, h:6, eye:[2,8], px:[
+    [0,0,0,0,1,1,1,0,0,0,0],
+    [0,0,1,1,1,1,1,1,1,0,0],
+    [0,1,1,1,1,1,1,1,1,1,0],
+    [0,2,2,2,2,2,2,2,2,1,0],
+    [0,0,2,2,2,2,2,2,2,0,0],
+    [0,0,0,0,2,2,2,0,0,0,0]] },
+  betta: { w:14, h:11, eye:[5,10], px:[
+    [0,0,2,2,2,0,0,0,0,1,0,0,0,0],
+    [0,2,2,2,2,2,1,1,1,1,0,0,0,0],
+    [2,2,2,2,2,1,1,1,1,1,1,0,0,0],
+    [2,2,2,2,1,1,1,1,1,1,1,0,0,0],
+    [0,2,2,1,1,1,1,1,1,1,1,1,0,0],
+    [0,0,2,1,1,1,1,1,1,1,1,1,0,0],
+    [0,2,2,1,1,1,1,1,1,1,1,1,0,0],
+    [2,2,2,2,1,1,1,1,1,1,1,0,0,0],
+    [2,2,2,2,2,1,1,1,1,1,1,0,0,0],
+    [0,2,2,2,2,2,1,1,1,1,0,0,0,0],
+    [0,0,2,2,2,0,0,0,0,1,0,0,0,0]] },
+  angelfish: { w:10, h:13, eye:[5,7], px:[
+    [0,0,0,0,0,2,0,0,0,0],
+    [0,0,0,0,2,1,2,0,0,0],
+    [0,0,0,2,1,1,1,0,0,0],
+    [0,0,2,1,1,1,1,1,0,0],
+    [0,2,1,1,1,1,1,1,0,0],
+    [2,1,1,1,1,1,1,1,1,0],
+    [2,1,1,1,1,1,1,1,1,0],
+    [0,2,1,1,1,1,1,1,0,0],
+    [0,0,2,1,1,1,1,1,0,0],
+    [0,0,0,2,1,1,1,0,0,0],
+    [0,0,0,0,2,1,2,0,0,0],
+    [0,0,0,0,0,2,0,0,0,0],
+    [0,0,0,0,0,2,0,0,0,0]] },
+  clownfish: { w:12, h:8, eye:[3,9], px:[
+    [0,0,0,0,1,0,0,0,1,0,0,0],
+    [0,0,1,2,1,1,2,1,1,1,0,0],
+    [0,1,1,2,1,1,2,1,1,1,1,0],
+    [1,1,1,2,1,1,2,1,1,1,1,0],
+    [1,1,1,2,1,1,2,1,1,1,1,0],
+    [0,1,1,2,1,1,2,1,1,1,1,0],
+    [0,0,1,2,1,1,2,1,1,1,0,0],
+    [0,0,0,0,1,0,0,0,1,0,0,0]] }
+};
+
+var SNAIL_PX = [[0,0,2,0],[0,2,2,2],[1,1,2,2],[1,1,1,1]];
+var GRAVEL_COLORS = ['#5D4037','#6D4C41','#795548','#8D6E63','#4E342E','#3E2723'];
+var PLANT_COLORS  = ['#2E7D32','#388E3C','#43A047','#1B5E20','#4CAF50'];
+
+var DECO_PX = {
+  plant_fern:    { w:5, h:9, c:['#2E7D32','#43A047'], px:[[0,0,1,0,0],[0,1,1,0,0],[0,1,1,1,0],[1,1,1,0,0],[0,2,1,1,0],[0,1,1,0,0],[0,0,1,0,0],[0,0,2,0,0],[0,0,2,0,0]] },
+  plant_grass:   { w:3, h:10, c:['#388E3C','#66BB6A'], px:[[0,1,0],[1,0,1],[0,1,0],[1,0,1],[0,1,0],[0,1,0],[0,1,0],[0,2,0],[0,2,0],[0,2,0]] },
+  plant_anubias: { w:7, h:6, c:['#1B5E20','#4CAF50'], px:[[0,1,1,0,1,1,0],[1,1,1,1,1,1,1],[0,1,1,1,1,1,0],[0,0,1,1,1,0,0],[0,0,0,2,0,0,0],[0,0,0,2,0,0,0]] },
+  shipwreck:     { w:9, h:7, c:['#5D4037','#8D6E63'], px:[[0,0,0,1,0,0,0,0,0],[0,0,1,1,1,0,0,0,0],[0,1,1,2,1,1,0,0,0],[1,1,2,2,2,1,1,0,0],[1,2,2,2,2,2,1,0,0],[1,1,1,2,2,2,1,1,1],[0,0,0,1,1,1,0,0,0]] },
+  bubbler:       { w:3, h:7, c:['#78909C','#B0BEC5'], px:[[0,1,0],[1,1,1],[1,2,1],[1,2,1],[1,1,1],[0,2,0],[2,0,2]] },
+  castle:        { w:7, h:8, c:['#9E9E9E','#BDBDBD'], px:[[1,0,1,0,1,0,1],[1,0,1,1,1,0,1],[1,1,1,2,1,1,1],[0,1,2,2,2,1,0],[0,1,2,0,2,1,0],[0,1,1,0,1,1,0],[0,1,1,1,1,1,0],[1,1,1,1,1,1,1]] },
+  treasure:      { w:7, h:5, c:['#6D4C41','#FFD54F'], px:[[0,1,1,1,1,1,0],[1,2,2,2,2,2,1],[1,1,1,1,1,1,1],[1,2,1,2,1,2,1],[1,1,1,1,1,1,1]] },
+  coral_rock:    { w:7, h:6, c:['#E91E63','#F48FB1'], px:[[0,0,1,0,1,0,0],[0,1,1,1,1,1,0],[1,2,1,2,1,2,1],[1,1,2,1,2,1,1],[0,1,1,1,1,1,0],[0,0,1,1,1,0,0]] }
+};
+
+// ── Room pixel art per tier ──────────────────────────────────────────────────
+// (Pixel art frames drawn dynamically in buildRoomScene via canvas)
+
+// ── Globals ──────────────────────────────────────────────────────────────────
+
+var homey, widgetId;
+var gameState = null, storeCatalog = null, tankInfo = null, upgradesCatalog = null, foodCapacity = 30;
+var tanksListData = null;
+var menuOpen = false, selectedFishId = null, toastTimer = null;
+var actionInFlight = false;
+
+var canvas, ctx, dirtCanvas, dirtCtx, tankWrap, widgetContainer;
+var W = 0, H = 0;
+var PIXEL = 3;
+
+var fishSprites = [], foodObjects = [], bubbles = [], snailSprites = [];
+var gravelData = [], plants = [];
+var lastFrame = 0, animFrame = null;
+var schoolAnchor = { x: 150, y: 120, vx: 12, vy: 6, timer: 0 };
+
+var dirtMaskCanvas = null, dirtMaskCtx = null;
+var dirtMaskGenerated = false;
+
+var currentTool = 'none';
+var selectedFoodId = 'flakes';
+var laserPos = { x: 0, y: 0 };
+var laserTimer = 0;
+var cleanStartCleanliness = 0;
+var cleanWipeCount = 0;
+var cleanInitialDirt = 0;
+var cleanWipeProgress = 0;
+var cleanFinishedFull = false;
+var hudTooltipTimer = null;
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
+function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+function lerp(a, b, t) { return a + (b - a) * clamp(t, 0, 1); }
+function rnd(a, b) { return a + Math.random() * (b - a); }
+function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+function xpToNext(lv) { return 30 + 14 * (lv - 1); }
+function lifeStage(fish) {
+  var d = (Date.now() - fish.bornAt) / 86400000;
+  if (d < 2) return { stage: 'Baby', emoji: '\u{1F423}' };
+  if (d < 7) return { stage: 'Child', emoji: '\u{1F420}' };
+  return { stage: 'Adult', emoji: '\u{1F41F}' };
+}
+function ageDays(fish) { return Math.floor((Date.now() - fish.bornAt) / 86400000); }
+function ageStr(fish) { var d = ageDays(fish); return d > 0 ? d + 'd' : Math.floor((Date.now() - fish.bornAt) / 3600000) + 'h'; }
+function $(id) { return document.getElementById(id); }
+
+// ── Multi-tank state accessors ───────────────────────────────────────────────
+
+function getActiveTank() {
+  if (!gameState || !gameState.tanks) return null;
+  return gameState.tanks[gameState.activeTankId] || null;
+}
+function getActiveTier() { return gameState ? gameState.activeTankId : 1; }
+function getActiveFish() { var t = getActiveTank(); return t ? t.fish : []; }
+function getActiveCleanliness() { var t = getActiveTank(); return t ? t.cleanliness : 100; }
+function getActiveSnails() { var t = getActiveTank(); return t ? (t.snails || 0) : 0; }
+function getActiveUpgrades() { var t = getActiveTank(); return t ? t.upgrades : { filterLevel:0, autoFeederLevel:0, foodSiloLevel:0 }; }
+function getActiveDecorations() { var t = getActiveTank(); return t ? (t.decorations || []) : []; }
+
+function getUsedSpace() {
+  var fish = getActiveFish();
+  return fish.reduce(function(sum, f) { return sum + (SPECIES[f.speciesId] ? SPECIES[f.speciesId].spaceCost : 1); }, 0);
+}
+function getSpaceCapacity() {
+  return (tankInfo && tankInfo.spaceCapacity) ? tankInfo.spaceCapacity : 6;
+}
+
+// ── Toast & UI helpers ───────────────────────────────────────────────────────
+
+function showToast(msg, dur) {
+  var t = $('toast');
+  t.textContent = msg;
+  t.classList.add('visible');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function() { t.classList.remove('visible'); }, dur || 2500);
+}
+
+function floatText(x, y, text) {
+  var el = document.createElement('div');
+  el.className = 'float-text';
+  el.textContent = text;
+  el.style.left = x + 'px';
+  el.style.top = y + 'px';
+  widgetContainer.appendChild(el);
+  setTimeout(function() { el.remove(); }, 1200);
+}
+
+function showHudTooltip(title, body, anchorEl) {
+  var tt = $('hudTooltip');
+  $('hudTooltipTitle').textContent = title;
+  $('hudTooltipBody').textContent = body;
+  tt.classList.add('visible');
+  var rect = anchorEl.getBoundingClientRect();
+  var cRect = widgetContainer.getBoundingClientRect();
+  var left = rect.left - cRect.left;
+  var top = rect.bottom - cRect.top + 6;
+  if (left + 200 > cRect.width) left = cRect.width - 210;
+  if (left < 4) left = 4;
+  tt.style.left = left + 'px';
+  tt.style.top = top + 'px';
+  clearTimeout(hudTooltipTimer);
+  hudTooltipTimer = setTimeout(function() { hideHudTooltip(); }, 4000);
+}
+
+function hideHudTooltip() {
+  $('hudTooltip').classList.remove('visible');
+  clearTimeout(hudTooltipTimer);
+}
+
+// ── Environment ──────────────────────────────────────────────────────────────
+
+function initEnvironment() {
+  var tier = getActiveTier();
+  gravelData = [];
+  var rows = tier === 1 ? 2 : tier === 2 ? 3 : 4;
+  var cols = Math.ceil(W / PIXEL);
+  for (var r = 0; r < rows; r++) {
+    for (var c = 0; c < cols; c++) {
+      gravelData.push({ x: c * PIXEL, y: H - (rows - r) * PIXEL, color: pick(GRAVEL_COLORS) });
+    }
+  }
+  plants = [];
+  var pCount = tier === 1 ? 2 : tier === 2 ? 5 : 10;
+  for (var i = 0; i < pCount; i++) {
+    var x = 15 + Math.random() * (W - 30);
+    var stemH = 5 + Math.floor(Math.random() * (tier * 3));
+    var leaves = [];
+    for (var j = 1; j < stemH; j += 2) {
+      if (Math.random() > 0.3) leaves.push({ y: j, dir: Math.random() > 0.5 ? 1 : -1, len: 2 + Math.floor(Math.random() * 3) });
+    }
+    plants.push({ x: x, stemH: stemH, leaves: leaves, color: pick(PLANT_COLORS) });
+  }
+}
+
+function drawEnvironment() {
+  for (var i = 0; i < gravelData.length; i++) { var g = gravelData[i]; ctx.fillStyle = g.color; ctx.fillRect(g.x, g.y, PIXEL, PIXEL); }
+  for (var pi = 0; pi < plants.length; pi++) {
+    var p = plants[pi]; ctx.fillStyle = p.color;
+    var by = H - gravelData.length / Math.ceil(W / PIXEL) * PIXEL - PIXEL;
+    for (var j = 0; j < p.stemH; j++) ctx.fillRect(p.x, by - j * PIXEL, PIXEL, PIXEL);
+    for (var li = 0; li < p.leaves.length; li++) { var l = p.leaves[li]; for (var k = 1; k <= l.len; k++) { ctx.fillRect(p.x + l.dir * k * PIXEL, by - l.y * PIXEL - k * PIXEL * 0.5, PIXEL, PIXEL); } }
+  }
+  // Light rays from top
+  ctx.save();
+  ctx.globalAlpha = 0.04;
+  ctx.fillStyle = '#ffffff';
+  for (var ri = 0; ri < 3; ri++) {
+    var rx = W * (0.18 + ri * 0.32);
+    ctx.beginPath();
+    ctx.moveTo(rx - 5, 0);
+    ctx.lineTo(rx + 12, 0);
+    ctx.lineTo(rx + 28 + ri * 10, H);
+    ctx.lineTo(rx - 8 + ri * 10, H);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
+// ── Decorations drawing ──────────────────────────────────────────────────────
+
+function drawDecorations() {
+  var decos = getActiveDecorations();
+  if (!decos || decos.length === 0) return;
+  var gravelH = (getActiveTier() === 1 ? 2 : getActiveTier() === 2 ? 3 : 4) * PIXEL;
+  var baseY = H - gravelH;
+
+  for (var di = 0; di < decos.length; di++) {
+    var deco = decos[di];
+    var art = DECO_PX[deco.type];
+    if (!art) continue;
+    var dx = deco.x * (W - art.w * PIXEL);
+    var dy = baseY - art.h * PIXEL;
+
+    for (var r = 0; r < art.px.length; r++) {
+      for (var c = 0; c < art.px[r].length; c++) {
+        var v = art.px[r][c];
+        if (!v) continue;
+        ctx.fillStyle = art.c[v - 1] || art.c[0];
+        ctx.fillRect(dx + c * PIXEL, dy + r * PIXEL, PIXEL, PIXEL);
+      }
+    }
+  }
+}
+
+// ── Equipment drawing ────────────────────────────────────────────────────────
+
+function drawEquipment() {
+  var upg = getActiveUpgrades();
+  // Filter: right side of tank
+  if (upg.filterLevel > 0) {
+    var fx = W - PIXEL * 4;
+    var fy = Math.floor(H * 0.3);
+    ctx.fillStyle = '#546E7A';
+    ctx.fillRect(fx, fy, PIXEL * 3, PIXEL * 6);
+    ctx.fillStyle = '#78909C';
+    ctx.fillRect(fx + PIXEL, fy + PIXEL, PIXEL, PIXEL * 4);
+    if (upg.filterLevel >= 2) {
+      ctx.fillStyle = 'rgba(200,230,255,0.3)';
+      ctx.fillRect(fx - PIXEL, fy + PIXEL, PIXEL, PIXEL);
+      ctx.fillRect(fx - PIXEL, fy + PIXEL * 3, PIXEL, PIXEL);
+    }
+  }
+  // Auto-feeder: top right
+  if (upg.autoFeederLevel > 0) {
+    var ax = W - PIXEL * 6;
+    ctx.fillStyle = '#FF8A65';
+    ctx.fillRect(ax, 0, PIXEL * 4, PIXEL * 2);
+    ctx.fillStyle = '#4E342E';
+    ctx.fillRect(ax + PIXEL, PIXEL * 2, PIXEL * 2, PIXEL);
+    if (upg.autoFeederLevel >= 2) {
+      ctx.fillStyle = '#FFD54F';
+      ctx.fillRect(ax + PIXEL * 4, PIXEL, PIXEL, PIXEL);
+    }
+  }
+}
+
+// ── Room scene (pixel art frames & decorations) ─────────────────────────────
+
+function drawPixelRect(ctx, x, y, w, h, color) {
+  ctx.fillStyle = color;
+  ctx.fillRect(x, y, w, h);
+}
+
+function fillPixelEllipse(ctx, cx, cy, rx, ry, p) {
+  for (var row = -ry; row <= ry; row += p) {
+    var ratio = (row * row) / (ry * ry);
+    if (ratio > 1) continue;
+    var xSpan = rx * Math.sqrt(1 - ratio);
+    var startX = Math.round((cx - xSpan) / p) * p;
+    var endX = Math.round((cx + xSpan) / p) * p;
+    ctx.fillRect(startX, Math.round((cy + row) / p) * p, endX - startX + p, p);
+  }
+}
+
+function buildRoomScene() {
+  // Remove old pixel frame overlays
+  var old = widgetContainer.querySelectorAll('.pixel-frame,.room-pixel-item');
+  for (var i = 0; i < old.length; i++) old[i].remove();
+
+  var tier = getActiveTier();
+  var cw = widgetContainer.clientWidth || 478;
+  var ch = widgetContainer.clientHeight || 359;
+  // Chunky pixel size – at least 4px for visible pixel art steps
+  var P = Math.max(4, Math.round(cw / 100));
+
+  if (tier === 1) buildBowlFrame(cw, ch, P);
+  else if (tier === 2) buildAquariumFrame(cw, ch, P);
+  else if (tier === 3) buildBigTankFrame(cw, ch, P);
+}
+
+function addFrameCanvas(w, h, css) {
+  var c = document.createElement('canvas');
+  c.className = 'pixel-frame';
+  c.width = w; c.height = h;
+  c.style.width = w + 'px';
+  c.style.height = h + 'px';
+  for (var k in css) { if (css.hasOwnProperty(k)) c.style[k] = css[k]; }
+  widgetContainer.appendChild(c);
+  return c;
+}
+
+// ── Tier 1: Fishbowl with chunky pixel art outline ─────────────────────────
+
+function buildBowlFrame(cw, ch, P) {
+  var bowlSize = Math.round(cw * 0.52);
+  var bowlX = Math.round((cw - bowlSize) / 2);
+  var bowlY = Math.round(ch * 0.08);
+
+  var pad = P * 6;
+  var fw = bowlSize + pad * 2;
+  var fh = bowlSize + pad * 2 + P * 6;
+  var c = addFrameCanvas(fw, fh, {
+    left: (bowlX - pad) + 'px',
+    top: (bowlY - pad) + 'px'
+  });
+  var ctx = c.getContext('2d');
+  var cx = fw / 2;
+  var cy = pad + bowlSize / 2;
+  var rx = bowlSize / 2;
+  var ry = bowlSize / 2;
+
+  // Layer 1: Outermost dark outline fill
+  ctx.fillStyle = '#3A4A3E';
+  fillPixelEllipse(ctx, cx, cy, rx + P * 3, ry + P * 3, P);
+
+  // Layer 2: Glass body (light gray/white)
+  ctx.fillStyle = '#D8D8D0';
+  fillPixelEllipse(ctx, cx, cy, rx + P * 1, ry + P * 1, P);
+
+  // Layer 3: Inner dark edge
+  ctx.fillStyle = '#6A7A65';
+  fillPixelEllipse(ctx, cx, cy, rx - P * 1, ry - P * 1, P);
+
+  // Layer 4: Clear inside so fish canvas shows through
+  ctx.globalCompositeOperation = 'destination-out';
+  ctx.fillStyle = '#000';
+  fillPixelEllipse(ctx, cx, cy, rx - P * 2, ry - P * 2, P);
+  ctx.globalCompositeOperation = 'source-over';
+
+  // Glass highlight streak (top-left area)
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  var hlX = cx - rx * 0.3;
+  var hlY = cy - ry * 0.5;
+  ctx.fillRect(Math.round(hlX / P) * P, Math.round(hlY / P) * P, P, P * 3);
+  ctx.fillRect(Math.round(hlX / P) * P - P, Math.round(hlY / P) * P + P, P, P * 2);
+
+  // Top rim / opening - flat wide rectangle across the top of the bowl
+  var rimW = Math.round(bowlSize * 0.62);
+  var rimX = cx - rimW / 2;
+  var rimTop = cy - ry - P * 2;
+  // Dark outline rim
+  drawPixelRect(ctx, Math.round(rimX / P) * P - P, rimTop - P, rimW + P * 2, P * 5, '#3A4A3E');
+  // White rim body
+  drawPixelRect(ctx, Math.round(rimX / P) * P, rimTop, rimW, P * 3, '#E8E8E0');
+  // Rim highlight
+  drawPixelRect(ctx, Math.round(rimX / P) * P, rimTop, rimW, P, '#F5F5F0');
+  // Rim shadow line
+  drawPixelRect(ctx, Math.round(rimX / P) * P, rimTop + P * 2, rimW, P, '#B8B8B0');
+
+  // Bowl base / flat bottom
+  var baseY = cy + ry + P;
+  var baseW = Math.round(bowlSize * 0.5);
+  var baseX = cx - baseW / 2;
+  drawPixelRect(ctx, Math.round(baseX / P) * P - P, baseY, baseW + P * 2, P * 2, '#3A4A3E');
+  drawPixelRect(ctx, Math.round(baseX / P) * P, baseY + P * 2, baseW, P * 2, '#6A6A60');
+  drawPixelRect(ctx, Math.round(baseX / P) * P + P, baseY + P * 2, baseW - P * 2, P, '#8A8A80');
+
+  addTablePixelArt(cw, ch, P, 1);
+}
+
+// ── Tier 2: Rectangular aquarium with frame, hood & wooden stand ────────────
+
+function buildAquariumFrame(cw, ch, P) {
+  var tw = Math.round(cw * 0.72);
+  var th = Math.round(ch * 0.52);
+  var tx = Math.round((cw - tw) / 2);
+  var ty = Math.round(ch * 0.04);
+
+  var pad = P * 8;
+  var fw = tw + pad * 2;
+  var fhTotal = th + P * 24;
+  var c = addFrameCanvas(fw, fhTotal, {
+    left: (tx - pad) + 'px',
+    top: (ty - P * 8) + 'px'
+  });
+  var ctx = c.getContext('2d');
+  var ix = pad;
+  var iy = P * 8;
+
+  // ── Hood / light fixture ──
+  var hoodW = tw + P * 6;
+  var hoodX = ix - P * 3;
+  // Hood outer
+  drawPixelRect(ctx, hoodX - P, iy - P * 7, hoodW + P * 2, P * 5, '#2A2A3A');
+  // Hood body cream
+  drawPixelRect(ctx, hoodX, iy - P * 6, hoodW, P * 3, '#E8E0D0');
+  // Hood highlight top
+  drawPixelRect(ctx, hoodX + P, iy - P * 6, hoodW - P * 2, P, '#F5EFE5');
+  // Hood bottom accent
+  drawPixelRect(ctx, hoodX, iy - P * 3, hoodW, P, '#C8C0B0');
+  // Hood shadow line
+  drawPixelRect(ctx, hoodX, iy - P * 2, hoodW, P, '#8A8478');
+
+  // ── Tank frame (thick dark border around glass) ──
+  var frameT = P * 3; // frame thickness
+  // Top bar
+  drawPixelRect(ctx, ix - frameT, iy - P, tw + frameT * 2, frameT, '#1A1A2E');
+  // Bottom bar
+  drawPixelRect(ctx, ix - frameT, iy + th - P, tw + frameT * 2, frameT, '#1A1A2E');
+  // Left bar
+  drawPixelRect(ctx, ix - frameT, iy - P, frameT, th + frameT - P, '#1A1A2E');
+  // Right bar
+  drawPixelRect(ctx, ix + tw, iy - P, frameT, th + frameT - P, '#1A1A2E');
+
+  // Inner frame accent (lighter)
+  drawPixelRect(ctx, ix - P, iy + frameT - P * 2, P, th - frameT * 2 + P * 2, '#2A3A5E');
+  drawPixelRect(ctx, ix + tw - P, iy + frameT - P * 2, P, th - frameT * 2 + P * 2, '#2A3A5E');
+
+  // ── Wooden stand / cabinet ──
+  var standY = iy + th + frameT - P;
+  var standW = tw + frameT * 2;
+  var standX = ix - frameT;
+  var standH = P * 8;
+  // Stand top surface
+  drawPixelRect(ctx, standX - P, standY, standW + P * 2, P * 2, '#6B4D2E');
+  drawPixelRect(ctx, standX, standY, standW, P, '#A08060');
+  // Stand body
+  drawPixelRect(ctx, standX, standY + P * 2, standW, standH, '#5D3E1E');
+  // Wood grain detail
+  drawPixelRect(ctx, standX + P * 2, standY + P * 4, standW - P * 4, P, '#7B5D3E');
+  drawPixelRect(ctx, standX + P * 3, standY + P * 6, standW - P * 6, P, '#7B5D3E');
+  // Cabinet door line (center split)
+  drawPixelRect(ctx, standX + Math.round(standW / 2) - P / 2, standY + P * 3, P, standH - P * 3, '#4D2E0E');
+  // Knobs
+  var kY = standY + Math.round(standH / 2);
+  drawPixelRect(ctx, standX + Math.round(standW * 0.3), kY, P, P, '#C0A080');
+  drawPixelRect(ctx, standX + Math.round(standW * 0.7), kY, P, P, '#C0A080');
+  // Bottom edge
+  drawPixelRect(ctx, standX - P, standY + P * 2 + standH, standW + P * 2, P, '#3D1E0E');
+  // Feet
+  drawPixelRect(ctx, standX + P, standY + P * 3 + standH, P * 2, P * 2, '#4D2E0E');
+  drawPixelRect(ctx, standX + standW - P * 3, standY + P * 3 + standH, P * 2, P * 2, '#4D2E0E');
+
+  // Glass reflection
+  drawPixelRect(ctx, ix + P * 2, iy + P * 2, P, P * 4, 'rgba(255,255,255,0.2)');
+  drawPixelRect(ctx, ix + P * 3, iy + P, P, P * 3, 'rgba(255,255,255,0.15)');
+
+  addTablePixelArt(cw, ch, P, 2);
+}
+
+// ── Tier 3: Big professional tank with sleek frame ──────────────────────────
+
+function buildBigTankFrame(cw, ch, P) {
+  var tw = Math.round(cw * 0.92);
+  var th = Math.round(ch * 0.78);
+  var tx = Math.round(cw * 0.04);
+  var ty = Math.round(ch * 0.04);
+
+  var pad = P * 5;
+  var fw = tw + pad * 2;
+  var fh = th + P * 14;
+  var c = addFrameCanvas(fw, fh, {
+    left: (tx - pad) + 'px',
+    top: (ty - P * 4) + 'px'
+  });
+  var ctx = c.getContext('2d');
+  var ix = pad;
+  var iy = P * 4;
+
+  // ── Modern light bar ──
+  var barW = tw + P * 4;
+  var barX = ix - P * 2;
+  drawPixelRect(ctx, barX, iy - P * 4, barW, P * 3, '#1A2A3E');
+  drawPixelRect(ctx, barX + P, iy - P * 3, barW - P * 2, P, '#2A3A5E');
+  // LED indicators
+  drawPixelRect(ctx, barX + Math.round(barW * 0.4), iy - P * 4, P * 2, P, '#4FC3F7');
+  drawPixelRect(ctx, barX + Math.round(barW * 0.6), iy - P * 4, P * 2, P, '#4FC3F7');
+
+  // ── Frame ──
+  var frameT = P * 2;
+  drawPixelRect(ctx, ix - frameT, iy - P, tw + frameT * 2, frameT, '#0D0D1A');
+  drawPixelRect(ctx, ix - frameT, iy + th - P, tw + frameT * 2, frameT, '#0D0D1A');
+  drawPixelRect(ctx, ix - frameT, iy - P, frameT, th + frameT, '#0D0D1A');
+  drawPixelRect(ctx, ix + tw, iy - P, frameT, th + frameT, '#0D0D1A');
+  // Inner accent
+  drawPixelRect(ctx, ix - P, iy + P, P, th - P * 3, '#1A2A3E');
+  drawPixelRect(ctx, ix + tw - P, iy + P, P, th - P * 3, '#1A2A3E');
+
+  // ── Sleek stand ──
+  var standY = iy + th + frameT - P;
+  var standW = tw + frameT * 2;
+  var standX = ix - frameT;
+  drawPixelRect(ctx, standX - P, standY, standW + P * 2, P * 2, '#0D1A2E');
+  drawPixelRect(ctx, standX, standY, standW, P, '#1A2A3E');
+  drawPixelRect(ctx, standX, standY + P * 2, standW, P * 3, '#0D1A2E');
+  drawPixelRect(ctx, standX + P * 2, standY + P * 3, standW - P * 4, P, '#1A2A3E');
+  // Feet
+  drawPixelRect(ctx, standX + P, standY + P * 5, P * 3, P * 2, '#0D1A2E');
+  drawPixelRect(ctx, standX + standW - P * 4, standY + P * 5, P * 3, P * 2, '#0D1A2E');
+}
+
+// ── Table decorations per tier ──────────────────────────────────────────────
+
+function addTablePixelArt(cw, ch, P, tier) {
+  var c = document.createElement('canvas');
+  c.className = 'room-pixel-item';
+  c.width = cw; c.height = ch;
+  c.style.cssText = 'position:absolute;left:0;top:0;width:' + cw + 'px;height:' + ch + 'px;pointer-events:none;image-rendering:pixelated;z-index:3';
+  widgetContainer.appendChild(c);
+  var ctx = c.getContext('2d');
+
+  if (tier === 1) {
+    var tableY = Math.round(ch * 0.82);
+
+    // Window (upper left)
+    var wx = Math.round(cw * 0.04), wy = Math.round(ch * 0.04);
+    var ww = P * 7, wh = P * 9;
+    drawPixelRect(ctx, wx - P, wy - P, ww + P * 2, wh + P * 2, '#5D4037');
+    drawPixelRect(ctx, wx, wy, ww, wh, '#87CEEB');
+    drawPixelRect(ctx, wx + Math.round(ww / 2) - Math.round(P / 2), wy, P, wh, '#5D4037');
+    drawPixelRect(ctx, wx, wy + Math.round(wh / 2) - Math.round(P / 2), ww, P, '#5D4037');
+    drawPixelRect(ctx, wx + P, wy + P, Math.round(ww / 2) - P * 2, Math.round(wh / 2) - P * 2, '#AED8F0');
+    // Curtain accents
+    drawPixelRect(ctx, wx - P * 2, wy - P, P, wh + P * 2, '#D4A06A');
+    drawPixelRect(ctx, wx + ww + P, wy - P, P, wh + P * 2, '#D4A06A');
+    drawPixelRect(ctx, wx - P * 2, wy - P * 2, ww + P * 4 + P, P, '#C4905A');
+
+    // Books stack (left side of desk)
+    var bx = Math.round(cw * 0.06), by = tableY;
+    drawPixelRect(ctx, bx, by - P * 4, P * 8, P * 2, '#C62828');
+    drawPixelRect(ctx, bx + P, by - P * 4, P * 6, P, '#E53935');
+    drawPixelRect(ctx, bx + P, by - P * 7, P * 7, P * 2, '#1565C0');
+    drawPixelRect(ctx, bx + P * 2, by - P * 7, P * 5, P, '#1E88E5');
+    drawPixelRect(ctx, bx, by - P * 9, P * 8, P * 2, '#2E7D32');
+    drawPixelRect(ctx, bx + P, by - P * 9, P * 6, P, '#43A047');
+
+    // Coffee mug (right side)
+    var mx = Math.round(cw * 0.80), my = tableY;
+    drawPixelRect(ctx, mx, my - P * 6, P * 5, P * 6, '#E0E0E0');
+    drawPixelRect(ctx, mx + P, my - P * 5, P * 3, P * 4, '#F5F5F5');
+    drawPixelRect(ctx, mx + P * 5, my - P * 5, P * 2, P, '#BDBDBD');
+    drawPixelRect(ctx, mx + P * 5, my - P * 3, P * 2, P, '#BDBDBD');
+    drawPixelRect(ctx, mx + P * 6, my - P * 5, P, P * 3, '#BDBDBD');
+    drawPixelRect(ctx, mx + P, my - P * 6, P * 3, P, '#5D4037');
+
+    // Small potted plant (far right)
+    var px = Math.round(cw * 0.90), py = tableY;
+    drawPixelRect(ctx, px, py - P * 4, P * 4, P * 4, '#A1887F');
+    drawPixelRect(ctx, px + P, py - P * 3, P * 2, P * 2, '#795548');
+    drawPixelRect(ctx, px + P, py - P * 6, P * 2, P * 2, '#4CAF50');
+    drawPixelRect(ctx, px, py - P * 7, P, P * 2, '#66BB6A');
+    drawPixelRect(ctx, px + P * 3, py - P * 7, P, P * 2, '#43A047');
+    drawPixelRect(ctx, px + P, py - P * 8, P * 2, P, '#81C784');
+
+  } else if (tier === 2) {
+    var tableY = Math.round(ch * 0.78);
+
+    // Window (upper right)
+    var wx2 = Math.round(cw * 0.82), wy2 = Math.round(ch * 0.02);
+    var ww2 = P * 8, wh2 = P * 10;
+    drawPixelRect(ctx, wx2 - P, wy2 - P, ww2 + P * 2, wh2 + P * 2, '#4E342E');
+    drawPixelRect(ctx, wx2, wy2, ww2, wh2, '#90CAF9');
+    drawPixelRect(ctx, wx2 + Math.round(ww2 / 2) - Math.round(P / 2), wy2, P, wh2, '#4E342E');
+    drawPixelRect(ctx, wx2, wy2 + Math.round(wh2 / 2) - Math.round(P / 2), ww2, P, '#4E342E');
+    // Sky gradient in window
+    drawPixelRect(ctx, wx2 + P, wy2 + P, Math.round(ww2 / 2) - P * 2, Math.round(wh2 / 2) - P * 2, '#B3D9F7');
+    drawPixelRect(ctx, wx2 + Math.round(ww2 / 2) + P, wy2 + P, Math.round(ww2 / 2) - P * 2, Math.round(wh2 / 2) - P * 2, '#B3D9F7');
+
+    // Potted plant (left side)
+    var px2 = Math.round(cw * 0.03), py2 = tableY;
+    drawPixelRect(ctx, px2, py2 - P * 5, P * 6, P * 5, '#A1887F');
+    drawPixelRect(ctx, px2 + P, py2 - P * 4, P * 4, P * 3, '#8D6E63');
+    drawPixelRect(ctx, px2 + P * 2, py2 - P * 8, P * 2, P * 3, '#4CAF50');
+    drawPixelRect(ctx, px2 + P, py2 - P * 9, P, P * 2, '#66BB6A');
+    drawPixelRect(ctx, px2 + P * 4, py2 - P * 9, P, P * 2, '#388E3C');
+    drawPixelRect(ctx, px2 + P * 2, py2 - P * 10, P * 2, P, '#81C784');
+
+    // Photo frame (right side, above desk)
+    var fx = Math.round(cw * 0.87), fy = tableY;
+    drawPixelRect(ctx, fx, fy - P * 7, P * 6, P * 7, '#5D4037');
+    drawPixelRect(ctx, fx + P, fy - P * 6, P * 4, P * 5, '#795548');
+    drawPixelRect(ctx, fx + P, fy - P * 6, P * 4, P * 2, '#87CEEB');
+    drawPixelRect(ctx, fx + P * 2, fy - P * 4, P * 2, P, '#FFCCBC');
+    drawPixelRect(ctx, fx + P * 3, fy, P, P * 2, '#5D4037');
+    drawPixelRect(ctx, fx + P * 2, fy + P * 2, P * 3, P, '#5D4037');
+  }
+}
+
+// ── Bubbles, Snails ──────────────────────────────────────────────────────────
+
+function updateBubbles(dt) {
+  if (Math.random() < 0.02) bubbles.push({ x: rnd(10, W - 10), y: H - 15, speed: rnd(12, 25), size: rnd(1, 2.5), alpha: rnd(0.15, 0.4), wobble: Math.random() * 6.28 });
+  for (var i = bubbles.length - 1; i >= 0; i--) { var b = bubbles[i]; b.y -= b.speed * dt; b.wobble += dt * 2; b.x += Math.sin(b.wobble) * 0.3; if (b.y < -5) bubbles.splice(i, 1); }
+}
+
+function drawBubbles() {
+  for (var i = 0; i < bubbles.length; i++) { var b = bubbles[i]; ctx.beginPath(); ctx.arc(b.x, b.y, b.size, 0, 6.28); ctx.fillStyle = 'rgba(200,230,255,' + b.alpha + ')'; ctx.fill(); }
+}
+
+function initSnails() {
+  snailSprites = [];
+  var count = getActiveSnails();
+  if (!count) return;
+  for (var i = 0; i < count; i++) snailSprites.push({ x: rnd(15, W - 15), y: H - 10, vx: (Math.random() > 0.5 ? 1 : -1) * 3, fr: Math.random() > 0.5 });
+}
+
+function updateSnails(dt) {
+  for (var i = 0; i < snailSprites.length; i++) { var s = snailSprites[i]; s.x += s.vx * dt; if (s.x > W - 15) { s.x = W - 15; s.vx *= -1; s.fr = false; } if (s.x < 15) { s.x = 15; s.vx *= -1; s.fr = true; } }
+}
+
+function drawSnails() {
+  for (var si = 0; si < snailSprites.length; si++) { var s = snailSprites[si]; ctx.save(); ctx.translate(s.x, s.y); if (!s.fr) ctx.scale(-1, 1);
+    for (var r = 0; r < SNAIL_PX.length; r++) { for (var c = 0; c < SNAIL_PX[r].length; c++) { var v = SNAIL_PX[r][c]; if (!v) continue; ctx.fillStyle = v === 2 ? '#795548' : '#A1887F'; ctx.fillRect((c - 2) * PIXEL, (r - 2) * PIXEL, PIXEL, PIXEL); } }
+    ctx.restore(); }
+}
+
+// ── Dirt ──────────────────────────────────────────────────────────────────────
+
+function generateDirtMask() {
+  if (!dirtMaskCanvas) { dirtMaskCanvas = document.createElement('canvas'); dirtMaskCtx = dirtMaskCanvas.getContext('2d'); }
+  dirtMaskCanvas.width = W; dirtMaskCanvas.height = H;
+  dirtMaskCtx.clearRect(0, 0, W, H);
+  var dirt = 1 - (getActiveCleanliness() / 100);
+  if (dirt <= 0.05) { dirtMaskGenerated = true; return; }
+  var seed = (getActiveTier() * 1000) + Math.floor(getActiveCleanliness());
+  var s = seed;
+  function seededRnd() { s = (s * 16807 + 0) % 2147483647; return (s & 0x7fffffff) / 2147483647; }
+  // For tier 1 (fishbowl), clip dirt to circular bowl shape so corners stay clean
+  var isBowl = getActiveTier() === 1;
+  if (isBowl) {
+    dirtMaskCtx.save();
+    dirtMaskCtx.beginPath();
+    dirtMaskCtx.arc(W / 2, H / 2, Math.min(W, H) * 0.48, 0, 6.28);
+    dirtMaskCtx.clip();
+  }
+  // Light translucent base — visible on both light and dark backgrounds
+  dirtMaskCtx.fillStyle = 'rgba(120,140,80,' + (dirt * 0.35) + ')';
+  dirtMaskCtx.fillRect(0, 0, W, H);
+  // Edge grime
+  var edgeW = Math.max(8, W * 0.06 * dirt);
+  dirtMaskCtx.fillStyle = 'rgba(100,120,60,' + (dirt * 0.2) + ')';
+  dirtMaskCtx.fillRect(0, 0, edgeW, H); dirtMaskCtx.fillRect(W - edgeW, 0, edgeW, H); dirtMaskCtx.fillRect(0, 0, W, edgeW * 0.7);
+  // Scale blob count with canvas area so bigger tanks look equally dirty
+  var area = W * H;
+  var areaScale = Math.max(1, area / 25000);
+  var blobCount = Math.floor((25 + dirt * 35) * areaScale);
+  // Large algae blobs — clearly visible patches
+  for (var i = 0; i < blobCount; i++) { dirtMaskCtx.beginPath(); dirtMaskCtx.arc(seededRnd() * W, seededRnd() * H, 12 + seededRnd() * 40, 0, 6.28); dirtMaskCtx.fillStyle = 'rgba(90,115,55,' + (0.15 + seededRnd() * 0.2) + ')'; dirtMaskCtx.fill(); }
+  // Small grime speckles
+  for (var j = 0; j < blobCount * 2; j++) { dirtMaskCtx.fillStyle = 'rgba(130,150,80,' + (0.18 + seededRnd() * 0.15) + ')'; dirtMaskCtx.fillRect(seededRnd() * W, seededRnd() * H, 3 + seededRnd() * 6, 3 + seededRnd() * 6); }
+  if (isBowl) { dirtMaskCtx.restore(); }
+  dirtMaskGenerated = true;
+}
+
+function drawDirtOverlay() {
+  dirtCtx.clearRect(0, 0, W, H);
+  if (!gameState || !dirtMaskGenerated) return;
+  var dirt = 1 - (getActiveCleanliness() / 100);
+  if (dirt <= 0.05) return;
+  if (dirtMaskCanvas) dirtCtx.drawImage(dirtMaskCanvas, 0, 0);
+}
+
+function getWipeRadius() {
+  return Math.max(30, Math.min(W, H) * 0.12);
+}
+
+function wipeDirtAt(x, y) {
+  if (!dirtMaskCtx) return;
+  var r = getWipeRadius();
+  dirtMaskCtx.globalCompositeOperation = 'destination-out';
+  dirtMaskCtx.beginPath(); dirtMaskCtx.arc(x, y, r, 0, 6.28); dirtMaskCtx.fill();
+  dirtMaskCtx.globalCompositeOperation = 'source-over';
+  drawDirtOverlay();
+  cleanWipeCount++;
+  if (cleanWipeCount % 8 === 0 || cleanWipeCount <= 2) {
+    var remaining = estimateRemainingDirt();
+    cleanWipeProgress = cleanInitialDirt > 0 ? clamp((1 - remaining / cleanInitialDirt) * 100, 0, 100) : 100;
+    updateCleanBarLocal();
+    // Auto-complete when 95%+ done — remaining specks are too hard to find
+    if (cleanWipeProgress >= 95 || remaining < 0.02) {
+      cleanWipeProgress = 100;
+      dirtMaskCtx.clearRect(0, 0, dirtMaskCanvas.width, dirtMaskCanvas.height);
+      drawDirtOverlay();
+      updateCleanBarLocal();
+      finishCleaning(); setTool('none');
+    }
+  }
+}
+
+function estimateRemainingDirt() {
+  if (!dirtMaskCtx || !dirtMaskCanvas.width || !dirtMaskCanvas.height) return 0;
+  var step = 4;
+  var data = dirtMaskCtx.getImageData(0, 0, dirtMaskCanvas.width, dirtMaskCanvas.height);
+  var w = data.width, h = data.height, d = data.data;
+  var dirty = 0, total = 0;
+  for (var y = 0; y < h; y += step) {
+    for (var x = 0; x < w; x += step) {
+      var idx = (y * w + x) * 4;
+      total++;
+      if (d[idx + 3] > 10) dirty++;
+    }
+  }
+  return total > 0 ? dirty / total : 0;
+}
+
+function updateCleanBarLocal() {
+  var displayClean = cleanStartCleanliness + (100 - cleanStartCleanliness) * (cleanWipeProgress / 100);
+  var fill = document.querySelector('#cleanBar .hud-bar-fill');
+  if (fill) fill.style.width = clamp(displayClean, 0, 100) + '%';
+  var lbl = document.getElementById('cleanDockLabel');
+  if (lbl) lbl.textContent = cleanWipeProgress > 0 ? ('\u{1F9F9} ' + Math.round(cleanWipeProgress) + '% cleaned') : '\u{1F9F9} Wipe to clean!';
+}
+
+function finishCleaning() {
+  if (cleanWipeProgress <= 0) return;
+  var rawPct = Math.round(cleanWipeProgress);
+  // Full credit for completing (95%+ auto-completes to 100)
+  // Half credit for quitting early — incentivise finishing the job
+  var completed = rawPct >= 100;
+  var effectivePct = completed ? rawPct : Math.round(rawPct * 0.5);
+  cleanFinishedFull = completed;
+  doAction('clean', { percentCleaned: effectivePct });
+  cleanWipeProgress = 0;
+  cleanWipeCount = 0;
+}
+
+function redrawDirt() {
+  if (currentTool !== 'clean') { dirtMaskGenerated = false; generateDirtMask(); drawDirtOverlay(); }
+}
+
+// ── Fish sprites & physics ───────────────────────────────────────────────────
+
+function initFishSprites() {
+  fishSprites = [];
+  var fish = getActiveFish();
+  if (!fish || fish.length === 0) return;
+  var zones = { top: { min: 0.08, max: 0.35 }, middle: { min: 0.25, max: 0.70 }, bottom: { min: 0.60, max: 0.88 }, everywhere: { min: 0.1, max: 0.9 } };
+  for (var fi = 0; fi < fish.length; fi++) {
+    var f = fish[fi];
+    var z = zones[f.zone] || zones.middle;
+    fishSprites.push({ id: f.id, x: rnd(20, W - 20), y: rnd(z.min * H, z.max * H), vx: 0, vy: 0, right: Math.random() > 0.5, zone: z, t: Math.random() * 8, dartPause: 0, circAngle: Math.random() * 6.28, circCenter: { x: W / 2, y: H / 2 }, schoolOff: { x: rnd(-30, 30), y: rnd(-25, 25) }, selected: false, wigglePhase: 0 });
+  }
+}
+
+function sizeScale(speciesId) {
+  var sc = SPECIES[speciesId] ? SPECIES[speciesId].spaceCost : 1;
+  if (sc <= 1) return 0.7; if (sc >= 4) return 1.4; if (sc >= 3) return 1.15; return 1.0;
+}
+
+var MAX_TURN_RATE = 120;
+
+function approach(current, target, maxDelta) {
+  var diff = target - current;
+  if (Math.abs(diff) <= maxDelta) return target;
+  return current + (diff > 0 ? 1 : -1) * maxDelta;
+}
+
+function updateFish(dt) {
+  if (!gameState) return;
+  var fish = getActiveFish();
+  schoolAnchor.timer += dt;
+  schoolAnchor.x += schoolAnchor.vx * dt; schoolAnchor.y += schoolAnchor.vy * dt;
+  if (schoolAnchor.x < 60 || schoolAnchor.x > W - 60) schoolAnchor.vx *= -1;
+  if (schoolAnchor.y < 60 || schoolAnchor.y > H - 60) schoolAnchor.vy *= -1;
+  schoolAnchor.x = clamp(schoolAnchor.x, 60, W - 60); schoolAnchor.y = clamp(schoolAnchor.y, 60, H - 60);
+  if (Math.random() < 0.04) { schoolAnchor.vx += rnd(-6, 6); schoolAnchor.vy += rnd(-3, 3); }
+
+  for (var idx = 0; idx < fishSprites.length; idx++) {
+    var sp = fishSprites[idx];
+    var fData = null;
+    for (var fi2 = 0; fi2 < fish.length; fi2++) { if (fish[fi2].id === sp.id) { fData = fish[fi2]; break; } }
+    if (!fData) continue;
+
+    if (sp.selected) { sp.wigglePhase += dt * 18; updateBubblePosition(sp); continue; }
+
+    var baseSpeed = (fData.weak ? 0.4 : 1.0) * 25;
+    var hungerMult = fData.hunger < 70 ? lerp(1.5, 2.5, 1 - fData.hunger / 70) : 1.0;
+    sp.t += dt;
+    var wantVx = 0, wantVy = 0;
+
+    if (currentTool === 'laser') {
+      var ldx = laserPos.x - sp.x, ldy = laserPos.y - sp.y, ldist = Math.hypot(ldx, ldy);
+      if (ldist > 5) { wantVx = (ldx / ldist) * 70; wantVy = (ldy / ldist) * 70; }
+    } else if (foodObjects.length > 0 && fData.hunger < 85) {
+      var nearest = null, nd = Infinity;
+      var favPri = FOOD_PRIORITY[fData.favoriteFoodId] || 1;
+      for (var foi = 0; foi < foodObjects.length; foi++) { var foPri = FOOD_PRIORITY[foodObjects[foi].type] || 1; if (foPri < favPri) continue; var d = Math.hypot(foodObjects[foi].x - sp.x, foodObjects[foi].y - sp.y); if (d < nd) { nd = d; nearest = foodObjects[foi]; } }
+      if (nearest) { var fdx = nearest.x - sp.x, fdy = nearest.y - sp.y; var fspd = baseSpeed * hungerMult * 1.5; wantVx = (fdx / nd) * fspd; wantVy = (fdy / nd) * fspd; }
+      else { var sv = getSwimVelocity(sp, fData, baseSpeed); wantVx = sv.vx; wantVy = sv.vy; }
+    } else {
+      var sv2 = getSwimVelocity(sp, fData, baseSpeed); wantVx = sv2.vx; wantVy = sv2.vy;
+    }
+
+    var steerRate = MAX_TURN_RATE * dt;
+    sp.vx = approach(sp.vx, wantVx, steerRate); sp.vy = approach(sp.vy, wantVy, steerRate);
+    var spd = Math.hypot(sp.vx, sp.vy); var maxSpd = baseSpeed * hungerMult * 2;
+    if (spd > maxSpd) { sp.vx = sp.vx / spd * maxSpd; sp.vy = sp.vy / spd * maxSpd; }
+    if (Math.abs(sp.vx) > 1) sp.right = sp.vx > 0;
+    sp.x += sp.vx * dt; sp.y += sp.vy * dt;
+    if (sp.x > W - 12) { sp.right = false; sp.x = W - 12; sp.vx *= -0.5; }
+    if (sp.x < 12) { sp.right = true; sp.x = 12; sp.vx *= -0.5; }
+    if (sp.y < sp.zone.min * H) sp.vy += 18 * dt;
+    if (sp.y > sp.zone.max * H) sp.vy -= 18 * dt;
+    sp.y = clamp(sp.y, 5, H - 5);
+    if (fData.swimPattern !== 'circle' && fData.swimPattern !== 'school' && Math.random() < 0.001) sp.right = !sp.right;
+  }
+}
+
+function getSwimVelocity(sp, fish, speed) {
+  var vx = 0, vy = 0;
+  switch (fish.swimPattern) {
+    case 'school': var tx = schoolAnchor.x + sp.schoolOff.x, ty = schoolAnchor.y + sp.schoolOff.y; vx = (tx - sp.x) * 1.5; vy = (ty - sp.y) * 1.5; var m = Math.hypot(vx, vy); if (m > speed * 1.2) { vx = vx / m * speed * 1.2; vy = vy / m * speed * 1.2; } break;
+    case 'drift': vx = (sp.right ? 1 : -1) * speed * 0.6; vy = Math.sin(sp.t * 0.8) * 6; break;
+    case 'dart': if (sp.dartPause > 0) { sp.dartPause -= 0; vx = sp.vx * 0.9; vy = sp.vy * 0.9; } else { vx = (sp.right ? 1 : -1) * speed * 1.3; vy = Math.sin(sp.t * 2) * speed * 0.3; if (Math.random() < 0.02) sp.dartPause = rnd(1, 2.5); } break;
+    case 'glide': vx = (sp.right ? 1 : -1) * speed * 0.8; vy = Math.sin(sp.t * 0.5) * 12; break;
+    case 'circle': if (sp.t < 0.1) sp.circCenter = { x: sp.x, y: sp.y }; sp.circAngle += 0.016 * 0.6 * (fish.weak ? 0.4 : 1); var rad = 30 + Math.sin(sp.t * 0.2) * 10; var cx = sp.circCenter.x + Math.cos(sp.circAngle) * rad; var cy = sp.circCenter.y + Math.sin(sp.circAngle) * rad; vx = (cx - sp.x) * 2; vy = (cy - sp.y) * 2; sp.circCenter.x += (W / 2 - sp.circCenter.x) * 0.016 * 0.05; break;
+    case 'zigzag': vx = (sp.right ? 1 : -1) * speed * 0.7; vy = Math.sin(sp.t * 3) * speed * 0.5; break;
+    default: vx = (sp.right ? 1 : -1) * speed * 0.5; vy = Math.sin(sp.t) * 5;
+  }
+  return { vx: vx, vy: vy };
+}
+
+function drawFish() {
+  if (!gameState) return;
+  var fish = getActiveFish();
+  for (var idx = 0; idx < fishSprites.length; idx++) {
+    var sp = fishSprites[idx]; var fData = null;
+    for (var fi2 = 0; fi2 < fish.length; fi2++) { if (fish[fi2].id === sp.id) { fData = fish[fi2]; break; } }
+    if (!fData) continue;
+    var art = FISH_PX[fData.speciesId]; if (!art) continue;
+    var sc = PIXEL * (fData.sizeVariance || 1) * sizeScale(fData.speciesId);
+    var bodyC = (fData.color && fData.color.body) ? fData.color.body : '#FF7043';
+    var tailC = (fData.color && fData.color.tail) ? fData.color.tail : '#FFB74D';
+    var weakA = fData.weak ? 0.45 : 1.0;
+    ctx.save();
+    if (sp.selected) { ctx.translate(sp.x + Math.sin(sp.wigglePhase) * 3, sp.y + Math.cos(sp.wigglePhase * 0.7) * 2); }
+    else { ctx.translate(sp.x, sp.y); }
+    if (!sp.right) ctx.scale(-1, 1);
+    if (sp.selected) { ctx.shadowBlur = 10; ctx.shadowColor = 'rgba(255,255,200,0.5)'; }
+    ctx.globalAlpha = weakA;
+    for (var r = 0; r < art.px.length; r++) { for (var c = 0; c < art.px[r].length; c++) { var v = art.px[r][c]; if (!v) continue; ctx.fillStyle = v === 1 ? bodyC : tailC; ctx.fillRect((c - art.w / 2) * sc, (r - art.h / 2) * sc, sc, sc); } }
+    ctx.fillStyle = '#111'; ctx.fillRect((art.eye[1] - art.w / 2) * sc, (art.eye[0] - art.h / 2) * sc, sc * 0.6, sc * 0.6);
+    if (fData.weak) { ctx.globalAlpha = 0.6; ctx.fillStyle = '#FFAB91'; ctx.beginPath(); ctx.arc(0, -art.h / 2 * sc - 5, 3, 0, 6.28); ctx.fill(); }
+    ctx.shadowBlur = 0; ctx.restore();
+  }
+}
+
+// ── Food ─────────────────────────────────────────────────────────────────────
+
+function spawnFood(x, y) {
+  if (!gameState) return;
+  var type = selectedFoodId;
+  var stock = gameState.foodStock[type] || 0;
+  if (stock <= 0) { showToast('Out of stock!'); return; }
+  gameState.foodStock[type]--;
+  renderToolDock();
+  doAction('feed', { foodId: type }).catch(function() { gameState.foodStock[type]++; renderToolDock(); });
+  foodObjects.push({ id: Date.now() + Math.random(), type: type, x: x, y: y, vx: rnd(-0.8, 0.8), vy: rnd(0.4, 0.8), life: 800, color: FOOD_COLORS[type] || '#d4a373', size: type === 'pellets' ? 4 : 3 });
+}
+
+function updateFood(dt) {
+  for (var i = foodObjects.length - 1; i >= 0; i--) { var f = foodObjects[i]; f.y += f.vy; f.x += f.vx; f.vx *= 0.96; f.vy = Math.min(f.vy + 0.02, 1.8); if (f.y > H - 18) { f.y = H - 18; f.vy = 0; f.life -= 3; } f.life--; if (f.life <= 0) foodObjects.splice(i, 1); }
+}
+
+function drawFood() {
+  for (var i = 0; i < foodObjects.length; i++) { var f = foodObjects[i]; ctx.fillStyle = f.color; ctx.beginPath(); ctx.arc(f.x, f.y, f.size, 0, 6.28); ctx.fill(); ctx.fillStyle = 'rgba(255,255,255,0.25)'; ctx.beginPath(); ctx.arc(f.x - 1, f.y - 1, f.size * 0.4, 0, 6.28); ctx.fill(); }
+}
+
+function checkFoodConsumption() {
+  var fish = getActiveFish();
+  if (!fish || fish.length === 0 || foodObjects.length === 0) return;
+  for (var fi = foodObjects.length - 1; fi >= 0; fi--) { var fo = foodObjects[fi];
+    for (var si = 0; si < fishSprites.length; si++) { var sp = fishSprites[si]; if (sp.selected) continue;
+      var fData = null; for (var fi2 = 0; fi2 < fish.length; fi2++) { if (fish[fi2].id === sp.id) { fData = fish[fi2]; break; } }
+      if (!fData || fData.hunger >= 98) continue;
+      var favPri = FOOD_PRIORITY[fData.favoriteFoodId] || 1;
+      var foPri = FOOD_PRIORITY[fo.type] || 1;
+      if (foPri < favPri) continue;
+      var dist = Math.hypot(fo.x - sp.x, fo.y - sp.y);
+      if (dist < 15) { foodObjects.splice(fi, 1); doAction('fish_consume', { fishId: fData.id, foodId: fo.type }); var rect = canvas.getBoundingClientRect(); var sx = rect.width / W; floatText(sp.x * sx, sp.y * (rect.height / H) - 15, '+XP'); break; }
+    }
+  }
+}
+
+// ── Laser ────────────────────────────────────────────────────────────────────
+
+function drawLaser(dt) {
+  if (currentTool !== 'laser') return;
+  ctx.save(); ctx.shadowBlur = 10; ctx.shadowColor = '#ff0000'; ctx.fillStyle = '#ff0000';
+  ctx.beginPath(); ctx.arc(laserPos.x, laserPos.y, 4, 0, 6.28); ctx.fill(); ctx.shadowBlur = 0; ctx.restore();
+  laserTimer += dt; if (laserTimer > 2) { laserTimer = 0; doAction('laser_pointer'); }
+}
+
+// ── HUD ──────────────────────────────────────────────────────────────────────
+
+function updateHUD() {
+  if (!gameState) return;
+  $('coinCount').textContent = Math.floor(gameState.coins);
+  $('cleanBar').style.width = getActiveCleanliness() + '%';
+  var fish = getActiveFish();
+  var avgH = fish.length > 0 ? fish.reduce(function(s, f) { return s + f.hunger; }, 0) / fish.length : 100;
+  $('hungerBar').style.width = Math.round(avgH) + '%';
+}
+
+// ── Menu & Panel management ──────────────────────────────────────────────────
+
+function toggleMenu() {
+  menuOpen = !menuOpen;
+  $('menuOverlay').classList.toggle('visible', menuOpen);
+  $('fab').classList.toggle('open', menuOpen);
+  if (menuOpen) closeFishBubble();
+  var lb = $('laserBtn');
+  lb.classList.toggle('locked', !tankInfo || !tankInfo.features || tankInfo.features.indexOf('laser') === -1);
+}
+
+function openPanel(id) {
+  closeAllPanels(); closeMenu(); setTool('none');
+  var panel = $(id); if (!panel) return;
+  panel.classList.add('visible');
+  if (id === 'storePanel') buildStorePanel();
+  else if (id === 'upgradesPanel') buildUpgradesPanel();
+  else if (id === 'inventoryPanel') buildInventoryPanel();
+  else if (id === 'tanksPanel') buildTanksPanel();
+  else if (id === 'helpPanel') buildHelpPanel();
+}
+
+function closeAllPanels() { var panels = document.querySelectorAll('.panel'); for (var i = 0; i < panels.length; i++) panels[i].classList.remove('visible'); }
+function closeMenu() { menuOpen = false; $('menuOverlay').classList.remove('visible'); $('fab').classList.remove('open'); }
+
+function closeFishBubble() {
+  for (var i = 0; i < fishSprites.length; i++) fishSprites[i].selected = false;
+  selectedFishId = null; $('fishBubble').classList.remove('visible');
+}
+
+// ── Tool modes & dock ────────────────────────────────────────────────────────
+
+function setTool(mode) {
+  if (currentTool === 'clean' && mode !== 'clean') finishCleaning();
+  tankWrap.classList.remove('tool-feed', 'tool-clean', 'tool-laser', 'cleaning');
+  currentTool = mode; laserTimer = 0;
+  if (mode === 'feed') { tankWrap.classList.add('tool-feed'); showToast('Tap tank to drop food!'); }
+  else if (mode === 'clean') {
+    if (getActiveCleanliness() >= 95) { showToast('Tank is already sparkling clean!'); currentTool = 'none'; updateBottomBar(); if (menuOpen) closeMenu(); return; }
+    tankWrap.classList.add('tool-clean', 'cleaning');
+    cleanStartCleanliness = getActiveCleanliness();
+    cleanWipeCount = 0; cleanWipeProgress = 0; cleanFinishedFull = false;
+    dirtMaskGenerated = false; generateDirtMask(); drawDirtOverlay();
+    cleanInitialDirt = estimateRemainingDirt();
+    showToast('Wipe to clean!');
+  }
+  else if (mode === 'laser') { tankWrap.classList.add('tool-laser'); showToast('Drag to play with fish!'); }
+  if (menuOpen) closeMenu();
+  updateBottomBar();
+}
+
+function renderToolDock() {
+  var dock = $('toolDock');
+  dock.innerHTML = '';
+
+  if (currentTool === 'feed') {
+    var foods = ['flakes', 'pellets', 'premium_flakes'];
+    for (var i = 0; i < foods.length; i++) {
+      (function(id) {
+        var count = (gameState && gameState.foodStock) ? (gameState.foodStock[id] || 0) : 0;
+        var el = document.createElement('div');
+        el.className = 'dock-item' + (selectedFoodId === id ? ' selected' : '') + (count <= 0 ? ' disabled' : '');
+        el.innerHTML = '<div class="dock-icon">' + (FOOD_ICONS[id] || '') + '</div><div class="dock-count">' + count + '</div>';
+        el.onclick = function(e) { e.stopPropagation(); if (count > 0) { selectedFoodId = id; renderToolDock(); } else showToast('Out of stock!'); };
+        dock.appendChild(el);
+      })(foods[i]);
+    }
+  } else if (currentTool === 'clean') {
+    var lbl = document.createElement('div');
+    lbl.className = 'dock-label';
+    lbl.id = 'cleanDockLabel';
+    lbl.textContent = cleanWipeProgress > 0 ? ('\u{1F9F9} ' + Math.round(cleanWipeProgress) + '% cleaned') : '\u{1F9F9} Wipe to clean!';
+    dock.appendChild(lbl);
+  } else if (currentTool === 'laser') {
+    var lbl2 = document.createElement('div');
+    lbl2.className = 'dock-label';
+    lbl2.textContent = '\u{1F534} Playing...';
+    dock.appendChild(lbl2);
+  }
+
+  var close = document.createElement('div');
+  close.className = 'dock-close'; close.innerHTML = '&times;';
+  close.onclick = function(e) { e.stopPropagation(); setTool('none'); };
+  dock.appendChild(close);
+}
+
+function updateBottomBar() {
+  var navEl = $('tankNav');
+  var dockEl = $('toolDock');
+
+  if (currentTool !== 'none') {
+    navEl.style.display = 'none';
+    dockEl.classList.add('visible');
+    renderToolDock();
+  } else {
+    dockEl.classList.remove('visible');
+    dockEl.innerHTML = '';
+    if (gameState && gameState.unlockedTanks && gameState.unlockedTanks.length > 1) {
+      navEl.style.display = 'flex';
+      updateTankNav();
+    } else {
+      navEl.style.display = 'none';
+    }
+  }
+}
+
+function updateTankNav() {
+  if (!gameState) return;
+  var tanks = gameState.unlockedTanks;
+  var idx = tanks.indexOf(gameState.activeTankId);
+  $('tnLabel').textContent = tankInfo ? tankInfo.name : ('Tank ' + gameState.activeTankId);
+  $('tnPrev').disabled = idx <= 0;
+  $('tnNext').disabled = idx >= tanks.length - 1;
+}
+
+function switchTankDir(dir) {
+  if (!gameState) return;
+  var tanks = gameState.unlockedTanks;
+  var idx = tanks.indexOf(gameState.activeTankId);
+  var newIdx = idx + dir;
+  if (newIdx < 0 || newIdx >= tanks.length) return;
+  doAction('switch_tank', { tankId: tanks[newIdx] });
+}
+
+// ── Store panel ──────────────────────────────────────────────────────────────
+
+function buildStorePanel() {
+  var list = $('storeList'); list.innerHTML = '';
+  if (!storeCatalog) return;
+  var used = getUsedSpace(); var cap = getSpaceCapacity();
+  $('storeCap').textContent = '(' + used + '/' + cap + ' space)';
+
+  appendTitle(list, 'Fish');
+  for (var i = 0; i < storeCatalog.fish.length; i++) {
+    (function(sp) {
+      var spCost = SPECIES[sp.speciesId] ? SPECIES[sp.speciesId].spaceCost : 1;
+      var canAfford = gameState.coins >= sp.price;
+      var hasSpace = used + spCost <= cap;
+      var canBuy = !sp.locked && canAfford && hasSpace;
+      var desc = sp.baseCoinPerHour.toFixed(1) + ' coins/hr \u00B7 \u25C6' + spCost + (sp.locked ? ' \u00B7 Requires Tier ' + sp.requiredTier : '');
+      var item = mkItem(sp.name, desc, sp.price, canBuy, sp.locked);
+      if (!sp.locked) {
+        var btn = item.querySelector('.buy-btn');
+        if (!hasSpace && canAfford) { btn.disabled = true; btn.textContent = 'Full'; }
+        btn.onclick = function() {
+          if (!hasSpace) { showToast('Tank is full (' + used + '/' + cap + ').'); return; }
+          doAction('buy_fish', { speciesId: sp.speciesId });
+        };
+      }
+      list.appendChild(item);
+    })(storeCatalog.fish[i]);
+  }
+
+  appendTitle(list, 'Food');
+  for (var j = 0; j < storeCatalog.foods.length; j++) {
+    (function(food) {
+      var canBuy = gameState.coins >= food.price * 5;
+      var stock = gameState.foodStock[food.foodId] || 0;
+      var item = mkItem(food.name, '+' + food.hungerRestore + ' hunger \u00B7 Stock: ' + stock, food.price * 5, canBuy, false, 'Buy x5');
+      item.querySelector('.buy-btn').onclick = function() { doAction('buy_food', { foodId: food.foodId, quantity: 5 }); };
+      list.appendChild(item);
+    })(storeCatalog.foods[j]);
+  }
+
+  if (storeCatalog.decorations && storeCatalog.decorations.length > 0) {
+    appendTitle(list, 'Decorations');
+    for (var k = 0; k < storeCatalog.decorations.length; k++) {
+      (function(dec) {
+        var canBuy = gameState.coins >= dec.price;
+        var item = mkItem(dec.name, 'Sell value: ' + dec.sellValue + ' coins', dec.price, canBuy, false);
+        item.querySelector('.buy-btn').onclick = function() { doAction('buy_decoration', { decorationType: dec.decorationId }); };
+        list.appendChild(item);
+      })(storeCatalog.decorations[k]);
+    }
+  }
+}
+
+// ── Upgrades panel ───────────────────────────────────────────────────────────
+
+function buildUpgradesPanel() {
+  var list = $('upgradesList'); list.innerHTML = '';
+  if (!upgradesCatalog) return;
+
+  if (upgradesCatalog.snails) {
+    appendTitle(list, 'Snails');
+    var s = upgradesCatalog.snails;
+    var sItem = mkItem('Snail (' + s.current + '/' + s.max + ')', 'Eats algae, reduces dirt by 15%', s.price, s.canBuy, false);
+    sItem.querySelector('.buy-btn').onclick = function() { doAction('buy_snail'); };
+    list.appendChild(sItem);
+  }
+
+  if (upgradesCatalog.upgrades && upgradesCatalog.upgrades.length > 0) {
+    appendTitle(list, 'Equipment');
+    for (var i = 0; i < upgradesCatalog.upgrades.length; i++) {
+      (function(upg) {
+        var label = upg.icon + ' ' + upg.name + ' (Lv.' + upg.currentLevel + ' \u2192 ' + (upg.currentLevel + 1) + ')';
+        var item = mkItem(label, upg.nextDescription, upg.nextPrice, upg.canBuy, upg.locked);
+        if (upg.locked) { item.querySelector('.s-desc').textContent += ' \u00B7 Requires Tier ' + upg.requiredTier; }
+        else if (upg.canBuy) { item.querySelector('.buy-btn').onclick = function() { doAction('buy_upgrade', { upgradeId: upg.id }); }; }
+        list.appendChild(item);
+      })(upgradesCatalog.upgrades[i]);
+    }
+  }
+
+  if (upgradesCatalog.allMaxed) {
+    list.innerHTML += '<div style="text-align:center;color:rgba(255,255,255,0.5);padding:20px">All upgrades purchased!</div>';
+  }
+}
+
+// ── Inventory panel ──────────────────────────────────────────────────────────
+
+function buildInventoryPanel() {
+  var list = $('inventoryList'); list.innerHTML = '';
+  if (!gameState) return;
+
+  appendTitle(list, 'Food Stock');
+  if (storeCatalog && storeCatalog.foods) {
+    for (var i = 0; i < storeCatalog.foods.length; i++) {
+      var food = storeCatalog.foods[i]; var stock = gameState.foodStock[food.foodId] || 0;
+      var d = document.createElement('div'); d.className = 's-item';
+      d.innerHTML = '<div class="s-info"><div class="s-name">' + (FOOD_ICONS[food.foodId] || '') + ' ' + food.name + '</div><div class="s-desc">+' + food.hungerRestore + ' hunger per use</div></div><div class="inv-count">' + stock + '</div>';
+      list.appendChild(d);
+    }
+  }
+
+  var fish = getActiveFish();
+  var used = getUsedSpace(); var cap = getSpaceCapacity();
+  appendTitle(list, 'Fish in Tank (' + used + '/' + cap + ' space)');
+  for (var j = 0; j < fish.length; j++) {
+    (function(f) {
+      var ls = lifeStage(f); var sp = SPECIES[f.speciesId];
+      var d2 = document.createElement('div'); d2.className = 's-item';
+      var infoHtml = '<div class="s-info"><div class="s-name">' + f.name + ' \u00B7 ' + (sp ? sp.name : f.speciesId) + '</div>'
+        + '<div class="s-desc">' + ls.emoji + ' ' + ls.stage + ' \u00B7 ' + ageStr(f) + ' \u00B7 Lv.' + f.level + ' \u00B7 \u25C6' + (sp ? sp.spaceCost : 1) + (f.weak ? ' \u00B7 Weak' : '') + '</div></div>';
+      var btnsHtml = '<div class="s-right" style="flex-direction:column;gap:3px;align-items:flex-end">';
+      btnsHtml += '<div style="width:40px;height:4px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden"><div style="width:' + f.hunger + '%;height:100%;background:' + (f.hunger > 30 ? '#81C784' : '#FFAB91') + ';border-radius:2px"></div></div>';
+      // Move buttons for other unlocked tanks
+      var moveBtns = '';
+      if (gameState.unlockedTanks.length > 1 && fish.length > 1) {
+        for (var ti = 0; ti < gameState.unlockedTanks.length; ti++) {
+          var otherTid = gameState.unlockedTanks[ti];
+          if (otherTid === gameState.activeTankId) continue;
+          if (sp && sp.tier > otherTid) continue;
+          var tName = otherTid === 1 ? 'Bowl' : otherTid === 2 ? 'Mini' : 'Big';
+          moveBtns += '<button class="move-btn" data-fish="' + f.id + '" data-to="' + otherTid + '">\u2192 ' + tName + '</button>';
+        }
+      }
+      btnsHtml += '</div>';
+      d2.innerHTML = infoHtml + btnsHtml;
+      if (moveBtns) {
+        var mbDiv = document.createElement('div');
+        mbDiv.style.cssText = 'display:flex;gap:3px;margin-top:3px;flex-wrap:wrap;width:100%';
+        mbDiv.innerHTML = moveBtns;
+        d2.appendChild(mbDiv);
+      }
+      list.appendChild(d2);
+    })(fish[j]);
+  }
+
+  // Move button handlers
+  list.addEventListener('click', function(e) {
+    var mb = e.target.closest('.move-btn');
+    if (!mb) return;
+    var fishId = mb.dataset.fish;
+    var toTankId = parseInt(mb.dataset.to, 10);
+    doAction('move_fish', { fishId: fishId, toTankId: toTankId });
+  });
+
+  // Decorations in this tank
+  var decos = getActiveDecorations();
+  if (decos && decos.length > 0) {
+    appendTitle(list, 'Decorations');
+    for (var k = 0; k < decos.length; k++) {
+      (function(dec) {
+        var d3 = document.createElement('div'); d3.className = 's-item';
+        var decName = dec.type.replace(/_/g, ' ').replace(/\b\w/g, function(c) { return c.toUpperCase(); });
+        d3.innerHTML = '<div class="s-info"><div class="s-name">' + decName + '</div></div>'
+          + '<div class="s-right"><button class="sell-btn" data-decid="' + dec.id + '">Sell</button></div>';
+        d3.querySelector('.sell-btn').onclick = function() { doAction('sell_decoration', { decorationId: dec.id }); };
+        list.appendChild(d3);
+      })(decos[k]);
+    }
+  }
+}
+
+// ── Tanks panel ──────────────────────────────────────────────────────────────
+
+function buildTanksPanel() {
+  var list = $('tanksList'); list.innerHTML = '';
+  if (!tanksListData) return;
+
+  for (var i = 0; i < tanksListData.length; i++) {
+    (function(t) {
+      var d = document.createElement('div');
+      d.className = 's-item' + (t.isActive ? ' active-tank' : '');
+
+      var desc = '';
+      if (t.unlocked) {
+        desc = t.fishCount + ' fish \u00B7 ' + t.usedSpace + '/' + t.spaceCapacity + ' space';
+      } else if (!t.meetsRequirements) {
+        desc = t.requirementsDesc || 'Requirements not met';
+      } else {
+        desc = 'Ready to unlock!';
+      }
+
+      var btnHtml = '';
+      if (t.isActive) {
+        btnHtml = '<span style="color:#4FC3F7;font-size:10px;font-weight:700">Current</span>';
+      } else if (t.unlocked) {
+        btnHtml = '<button class="buy-btn">Switch</button>';
+      } else {
+        btnHtml = '<div class="s-price"><div class="coin-icon-sm"></div>' + t.unlockPrice + '</div>'
+          + '<button class="buy-btn"' + (!t.canUnlock ? ' disabled' : '') + '>' + (t.meetsRequirements ? 'Unlock' : 'Locked') + '</button>';
+      }
+
+      d.innerHTML = '<div class="s-info"><div class="s-name">' + t.name + '</div><div class="s-desc">' + desc + '</div></div>'
+        + '<div class="s-right">' + btnHtml + '</div>';
+
+      var btn = d.querySelector('.buy-btn');
+      if (btn && !btn.disabled) {
+        if (t.unlocked && !t.isActive) {
+          btn.onclick = function() { doAction('switch_tank', { tankId: t.tankId }); closeAllPanels(); };
+        } else if (!t.unlocked && t.canUnlock) {
+          btn.onclick = function() { doAction('unlock_tank', { tankId: t.tankId }); };
+        }
+      }
+
+      list.appendChild(d);
+    })(tanksListData[i]);
+  }
+}
+
+// ── Help panel ───────────────────────────────────────────────────────────────
+
+function buildHelpPanel() {
+  $('helpBody').innerHTML = ''
+    + helpSec('Overview', 'Create your own slice of tranquility! Feed your fish, keep the tank clean, and unlock bigger tanks with more species.')
+    + helpSec('Multiple Tanks', 'Start with a fishbowl, then unlock the small aquarium and big tank. Each tank has its own fish and upgrades. Switch using the arrows at the bottom or the Tanks panel.')
+    + helpSec('Feeding Tool', 'Open the menu and tap Feed. Select a food type from the dock, then tap inside the tank to drop food. Fish will swim to it!')
+    + helpSec('Cleaning Tool', 'Tap Clean, then swipe across the tank to wipe away algae. Tap the close button when done.')
+    + helpSec('Laser Pointer', 'Available in Big Tank. Drag to move the red dot. Rewards once every 6 hours. Tap close to stop.')
+    + helpSec('Decorations', 'Buy decorations in the Store to customize your tanks. Sell them from the Inventory panel.')
+    + helpSec('Fish Movement', 'Move fish between tanks from the Inventory panel. Species must be compatible with the target tank tier.')
+    + helpSec('Space Cost', 'Each species uses different space: Guppies 1, Goldfish 2, Neon Tetras 1, Bettas 2, Clownfish 3, Angelfish 4.')
+    + helpSec('Upgrades', 'Filter reduces dirt. Auto-Feeder feeds fish automatically. Food Silo increases storage. Snails eat algae.')
+    + helpSec('Reset', '<button class="reset-btn" onclick="confirmReset()">Reset All Progress</button>');
+}
+
+function helpSec(title, body) { return '<div class="help-sec"><div class="help-sec-t">' + title + '</div><p>' + body + '</p></div>'; }
+function appendTitle(parent, text) { var t = document.createElement('div'); t.className = 'sec-title'; t.textContent = text; parent.appendChild(t); }
+function mkItem(name, desc, price, canBuy, locked, btnText) {
+  var d = document.createElement('div'); d.className = 's-item' + (locked ? ' locked' : '');
+  d.innerHTML = '<div class="s-info"><div class="s-name">' + name + '</div><div class="s-desc">' + desc + '</div></div>'
+    + '<div class="s-right">' + (price != null ? '<div class="s-price"><div class="coin-icon-sm"></div>' + price + '</div>' : '')
+    + '<button class="buy-btn"' + (!canBuy ? ' disabled' : '') + '>' + (locked ? 'Locked' : btnText || 'Buy') + '</button></div>';
+  return d;
+}
+
+// ── Fish bubble ──────────────────────────────────────────────────────────────
+
+function showFishBubble(fish, sp) {
+  selectedFishId = fish.id;
+  for (var i = 0; i < fishSprites.length; i++) fishSprites[i].selected = false;
+  sp.selected = true; sp.wigglePhase = 0;
+  var b = $('fishBubble'); var ls = lifeStage(fish); var species = SPECIES[fish.speciesId];
+  $('fbName').textContent = fish.name;
+  $('fbSpecies').textContent = (species ? species.name : fish.speciesId) + ' \u00B7 \u25C6' + (species ? species.spaceCost : 1);
+  $('fbDetail').textContent = ageStr(fish) + ' old \u00B7 Lv.' + fish.level;
+  $('fbHunger').style.width = fish.hunger + '%';
+  $('fbHunger').className = 'fb-fill hunger-fill' + (fish.hunger <= 30 ? ' low' : '');
+  var xpPct = fish.level >= 10 ? 100 : Math.min(100, (fish.xp / xpToNext(fish.level)) * 100);
+  $('fbXp').style.width = xpPct + '%';
+  $('fbFav').textContent = (FOOD_ICONS[fish.favoriteFoodId] || '') + ' ' + (fish.favoriteFoodId || '');
+  $('fbStage').textContent = ls.emoji + ' ' + ls.stage;
+  $('fbWeak').style.display = fish.weak ? 'inline-block' : 'none';
+
+  // Buttons: sell + move
+  var btnsEl = $('fbBtns'); btnsEl.innerHTML = '';
+  var activeFish = getActiveFish();
+  if (activeFish.length > 1) {
+    var sellBtn = document.createElement('button');
+    sellBtn.className = 'sell-btn'; sellBtn.textContent = 'Sell';
+    sellBtn.onclick = function() { doAction('sell_fish', { fishId: selectedFishId }); closeFishBubble(); };
+    btnsEl.appendChild(sellBtn);
+  }
+
+  updateBubblePosition(sp); b.classList.add('visible');
+}
+
+function updateBubblePosition(sp) {
+  var b = $('fishBubble'); if (!b.classList.contains('visible')) return;
+  var rect = canvas.getBoundingClientRect(); var cRect = widgetContainer.getBoundingClientRect();
+  var sx = rect.width / W, sy = rect.height / H;
+  var ox = rect.left - cRect.left, oy = rect.top - cRect.top;
+  var bx = ox + sp.x * sx - 60, by = oy + sp.y * sy - 100;
+  bx = clamp(bx, 4, cRect.width - 180); by = clamp(by, 4, cRect.height - 110);
+  b.style.left = bx + 'px'; b.style.top = by + 'px';
+}
+
+// ── Tank tap handling ────────────────────────────────────────────────────────
+
+function handleTankTap(e) {
+  if (menuOpen) return;
+  var pos = getPos(e);
+  // Check snail taps
+  for (var si = 0; si < snailSprites.length; si++) {
+    var snail = snailSprites[si];
+    var sdist = Math.hypot(pos.x - snail.x, pos.y - snail.y);
+    if (sdist < 18) {
+      snail.vx *= -1; snail.fr = !snail.fr;
+      gameState.coins += 1;
+      var rect = canvas.getBoundingClientRect();
+      var sx = rect.width / W;
+      floatText(snail.x * sx, snail.y * (rect.height / H) - 15, '\u{1F40C} +1');
+      updateHUD();
+      return;
+    }
+  }
+  var fish = getActiveFish();
+  var tappedSp = null, tappedFish = null;
+  for (var i = fishSprites.length - 1; i >= 0; i--) {
+    var sp = fishSprites[i]; var fData = null;
+    for (var fi2 = 0; fi2 < fish.length; fi2++) { if (fish[fi2].id === sp.id) { fData = fish[fi2]; break; } }
+    if (!fData) continue;
+    var art = FISH_PX[fData.speciesId]; if (!art) continue;
+    var sc = PIXEL * (fData.sizeVariance || 1) * sizeScale(fData.speciesId);
+    var hw = art.w * sc / 2, hh = art.h * sc / 2;
+    var fx = sp.selected ? sp.x + Math.sin(sp.wigglePhase) * 3 : sp.x;
+    var fy = sp.selected ? sp.y + Math.cos(sp.wigglePhase * 0.7) * 2 : sp.y;
+    if (pos.x >= fx - hw && pos.x <= fx + hw && pos.y >= fy - hh && pos.y <= fy + hh) { tappedSp = sp; tappedFish = fData; break; }
+  }
+  if (tappedFish) showFishBubble(tappedFish, tappedSp);
+  else closeFishBubble();
+}
+
+function getPos(e) {
+  var el = (currentTool === 'clean') ? dirtCanvas : canvas;
+  var rect = el.getBoundingClientRect();
+  var cx = e.touches ? e.touches[0].clientX : e.clientX;
+  var cy = e.touches ? e.touches[0].clientY : e.clientY;
+  return { x: (cx - rect.left) * (W / rect.width), y: (cy - rect.top) * (H / rect.height) };
+}
+
+// ── State management ─────────────────────────────────────────────────────────
+
+function loadState() {
+  return homey.api('GET', '/?widgetId=' + widgetId).then(function(data) {
+    applyState(data);
+    if (data.isNew) showToast('Welcome to your aquarium!', 3000);
+    else if (data.simResult && data.simResult.dtHours > 1 && data.simResult.coinsEarned > 0) showToast('+' + data.simResult.coinsEarned + ' coins while away', 3500);
+    reinitializeTank();
+  }).catch(function(err) { console.error('loadState failed:', err); showToast('Failed to load aquarium'); });
+}
+
+function applyState(data) {
+  gameState = data.state;
+  storeCatalog = data.storeCatalog;
+  tankInfo = data.tankInfo;
+  upgradesCatalog = data.upgradesCatalog;
+  foodCapacity = data.foodCapacity || 30;
+  tanksListData = data.tanksList;
+  widgetContainer.dataset.tier = gameState.activeTankId;
+  updateHUD();
+  updateBottomBar();
+}
+
+function reinitializeTank() {
+  resizeCanvas();
+  initEnvironment();
+  initFishSprites();
+  initSnails();
+  dirtMaskGenerated = false;
+  generateDirtMask();
+  drawDirtOverlay();
+  closeFishBubble();
+  foodObjects = [];
+  bubbles = [];
+  // Defer scene build so layout dimensions are final
+  requestAnimationFrame(function() { buildRoomScene(); });
+}
+
+function doAction(type, payload) {
+  var isPurchase = ['buy_fish','buy_food','buy_snail','buy_upgrade','sell_fish','buy_decoration','sell_decoration','unlock_tank','move_fish'].indexOf(type) !== -1;
+  if (isPurchase && actionInFlight) return Promise.resolve(null);
+  if (isPurchase) actionInFlight = true;
+  if (isPurchase) { var btns = document.querySelectorAll('.buy-btn:not(:disabled)'); for (var bi = 0; bi < btns.length; bi++) btns[bi].classList.add('processing'); }
+
+  return homey.api('POST', '/?widgetId=' + widgetId, { type: type, payload: payload || {} }).then(function(data) {
+    if (data.result && data.result.error) { showToast(data.result.error); return data; }
+
+    var oldTier = gameState ? gameState.activeTankId : 1;
+    applyState(data);
+    var newTier = gameState.activeTankId;
+    var tierChanged = oldTier !== newTier;
+
+    // Reinitialize on tank/tier changes
+    if (type === 'switch_tank' || type === 'unlock_tank' || type === 'reset_state' || tierChanged) {
+      if (type === 'switch_tank' || type === 'unlock_tank') {
+        widgetContainer.style.opacity = '0';
+        setTimeout(function() { reinitializeTank(); setTimeout(function() { widgetContainer.style.opacity = '1'; }, 50); }, 300);
+      } else {
+        reinitializeTank();
+      }
+    }
+    if (type === 'buy_fish' || type === 'sell_fish' || type === 'move_fish') { initFishSprites(); closeFishBubble(); }
+    if (type === 'buy_snail') initSnails();
+    if (type === 'clean') redrawDirt();
+
+    // Toast messages
+    switch (type) {
+      case 'clean': if (data.result && !data.result.error) { if (cleanFinishedFull) { showToast(data.result.bonus > 0 ? 'Sparkling! +' + data.result.bonus + ' coins' : 'Tank cleaned!'); } else { showToast(data.result.bonus > 0 ? 'Partially cleaned +' + data.result.bonus + ' coins' : 'Partially cleaned — finish for full reward!'); } } break;
+      case 'buy_fish': showToast((data.result.fish ? data.result.fish.name : 'Fish') + ' joined!'); break;
+      case 'sell_fish': showToast('Sold ' + data.result.fishName + ' for ' + data.result.value + ' coins'); break;
+      case 'buy_food': showToast('Purchased!'); break;
+      case 'buy_snail': showToast('Snail added!'); break;
+      case 'buy_upgrade': showToast('Upgraded!'); break;
+      case 'switch_tank': showToast('Switched to ' + (tankInfo ? tankInfo.name : 'tank')); break;
+      case 'unlock_tank': showToast('Welcome to your ' + (data.result.tankName || 'new tank') + '!', 4000); break;
+      case 'buy_decoration': showToast('Decoration added!'); break;
+      case 'sell_decoration': showToast('Sold for ' + (data.result.value || 0) + ' coins'); break;
+      case 'move_fish': if (data.result.moved) showToast(data.result.fishName + ' moved!'); break;
+      case 'laser_pointer': if (data.result && data.result.reward && data.result.reward.coins > 0) showToast('+' + data.result.reward.coins + ' coins!'); break;
+      case 'reset_state': showToast('Aquarium Reset!'); break;
+    }
+
+    // Refresh open panels
+    var panels = document.querySelectorAll('.panel.visible');
+    for (var pi = 0; pi < panels.length; pi++) {
+      if (panels[pi].id === 'storePanel') buildStorePanel();
+      else if (panels[pi].id === 'upgradesPanel') buildUpgradesPanel();
+      else if (panels[pi].id === 'inventoryPanel') buildInventoryPanel();
+      else if (panels[pi].id === 'tanksPanel') buildTanksPanel();
+    }
+    if (currentTool === 'feed') renderToolDock();
+    return data;
+  }).catch(function(err) { console.error('Action failed:', err); showToast('Something went wrong'); return null;
+  }).finally(function() {
+    if (isPurchase) { actionInFlight = false; var pbtns = document.querySelectorAll('.buy-btn.processing'); for (var pi = 0; pi < pbtns.length; pi++) pbtns[pi].classList.remove('processing'); }
+  });
+}
+
+function confirmReset() { if (confirm('Reset All Tanks? All progress will be lost forever.')) { doAction('reset_state'); closeAllPanels(); } }
+window.confirmReset = confirmReset;
+
+// ── Events ───────────────────────────────────────────────────────────────────
+
+function initEvents() {
+  $('fab').addEventListener('click', function(e) { e.stopPropagation(); toggleMenu(); });
+
+  var menuBtns = document.querySelectorAll('.menu-btn');
+  for (var i = 0; i < menuBtns.length; i++) {
+    (function(btn) { btn.addEventListener('click', function(e) { e.stopPropagation(); var action = btn.dataset.action;
+      if (action === 'feed' || action === 'clean' || action === 'laser') setTool(action);
+      else if (action === 'store') openPanel('storePanel');
+      else if (action === 'upgrades') openPanel('upgradesPanel');
+      else if (action === 'inventory') openPanel('inventoryPanel');
+      else if (action === 'tanks') openPanel('tanksPanel');
+      else if (action === 'help') openPanel('helpPanel');
+      closeMenu();
+    }); })(menuBtns[i]);
+  }
+
+  var closeBtns = document.querySelectorAll('.panel-x');
+  for (var ci = 0; ci < closeBtns.length; ci++) { (function(btn) { btn.addEventListener('click', function() { var id = btn.dataset.close; if (id) $(id).classList.remove('visible'); }); })(closeBtns[ci]); }
+
+  $('tnPrev').addEventListener('click', function(e) { e.stopPropagation(); switchTankDir(-1); });
+  $('tnNext').addEventListener('click', function(e) { e.stopPropagation(); switchTankDir(1); });
+
+  $('coinHud').addEventListener('click', function(e) { e.stopPropagation(); showHudTooltip('Coins', 'Earned over time by happy fish. Used for fish, upgrades, food.', e.currentTarget); });
+  $('cleanHud').addEventListener('click', function(e) { e.stopPropagation(); var pct = Math.round(getActiveCleanliness()); showHudTooltip('Cleanliness: ' + pct + '%', 'Dirt builds up over time. Use Clean tool to wipe it away.', e.currentTarget); });
+  $('hungerHud').addEventListener('click', function(e) { e.stopPropagation(); var fish = getActiveFish(); var avgH = fish.length > 0 ? Math.round(fish.reduce(function(s, f) { return s + f.hunger; }, 0) / fish.length) : 100; showHudTooltip('Avg Hunger: ' + avgH + '%', 'Feed your fish using the Feed tool!', e.currentTarget); });
+
+  widgetContainer.addEventListener('click', function(e) { if (!e.target.closest('.hud-tooltip') && !e.target.closest('.coin-display') && !e.target.closest('.hud-bar')) hideHudTooltip(); });
+
+  function onStart(e) {
+    var t = e.target;
+    if (t.closest('.tool-dock') || t.closest('.tank-nav') || t.closest('.panel') || t.closest('.menu-overlay') || t.closest('.hud') || t.closest('#fab') || t.closest('.fish-bubble') || t.closest('.hud-tooltip') || t.closest('.bottom-bar')) return;
+    e.preventDefault(); hideHudTooltip();
+    var pos = getPos(e);
+    if (currentTool === 'feed') spawnFood(pos.x, pos.y);
+    else if (currentTool === 'clean') wipeDirtAt(pos.x, pos.y);
+    else if (currentTool === 'laser') { laserPos.x = pos.x; laserPos.y = pos.y; }
+    else handleTankTap(e);
+  }
+
+  function onMove(e) {
+    var t = e.target;
+    if (t.closest('.tool-dock') || t.closest('.tank-nav') || t.closest('.panel') || t.closest('.menu-overlay') || t.closest('.hud') || t.closest('#fab') || t.closest('.fish-bubble') || t.closest('.hud-tooltip') || t.closest('.bottom-bar')) return;
+    e.preventDefault();
+    var pos = getPos(e);
+    if (currentTool === 'clean') { wipeDirtAt(pos.x, pos.y); }
+    else if (currentTool === 'laser') { laserPos.x = pos.x; laserPos.y = pos.y; }
+  }
+
+  tankWrap.addEventListener('mousedown', onStart);
+  tankWrap.addEventListener('mousemove', onMove);
+  tankWrap.addEventListener('touchstart', onStart, { passive: false });
+  tankWrap.addEventListener('touchmove', onMove, { passive: false });
+}
+
+// ── Render loop ──────────────────────────────────────────────────────────────
+
+function renderLoop(ts) {
+  if (!lastFrame) lastFrame = ts;
+  var dt = Math.min((ts - lastFrame) / 1000, 0.1);
+  lastFrame = ts;
+  ctx.clearRect(0, 0, W, H);
+  drawEnvironment();
+  drawDecorations();
+  drawEquipment();
+  updateBubbles(dt); drawBubbles();
+  updateSnails(dt); drawSnails();
+  updateFood(dt); drawFood(); checkFoodConsumption();
+  updateFish(dt); drawFish();
+  drawLaser(dt);
+  updateHUD();
+  animFrame = requestAnimationFrame(renderLoop);
+}
+
+function resizeCanvas() {
+  var dpr = window.devicePixelRatio || 1;
+  W = tankWrap.clientWidth; H = tankWrap.clientHeight;
+  if (W <= 0 || H <= 0) { W = 200; H = 200; }
+  canvas.width = W * dpr; canvas.height = H * dpr;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  dirtCanvas.width = W; dirtCanvas.height = H;
+}
+
+function startPeriodicRefresh() {
+  setInterval(function() { homey.api('GET', '/?widgetId=' + widgetId).then(function(data) { applyState(data); }).catch(function() {}); }, 5 * 60 * 1000);
+}
+
+// ── Initialization ───────────────────────────────────────────────────────────
+
+function init(Homey) {
+  try {
+    homey = Homey;
+    widgetId = homey.getWidgetInstanceId ? homey.getWidgetInstanceId() : 'default';
+    if (widgetId && typeof widgetId.then === 'function') { widgetId.then(function(id) { widgetId = id; initAfterWidgetId(); }); }
+    else initAfterWidgetId();
+  } catch (err) { console.error('Init failed:', err); $('loading').textContent = 'Error: ' + err.message; }
+}
+
+function initAfterWidgetId() {
+  widgetContainer = $('widgetContainer'); tankWrap = $('tankWrap');
+  canvas = $('tank'); ctx = canvas.getContext('2d');
+  dirtCanvas = $('dirtCanvas'); dirtCtx = dirtCanvas.getContext('2d');
+
+  // Set 4:3 aspect ratio
+  var w = document.documentElement.clientWidth || 300;
+  var h = Math.round(w * 0.75);
+
+  resizeCanvas(); initEvents();
+
+  window.addEventListener('resize', function() {
+    var w2 = document.documentElement.clientWidth || 300;
+    var h2 = Math.round(w2 * 0.75);
+    homey.setHeight(h2);
+    setTimeout(function() { resizeCanvas(); initEnvironment(); redrawDirt(); buildRoomScene(); }, 100);
+  });
+
+  if (homey.on) { homey.on('settings.set', function(key, val) { if (key === 'reset_state' && val === true) confirmReset(); }); }
+
+  loadState().then(function() {
+    lastFrame = 0;
+    animFrame = requestAnimationFrame(renderLoop);
+    startPeriodicRefresh();
+    $('loading').classList.add('hidden');
+    homey.ready({ height: h });
+  });
+}
+
+window.onHomeyReady = init;
+</script>
+</body>
+</html>

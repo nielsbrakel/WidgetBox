@@ -14,9 +14,11 @@
 
     .buienradar-container {
       width: 100%;
-      height: 100%;
       margin: 0;
       padding: 0;
+      overflow: hidden;
+      transform-origin: top left;
+      border-radius: 12px;
     }
 
     .buienradar-container iframe {
@@ -24,47 +26,83 @@
       display: block;
       margin: 0;
       padding: 0;
+      transform-origin: top left;
+    }
+
+    .attribution {
+      position: absolute;
+      bottom: 6px;
+      right: 6px;
+      font-size: 9px;
+      color: rgba(0, 0, 0, 0.4);
+      /* Dark text for light map bg, or white if dark mode? Map is usually white/light */
+      /* Actually the 5-day gadget is usually light. */
+      background: rgba(255, 255, 255, 0.7);
+      padding: 2px 4px;
+      border-radius: 4px;
+      pointer-events: auto;
+      text-decoration: none;
+      z-index: 90;
     }
   </style>
 </head>
 
 <body>
   <div id="buienradar-container" class="buienradar-container"></div>
+  <a href="https://www.buienradar.nl" target="_blank" class="attribution">Buienradar.nl</a>
 
   <script type="text/javascript">
     let currentSettings = {};
+    const ORIGINAL_WIDTH = 256;
+    const ORIGINAL_HEIGHT = 406;
 
     function render() {
-      const content = document.getElementById('buienradar-container');
-      // Always use 5-day radar
+      const container = document.getElementById('buienradar-container');
       const iframeUrl = 'https://gadgets.buienradar.nl/gadget/radarfivedays';
-
-      // Use widget dimensions
-      const width = 256;
-      const height = 406;
-      // Note: The gadget has a fixed size initially but we can try to fit it or simpler just verify it works.
-      // The original code passed fixed w/h for radarfivedays.
 
       const iframe = document.createElement('iframe');
       iframe.src = iframeUrl;
       iframe.setAttribute('noresize', 'true');
       iframe.setAttribute('scrolling', 'NO');
-      iframe.setAttribute('hspace', '0');
-      iframe.setAttribute('vspace', '0');
       iframe.setAttribute('frameborder', '0');
-      iframe.setAttribute('marginheight', '0');
-      iframe.setAttribute('marginwidth', '0');
-      iframe.setAttribute('width', '256');
-      iframe.setAttribute('height', '406');
+      iframe.width = ORIGINAL_WIDTH;
+      iframe.height = ORIGINAL_HEIGHT;
 
-      content.innerHTML = '';
-      content.appendChild(iframe);
+      container.innerHTML = '';
+      container.appendChild(iframe);
+
+      // Initial scaling
+      updateScale();
+    }
+
+    function updateScale() {
+      const container = document.getElementById('buienradar-container');
+      const iframe = container.querySelector('iframe');
+      if (!iframe) return;
+
+      const availableWidth = document.body.clientWidth || window.innerWidth;
+      const scale = availableWidth / ORIGINAL_WIDTH;
+
+      iframe.style.transform = `scale(${scale})`;
+
+      const newHeight = ORIGINAL_HEIGHT * scale;
+      container.style.height = `${newHeight}px`; // ensure container has correct height
+
+      if (window.Homey && Homey.setHeight) {
+        Homey.setHeight(newHeight);
+      }
     }
 
     async function onHomeyReady(Homey) {
       currentSettings = Homey.getSettings();
       render();
       Homey.ready();
+
+      // Listen for resize events to update scale
+      const resizeObserver = new ResizeObserver(() => {
+        updateScale();
+      });
+      resizeObserver.observe(document.body);
     }
   </script>
 </body>

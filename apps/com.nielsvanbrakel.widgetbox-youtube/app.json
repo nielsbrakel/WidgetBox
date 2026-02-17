@@ -130,6 +130,19 @@
           "value": false
         },
         {
+          "id": "preventSleep",
+          "type": "checkbox",
+          "label": {
+            "en": "Keep Screen On",
+            "nl": "Scherm Aanhouden"
+          },
+          "hint": {
+            "en": "Prevents the device from going to sleep while the widget is active.",
+            "nl": "Voorkomt dat het apparaat in slaapstand gaat terwijl de widget actief is."
+          },
+          "value": false
+        },
+        {
           "id": "playlistId",
           "type": "text",
           "label": {

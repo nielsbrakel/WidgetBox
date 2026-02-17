@@ -38,6 +38,21 @@ async function generateRegistry() {
 
         console.log(`Found widget: ${widgetId} (${appName}) -> ${urlPath}`);
 
+        const appDir = path.dirname(path.dirname(widgetDir)); // apps/<app-name>
+        const localesDir = path.join(appDir, 'locales');
+
+        // Find available locales
+        const locales = {};
+        if (fs.existsSync(localesDir)) {
+            const localeFiles = fs.readdirSync(localesDir).filter(f => f.endsWith('.json'));
+            localeFiles.forEach(f => {
+                const lang = path.basename(f, '.json');
+                const localePath = path.join(localesDir, f);
+                // Create Vite /@fs/ URL for the locale file
+                locales[lang] = `/@fs${localePath}`;
+            });
+        }
+
         return {
             id: widgetId,
             app: appName,
@@ -47,7 +62,8 @@ async function generateRegistry() {
             height: content.platforms?.web?.height || content.height || 160,
             width: content.platforms?.web?.width || content.width,
             path: urlPath,
-            absolutePath: widgetDir
+            absolutePath: widgetDir,
+            locales: locales
         };
     });
 

@@ -72,14 +72,18 @@
             align-items: center;
             justify-content: center;
             color: var(--homey-text-color);
-            opacity: 0.15;
-            transition: opacity 0.3s, color 0.3s;
+            opacity: 0.08;
+            /* Darker inactive */
+            transition: opacity 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), color 0.4s ease;
             aspect-ratio: 1;
         }
 
         .matrix span.active {
             opacity: 1;
-            font-weight: 600;
+            font-weight: 700;
+            text-shadow: 0 0 10px currentColor;
+            transform: scale(1.05);
+            /* Slight pop */
         }
 
         /* Size variants - width determines everything, capped at available space */

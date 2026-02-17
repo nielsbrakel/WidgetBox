@@ -1,0 +1,2158 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <style>
+        /* ── Reset ─────────────────────────────────── */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            overflow: hidden;
+            touch-action: manipulation;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        html {
+            overflow: hidden;
+        }
+
+        /* ── Tank Container ────────────────────────── */
+        .tank-wrap {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            background: linear-gradient(180deg, #1a5276 0%, #1f6f8b 30%, #1a8a7d 60%, #1f6f5b 100%);
+            overflow: hidden;
+        }
+
+        canvas#tank {
+            display: block;
+            width: 100%;
+            height: 100%;
+            image-rendering: pixelated;
+        }
+
+        /* ── Coin Display ──────────────────────────── */
+        .coin-display {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            padding: 4px 10px;
+            border-radius: 12px;
+            color: #FFD54F;
+            font-size: 13px;
+            font-weight: 700;
+            z-index: 10;
+            pointer-events: none;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .coin-icon {
+            width: 14px;
+            height: 14px;
+            background: #FFD54F;
+            border-radius: 50%;
+            border: 1.5px solid #F9A825;
+            flex-shrink: 0;
+        }
+
+        /* ── Cleanliness indicator ─────────────────── */
+        .clean-indicator {
+            position: absolute;
+            top: 10px;
+            right: 52px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            padding: 4px 10px;
+            border-radius: 12px;
+            color: #81D4FA;
+            font-size: 11px;
+            font-weight: 600;
+            z-index: 10;
+            pointer-events: none;
+            transition: color 0.3s;
+        }
+
+        .clean-indicator.dirty {
+            color: #FFAB91;
+        }
+
+        .clean-bar {
+            width: 36px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .clean-bar-fill {
+            height: 100%;
+            border-radius: 2px;
+            background: #81D4FA;
+            transition: width 0.5s ease, background 0.3s;
+        }
+
+        .clean-indicator.dirty .clean-bar-fill {
+            background: #FFAB91;
+        }
+
+        /* ── FAB Button ────────────────────────────── */
+        .fab {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            border: 1.5px solid rgba(255, 255, 255, 0.15);
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 20;
+            transition: transform 0.2s, background 0.2s;
+        }
+
+        .fab:active {
+            transform: scale(0.9);
+        }
+
+        .fab.open {
+            background: rgba(255, 255, 255, 0.15);
+            transform: rotate(45deg);
+        }
+
+        /* ── Menu Overlay ──────────────────────────── */
+        .menu-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 15;
+            display: none;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 12px;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+
+        .menu-overlay.visible {
+            display: flex;
+            opacity: 1;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            max-width: 300px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .menu-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 14px 8px;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s, transform 0.1s;
+        }
+
+        .menu-btn:active {
+            transform: scale(0.95);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .menu-btn .menu-icon {
+            font-size: 22px;
+        }
+
+        /* ── Panel Overlay (store, inventory, feed) ── */
+        .panel-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 25;
+            display: none;
+            flex-direction: column;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .panel-overlay.visible {
+            display: flex;
+            opacity: 1;
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 14px 8px;
+        }
+
+        .panel-title {
+            color: #fff;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .panel-close {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 22px;
+            cursor: pointer;
+            padding: 2px 6px;
+            line-height: 1;
+        }
+
+        .panel-close:active {
+            color: #fff;
+        }
+
+        .panel-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 4px 14px 14px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* ── Store / Inventory items ───────────────── */
+        .store-section-title {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 10px 0 6px;
+        }
+
+        .store-section-title:first-child {
+            margin-top: 0;
+        }
+
+        .store-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin-bottom: 6px;
+            transition: background 0.15s;
+        }
+
+        .store-item:active {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .store-item-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .store-item-name {
+            color: #fff;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .store-item-desc {
+            color: rgba(255, 255, 255, 0.45);
+            font-size: 10px;
+        }
+
+        .store-item-price {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: #FFD54F;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .store-item-price .coin-icon-sm {
+            width: 10px;
+            height: 10px;
+            background: #FFD54F;
+            border-radius: 50%;
+            border: 1px solid #F9A825;
+        }
+
+        .buy-btn {
+            background: rgba(77, 182, 172, 0.3);
+            border: 1px solid rgba(77, 182, 172, 0.4);
+            color: #80CBC4;
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.15s;
+            white-space: nowrap;
+        }
+
+        .buy-btn:active {
+            background: rgba(77, 182, 172, 0.5);
+        }
+
+        .buy-btn:disabled {
+            opacity: 0.4;
+            cursor: default;
+        }
+
+        /* ── Inventory count badge ─────────────────── */
+        .inv-count {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.7);
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* ── Fish info bubble ──────────────────────── */
+        .fish-bubble {
+            position: absolute;
+            z-index: 12;
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 10px;
+            padding: 8px 12px;
+            color: #fff;
+            pointer-events: auto;
+            display: none;
+            min-width: 110px;
+            max-width: 160px;
+        }
+
+        .fish-bubble.visible {
+            display: block;
+        }
+
+        .fish-bubble-name {
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .fish-bubble-detail {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.6);
+            line-height: 1.5;
+        }
+
+        .fish-bubble-hunger-bar {
+            width: 100%;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            margin-top: 4px;
+            overflow: hidden;
+        }
+
+        .fish-bubble-hunger-fill {
+            height: 100%;
+            border-radius: 2px;
+            background: #81C784;
+            transition: width 0.3s;
+        }
+
+        .fish-bubble-hunger-fill.low {
+            background: #FFAB91;
+        }
+
+        .fish-bubble-weak {
+            display: inline-block;
+            background: rgba(255, 171, 145, 0.2);
+            color: #FFAB91;
+            font-size: 9px;
+            font-weight: 700;
+            padding: 1px 5px;
+            border-radius: 4px;
+            margin-top: 3px;
+        }
+
+        /* ── Toast notification ────────────────────── */
+        .toast {
+            position: absolute;
+            top: 40px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-20px);
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 8px 14px;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 12px;
+            font-weight: 600;
+            z-index: 30;
+            opacity: 0;
+            transition: opacity 0.3s, transform 0.3s;
+            pointer-events: none;
+            text-align: center;
+            max-width: 200px;
+        }
+
+        .toast.visible {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* ── Sell button inside fish bubble ────────── */
+        .sell-btn {
+            background: rgba(255, 82, 82, 0.2);
+            border: 1px solid rgba(255, 82, 82, 0.3);
+            color: #FF8A80;
+            border-radius: 6px;
+            padding: 3px 8px;
+            font-size: 9px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 4px;
+            display: inline-block;
+        }
+
+        .sell-btn:active {
+            background: rgba(255, 82, 82, 0.35);
+        }
+
+        /* ── Loading ───────────────────────────────── */
+        .loading-screen {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(180deg, #1a5276 0%, #1f6f8b 50%, #1a8a7d 100%);
+            z-index: 50;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 13px;
+        }
+
+        .loading-screen.hidden {
+            display: none;
+        }
+
+        /* ── XP progress bar in fish bubble ───────── */
+        .fish-bubble-xp-bar {
+            width: 100%;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            margin-top: 3px;
+            overflow: hidden;
+        }
+
+        .fish-bubble-xp-fill {
+            height: 100%;
+            border-radius: 2px;
+            background: #64B5F6;
+            transition: width 0.3s;
+        }
+
+        .fish-bubble-stage {
+            display: inline-block;
+            background: rgba(100, 181, 246, 0.2);
+            color: #90CAF9;
+            font-size: 9px;
+            font-weight: 700;
+            padding: 1px 5px;
+            border-radius: 4px;
+            margin-top: 2px;
+        }
+
+        /* ── Menu grid (3 columns for 6 items) ────── */
+        .menu-grid {
+            grid-template-columns: repeat(3, 1fr) !important;
+        }
+
+        /* ── Help panel ───────────────────────────── */
+        .help-body {
+            padding: 12px 14px;
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 12px;
+            line-height: 1.7;
+            overflow-y: auto;
+            max-height: 220px;
+        }
+
+        .help-section {
+            margin-bottom: 12px;
+        }
+
+        .help-section-title {
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            color: rgba(255, 255, 255, 0.95);
+        }
+
+        .help-body p {
+            margin: 0 0 6px 0;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* ── Upgrade badge ────────────────────────── */
+        .upgrade-badge {
+            position: absolute;
+            top: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 183, 77, 0.25);
+            border: 1px solid rgba(255, 183, 77, 0.4);
+            color: #FFB74D;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 8px;
+            z-index: 15;
+            cursor: pointer;
+            animation: pulse-badge 2s ease-in-out infinite;
+            display: none;
+        }
+
+        .upgrade-badge.visible {
+            display: block;
+        }
+
+        @keyframes pulse-badge {
+
+            0%,
+            100% {
+                opacity: 0.8;
+            }
+
+            50% {
+                opacity: 1;
+            }
+        }
+
+        /* ── Upgrade item styling ─────────────────── */
+        .upgrade-locked {
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        .upgrade-requirement {
+            font-size: 9px;
+            color: rgba(255, 171, 145, 0.8);
+            margin-top: 2px;
+        }
+
+        .tank-upgrade-section {
+            border: 1px solid rgba(255, 183, 77, 0.3);
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 10px;
+            background: rgba(255, 183, 77, 0.08);
+        }
+
+        .tank-upgrade-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #FFB74D;
+            margin-bottom: 6px;
+        }
+
+        .tank-upgrade-desc {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 6px;
+        }
+
+        /* ── Tank Tiers ────────────────────────────── */
+        .tank-wrap[data-tier="1"] {
+            border-radius: 50%;
+            width: 260px;
+            height: 260px;
+            margin: 20px auto;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2), inset 0 0 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            background: linear-gradient(180deg, #e0f7fa 0%, #b2ebf2 100%);
+        }
+
+        .tank-wrap[data-tier="2"] {
+            border-radius: 6px;
+            border: 8px solid #333;
+            border-top: none;
+            width: 100%;
+            height: 300px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(180deg, #81d4fa 0%, #4fc3f7 100%);
+        }
+
+        .tank-wrap[data-tier="3"] {
+            border-radius: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: linear-gradient(180deg, #0288d1 0%, #01579b 100%);
+        }
+
+        /* ── HUD ───────────────────────────────────── */
+        .hud-stats {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 8px;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 4px 8px;
+            border-radius: 12px;
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+            backdrop-filter: blur(4px);
+            z-index: 10;
+        }
+
+        .stat-bar {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .bar-track {
+            width: 40px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            width: 100%;
+            transition: width 0.3s;
+        }
+
+        .bar-fill.clean {
+            background: #4fc3f7;
+        }
+
+        .bar-fill.hunger {
+            background: #ff7043;
+        }
+
+        .coin-rate {
+            font-size: 10px;
+            opacity: 0.8;
+            margin-left: 4px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="loading-screen" id="loading">Loading...</div>
+
+    <div class="tank-wrap" id="tankWrap">
+        <canvas id="tank"></canvas>
+
+        <!-- Coin display -->
+        <div class="coin-display" id="coinDisplay">
+            <div class="coin-icon"></div>
+            <span id="coinCount">0</span>
+        </div>
+
+        <!-- Cleanliness -->
+        <!-- Cleanliness / Hunger HUD -->
+        <div class="hud-stats">
+            <div class="stat-bar" title="Cleanliness">
+                <span>🧼</span>
+                <div class="bar-track">
+                    <div class="bar-fill clean" id="cleanBar"></div>
+                </div>
+            </div>
+            <div class="stat-bar" title="Avg Hunger">
+                <span>🍤</span>
+                <div class="bar-track">
+                    <div class="bar-fill hunger" id="hungerBar"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fish info bubble -->
+        <div class="fish-bubble" id="fishBubble">
+            <div class="fish-bubble-name" id="bubbleName"></div>
+            <div class="fish-bubble-detail" id="bubbleDetail"></div>
+            <div class="fish-bubble-hunger-bar">
+                <div class="fish-bubble-hunger-fill" id="bubbleHunger"></div>
+            </div>
+            <div class="fish-bubble-xp-bar">
+                <div class="fish-bubble-xp-fill" id="bubbleXp"></div>
+            </div>
+            <div style="display:flex;gap:4px;align-items:center;flex-wrap:wrap">
+                <div class="fish-bubble-stage" id="bubbleStage"></div>
+                <div class="fish-bubble-weak" id="bubbleWeak" style="display:none">Weak</div>
+            </div>
+            <button class="sell-btn" id="bubbleSell" style="display:none">Sell</button>
+        </div>
+
+        <!-- Upgrade badge -->
+        <div class="upgrade-badge" id="upgradeBadge" style="display:none">🏗 Upgrade Available</div>
+
+        <!-- FAB -->
+        <button class="fab" id="fab">☰</button>
+
+        <!-- Menu overlay -->
+        <div class="menu-overlay" id="menuOverlay">
+            <div class="menu-grid">
+                <div class="menu-btn" data-action="feed">
+                    <div class="menu-icon">🍞</div>
+                    <div class="menu-label">Feed</div>
+                </div>
+                <div class="menu-btn" data-action="clean">
+                    <div class="menu-icon">🧼</div>
+                    <div class="menu-label">Clean</div>
+                </div>
+                <div class="menu-btn" data-action="store">
+                    <div class="menu-icon">🛍️</div>
+                    <div class="menu-label">Store</div>
+                </div>
+                <div class="menu-btn" data-action="inventory">
+                    <div class="menu-icon">🎒</div>
+                    <div class="menu-label">Inventory</div>
+                </div>
+                <div class="menu-btn" data-action="upgrades">
+                    <div class="menu-icon">⬆️</div>
+                    <div class="menu-label">Upgrades</div>
+                </div>
+                <div class="menu-btn" data-action="laser" id="laserBtn" style="display:none">
+                    <div class="menu-icon">🔴</div>
+                    <div class="menu-label">Laser</div>
+                </div>
+                <div class="menu-btn" data-action="help">
+                    <div class="menu-icon">❓</div>
+                    <div class="menu-label">Help</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feed panel -->
+        <div class="panel-overlay" id="feedPanel">
+            <div class="panel-header">
+                <span class="panel-title">🍞 Feed</span>
+                <button class="panel-close" data-close="feedPanel">×</button>
+            </div>
+            <div class="panel-body" id="feedList"></div>
+        </div>
+
+        <!-- Store panel -->
+        <div class="panel-overlay" id="storePanel">
+            <div class="panel-header">
+                <span class="panel-title">🛒 Store</span>
+                <button class="panel-close" data-close="storePanel">×</button>
+            </div>
+            <div class="panel-body" id="storeList"></div>
+        </div>
+
+        <!-- Inventory panel -->
+        <div class="panel-overlay" id="inventoryPanel">
+            <div class="panel-header">
+                <span class="panel-title">📦 Inventory</span>
+                <button class="panel-close" data-close="inventoryPanel">×</button>
+            </div>
+            <div class="panel-body" id="inventoryList"></div>
+        </div>
+
+        <!-- Upgrades panel -->
+        <div class="panel-overlay" id="upgradesPanel">
+            <div class="panel-header">
+                <span class="panel-title">⬆️ Upgrades</span>
+                <button class="panel-close" data-close="upgradesPanel">×</button>
+            </div>
+            <div class="panel-body" id="upgradesList"></div>
+        </div>
+
+        <!-- Help panel -->
+        <div class="panel-overlay" id="helpPanel">
+            <div class="panel-header">
+                <span class="panel-title">📖 Help</span>
+                <button class="panel-close" data-close="helpPanel">×</button>
+            </div>
+            <div class="help-body">
+                <div class="help-section">
+                    <div class="help-section-title">🐠 Welcome</div>
+                    <p>Create your own slice of tranquility. Your goal is to build a thriving aquarium, collect rare
+                        fish, and upgrade your tank.</p>
+                </div>
+                <div class="help-section">
+                    <div class="help-section-title">🥣 Feeding</div>
+                    <p>Fish get hungry over time. Tap the "Feed" button to drop food. Different fish prefer different
+                        food types, which grant bonus XP.</p>
+                </div>
+                <div class="help-section">
+                    <div class="help-section-title">🧼 Cleaning</div>
+                    <p>Algae builds up on the glass. Swipe your finger across the tank to clean it! keeping the tank
+                        clean (90%+) boosts coin production.</p>
+                </div>
+                <div class="help-section">
+                    <div class="help-section-title">✨ Interaction</div>
+                    <p>Tap any fish to see its details. Happy fish will wiggle! In Tier 3 tanks, you can unlock a Laser
+                        Pointer to play with your fish.</p>
+                </div>
+                <div class="help-section">
+                    <div class="help-section-title">🐌 Snails & Upgrades</div>
+                    <p>Snails eat algae and keep the tank clean. Filters and Auto-Feeders can automate care so your fish
+                        stay happy while you're away.</p>
+                </div>
+                <div class="help-section">
+                    <div class="help-section-title">📈 Growth & Levels</div>
+                    <p>Fish gain XP when fed and cleaned. leveling up increases their coin production. They grow from
+                        Baby → Child → Adult.</p>
+                </div>
+                <div class="help-section">
+                    <div class="help-section-title">🏗 Bigger Tanks</div>
+                    <p>Save up coins to upgrade your tank! Larger tanks unlock more fish capacity and new species like
+                        Angelfish.</p>
+                </div>
+                <div class="help-section">
+                    <div class="help-section-title">💛 Cozy Reminder</div>
+                    <p>There is no rush. Your fish will be fine if you leave for a while. Enjoy the slow growth and
+                        peaceful atmosphere.</p>
+                </div>
+                <div class="help-section"
+                    style="margin-top:20px; border-top:1px solid rgba(255,255,255,0.1); padding-top:10px;">
+                    <div class="help-section-title">⚙️ Settings</div>
+                    <p>Need a fresh start? This will wipe all progress.</p>
+                    <button class="sell-btn" style="background:#ef5350; width:100%" onclick="confirmReset()">Reset
+                        Tank</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast -->
+        <div class="toast" id="toast"></div>
+    </div>
+
+    <script>
+        // ── Globals ─────────────────────────────────────────────────────────
+        let homey = null; // injected Homey instance
+        let widgetId = null;
+        let gameState = null;
+        let storeCatalog = null;
+        let tankInfo = null;
+        let upgradesCatalog = null;
+        let menuOpen = false;
+        let selectedFishId = null;
+        let animFrame = null;
+        let fishSprites = []; // live animation state per fish
+        let bubbles = []; // ambient bubbles
+        let toastTimer = null;
+
+        // Interaction state
+        let laserState = { active: false, x: 0, y: 0, scale: 1.0, lastReward: 0 };
+        let schoolAnchor = { x: 150, y: 150, vx: 10, vy: 5, timer: 0 };
+        let interactionTarget = null; // { type: 'tap'|'laser', x, y, fishId }
+
+        // Canvas
+        const canvas = document.getElementById('tank');
+        const ctx = canvas.getContext('2d');
+        let W = 0, H = 0;
+        const PIXEL = 3; // pixel art scale factor
+
+        // ── Fish pixel art data ─────────────────────────────────────────────
+        // Each species has a pixel grid [rows][cols] of 0/1/2 (0=empty, 1=body, 2=tail/fin)
+        const FISH_PIXELS = {
+            guppy: {
+                pixels: [
+                    [0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 2, 2, 1, 1, 1, 0, 0, 0, 0],
+                    [2, 2, 2, 1, 1, 1, 1, 1, 1, 0, 0],
+                    [2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 0],
+                    [2, 2, 2, 1, 1, 1, 1, 1, 1, 0, 0],
+                    [0, 0, 2, 2, 1, 1, 1, 0, 0, 0, 0],
+                    [0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0],
+                ],
+                eyePos: { row: 3, col: 8 },
+                width: 11,
+                height: 7,
+            },
+            goldfish: {
+                pixels: [
+                    [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 2, 2, 0, 1, 1, 1, 0, 0, 0, 0, 0],
+                    [0, 2, 2, 2, 1, 1, 1, 1, 1, 1, 0, 0, 0],
+                    [2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+                    [2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+                    [2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+                    [0, 2, 2, 2, 1, 1, 1, 1, 1, 1, 0, 0, 0],
+                    [0, 0, 2, 2, 0, 1, 1, 1, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+                ],
+                eyePos: { row: 4, col: 9 },
+                width: 13,
+                height: 9,
+            },
+            neon_tetra: {
+                pixels: [
+                    [0, 0, 0, 0, 1, 1, 0, 0, 0],
+                    [0, 2, 2, 1, 1, 1, 1, 1, 0],
+                    [2, 2, 1, 1, 1, 1, 1, 1, 0],
+                    [0, 2, 2, 1, 1, 1, 1, 1, 0],
+                    [0, 0, 0, 0, 1, 1, 0, 0, 0],
+                ],
+                eyePos: { row: 2, col: 6 },
+                width: 9,
+                height: 5,
+            },
+            betta: {
+                pixels: [
+                    [0, 0, 2, 2, 0, 0, 0, 1, 0, 0, 0, 0],
+                    [0, 2, 2, 2, 1, 1, 1, 1, 0, 0, 0, 0],
+                    [2, 2, 2, 1, 1, 1, 1, 1, 1, 0, 0, 0],
+                    [2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+                    [2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 0],
+                    [2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+                    [2, 2, 2, 1, 1, 1, 1, 1, 1, 0, 0, 0],
+                    [0, 2, 2, 2, 1, 1, 1, 1, 0, 0, 0, 0],
+                    [0, 0, 2, 2, 0, 0, 0, 1, 0, 0, 0, 0],
+                ],
+                eyePos: { row: 4, col: 8 },
+                width: 12,
+                height: 9,
+            },
+            angelfish: {
+                pixels: [
+                    [0, 0, 0, 0, 1, 0, 0, 0, 0],
+                    [0, 0, 0, 1, 1, 1, 0, 0, 0],
+                    [0, 2, 1, 1, 1, 1, 1, 0, 0],
+                    [2, 2, 1, 1, 1, 1, 1, 1, 0],
+                    [2, 2, 1, 1, 1, 1, 1, 1, 0],
+                    [0, 2, 1, 1, 1, 1, 1, 0, 0],
+                    [0, 0, 0, 1, 1, 1, 0, 0, 0],
+                    [0, 0, 0, 0, 1, 0, 0, 0, 0],
+                ],
+                eyePos: { row: 3, col: 6 },
+                width: 9,
+                height: 8,
+            },
+            clownfish: {
+                pixels: [
+                    [0, 0, 0, 2, 0, 0, 0, 1, 0, 0, 0],
+                    [0, 0, 2, 1, 2, 1, 1, 1, 1, 0, 0],
+                    [0, 2, 1, 1, 2, 1, 1, 1, 1, 1, 0],
+                    [2, 1, 1, 1, 2, 1, 1, 1, 1, 1, 0],
+                    [0, 2, 1, 1, 2, 1, 1, 1, 1, 1, 0],
+                    [0, 0, 2, 1, 2, 1, 1, 1, 1, 0, 0],
+                    [0, 0, 0, 2, 0, 0, 0, 1, 0, 0, 0],
+                ],
+                eyePos: { row: 3, col: 8 },
+                width: 11,
+                height: 7,
+            },
+        };
+
+        // ── Gravel colors ───────────────────────────────────────────────────
+        const GRAVEL_COLORS = ['#5D4037', '#6D4C41', '#795548', '#8D6E63', '#4E342E', '#3E2723'];
+        let gravelData = []; // pre-generated
+
+        // ── Plant data ──────────────────────────────────────────────────────
+        const PLANT_COLORS = ['#2E7D32', '#388E3C', '#43A047', '#1B5E20', '#4CAF50'];
+        let plants = [];
+
+        // ── Initialize gravel + plants ──────────────────────────────────────
+        function initEnvironment() {
+            gravelData = [];
+            // Tier-based gravel density/color
+            const tier = gameState?.tankTier || 1;
+            const gravelRows = tier === 1 ? 2 : (tier === 2 ? 3 : 4);
+
+            const cols = Math.ceil(W / PIXEL);
+            for (let r = 0; r < gravelRows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    gravelData.push({
+                        x: c * PIXEL,
+                        y: H - (gravelRows - r) * PIXEL,
+                        color: GRAVEL_COLORS[Math.floor(Math.random() * GRAVEL_COLORS.length)],
+                    });
+                }
+            }
+
+            // Plants based on tier
+            plants = [];
+            let plantCount = 2; // Tier 1 default
+            if (tier === 2) plantCount = 4 + Math.floor(Math.random() * 2);
+            if (tier === 3) plantCount = 8 + Math.floor(Math.random() * 4);
+
+            for (let i = 0; i < plantCount; i++) {
+                const x = 20 + Math.random() * (W - 40);
+                const stemHeight = 6 + Math.floor(Math.random() * 8);
+                const leaves = [];
+                for (let j = 1; j < stemHeight; j += 2) {
+                    if (Math.random() > 0.3) {
+                        leaves.push({
+                            y: j,
+                            dir: Math.random() > 0.5 ? 1 : -1,
+                            len: 2 + Math.floor(Math.random() * 3),
+                        });
+                    }
+                }
+                plants.push({ x, stemHeight, leaves, color: PLANT_COLORS[Math.floor(Math.random() * PLANT_COLORS.length)] });
+            }
+        }
+
+        // ── Draw environment ────────────────────────────────────────────────
+        function drawEnvironment() {
+            // Gravel
+            for (const g of gravelData) {
+                ctx.fillStyle = g.color;
+                ctx.fillRect(g.x, g.y, PIXEL, PIXEL);
+            }
+
+            // Plants
+            for (const plant of plants) {
+                ctx.fillStyle = plant.color;
+                const baseY = H - 3 * PIXEL;
+                // Stem
+                for (let j = 0; j < plant.stemHeight; j++) {
+                    ctx.fillRect(plant.x, baseY - j * PIXEL, PIXEL, PIXEL);
+                }
+                // Leaves
+                for (const leaf of plant.leaves) {
+                    for (let l = 1; l <= leaf.len; l++) {
+                        const lx = plant.x + leaf.dir * l * PIXEL;
+                        const ly = baseY - leaf.y * PIXEL - l * PIXEL * 0.5;
+                        ctx.fillRect(lx, ly, PIXEL, PIXEL);
+                    }
+                }
+            }
+        }
+
+        // ── Snails ──────────────────────────────────────────────────────────
+        let snailSprites = [];
+
+        function initSnails() {
+            snailSprites = [];
+            if (!gameState || !gameState.snails) return;
+            for (let i = 0; i < gameState.snails; i++) {
+                snailSprites.push({
+                    x: 10 + Math.random() * (W - 20),
+                    y: H - 8, // On gravel
+                    vx: (Math.random() > 0.5 ? 1 : -1) * 3, // very slow
+                    facingRight: Math.random() > 0.5
+                });
+            }
+        }
+
+        function updateSnails(dt) {
+            for (const s of snailSprites) {
+                s.x += s.vx * dt;
+                if (s.x > W - 15) { s.x = W - 15; s.vx *= -1; s.facingRight = false; }
+                if (s.x < 15) { s.x = 15; s.vx *= -1; s.facingRight = true; }
+            }
+        }
+
+        function drawSnails() {
+            const snailPixels = [
+                [0, 2, 0, 0],
+                [2, 2, 2, 0],
+                [0, 2, 2, 2]
+            ];
+            const shellColor = '#795548';
+            const bodyColor = '#A1887F';
+
+            for (const s of snailSprites) {
+                ctx.save();
+                ctx.translate(s.x, s.y);
+                if (!s.facingRight) ctx.scale(-1, 1);
+
+                for (let r = 0; r < snailPixels.length; r++) {
+                    for (let c = 0; c < snailPixels[r].length; c++) {
+                        if (snailPixels[r][c] === 0) continue;
+                        ctx.fillStyle = snailPixels[r][c] === 2 ? shellColor : bodyColor;
+                        ctx.fillRect((c - 1.5) * PIXEL, (r - 1.5) * PIXEL, PIXEL, PIXEL);
+                    }
+                }
+                ctx.restore();
+            }
+        }
+
+        // ── Draw ambient bubbles ────────────────────────────────────────────
+        function updateBubbles(dt) {
+            // Spawn
+            if (Math.random() < 0.02) {
+                bubbles.push({
+                    x: 10 + Math.random() * (W - 20),
+                    y: H - 15,
+                    speed: 10 + Math.random() * 20,
+                    size: 1 + Math.random() * 2,
+                    alpha: 0.2 + Math.random() * 0.3,
+                    wobble: Math.random() * Math.PI * 2,
+                });
+            }
+
+            for (let i = bubbles.length - 1; i >= 0; i--) {
+                const b = bubbles[i];
+                b.y -= b.speed * dt;
+                b.wobble += dt * 2;
+                b.x += Math.sin(b.wobble) * 0.3;
+                if (b.y < -5) bubbles.splice(i, 1);
+            }
+        }
+
+        function drawBubbles() {
+            for (const b of bubbles) {
+                ctx.beginPath();
+                ctx.arc(b.x, b.y, b.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(200, 230, 255, ${b.alpha})`;
+                ctx.fill();
+            }
+        }
+
+        // ── Fish sprite animation state ─────────────────────────────────────
+        function initFishSprites() {
+            fishSprites = [];
+            if (!gameState || !gameState.fish) return;
+
+            for (const fish of gameState.fish) {
+                const zoneRanges = {
+                    top: { minY: 0.05, maxY: 0.35 },
+                    middle: { minY: 0.25, maxY: 0.75 },
+                    bottom: { minY: 0.65, maxY: 0.90 },
+                    everywhere: { minY: 0.1, maxY: 0.9 },
+                };
+                const zone = zoneRanges[fish.zone] || zoneRanges.middle;
+
+                fishSprites.push({
+                    fishId: fish.id,
+                    x: Math.random() * W,
+                    y: zone.minY * H + Math.random() * (zone.maxY - zone.minY) * H,
+                    vx: 0,
+                    vy: 0,
+                    facingRight: Math.random() > 0.5,
+                    zone,
+                    swimTimer: Math.random() * 5,
+                    dartPause: 0,
+                    circleAngle: Math.random() * Math.PI * 2,
+                    circleCenter: { x: W / 2, y: H / 2 },
+                    schoolOffset: { x: (Math.random() - 0.5) * 40, y: (Math.random() - 0.5) * 40 },
+                    interaction: null, // { type: 'tap', timer: 0 }
+                });
+            }
+        }
+
+        function updateFishSprites(dt) {
+            if (!gameState) return;
+
+            // Global school anchor update
+            schoolAnchor.timer += dt;
+            schoolAnchor.x += schoolAnchor.vx * dt;
+            schoolAnchor.y += schoolAnchor.vy * dt;
+            if (schoolAnchor.x < 100 || schoolAnchor.x > W - 100) schoolAnchor.vx *= -1;
+            if (schoolAnchor.y < 100 || schoolAnchor.y > H - 100) schoolAnchor.vy *= -1;
+            schoolAnchor.x = clamp(schoolAnchor.x, 100, W - 100);
+            schoolAnchor.y = clamp(schoolAnchor.y, 100, H - 100);
+            if (Math.random() < 0.05) { schoolAnchor.vx += (Math.random() - 0.5) * 10; schoolAnchor.vy += (Math.random() - 0.5) * 5; }
+
+            for (let i = 0; i < fishSprites.length; i++) {
+                const sprite = fishSprites[i];
+                const fish = gameState.fish.find(f => f.id === sprite.fishId);
+                if (!fish) continue;
+
+                // Stop for tap interaction
+                if (sprite.interaction?.type === 'tap') {
+                    sprite.vx = 0;
+                    sprite.vy = 0;
+                    sprite.interaction.timer -= dt;
+                    if (sprite.interaction.timer <= 0) sprite.interaction = null;
+                    continue; // Skip movement
+                }
+
+                const speedMult = fish.weak ? 0.4 : 1.0;
+                let baseSpeed = 25 * speedMult;
+                sprite.swimTimer += dt;
+
+                // Laser Chasing
+                if (laserState.active && (fish.swimPattern === 'school' || fish.swimPattern === 'dart' || fish.swimPattern === 'zigzag')) {
+                    const dx = laserState.x - sprite.x;
+                    const dy = laserState.y - sprite.y;
+                    const dist = Math.hypot(dx, dy);
+                    if (dist > 5) {
+                        sprite.vx += (dx / dist) * 100 * dt;
+                        sprite.vy += (dy / dist) * 100 * dt;
+                        // Limit max speed
+                        const speed = Math.hypot(sprite.vx, sprite.vy);
+                        if (speed > 80) {
+                            sprite.vx = (sprite.vx / speed) * 80;
+                            sprite.vy = (sprite.vy / speed) * 80;
+                        }
+                    }
+                    sprite.facingRight = sprite.vx > 0;
+                    // Skip regular movement
+                    sprite.x += sprite.vx * dt;
+                    sprite.y += sprite.vy * dt;
+                    // Simple bounds
+                    if (sprite.x > W - 10) sprite.x = W - 10;
+                    if (sprite.x < 10) sprite.x = 10;
+                    if (sprite.y > H - 10) sprite.y = H - 10;
+                    if (sprite.y < 10) sprite.y = 10;
+                    continue;
+                }
+
+                // Normal movement
+                switch (fish.swimPattern) {
+                    case 'school':
+                        // Seek anchor + offset
+                        const targetX = schoolAnchor.x + sprite.schoolOffset.x;
+                        const targetY = schoolAnchor.y + sprite.schoolOffset.y;
+                        const dx = targetX - sprite.x;
+                        const dy = targetY - sprite.y;
+                        sprite.vx += dx * 2 * dt;
+                        sprite.vy += dy * 2 * dt;
+                        // Dampen
+                        sprite.vx *= 0.95;
+                        sprite.vy *= 0.95;
+                        sprite.facingRight = sprite.vx > 0;
+                        break;
+
+                    case 'drift':
+                        sprite.vx = (sprite.facingRight ? 1 : -1) * baseSpeed * 0.6;
+                        sprite.vy = Math.sin(sprite.swimTimer * 0.8) * 6;
+                        break;
+
+                    case 'dart':
+                        if (sprite.dartPause > 0) {
+                            sprite.dartPause -= dt;
+                            sprite.vx *= 0.9;
+                            sprite.vy *= 0.9;
+                        } else {
+                            sprite.vx = (sprite.facingRight ? 1 : -1) * baseSpeed * 1.5;
+                            sprite.vy = (Math.random() - 0.5) * baseSpeed * 0.8;
+                            if (Math.random() < 0.03) {
+                                sprite.dartPause = 1 + Math.random() * 2;
+                            }
+                        }
+                        break;
+
+                    case 'glide':
+                        sprite.vx = (sprite.facingRight ? 1 : -1) * baseSpeed * 0.8;
+                        sprite.vy = Math.sin(sprite.swimTimer * 0.5) * 15;
+                        break;
+
+                    case 'circle':
+                        if (sprite.swimTimer < 0.1) {
+                            sprite.circleCenter = { x: sprite.x, y: sprite.y };
+                        }
+                        sprite.circleAngle += dt * 0.6 * speedMult;
+                        const radius = 30 + Math.sin(sprite.swimTimer * 0.2) * 10;
+                        const tX = sprite.circleCenter.x + Math.cos(sprite.circleAngle) * radius;
+                        const tY = sprite.circleCenter.y + Math.sin(sprite.circleAngle) * radius;
+                        sprite.vx = (tX - sprite.x) * 2;
+                        sprite.vy = (tY - sprite.y) * 2;
+                        sprite.facingRight = sprite.vx > 0;
+                        break;
+
+                    case 'zigzag':
+                        sprite.vx = (sprite.facingRight ? 1 : -1) * baseSpeed * 0.7;
+                        sprite.vy = Math.sin(sprite.swimTimer * 3) * baseSpeed * 0.5;
+                        break;
+
+                    default:
+                        sprite.vx = (sprite.facingRight ? 1 : -1) * baseSpeed * 0.5;
+                        sprite.vy = Math.sin(sprite.swimTimer) * 5;
+                }
+
+                // Apply velocity
+                sprite.x += sprite.vx * dt;
+                sprite.y += sprite.vy * dt;
+
+                // Boundaries + direction flip
+                const margin = 10;
+                if (sprite.x > W - margin) { sprite.facingRight = false; sprite.x = W - margin; sprite.vx *= -0.5; }
+                if (sprite.x < margin) { sprite.facingRight = true; sprite.x = margin; sprite.vx *= -0.5; }
+
+                // Zone boundaries
+                const minY = sprite.zone.minY * H;
+                const maxY = sprite.zone.maxY * H;
+                // Soft constraints for zones to allow drifting back
+                if (sprite.y < minY) { sprite.vy += 10 * dt; }
+                if (sprite.y > maxY) { sprite.vy -= 10 * dt; }
+
+                // Hard constraints
+                if (sprite.y < 0) sprite.y = 0;
+                if (sprite.y > H) sprite.y = H;
+
+                // Slow drift of circle center
+                if (fish.swimPattern === 'circle') {
+                    sprite.circleCenter.x += ((W / 2) - sprite.circleCenter.x) * dt * 0.05;
+                }
+
+                // Occasional random direction change for non-circle/school fish
+                if (fish.swimPattern !== 'circle' && fish.swimPattern !== 'school' && Math.random() < 0.003) {
+                    sprite.facingRight = !sprite.facingRight;
+                }
+            }
+        }
+
+        function drawFish() {
+            if (!gameState) return;
+
+            for (let i = 0; i < fishSprites.length; i++) {
+                const sprite = fishSprites[i];
+                const fish = gameState.fish.find(f => f.id === sprite.fishId);
+                if (!fish) continue;
+
+                const speciesData = FISH_PIXELS[fish.speciesId];
+                if (!speciesData) continue;
+
+                const scale = PIXEL * (fish.sizeVariance || 1);
+                const px = speciesData.pixels;
+                const bodyColor = fish.color?.body || '#FF7043';
+                const tailColor = fish.color?.tail || '#FFB74D';
+
+                ctx.save();
+                ctx.translate(sprite.x, sprite.y);
+                if (!sprite.facingRight) ctx.scale(-1, 1);
+
+                // Weak = desaturation via alpha overlay
+                const weakAlpha = fish.weak ? 0.5 : 1.0;
+
+                for (let r = 0; r < px.length; r++) {
+                    for (let c = 0; c < px[r].length; c++) {
+                        if (px[r][c] === 0) continue;
+                        const cellColor = px[r][c] === 1 ? bodyColor : tailColor;
+                        ctx.globalAlpha = weakAlpha;
+                        ctx.fillStyle = cellColor;
+                        ctx.fillRect(
+                            (c - speciesData.width / 2) * scale,
+                            (r - speciesData.height / 2) * scale,
+                            scale, scale
+                        );
+                    }
+                }
+
+                // Eye
+                ctx.globalAlpha = weakAlpha;
+                ctx.fillStyle = '#111';
+                const eyeX = (speciesData.eyePos.col - speciesData.width / 2) * scale;
+                const eyeY = (speciesData.eyePos.row - speciesData.height / 2) * scale;
+                ctx.fillRect(eyeX, eyeY, scale * 0.6, scale * 0.6);
+
+                // Weak indicator: small sad circle
+                if (fish.weak) {
+                    ctx.globalAlpha = 0.6;
+                    ctx.fillStyle = '#FFAB91';
+                    ctx.beginPath();
+                    ctx.arc(0, -speciesData.height / 2 * scale - 6, 3, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                ctx.restore();
+            }
+        }
+
+        // ── Render loop ─────────────────────────────────────────────────────
+        let lastFrameTime = 0;
+
+        function renderLoop(timestamp) {
+            if (!lastFrameTime) lastFrameTime = timestamp;
+            const dt = Math.min((timestamp - lastFrameTime) / 1000, 0.1); // cap at 100ms
+            lastFrameTime = timestamp;
+
+            // Clear
+            ctx.clearRect(0, 0, W, H);
+
+            // Draw layers
+            drawEnvironment();
+            updateBubbles(dt);
+            drawBubbles();
+            updateSnails(dt);
+            drawSnails();
+            updateFishSprites(dt);
+            drawFish();
+            drawLaser(dt);
+
+            // Update coin display (smooth counting in display could be added later)
+            if (gameState) {
+                document.getElementById('coinCount').textContent = Math.floor(gameState.coins);
+            }
+
+            animFrame = requestAnimationFrame(renderLoop);
+        }
+
+        function drawLaser(dt) {
+            if (!laserState.active) return;
+
+            // Draw red dot
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = '#ff0000';
+            ctx.fillStyle = '#ff0000';
+            ctx.beginPath();
+            ctx.arc(laserState.x, laserState.y, 4, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            // Reward check (once per 6h handled by backend, but we trigger it here)
+            // Just trigger it if active for few seconds?
+            // User said "Rewards Once per 6 hours".
+            // Let's just try to claim reward every second while active, backend handles cooldown.
+            laserState.timer = (laserState.timer || 0) + dt;
+            if (laserState.timer > 1.0) {
+                laserState.timer = 0;
+                doAction('laser_pointer');
+            }
+        }
+
+        // ── UI helpers ──────────────────────────────────────────────────────
+        function showToast(msg, duration = 2500) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('visible');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => toast.classList.remove('visible'), duration);
+        }
+
+        function updateCleanIndicator() {
+            if (!gameState) return;
+            // Cleanliness
+            const cleanBar = document.getElementById('cleanBar');
+            cleanBar.style.width = `${gameState.cleanliness}%`;
+
+            // Avg Hunger
+            const totalHunger = gameState.fish.reduce((sum, f) => sum + f.hunger, 0);
+            const avgHunger = gameState.fish.length > 0 ? totalHunger / gameState.fish.length : 100;
+            const hungerBar = document.getElementById('hungerBar');
+            hungerBar.style.width = `${avgHunger}%`;
+
+            // Update coin rate
+            // Calculate current coin rate per hour
+            // This is complex to do accurately without duplicating logic, 
+            // but we can estimate base rate + bonuses? 
+            // Or just rely on the coin counter incrementing. 
+            // User asked for "visible how many coins you earn".
+            // Let's add it next to coin count.
+            const rate = gameState.fish.reduce((sum, f) => {
+                const species = FISH_PIXELS[f.speciesId]; // Wait, pixels doesn't have prices.
+                // We don't have SPECIES constants here.
+                // We need to pass it from backend or approximate.
+                // Let's postpone exact rate display until we have data.
+                return sum;
+            }, 0);
+        }
+
+        function closeAllPanels() {
+            document.querySelectorAll('.panel-overlay').forEach(p => p.classList.remove('visible'));
+        }
+
+        function closeMenu() {
+            menuOpen = false;
+            document.getElementById('menuOverlay').classList.remove('visible');
+            document.getElementById('fab').classList.remove('open');
+        }
+
+        function openMenu() {
+            menuOpen = true;
+            document.getElementById('menuOverlay').classList.add('visible');
+            document.getElementById('fab').classList.add('open');
+            closeFishBubble();
+        }
+
+        function closeFishBubble() {
+            selectedFishId = null;
+            document.getElementById('fishBubble').classList.remove('visible');
+        }
+
+        // ── Build panel content ─────────────────────────────────────────────
+        function buildFeedPanel() {
+            const list = document.getElementById('feedList');
+            list.innerHTML = '';
+
+            if (!storeCatalog) return;
+
+            for (const food of storeCatalog.foods) {
+                const stock = gameState.foodStock[food.foodId] || 0;
+                const div = document.createElement('div');
+                div.className = 'store-item';
+                div.innerHTML = `
+          <div class="store-item-info">
+            <div class="store-item-name">${food.name}</div>
+            <div class="store-item-desc">+${food.hungerRestore} hunger · Stock: ${stock}</div>
+          </div>
+          <button class="buy-btn" ${stock <= 0 ? 'disabled' : ''}>Feed</button>
+        `;
+                div.querySelector('.buy-btn').addEventListener('click', () => doAction('feed', { foodId: food.foodId }));
+                list.appendChild(div);
+            }
+        }
+
+        function buildStorePanel() {
+            const list = document.getElementById('storeList');
+            list.innerHTML = '';
+
+            if (!storeCatalog) return;
+
+            // Fish section
+            const fishTitle = document.createElement('div');
+            fishTitle.className = 'store-section-title';
+            fishTitle.textContent = '🐟 Fish';
+            list.appendChild(fishTitle);
+
+            for (const sp of storeCatalog.fish) {
+                const canBuy = gameState.coins >= sp.price && gameState.fish.length < tankInfo.capacity;
+                const div = document.createElement('div');
+                div.className = 'store-item';
+                div.innerHTML = `
+          <div class="store-item-info">
+            <div class="store-item-name">${sp.name}</div>
+            <div class="store-item-desc">${sp.baseCoinPerHour.toFixed(1)} coins/hr</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="store-item-price"><div class="coin-icon-sm"></div>${sp.price}</div>
+            <button class="buy-btn" ${!canBuy ? 'disabled' : ''}>Buy</button>
+          </div>
+        `;
+                div.querySelector('.buy-btn').addEventListener('click', () => doAction('buy_fish', { speciesId: sp.speciesId }));
+                list.appendChild(div);
+            }
+
+            // Food section
+            const foodTitle = document.createElement('div');
+            foodTitle.className = 'store-section-title';
+            foodTitle.textContent = '🍞 Food';
+            list.appendChild(foodTitle);
+
+            for (const food of storeCatalog.foods) {
+                const canBuy = gameState.coins >= food.price;
+                const stock = gameState.foodStock[food.foodId] || 0;
+                const div = document.createElement('div');
+                div.className = 'store-item';
+                div.innerHTML = `
+          <div class="store-item-info">
+            <div class="store-item-name">${food.name}</div>
+            <div class="store-item-desc">+${food.hungerRestore} hunger · Stock: ${stock}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="store-item-price"><div class="coin-icon-sm"></div>${food.price}</div>
+            <button class="buy-btn" ${!canBuy ? 'disabled' : ''}>Buy ×5</button>
+          </div>
+        `;
+                div.querySelector('.buy-btn').addEventListener('click', () => doAction('buy_food', { foodId: food.foodId, quantity: 5 }));
+                list.appendChild(div);
+            }
+        }
+
+        function buildInventoryPanel() {
+            const list = document.getElementById('inventoryList');
+            list.innerHTML = '';
+
+            if (!storeCatalog) return;
+
+            const foodTitle = document.createElement('div');
+            foodTitle.className = 'store-section-title';
+            foodTitle.textContent = '🍞 Food Stock';
+            list.appendChild(foodTitle);
+
+            for (const food of storeCatalog.foods) {
+                const stock = gameState.foodStock[food.foodId] || 0;
+                const div = document.createElement('div');
+                div.className = 'store-item';
+                div.innerHTML = `
+          <div class="store-item-info">
+            <div class="store-item-name">${food.name}</div>
+            <div class="store-item-desc">+${food.hungerRestore} hunger per use</div>
+          </div>
+          <div class="inv-count">${stock}</div>
+        `;
+                list.appendChild(div);
+            }
+
+            // Fish roster (compact)
+            const fishTitle = document.createElement('div');
+            fishTitle.className = 'store-section-title';
+            fishTitle.textContent = '🐟 Your Fish';
+            list.appendChild(fishTitle);
+
+            for (const fish of gameState.fish) {
+                const ageDays = Math.floor((Date.now() - fish.bornAt) / 86400000);
+                const div = document.createElement('div');
+                div.className = 'store-item';
+                div.innerHTML = `
+          <div class="store-item-info">
+            <div class="store-item-name">${fish.name}</div>
+            <div class="store-item-desc">${getLifeStage(fish).stage} · ${ageDays}d · Lv.${fish.level} · ${fish.weak ? '😢 Weak' : '😊'}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:4px">
+            <div style="width:30px;height:4px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden">
+              <div style="width:${fish.hunger}%;height:100%;background:${fish.hunger > 30 ? '#81C784' : '#FFAB91'};border-radius:2px"></div>
+            </div>
+          </div>
+        `;
+                list.appendChild(div);
+            }
+        }
+
+        function getLifeStage(fish) {
+            const ageDays = (Date.now() - fish.bornAt) / 86400000;
+            if (ageDays < 2) return { stage: 'Baby', emoji: '🐣' };
+            if (ageDays < 7) return { stage: 'Child', emoji: '🐠' };
+            return { stage: 'Adult', emoji: '🐟' };
+        }
+
+        function xpToNextLevel(level) {
+            return 30 + 14 * (level - 1);
+        }
+
+        function buildUpgradesPanel() {
+            const list = document.getElementById('upgradesList');
+            list.innerHTML = '';
+            if (!upgradesCatalog) return;
+
+            // Tank upgrade section
+            if (upgradesCatalog.tankUpgrade) {
+                const tu = upgradesCatalog.tankUpgrade;
+                const section = document.createElement('div');
+                section.className = 'tank-upgrade-section';
+                section.innerHTML = `
+                    <div class="tank-upgrade-title">🏗 Upgrade to ${tu.tankName}</div>
+                    <div class="tank-upgrade-desc">Capacity: ${tu.capacity} fish</div>
+                    <div class="tank-upgrade-desc">${tu.requirementsDescription}</div>
+                    <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
+                        <div class="store-item-price"><div class="coin-icon-sm"></div>${tu.price}</div>
+                        <button class="buy-btn" id="upgradeTankBtn" ${!tu.canBuy ? 'disabled' : ''}>${tu.meetsRequirements ? 'Upgrade' : '🔒 Locked'}</button>
+                    </div>
+                    ${!tu.meetsRequirements ? '<div class="upgrade-requirement">Requirements not yet met</div>' : ''}
+                `;
+                list.appendChild(section);
+                if (tu.canBuy) {
+                    section.querySelector('#upgradeTankBtn').addEventListener('click', () => doAction('upgrade_tank'));
+                }
+            }
+
+            // Helper for upgrade items
+            const addUpgradeItem = (key, name, desc) => {
+                const item = upgradesCatalog[key];
+                if (!item) return;
+
+                const div = document.createElement('div');
+                div.className = 'store-item';
+                div.innerHTML = `
+                    <div class="store-item-info">
+                        <div class="store-item-name">${name} (Lv ${item.current}/${item.max})</div>
+                        <div class="store-item-desc">${desc}</div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:8px">
+                        ${item.current < item.max ? `
+                        <div class="store-item-price"><div class="coin-icon-sm"></div>${item.price}</div>
+                        <button class="buy-btn" ${!item.canBuy ? 'disabled' : ''}>Buy</button>
+                        ` : '<div style="font-size:10px;color:#81C784">MAXED</div>'}
+                    </div>
+                `;
+                if (item.current < item.max) {
+                    div.querySelector('.buy-btn').addEventListener('click', () => doAction('buy_upgrade', { upgradeId: key }));
+                }
+                list.appendChild(div);
+            };
+
+            // Section: Automation
+            const autoTitle = document.createElement('div');
+            autoTitle.className = 'store-section-title';
+            autoTitle.textContent = '⚙️ Automation';
+            list.appendChild(autoTitle);
+
+            if (upgradesCatalog.snails) {
+                const s = upgradesCatalog.snails;
+                // Manually handle snails as they are count-based not strictly levels
+                const div = document.createElement('div');
+                div.className = 'store-item';
+                div.innerHTML = `
+                    <div class="store-item-info">
+                        <div class="store-item-name">Snail (${s.current}/${s.max})</div>
+                        <div class="store-item-desc">Eats algae. Reduces dirt buildup by 15%.</div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:8px">
+                        ${s.current < s.max ? `
+                        <div class="store-item-price"><div class="coin-icon-sm"></div>${s.price}</div>
+                        <button class="buy-btn" ${!s.canBuy ? 'disabled' : ''}>Buy</button>
+                        ` : '<div style="font-size:10px;color:#81C784">MAXED</div>'}
+                    </div>
+                 `;
+                if (s.current < s.max) {
+                    div.querySelector('.buy-btn').addEventListener('click', () => doAction('buy_upgrade', { upgradeId: 'snails' }));
+                }
+                list.appendChild(div);
+            }
+
+            addUpgradeItem('filter', 'Filter System', 'Reduces dirt accumulation rate.');
+            addUpgradeItem('autoFeeder', 'Auto-Feeder', 'Automatically feeds fish when you are away.');
+            addUpgradeItem('foodSilo', 'Food Silo', 'Increases max food storage capacity.');
+
+            // Other upgrades
+            if (upgradesCatalog.upgrades.length > 0) {
+                const title = document.createElement('div');
+                title.className = 'store-section-title';
+                title.textContent = '⬆️ Equipment';
+                list.appendChild(title);
+
+                for (const upg of upgradesCatalog.upgrades) {
+                    const div = document.createElement('div');
+                    div.className = 'store-item';
+                    div.innerHTML = `
+                        < div class="store-item-info" >
+                            <div class="store-item-name">${upg.icon} ${upg.name} (Lv.${upg.currentLevel} → ${upg.currentLevel + 1})</div>
+                            <div class="store-item-desc">${upg.nextDescription}</div>
+                        </div >
+                    <div style="display:flex;align-items:center;gap:8px">
+                        <div class="store-item-price"><div class="coin-icon-sm"></div>${upg.nextPrice}</div>
+                        <button class="buy-btn" ${!upg.canBuy ? 'disabled' : ''}>Buy</button>
+                    </div>
+                `;
+                    div.querySelector('.buy-btn').addEventListener('click', () => doAction('buy_upgrade', { upgradeId: upg.id }));
+                    list.appendChild(div);
+                }
+            }
+
+            // If nothing available
+            if (!upgradesCatalog.tankUpgrade && !upgradesCatalog.snails && upgradesCatalog.upgrades.length === 0) {
+                list.innerHTML = '<div style="text-align:center;color:rgba(255,255,255,0.5);padding:20px">All upgrades purchased! 🎉</div>';
+            }
+        }
+
+        // ── Fish tap detection ──────────────────────────────────────────────
+        function handleTankTap(e) {
+            if (menuOpen) return;
+
+            // If laser active, ignore taps for fish selection (let user drag laser)
+            if (laserState.active) return;
+
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = W / rect.width;
+            const scaleY = H / rect.height;
+
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+            const tapX = (clientX - rect.left) * scaleX;
+            const tapY = (clientY - rect.top) * scaleY;
+
+            let tappedSprite = null;
+            let tappedFish = null;
+
+            // Check sprites (reverse order for top-most)
+            for (let i = fishSprites.length - 1; i >= 0; i--) {
+                const s = fishSprites[i];
+                const fish = gameState.fish.find(f => f.id === s.fishId);
+                if (!fish) continue;
+                const species = FISH_PIXELS[fish.speciesId];
+                if (!species) continue;
+
+                // Simple box collision
+                const w = species.width * PIXEL;
+                const h = species.height * PIXEL;
+                if (tapX >= s.x - w / 2 && tapX <= s.x + w / 2 &&
+                    tapY >= s.y - h / 2 && tapY <= s.y + h / 2) {
+                    tappedSprite = s;
+                    tappedFish = fish;
+                    break;
+                }
+            }
+
+            if (tappedFish) {
+                // Interaction: Halt + Wiggle
+                tappedSprite.interaction = { type: 'tap', timer: 2.0 };
+                showFishBubble(tappedFish, tappedSprite, rect);
+            } else {
+                closeFishBubble();
+            }
+        }
+
+        function showFishBubble(fish, sprite, canvasRect) {
+            selectedFishId = fish.id;
+            const bubble = document.getElementById('fishBubble');
+            const ageDays = Math.floor((Date.now() - fish.bornAt) / 86400000);
+            const ageHours = Math.floor((Date.now() - fish.bornAt) / 3600000);
+            const ageStr = ageDays > 0 ? `${ageDays}d old` : `${ageHours}h old`;
+            const lifeStage = getLifeStage(fish);
+
+            document.getElementById('bubbleName').textContent = fish.name;
+            document.getElementById('bubbleDetail').textContent =
+                `${ageStr} · Lv.${fish.level} · ❤️ ${fish.favoriteFoodId} `;
+
+            // Hunger bar
+            const hungerFill = document.getElementById('bubbleHunger');
+            hungerFill.style.width = `${fish.hunger}% `;
+            hungerFill.className = `fish - bubble - hunger - fill${fish.hunger <= 30 ? ' low' : ''} `;
+
+            // XP bar
+            const xpNeeded = xpToNextLevel(fish.level);
+            const xpPct = fish.level >= 10 ? 100 : Math.min(100, (fish.xp / xpNeeded) * 100);
+            document.getElementById('bubbleXp').style.width = `${xpPct}% `;
+
+            // Life stage badge
+            document.getElementById('bubbleStage').textContent = `${lifeStage.emoji} ${lifeStage.stage} `;
+
+            const weakBadge = document.getElementById('bubbleWeak');
+            weakBadge.style.display = fish.weak ? 'inline-block' : 'none';
+
+            const sellBtn = document.getElementById('bubbleSell');
+            sellBtn.style.display = gameState.fish.length > 1 ? 'inline-block' : 'none';
+
+            // Position bubble near fish
+            const scaleX = canvasRect.width / W;
+            const scaleY = canvasRect.height / H;
+            let bx = sprite.x * scaleX - 55;
+            let by = sprite.y * scaleY - 95;
+            bx = Math.max(5, Math.min(bx, canvasRect.width - 170));
+            by = Math.max(5, Math.min(by, canvasRect.height - 110));
+
+            bubble.style.left = `${bx} px`;
+            bubble.style.top = `${by} px`;
+            bubble.classList.add('visible');
+
+            try { if (homey.hapticFeedback) homey.hapticFeedback(); } catch (e) { }
+        }
+
+        // ── API calls ───────────────────────────────────────────────────────
+        function resizeCanvas() {
+            const wrap = document.getElementById('tankWrap');
+            const dpr = window.devicePixelRatio || 1;
+            W = wrap.clientWidth;
+            H = wrap.clientHeight;
+            canvas.width = W * dpr;
+            canvas.height = H * dpr;
+            ctx.scale(dpr, dpr);
+        }
+
+        async function loadState() {
+            try {
+                const data = await homey.api('GET', `/? widgetId = ${widgetId} `);
+                gameState = data.state;
+                storeCatalog = data.storeCatalog;
+                tankInfo = data.tankInfo;
+                upgradesCatalog = data.upgradesCatalog;
+
+                if (data.isNew) {
+                    showToast('🐟 Welcome to your aquarium!', 3000);
+                } else if (data.simResult.dtHours > 1 && data.simResult.coinsEarned > 0) {
+                    showToast(`💰 +${data.simResult.coinsEarned} coins while you were away`, 3500);
+                }
+
+                updateCleanIndicator();
+                updateUpgradeBadge();
+
+                // Update tier styling
+                document.querySelector('.tank-wrap').dataset.tier = gameState.tankTier;
+                // Force resize if tier changed (affects canvas size for fishbowl)
+                resizeCanvas();
+
+                initEnvironment();
+                initFishSprites();
+                initSnails();
+
+                // Update laser button visibility
+                if (gameState && gameState.tankTier >= 3) {
+                    document.getElementById('laserBtn').style.display = 'flex';
+                } else {
+                    document.getElementById('laserBtn').style.display = 'none';
+                }
+
+            } catch (err) {
+                console.error('Failed to load state:', err);
+                showToast('Failed to load aquarium');
+            }
+        }
+
+        function updateUpgradeBadge() {
+            const badge = document.getElementById('upgradeBadge');
+            if (upgradesCatalog?.tankUpgrade?.canBuy) {
+                badge.classList.add('visible');
+                badge.style.display = 'block';
+            } else {
+                badge.classList.remove('visible');
+                badge.style.display = 'none';
+            }
+        }
+
+        function confirmReset() {
+            if (confirm('Are you absolutely sure? This will delete all your fish and progress forever.')) {
+                doAction('reset_state');
+                closeAllPanels();
+                showToast('Resetting Aquarium...', 2000);
+            }
+        }
+
+        async function doAction(type, payload = {}) {
+            try {
+                const data = await homey.api('POST', `/?widgetId=${widgetId}`, { type, payload });
+
+                if (data.result.error) {
+                    showToast(`❌ ${data.result.error}`);
+                    return;
+                }
+
+                gameState = data.state;
+                storeCatalog = data.storeCatalog;
+                tankInfo = data.tankInfo;
+                upgradesCatalog = data.upgradesCatalog;
+                updateCleanIndicator();
+
+                updateUpgradeBadge();
+
+                // Refresh sprites if fish count changed
+                if (type === 'buy_fish' || type === 'sell_fish' || type === 'upgrade_tank') {
+                    initFishSprites();
+                    closeFishBubble();
+                }
+
+                // Close panels and show feedback
+                switch (type) {
+                    case 'feed':
+                        showToast(`🍞 Fed ${data.result.fedCount} fish!`);
+                        buildFeedPanel(); // refresh stock
+                        break;
+                    case 'clean':
+                        closeAllPanels();
+                        closeMenu();
+                        showToast(`✨ Tank cleaned! +${data.result.bonus} coins`);
+                        break;
+                    case 'buy_fish':
+                        showToast(`🐟 ${data.result.fish.name} joined your tank!`);
+                        buildStorePanel(); // refresh prices
+                        break;
+                    case 'sell_fish':
+                        showToast(`💰 Sold ${data.result.fishName} for ${data.result.value} coins`);
+                        buildStorePanel();
+                        break;
+                    case 'buy_food':
+                        showToast(`📦 Purchased!`);
+                        buildStorePanel();
+                        break;
+                    case 'buy_snail':
+                        showToast(`🐌 Snail added!`);
+                        buildUpgradesPanel();
+                        break;
+                    case 'buy_upgrade':
+                        showToast(`⬆️ ${data.result.upgradeId} upgraded to level ${data.result.newLevel}!`);
+                        buildUpgradesPanel();
+                        break;
+                    case 'upgrade_tank':
+                        closeAllPanels();
+                        closeMenu();
+                        document.querySelector('.tank-wrap').dataset.tier = gameState.tankTier;
+                        resizeCanvas();
+                        initEnvironment();
+                        initSnails();
+                        showToast(`🏗 Welcome to your ${data.result.tankName}!`, 4000);
+                        break;
+                    case 'reset_state':
+                        closeAllPanels();
+                        closeMenu();
+                        showToast('♻️ Aquarium Reset');
+                        document.querySelector('.tank-wrap').dataset.tier = gameState.tankTier;
+                        resizeCanvas();
+                        initEnvironment();
+                        initFishSprites();
+                        initSnails();
+                        break;
+                }
+            } catch (err) {
+                console.error('Action failed:', err);
+                showToast('Something went wrong');
+            }
+        }
+
+        // ── Event listeners ─────────────────────────────────────────────────
+        function setupEventListeners() {
+            // FAB toggle
+            document.getElementById('fab').addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (menuOpen) {
+                    closeMenu();
+                } else {
+                    closeAllPanels();
+                    closeFishBubble();
+                    openMenu();
+                }
+            });
+
+            // Laser tracking
+            const updateLaserPos = (clientX, clientY) => {
+                if (!laserState.active) return;
+                const rect = canvas.getBoundingClientRect();
+                const scaleX = W / rect.width;
+                const scaleY = H / rect.height;
+                laserState.x = (clientX - rect.left) * scaleX;
+                laserState.y = (clientY - rect.top) * scaleY;
+                laserState.x = Math.max(0, Math.min(W, laserState.x));
+                laserState.y = Math.max(0, Math.min(H, laserState.y));
+            };
+
+            canvas.addEventListener('mousemove', (e) => updateLaserPos(e.clientX, e.clientY));
+            canvas.addEventListener('touchmove', (e) => {
+                if (laserState.active) e.preventDefault();
+                updateLaserPos(e.touches[0].clientX, e.touches[0].clientY);
+            }, { passive: false });
+
+            // Upgrade badge click
+            document.getElementById('upgradeBadge').addEventListener('click', () => {
+                buildUpgradesPanel();
+                document.getElementById('upgradesPanel').classList.add('visible');
+            });
+
+            // Menu buttons
+            document.querySelectorAll('.menu-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const action = btn.dataset.action;
+                    closeMenu();
+
+                    switch (action) {
+                        case 'feed':
+                            buildFeedPanel();
+                            document.getElementById('feedPanel').classList.add('visible');
+                            break;
+                        case 'clean':
+                            doAction('clean');
+                            break;
+                        case 'store':
+                            buildStorePanel();
+                            document.getElementById('storePanel').classList.add('visible');
+                            break;
+                        case 'inventory':
+                            buildInventoryPanel();
+                            document.getElementById('inventoryPanel').classList.add('visible');
+                            break;
+                        case 'upgrades':
+                            buildUpgradesPanel();
+                            document.getElementById('upgradesPanel').classList.add('visible');
+                            break;
+                        case 'help':
+                            document.getElementById('helpPanel').classList.add('visible');
+                            break;
+                        case 'laser':
+                            laserState.active = !laserState.active;
+                            if (laserState.active) {
+                                showToast('🔴 Laser activated! Drag to play', 2000);
+                            } else {
+                                showToast('Laser deactivated');
+                            }
+                            break;
+                    }
+                });
+            });
+
+            // Panel close buttons
+            document.querySelectorAll('.panel-close').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const panelId = btn.dataset.close;
+                    document.getElementById(panelId).classList.remove('visible');
+                });
+            });
+
+            // Tank tap for fish selection
+            canvas.addEventListener('click', handleTankTap);
+
+            // Sell button
+            document.getElementById('bubbleSell').addEventListener('click', () => {
+                if (selectedFishId) {
+                    doAction('sell_fish', { fishId: selectedFishId });
+                }
+            });
+
+            // Close fish bubble when tapping elsewhere
+            document.getElementById('tankWrap').addEventListener('click', (e) => {
+                if (e.target === document.getElementById('tankWrap')) {
+                    closeFishBubble();
+                }
+            });
+        }
+
+        // ── Periodic state refresh (every 5 min for coin updates) ───────────
+        function startPeriodicRefresh() {
+            setInterval(async () => {
+                try {
+                    const data = await homey.api('GET', `/? widgetId = ${widgetId}`);
+                    gameState = data.state;
+                    storeCatalog = data.storeCatalog;
+                    updateCleanIndicator();
+                } catch (e) {
+                    // Silent fail
+                }
+            }, 5 * 60 * 1000);
+        }
+
+        // ── Init (called by Homey SDK or sandbox MockHomey) ──────────────
+        async function init(Homey) {
+            homey = Homey;
+            widgetId = await homey.getWidgetInstanceId();
+
+            // Setup canvas
+            const wrap = document.getElementById('tankWrap');
+            const dpr = window.devicePixelRatio || 1;
+            W = wrap.clientWidth * dpr;
+            H = 300 * dpr;
+            canvas.width = W;
+            canvas.height = H;
+            ctx.scale(dpr, dpr);
+            W = wrap.clientWidth;
+            H = 300;
+
+            initEnvironment();
+            setupEventListeners();
+
+            // Load game state
+            await loadState();
+
+            // Start render loop
+            lastFrameTime = 0;
+            animFrame = requestAnimationFrame(renderLoop);
+
+            // Start periodic refresh
+            startPeriodicRefresh();
+
+            // Hide loading
+            document.getElementById('loading').classList.add('hidden');
+
+            // Signal ready
+            homey.ready({ height: 300 });
+        }
+
+        // ── Entry point: onHomeyReady callback pattern ──────────────────────
+        window.onHomeyReady = init;
+    </script>
+</body>
+
+</html>

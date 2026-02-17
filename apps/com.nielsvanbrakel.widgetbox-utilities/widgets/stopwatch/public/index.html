@@ -95,7 +95,7 @@
       padding: 0;
       border: none;
       border-radius: 50%;
-      background: var(--homey-color-mono-100);
+      background: transparent;
       color: var(--homey-text-color);
       font-size: 16px;
       font-weight: bold;
@@ -659,6 +659,17 @@
       CONFIG.SHOW_MILLISECONDS = settings.showMilliseconds ?? CONFIG.SHOW_MILLISECONDS;
       CONFIG.SHOW_LAPS = settings.showLaps ?? CONFIG.SHOW_LAPS;
 
+
+      // Handle setting changes
+      Homey.on('settings.set', (key, value) => {
+        settings[key] = value;
+        CONFIG.MAX_STOPWATCHES = settings.maxStopwatches ?? CONFIG.MAX_STOPWATCHES;
+        CONFIG.ALLOW_ADDING = settings.allowAddingStopwatches ?? CONFIG.ALLOW_ADDING;
+        CONFIG.SHOW_MILLISECONDS = settings.showMilliseconds ?? CONFIG.SHOW_MILLISECONDS;
+        CONFIG.SHOW_LAPS = settings.showLaps ?? CONFIG.SHOW_LAPS;
+        render();
+        setHeight();
+      });
 
       // Try to restore from persistence
       const savedState = await loadState();

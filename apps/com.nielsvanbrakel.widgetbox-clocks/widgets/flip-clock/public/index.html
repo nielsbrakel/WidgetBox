@@ -19,26 +19,27 @@
 
         :root {
             /* Default to Light Mode values */
-            --flip-card-bg-top: linear-gradient(180deg, #f9f9f9 0%, #e0e0e0 100%);
-            --flip-card-bg-bottom: linear-gradient(180deg, #e0e0e0 0%, #f9f9f9 100%);
-            --flip-text-color: #222;
-            --flip-border-top: rgba(0, 0, 0, 0.1);
-            --flip-border-bottom: rgba(255, 255, 255, 0.8);
+            --flip-card-bg-top: linear-gradient(180deg, #f5f5f5 0%, #e8e8e8 100%);
+            --flip-card-bg-bottom: linear-gradient(180deg, #e8e8e8 0%, #f5f5f5 100%);
+            --flip-text-color: #333;
+            --flip-border-top: rgba(0, 0, 0, 0.05);
+            --flip-border-bottom: rgba(255, 255, 255, 0.5);
         }
 
         @media (prefers-color-scheme: dark) {
             :root {
                 /* Dark Mode overrides */
-                --flip-card-bg-top: linear-gradient(180deg, #2a2a2a 0%, #1a1a1a 100%);
-                --flip-card-bg-bottom: linear-gradient(180deg, #1a1a1a 0%, #222 100%);
-                --flip-text-color: #e0e0e0;
-                --flip-border-top: rgba(0, 0, 0, 0.3);
+                --flip-card-bg-top: linear-gradient(180deg, #333 0%, #2a2a2a 100%);
+                --flip-card-bg-bottom: linear-gradient(180deg, #2a2a2a 0%, #333 100%);
+                --flip-text-color: #f0f0f0;
+                --flip-border-top: rgba(0, 0, 0, 0.2);
                 --flip-border-bottom: rgba(255, 255, 255, 0.05);
             }
         }
 
-        /* Outer Wrapper for Spacing */
+        /* ... Wrapper styles unchanged ... */
         .widget-spacing-wrapper {
+            /* ... */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -47,17 +48,15 @@
             box-sizing: border-box;
             transition: none;
             overflow: hidden;
-            /* Ensure no scrollbars */
         }
 
-        /* Inner Card for Background/Border */
+        /* ... Inner Card ... */
         .widget-card {
             display: flex;
             align-items: center;
             justify-content: center;
             width: 100%;
             height: auto;
-            /* Allow dynamic height */
             background: var(--homey-background-color);
             border-radius: var(--homey-border-radius, 16px);
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
@@ -71,7 +70,6 @@
         }
 
         .flip-clock-wrapper {
-            /* Wrapper for scaling */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -83,15 +81,16 @@
             gap: 8px;
             align-items: center;
             justify-content: center;
-            perspective: 400px;
+            perspective: 600px;
+            /* Deeper perspective */
         }
 
         .flip-group {
             display: flex;
-            gap: 3px;
+            gap: 4px;
+            /* More spacing */
         }
 
-        /* Extra spacing for AM/PM group to match visual rhythm */
         #period-group {
             margin-left: 12px;
         }
@@ -99,10 +98,10 @@
         .colon {
             font-size: 32px;
             color: var(--homey-text-color, #333);
-            font-weight: bold;
-            opacity: 0.6;
-            margin-top: -5px;
-            /* Visual alignment */
+            font-weight: 400;
+            /* Lighter colon */
+            opacity: 0.8;
+            margin-top: -6px;
         }
 
         .colons-hidden .colon {
@@ -114,16 +113,15 @@
             position: relative;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-            border-radius: 4px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.08);
+            /* Softer shadow */
+            border-radius: 6px;
             font-family: 'SF Mono', 'Menlo', 'Monaco', 'Courier New', monospace;
-            font-weight: 700;
             font-weight: 700;
             color: var(--flip-text-color);
         }
 
-        /* Colors - Default (Auto) */
-        /* Base styles are set via variables defined in :root */
+        /* ... Colors ... */
 
         .flip-card-top,
         .flip-card-bottom {
@@ -137,13 +135,13 @@
         }
 
         .flip-card-top {
-            border-radius: 4px 4px 0 0;
+            border-radius: 6px 6px 0 0;
             background: var(--flip-card-bg-top);
             border-bottom: 1px solid var(--flip-border-top);
         }
 
         .flip-card-bottom {
-            border-radius: 0 0 4px 4px;
+            border-radius: 0 0 6px 6px;
             background: var(--flip-card-bg-bottom);
             border-top: 1px solid var(--flip-border-bottom);
         }

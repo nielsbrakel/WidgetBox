@@ -1,7 +1,7 @@
 {
     "name": {
         "en": "Word Clock Sentence",
-        "nl": "Woorden Klok Zin"
+        "nl": "Woordenklok (Zin)"
     },
     "description": {
         "en": "Time displayed as a natural language sentence",

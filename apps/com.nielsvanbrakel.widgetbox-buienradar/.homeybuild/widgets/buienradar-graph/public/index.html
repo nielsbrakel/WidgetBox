@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="https://apps-sdk.developer.homey.app/css/homey.widgets.css">
+    <script src="https://apps-sdk.developer.homey.app/js/homey.widgets.js"></script>
+    <style>
+        :root {
+            /* Default Blue */
+            --chart-fill-color: var(--homey-color-blue-500);
+            --chart-line-color: var(--homey-color-blue-500);
+            --chart-grid-color: rgba(255, 255, 255, 0.08);
+            /* Softer grid */
+            --text-color-secondary: rgba(255, 255, 255, 0.6);
+            --danger-color: var(--homey-color-red-500);
+
+            /* Homey Colors for dynamic assignment */
+            --color-blue: var(--homey-color-blue-500);
+            --color-red: var(--homey-color-red-500);
+            --color-green: var(--homey-color-green-500);
+            --color-orange: var(--homey-color-orange-500);
+            --color-purple: var(--homey-color-purple-500);
+            --color-mono: #888;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: transparent;
+            font-family: var(--homey-font-family);
+        }
+
+        .widget-container {
+            height: 100%;
+            width: 100%;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Chart Area */
+        .chart-container {
+            position: absolute;
+            top: 10px;
+            bottom: 25px;
+            left: 20px;
+            right: 20px;
+            border-bottom: 1px solid var(--chart-grid-color);
+        }
+
+        .grid-line {
+            position: absolute;
+            left: 0;
+            right: 0;
+            border-top: 1px solid var(--chart-grid-color);
+            pointer-events: none;
+        }
+
+        .grid-label {
+            position: absolute;
+            right: 0;
+            transform: translateY(-100%);
+            font-size: 10px;
+            font-weight: 500;
+            /* Regular weight */
+            color: var(--text-color-secondary);
+            opacity: 0.8;
+            pointer-events: none;
+            padding-bottom: 4px;
+            /* More space */
+            letter-spacing: 0.5px;
+        }
+
+        .now-line {
+            position: absolute;
+            top: -5px;
+            /* Extend slightly */
+            bottom: 0;
+            left: 0;
+            width: 2px;
+            /* Thicker */
+            background-color: var(--danger-color);
+            z-index: 10;
+            pointer-events: none;
+            opacity: 0.8;
+        }
+
+        .now-label {
+            position: absolute;
+            top: -16px;
+            left: -8px;
+            /* Center */
+            color: var(--danger-color);
+            font-size: 9px;
+            font-weight: 700;
+            pointer-events: none;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .chart-bar {
+            /* Gradient Fill */
+            background: linear-gradient(to top, var(--chart-fill-color), rgba(255, 255, 255, 0.2));
+            /* Simplified gradient logic, but we want color -> transparent? No, bars usually are solid or slight gradient */
+            /* Let's try matching the area chart style logic or keep it simple */
+            background: var(--chart-fill-color);
+            opacity: 0.8;
+            border-radius: 2px 2px 0 0;
+            transition: height 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+            /* Smoother easing */
+            position: relative;
+            min-height: 1px;
+        }
+
+        .chart-bar:hover {
+            filter: brightness(1.3);
+            opacity: 1;
+            z-index: 100;
+        }
+
+        .chart-wrapper {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: flex-end;
+            gap: 2px;
+            /* More spacing between bars */
+        }
+
+        .chart-tooltip {
+            position: absolute;
+            background: var(--homey-bg-card);
+            /* Homey Token */
+            color: var(--homey-color-text);
+            padding: 8px 12px;
+            border-radius: var(--homey-border-radius);
+            font-size: 12px;
+            font-weight: 500;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.15s ease;
+            z-index: 9999;
+            white-space: nowrap;
+            transform: translate(-50%, -100%);
+            margin-top: -12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .chart-axis-label {
+            position: absolute;
+            bottom: -24px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            color: var(--text-color-secondary);
+            font-weight: 500;
+            opacity: 0;
+            letter-spacing: 0.5px;
+        }
+
+        /* Show every 6th label */
+        .chart-bar:nth-child(6n+1) .chart-axis-label {
+            opacity: 0.9;
+        }
+
+        /* SVGs */
+        .chart-svg {
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+        }
+
+        .chart-path {
+            fill: none;
+            stroke: var(--chart-line-color);
+            stroke-width: 2.5;
+            /* Thicker line */
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            vector-effect: non-scaling-stroke;
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
+            /* Stronger shadow */
+        }
+
+        .chart-area {
+            fill: url(#areaGradient);
+            opacity: 0.7;
+            stroke: none;
+        }
+
+        .attribution {
+            position: absolute;
+            bottom: 6px;
+            right: 6px;
+            font-size: 9px;
+            color: rgba(255, 255, 255, 0.4);
+            /* Removed background for cleaner look, just text */
+            padding: 2px 4px;
+            border-radius: 4px;
+            pointer-events: auto;
+            text-decoration: none;
+            z-index: 90;
+            transition: color 0.2s;
+        }
+
+        .attribution:hover {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .status-message {
+            position: absolute;
+            top: 50%;
+            width: 100%;
+            text-align: center;
+            color: var(--text-color-secondary);
+            transform: translateY(-50%);
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+            font-weight: 300;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+
+<body class="homey-widget">
+    <div class="widget-container" id="app">
+        <div id="chart" class="chart-container"></div>
+        <a href="https://www.buienradar.nl" target="_blank" class="attribution">Buienradar.nl</a>
+    </div>
+
+    <script>
+        const SCALE = {
+            toPct: (mm, max) => Math.min(Math.max((mm / max) * 100, 0), 100)
+        };
+
+        class ChartRenderer {
+            constructor(container) {
+                this.container = container;
+                this.tooltip = document.createElement('div');
+                this.tooltip.className = 'chart-tooltip';
+                this.container.appendChild(this.tooltip);
+            }
+
+            render(data, settings) {
+                const style = settings.graphStyle || 'bars';
+                const color = settings.chartColor || 'blue';
+
+                // Determine maxMm based on data AND reference lines
+                let maxData = Math.max(0.5, ...data.map(d => d.mmPerHour));
+
+                // Ensure scale includes reference lines
+                const limitLight = parseFloat(settings.limitLight ?? 0.5);
+                const limitModerate = parseFloat(settings.limitModerate ?? 1.0);
+                const limitHeavy = parseFloat(settings.limitHeavy ?? 2.5);
+
+                maxData = Math.max(maxData, limitLight, limitModerate, limitHeavy);
+
+                const maxMm = maxData;
+
+                this.updateColors(color);
+                this.updateColors(color);
+                this.drawGrid(maxMm);
+                this.drawReferenceLines(settings, maxMm);
+                this.drawNowLine();
+
+                // Clear Content (except Grid/Tooltip)
+                Array.from(this.container.children).forEach(c => {
+                    if (c.className === 'chart-wrapper' || c.tagName === 'svg') c.remove();
+                });
+
+                if (style === 'bars') {
+                    this.renderBars(data, maxMm);
+                } else {
+                    this.renderLine(data, maxMm, style === 'smooth');
+                }
+            }
+
+            updateColors(colorName) {
+                const root = document.documentElement;
+                const varName = `--color-${colorName}`;
+                // Get base color
+                const colorVal = getComputedStyle(root).getPropertyValue(varName) || '#0099ff';
+
+                // Set solid colors
+                root.style.setProperty('--chart-fill-color', colorVal);
+                root.style.setProperty('--chart-line-color', colorVal);
+
+                // Create a lighter version for gradient top (simple hack using filter-like logic or just opacity)
+                // Since we can't easily manipulate hex in vanilla JS without a lib, we'll rely on CSS opacity or 
+                // just assume the variable exists. For standard colors, we can define them.
+                // For now, let's set gradient-top to the same color but rely on opacity in the area fill.
+                // For bars, we want a slight gradient.
+                root.style.setProperty('--chart-gradient-top', colorVal);
+                // In a real implementation with known palette, we'd pick a lighter shade.
+            }
+
+            drawNowLine() {
+                const line = document.createElement('div');
+                line.className = 'now-line';
+
+                const label = document.createElement('div');
+                label.className = 'now-label';
+                label.textContent = 'NU'; // Or 'NOW' based on locale if we had it passed down
+
+                this.container.appendChild(line);
+                this.container.appendChild(label);
+            }
+
+            drawGrid(maxMm) {
+                // Remove old lines
+                const existing = this.container.querySelectorAll('.grid-line, .grid-label');
+                existing.forEach(e => e.remove());
+
+                // Simple 3 levels: 0, 50%, 100% of max
+                [1, 0.5].forEach(k => {
+                    const val = maxMm * k;
+                    const pct = 100 - (k * 100);
+
+                    const line = document.createElement('div');
+                    line.className = 'grid-line';
+                    line.style.top = `${pct}%`;
+
+                    const label = document.createElement('div');
+                    label.className = 'grid-label';
+                    label.style.top = `${pct}%`;
+                    label.textContent = val.toFixed(1);
+
+                    this.container.appendChild(line);
+                    this.container.appendChild(label);
+                });
+            }
+
+            drawReferenceLines(settings, maxMm) {
+                // Remove old reference lines
+                const existing = this.container.querySelectorAll('.ref-line, .ref-label');
+                existing.forEach(e => e.remove());
+
+                const limits = [
+                    { id: 'limitLight', val: settings.limitLight ?? 0.5, color: 'rgba(100, 200, 255, 0.5)', label: 'LIGHT', className: 'light' },
+                    { id: 'limitModerate', val: settings.limitModerate ?? 1.0, color: 'rgba(255, 165, 0, 0.5)', label: 'MODERATE', className: 'moderate' },
+                    { id: 'limitHeavy', val: settings.limitHeavy ?? 2.5, color: 'rgba(255, 50, 50, 0.5)', label: 'HEAVY', className: 'heavy' }
+                ];
+
+                limits.forEach(l => {
+                    const val = parseFloat(l.val);
+                    if (isNaN(val) || val <= 0) return;
+
+                    // Only show if within reasonable range relative to max, 
+                    // or maybe we always show them and they might be off-chart if scale is small?
+                    // Better: The chart scales to include them if they are relevant/enabled? 
+                    // Actually, let's just draw them if they fit or clamp? 
+                    // The render function already adjusted maxMm to include them if 'refMode' was set, 
+                    // but we need to update that logic too.
+
+                    if (val > maxMm) return;
+
+                    const pct = 100 - ((val / maxMm) * 100);
+
+                    const line = document.createElement('div');
+                    line.className = 'grid-line ref-line ' + l.className;
+                    line.style.top = `${pct}%`;
+                    line.style.borderTop = `1px dashed ${l.color}`;
+                    line.style.opacity = '0.8';
+
+                    const label = document.createElement('div');
+                    label.className = 'grid-label ref-label';
+                    label.style.top = `${pct}%`;
+                    label.style.color = l.color;
+                    label.textContent = l.label;
+                    label.style.right = '0';
+                    label.style.borderBottom = 'none';
+
+                    this.container.appendChild(line);
+                    this.container.appendChild(label);
+                });
+            }
+
+            renderBars(data, maxMm) {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'chart-wrapper';
+
+                data.forEach(d => {
+                    const bar = document.createElement('div');
+                    bar.className = 'chart-bar';
+                    bar.style.flex = '1';
+
+                    // Height
+                    const h = (d.mmPerHour / maxMm) * 100;
+                    bar.style.height = `${Math.max(h, d.mmPerHour > 0 ? 2 : 0)}%`; // Min height for visibility
+
+                    // Tooltip Events
+                    bar.addEventListener('mouseenter', () => this.showTooltip(bar, d));
+                    bar.addEventListener('mouseleave', () => this.hideTooltip());
+
+                    wrapper.appendChild(bar);
+                });
+                this.container.appendChild(wrapper);
+
+                // Use Shared Axis Logic
+                this.drawAxisLabels(data);
+            }
+
+            renderLine(data, maxMm, smooth) {
+                const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                svg.classList.add('chart-svg');
+                svg.setAttribute("preserveAspectRatio", "none");
+                svg.setAttribute("viewBox", "0 0 100 100");
+
+                // Add Gradient Definition
+                const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+                const gradient = document.createElementNS("http://www.w3.org/2000/svg", "linearGradient");
+                gradient.setAttribute("id", "areaGradient");
+                gradient.setAttribute("x1", "0%");
+                gradient.setAttribute("y1", "0%");
+                gradient.setAttribute("x2", "0%");
+                gradient.setAttribute("y2", "100%");
+
+                const stop1 = document.createElementNS("http://www.w3.org/2000/svg", "stop");
+                stop1.setAttribute("offset", "0%");
+                stop1.setAttribute("stop-color", "var(--chart-fill-color)");
+                stop1.setAttribute("stop-opacity", "0.8");
+
+                const stop2 = document.createElementNS("http://www.w3.org/2000/svg", "stop");
+                stop2.setAttribute("offset", "100%");
+                stop2.setAttribute("stop-color", "var(--chart-fill-color)");
+                stop2.setAttribute("stop-opacity", "0.1");
+
+                gradient.appendChild(stop1);
+                gradient.appendChild(stop2);
+                defs.appendChild(gradient);
+                svg.appendChild(defs);
+
+                // Draw Axis Labels manually for Line chart since we don't have bars
+                this.drawAxisLabels(data);
+
+                const points = data.map((d, i) => {
+                    const x = (i / (data.length - 1)) * 100;
+                    const y = 100 - ((d.mmPerHour / maxMm) * 100);
+                    return [x, y];
+                });
+
+                let dPath = "";
+                if (smooth && points.length > 1) {
+                    // Simple Catmull-Rom or cubic bezier for smooth
+                    // For simplicity here, using L for now, but in real impl use splines
+                    // Fallback to strict line for robustness first
+                    dPath = points.map((p, i) => (i === 0 ? "M" : "L") + ` ${p[0]},${p[1]}`).join(" ");
+                } else {
+                    dPath = points.map((p, i) => (i === 0 ? "M" : "L") + ` ${p[0]},${p[1]}`).join(" ");
+                }
+
+                const areaPath = `${dPath} L 100,100 L 0,100 Z`;
+
+                const area = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                area.classList.add('chart-area');
+                area.setAttribute("d", areaPath);
+
+                const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                path.classList.add('chart-path');
+                path.setAttribute("d", dPath);
+
+                svg.appendChild(area);
+                svg.appendChild(path);
+                this.container.appendChild(svg);
+
+                // Interaction Layer (invisible bars)
+                const wrapper = document.createElement('div');
+                wrapper.className = 'chart-wrapper';
+                wrapper.style.position = 'absolute';
+                wrapper.style.top = '0';
+                wrapper.style.opacity = '0'; // Invisible but interactive
+
+                data.forEach(d => {
+                    const zone = document.createElement('div');
+                    zone.style.flex = '1';
+                    zone.style.height = '100%';
+                    zone.addEventListener('mouseenter', (e) => this.showTooltip(zone, d));
+                    zone.addEventListener('mouseleave', () => this.hideTooltip());
+                    wrapper.appendChild(zone);
+                });
+                this.container.appendChild(wrapper);
+            }
+
+            showTooltip(el, data) {
+                const rect = el.getBoundingClientRect();
+                const containerRect = this.container.getBoundingClientRect();
+
+                this.tooltip.textContent = `${data.time}: ${data.mmPerHour} mm/u`;
+                this.tooltip.style.left = `${(rect.left - containerRect.left) + (rect.width / 2)}px`;
+                this.tooltip.style.top = `${rect.top - containerRect.top}px`;
+                this.tooltip.style.opacity = '1';
+            }
+
+            hideTooltip() {
+                this.tooltip.style.opacity = '0';
+            }
+
+            drawAxisLabels(data) {
+                // We want labels approx every 30 mins.
+                // Data is every 5 mins. So every 6th data point.
+
+                const wrapper = document.createElement('div');
+                wrapper.style.position = 'absolute';
+                wrapper.style.bottom = '0';
+                wrapper.style.left = '0';
+                wrapper.style.right = '0';
+                wrapper.style.height = '0'; // Just a container for positioning
+                wrapper.style.pointerEvents = 'none';
+                wrapper.style.zIndex = '20'; // Ensure it's above the SVG (default is auto/0)
+
+                data.forEach((d, i) => {
+                    if (i % 6 === 0) { // Every 30 mins
+                        const label = document.createElement('div');
+                        label.className = 'chart-axis-label';
+                        label.textContent = d.time;
+                        label.style.opacity = '1';
+                        // Position based on percentage
+                        const pct = (i / (data.length - 1)) * 100;
+                        label.style.left = `${pct}%`;
+
+                        wrapper.appendChild(label);
+                    }
+                });
+                this.container.appendChild(wrapper);
+            }
+        }
+
+        function onHomeyReady(Homey) {
+            const renderer = new ChartRenderer(document.getElementById('chart'));
+            let currentSettings = Homey.getSettings() || {};
+
+            async function refresh() {
+                try {
+                    // Get Data from standard API (which uses RaintextAdapter backend)
+                    // Params: lat/lon from settings
+                    const lat = currentSettings.lat || '52.1';
+                    const lon = currentSettings.lon || '5.1';
+
+                    const data = await Homey.api('GET', `/?lat=${lat}&lon=${lon}`);
+
+                    if (data && data.forecast) {
+                        renderer.render(data.forecast, currentSettings);
+                    }
+                } catch (e) {
+                    console.error('Fetch error', e);
+                }
+            }
+
+            Homey.on('settings', (newSettings) => {
+                currentSettings = newSettings;
+                refresh();
+            });
+
+            // Initial
+            refresh();
+            Homey.ready();
+
+            setInterval(refresh, 5 * 60 * 1000);
+        }
+        window.onHomeyReady = onHomeyReady;
+    </script>
+</body>
+
+</html>

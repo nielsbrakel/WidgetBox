@@ -1,0 +1,117 @@
+{
+    "name": {
+        "en": "Station Weather",
+        "nl": "Weerstation"
+    },
+    "settings": [
+        {
+            "id": "lat",
+            "type": "text",
+            "label": {
+                "en": "Latitude",
+                "nl": "Breedtegraad"
+            },
+            "value": "52.09"
+        },
+        {
+            "id": "lon",
+            "type": "text",
+            "label": {
+                "en": "Longitude",
+                "nl": "Lengtegraad"
+            },
+            "value": "5.11"
+        },
+        {
+            "id": "stationId",
+            "type": "text",
+            "label": {
+                "en": "Station ID (Optional)",
+                "nl": "Station ID (Optioneel)"
+            },
+            "hint": {
+                "en": "Enter a specific station ID (e.g. 6260) to override auto-selection.",
+                "nl": "Vul een specifiek station ID in (bv. 6260) om autoselectie te overschrijven."
+            },
+            "value": ""
+        },
+        {
+            "id": "showAttribution",
+            "type": "checkbox",
+            "label": {
+                "en": "Show Data Attribution",
+                "nl": "Toon Data Bronvermelding"
+            },
+            "value": true,
+            "hint": {
+                "en": "Required for free data usage from Buienradar.",
+                "nl": "Vereist voor gratis gebruik van Buienradar data."
+            }
+        },
+        {
+            "id": "textAlign",
+            "type": "dropdown",
+            "label": {
+                "en": "Text Alignment",
+                "nl": "Tekst Uitlijning"
+            },
+            "value": "left",
+            "values": [
+                {
+                    "id": "left",
+                    "label": {
+                        "en": "Left",
+                        "nl": "Links"
+                    }
+                },
+                {
+                    "id": "center",
+                    "label": {
+                        "en": "Center",
+                        "nl": "Midden"
+                    }
+                },
+                {
+                    "id": "right",
+                    "label": {
+                        "en": "Right",
+                        "nl": "Rechts"
+                    }
+                }
+            ]
+        },
+        {
+            "id": "style",
+            "type": "dropdown",
+            "label": {
+                "en": "Style",
+                "nl": "Stijl"
+            },
+            "value": "default",
+            "values": [
+                {
+                    "id": "default",
+                    "label": {
+                        "en": "Default",
+                        "nl": "Standaard"
+                    }
+                },
+                {
+                    "id": "compact",
+                    "label": {
+                        "en": "Compact",
+                        "nl": "Compact"
+                    }
+                }
+            ]
+        }
+    ],
+    "api": {
+        "getData": {
+            "method": "GET",
+            "path": "/"
+        }
+    },
+    "height": 200,
+    "transparent": false
+}

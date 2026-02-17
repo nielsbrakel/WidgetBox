@@ -332,3 +332,100 @@ input[type="checkbox"] {
   background: rgba(125, 125, 125, 0.05);
   transform: translateY(1px);
 }
+
+/* Widget Group Labels (Sidebar) */
+.widget-group {
+  margin-bottom: 1.5rem;
+}
+
+.widget-group-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+}
+
+/* Toolbar Layout */
+.toolbar-left {
+  flex: 1;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.toolbar-title {
+  font-weight: 700;
+}
+
+.toolbar-right {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+/* Width Switcher */
+.width-switcher {
+  display: flex;
+  gap: 2px;
+  margin-right: 1rem;
+}
+
+.width-btn {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+}
+
+.width-btn.active {
+  font-weight: bold;
+  background: var(--homey-color-blue-500);
+  color: white;
+}
+
+/* Debug Section (Settings Panel) */
+.debug-section {
+  border-bottom: 1px solid var(--homey-line-color);
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+}
+
+.debug-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+}
+
+/* Setting Hints */
+.setting-hint {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 0.3rem;
+}
+
+.setting-hint.warning {
+  color: var(--homey-color-orange-500);
+}
+
+/* Widget iframe */
+.widget-iframe {
+  height: 100%;
+  width: 100%;
+  display: block;
+  border: none;
+  overflow: hidden;
+}
+
+/* Device frame transitions */
+.device-frame {
+  transition: width 0.3s ease;
+}
+
+.homey-card {
+  transition: height 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}

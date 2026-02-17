@@ -1,7 +1,7 @@
 {
     "name": {
         "en": "Word Clock Grid",
-        "nl": "Woorden Klok Raster"
+        "nl": "Woordenklok (Raster)"
     },
     "description": {
         "en": "Time displayed as a word matrix with highlighted letters",
