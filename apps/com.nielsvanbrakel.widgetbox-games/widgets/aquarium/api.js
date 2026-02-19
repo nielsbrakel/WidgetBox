@@ -140,7 +140,7 @@ const CATALOG = {
             name: 'Mystery Snail', basePrice: 40, baseCoinPerHour: 0.5,
             hungerRate: 0.5, spaceCost: 1,
             diet: { accepts: ['algae_wafer'] },
-            preferences: { zonePreference: 'bottom' },
+            preferences: { zonePreference: 'bottom', movementType: 'crawl' },
             utility: { dirtReduction: 0.15 },
             visuals: { spriteKey: 'snail', sizeVarianceRange: [0.85, 1.0] },
           },
@@ -205,7 +205,7 @@ const CATALOG = {
         fish: {
           neon_tetra: {
             name: 'Neon Tetra', basePrice: 25, baseCoinPerHour: 3.2,
-            hungerRate: 0.8, spaceCost: 1,
+            hungerRate: 0.8, spaceCost: 0.5,
             diet: { accepts: ['tropical_flakes', 'bloodworms'] },
             requirements: { tools: [...TROPICAL_TOOL_REQS] },
             preferences: { zonePreference: 'middle', schooling: true },
@@ -243,7 +243,7 @@ const CATALOG = {
             hungerRate: 0.6, spaceCost: 2,
             diet: { accepts: ['algae_wafer'] },
             requirements: { tools: [...TROPICAL_TOOL_REQS] },
-            preferences: { zonePreference: 'bottom' },
+            preferences: { zonePreference: 'bottom', movementType: 'glass' },
             utility: { dirtReduction: 0.10 },
             visuals: { spriteKey: 'pleco', sizeVarianceRange: [0.9, 1.15] },
           },
@@ -359,7 +359,7 @@ const CATALOG = {
           },
           green_chromis: {
             name: 'Green Chromis', basePrice: 35, baseCoinPerHour: 3.0,
-            hungerRate: 0.8, spaceCost: 1,
+            hungerRate: 0.8, spaceCost: 0.5,
             diet: { accepts: ['reef_flakes', 'frozen_brine'] },
             requirements: { tools: [...SALT_TOOL_REQS] },
             preferences: { zonePreference: 'middle', schooling: true },
@@ -383,7 +383,7 @@ const CATALOG = {
           },
           banggai_cardinal: {
             name: 'Banggai Cardinalfish', basePrice: 40, baseCoinPerHour: 3.5,
-            hungerRate: 0.8, spaceCost: 1,
+            hungerRate: 0.8, spaceCost: 0.5,
             diet: { accepts: ['reef_flakes', 'frozen_brine'] },
             requirements: { tools: [...SALT_TOOL_REQS] },
             preferences: { zonePreference: 'middle', schooling: true },
@@ -397,7 +397,7 @@ const CATALOG = {
               tools: [...SALT_TOOL_REQS],
               decor: [{ decorId: 'cave', penalty: 55, label: 'Missing Cave' }],
             },
-            preferences: { nearDecor: 'cave', zonePreference: 'bottom' },
+            preferences: { nearDecor: 'cave', zonePreference: 'bottom', movementType: 'snake' },
             visuals: { spriteKey: 'moray_eel', sizeVarianceRange: [0.95, 1.05] },
           },
           cleaner_shrimp: {
@@ -405,7 +405,7 @@ const CATALOG = {
             hungerRate: 0.5, spaceCost: 1,
             diet: { accepts: ['reef_flakes'] },
             requirements: { tools: [...SALT_TOOL_REQS] },
-            preferences: { zonePreference: 'bottom' },
+            preferences: { zonePreference: 'bottom', movementType: 'crawl' },
             utility: { dirtReduction: 0.08 },
             visuals: { spriteKey: 'cleaner_shrimp', sizeVarianceRange: [0.85, 1.0] },
           },
@@ -1309,7 +1309,6 @@ function handleAction(save, type, payload) {
       const { fishId } = payload;
       const idx = tank.fish.findIndex(f => f.id === fishId);
       if (idx === -1) return { error: 'Fish not found' };
-      if (tank.fish.length <= 1) return { error: 'Cannot sell last fish' };
 
       const fish = tank.fish[idx];
       const value = getSellReturn(fish, tankCat);

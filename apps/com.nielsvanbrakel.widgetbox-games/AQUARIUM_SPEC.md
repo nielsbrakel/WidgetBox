@@ -2,8 +2,8 @@
 
 **App:** `com.nielsvanbrakel.widgetbox-games` (Homey WidgetBox)
 **Widget:** `aquarium`
-**Spec version:** 1.0.0
-**Last updated:** 2026-02-19
+**Spec version:** 1.2.0
+**Last updated:** 2025-07-18
 
 > See [docs/changelog/](docs/changelog/) for a history of spec changes between versions.
 
@@ -371,7 +371,8 @@ type FishSpecies = {
   preferences?: {
     nearDecor?: string;               // decorId to gravitate toward
     zonePreference?: "top" | "middle" | "bottom";
-    schooling?: boolean;              // swims in groups
+    schooling?: boolean;              // swims in leader-following groups, counts as 0.5 space
+    movementType?: 'default' | 'crawl' | 'glass' | 'snake';  // movement behavior override
   };
 
   visuals: {
@@ -540,28 +541,43 @@ Fish are visually identifiable by their species sprite, size variance, and behav
 ### 8.3 Fish Interaction
 
 **Tap a fish in normal mode:**
-1. Fish stops swimming and "wiggles" in place (oscillating animation)
-2. A label appears following the fish showing the species name
-3. Tap the label (or tap again) to open Fish Details panel
+1. Fish stops swimming and "wiggles" in place (rotation-based oscillation animation, 2 second duration)
+2. A fish bubble appears near the fish position with detailed info
+3. The bubble auto-dismisses after 8 seconds
+4. Hit detection is adjusted for crawl-type fish (uses substrate position)
 
-**Fish Details panel shows:**
-- Species, Age (days), Life Stage (Baby/Child/Adult)
-- Hunger bar with value
-- Happiness breakdown (see §9)
-- Requirements status (met/unmet with penalties)
-- Diet info: accepted foods
-- XP bar with level progress
-- Actions: Sell (with value), Move (to other unlocked tank of same type)
+**Fish Info Bubble shows:**
+- **Header:** Species name + Level/Life Stage
+- **Stats bar (pills):** Hunger %, HP, Happiness — displayed as colored pill badges
+- **Earning info:** Coins/hr rate + XP progress (current/needed)
+- **Weak warning:** Red warning text "Weak — Feed & clean to recover!" (only when weak)
+- **Trait labels:** Schooling fish (0.5 space), Bottom crawler, Glass cleaner, Dirt reduction %
+- **Action buttons:** Sell button (red, inline) — triggers sell_fish action with toast confirmation
+
+**Sell via fish bubble:**
+- Clicking the sell button immediately sells the fish
+- Shows toast: "Sold for X coins"
+- Updates state and dismisses bubble
+- Works for all fish including the last one (zero-fish tanks allowed)
 
 ### 8.4 Fish Behavior
 
-Fish have species-dependent movement patterns:
+Fish have species-dependent movement patterns. The `movementType` field in catalog preferences determines the primary behavior:
+
+| movementType | Description | Species |
+|---|---|---|
+| `default` (or omitted) | Normal zone-based swimming with random direction changes | Guppy, Goldfish, Blue-Eye, Moon Fish, Discus, Gourami, Clownfish, Blue Tang, Firefish, Royal Gramma |
+| `crawl` | Bottom-hugging only — 0.25× speed, clamped to substrate, left/right movement | Snail, Cleaner Shrimp |
+| `glass` | Wall-crawling — attached to left/right glass walls, 0.4× speed, 12% chance to switch sides, rendered vertically | Pleco |
+| `snake` | Serpentine movement — sinusoidal vertical oscillation, 0.5× speed, bottom zone | Moray Eel |
+| `school` | Leader-following — one fish is the leader (swims normally), all others follow with index-based offset | Neon Tetra, Green Chromis, Banggai Cardinalfish |
+
+**Legacy pattern names** (descriptive, not catalog fields):
 
 | Pattern | Description |
 |---|---|
 | `drift` | Slow horizontal movement, gentle vertical bob |
 | `glide` | Smooth diagonal sweeps |
-| `school` | Follows schooling anchor point (shared with same species) |
 | `dart` | Quick bursts with pauses |
 | `circle` | Orbits a point (near preferred decor if present) |
 | `zigzag` | Quick horizontal, small vertical changes |
@@ -570,12 +586,39 @@ Fish have species-dependent movement patterns:
 
 **Special behaviors:**
 - Clownfish gravitates toward nearest Anemone decor
-- Moray Eel spends ~70% of time "inside" Cave (partially visible)
+- Moray Eel uses `snake` movement — serpentine body undulation, stays in bottom zone near Cave
 - Discus swims near plant clusters
 - Gourami patrols the top zone near floating plants
-- Schooling fish (Neon Tetra, Green Chromis, Banggai Cardinalfish) share an anchor point and move together
+- Pleco uses `glass` movement — targets glass walls (x=0.04 or x=0.96) with 12% chance of switching sides; rendered rotated vertically (head up) when attached to glass
+- Snails and Cleaner Shrimp use `crawl` movement — bottom-hugging at 0.25× speed, never leave substrate
+- **Schooling (leader-following):** One fish of a schooling species becomes the "leader" (swims normally). All other same-species fish follow the leader with facing-relative offsets based on their index in the school. Followers add sinusoidal variation for natural spacing. The leader is identified by `schoolAnchors[speciesId].leaderId`.
+- Schooling fish (Neon Tetra, Green Chromis, Banggai Cardinalfish) count as **0.5 space** instead of 1
 - Hungry fish swim slower, lower; fed fish are livelier
 - Weak fish drift slowly, muted colors
+- **Wiggle on tap:** When a fish is tapped, it stops swimming and wiggles in place (rotation oscillation) for 2 seconds while showing the info bubble
+
+**Zero-fish tanks:**
+- Tanks are allowed to have zero fish. Selling the last fish is permitted.
+- The sell button always appears in inventory — no minimum fish restriction.
+- An empty tank still renders normally (environment, decor, cleaning, etc.)
+
+**Species Base Scales (`FISH_BASE_SCALES`):**
+
+Each species has a display scale multiplier applied during rendering so fish appear at species-appropriate sizes:
+
+| Species | Scale | Species | Scale |
+|---|---|---|---|
+| `guppy` | 1.0 | `neon_tetra` | 0.9 |
+| `goldfish` | 1.5 | `moon_fish` | 1.6 |
+| `snail` | 0.8 | `pleco` | 1.8 |
+| `shrimp` | 0.7 | `gourami` | 1.4 |
+| `discus` | 1.8 | `clownfish` | 1.3 |
+| `green_chromis` | 0.9 | `firefish` | 1.0 |
+| `blue_tang` | 1.7 | `royal_gramma` | 1.1 |
+| `moray_eel` | 2.2 | `banggai_cardinal` | 1.0 |
+| `cleaner_shrimp` | 0.8 |
+
+**Level badges:** Level badges (Lv.N) are only shown for the currently tapped fish (`selectedFishId`), with a 5-second auto-clear timer. This prevents visual clutter.
 
 ---
 
@@ -710,6 +753,18 @@ Each decor type has a valid placement zone. The client enforces this during plac
   - Name, current size, growth status
   - Actions: **Trim** (if growable), **Move**, **Sell**
 
+**Drag-to-move decorations (normal mode):**
+- In normal mode, pointer down first checks `hitTestDecor` before fish tap
+- If a non-floating decor is hit, dragging begins: `d.x` and `d.y` update in real-time
+- On pointer up, position is committed via `move_decor` action
+- Floating plants (`placement: 'top'`) are excluded from dragging — they drift autonomously
+
+**Floating plant drift:**
+- Floating plants (decor with `placement: 'top'`) have time-based sinusoidal drift animation
+- Uses `Date.now() / 4000` as phase for smooth, slow movement
+- Each plant cluster gets a unique phase based on its array index
+- Drift applies both horizontal (±driftX) and vertical (±driftY) oscillation
+
 ### 11.4 Decor Capacity
 
 - No hard cap on number of decor items (but UI becomes cluttered)
@@ -820,10 +875,14 @@ Grid: 64 × 48 cells (configurable in catalog.global.ui.wipeMaskGrid)
 Each cell: { dirty: boolean, opacity: number }
 ```
 
+**Important:** Dirt is only rendered **above the substrate line** (`subY = H * (1 - biome.subH)`). Both `renderDirtOverlay` and `initCleanMask` must use the same vertical boundary so cleaning accurately targets only visible dirt.
+
 **Initialization (deterministic):**
 ```
-seed = hash(tankId + Math.floor(cleanliness))
+seed = activeTankId.length * 1000 + 7   // same seed used by renderDirtOverlay
 for each cell (cx, cy):
+  // Map cy to above-substrate region only
+  worldY = (cy / gridRows) * subY        // only the water column
   isEdge = cx == 0 || cy == 0 || cx == maxX || cy == maxY
   isCorner = (cx <= 1 || cx >= maxX-1) && (cy <= 1 || cy >= maxY-1)
   threshold = isCorner ? 0.25 : isEdge ? 0.40 : 0.55
@@ -831,6 +890,8 @@ for each cell (cx, cy):
   cell.dirty = seededRandom() < threshold ? false : true  // below threshold = dirty
   cell.opacity = (0.08 + seededRandom() * 0.12) * (1 + dirtPercent * 0.5)
 ```
+
+The mask initialization uses a **coarse pre-sampling grid** (12×10) to match the same cells visible in renderDirtOverlay, ensuring that the wipe mask aligns exactly with visible dirt patches.
 
 The mask is **not re-randomized per stroke**. Once generated on entering clean mode, it stays stable until all dirt is removed or the player exits.
 
@@ -840,8 +901,10 @@ On pointer move/drag during clean mode:
 
 ```
 1. Map pointer (px, py) to grid coords via bounding rect normalization
-2. Compute brush radius (e.g. 3 cells)
-3. For each cell within brush radius:
+2. Map to above-substrate grid rows (cy maps to 0..subY, not full height)
+3. Return early if pointer is below substrate line
+4. Compute brush radius (e.g. 3 cells)
+5. For each cell within brush radius:
    a. If cell.dirty, set cell.dirty = false
    b. Track number of cells cleared this session
 4. Update visual overlay
@@ -977,10 +1040,12 @@ Example: Guppy (base 15), growth 1.18:
 
 | Constraint | Check |
 |---|---|
-| Tank space | `sum(fish.spaceCost) <= tank.spaceCapacity` |
+| Tank space | `sum(fish.spaceCost) <= tank.spaceCapacity` — **Note:** Schooling fish cost 0.5 space each |
 | Species max | `fish.filter(f => f.speciesId === id).length < species.maxPerTank` |
 | Tool requirements | Some fish need specific tools owned before purchase |
 | Food stock | Per-food inventory count |
+
+**Half-space fish:** Neon Tetra, Green Chromis, and Banggai Cardinalfish have `spaceCost: 0.5`. This is reflected in both the catalog (`api.js`) and store UI (shows "0.5 space" in buy button). The `getUsedSpace()` function naturally sums 0.5 values.
 
 ### 17.4 Store UI
 
@@ -1049,27 +1114,29 @@ The tank fills the **entire** 4:3 viewport. No desk, no frame, no border. The aq
 
 | Layer | Z-Index | Description |
 |---|---|---|
-| 1. Water gradient | 0 | Biome-specific gradient (canvas fill) |
-| 2. Back silhouettes | 1 | Distant plant/rock shapes (biome theme) |
-| 3. Caustic light | 2 | Animated light refraction pattern |
-| 4. Substrate | 3 | Gravel or sand at bottom ~18% of viewport |
-| 5. Rock clusters | 4 | Foreground rock formations (if biome has them) |
-| 6. Placed decor | 5 | Player-placed items with growth state |
-| 7. Equipment | 6 | Filter, heater, skimmer, UV sterilizer (hardware tools) |
-| 8. Fish sprites | 7 | All fish, pixel-rendered with species data |
-| 9. Snail sprites | 8 | Bottom-crawling snails |
-| 10. Food particles | 9 | Active food dropping/sinking |
-| 11. Bubbles | 10 | Ambient rising bubbles |
-| 12. Ambient particles | 11 | Floating dust motes |
-| 13. Grime overlay | 12 | Separate canvas (only shown in clean mode) |
-| 14. Laser dot | 13 | During play mode only |
-| 15. Float text | 20 | "+10 coins" floating animations |
-| 16. Fish label/bubble | 21 | Tapped fish info overlay |
-| 17. HUD | 30 | Coins, bars, tooltip |
-| 18. Tool dock / Tank nav | 40 | Bottom bar controls |
-| 19. Toast | 50 | Notification popups |
-| 20. Menu overlay | 60 | FAB menu grid |
-| 21. Panels | 70 | Store, Inventory, Help, etc. |
+| 1. Water gradient | 0 | Biome-specific 3-stop gradient: light top, mid-tone center, darkened bottom (uses `shadeColor` helper) |
+| 2. Glass frame | 0.5 | Beveled glass border with highlights, animated shimmer, inner reflection strips, and top reflection bar |
+| 3. Back silhouettes | 1 | Distant plant/rock shapes (biome theme) |
+| 3.5. Light rays | 1.5 | 7 underwater light rays from surface, animated slow drift |
+| 4. Caustic light | 2 | 12 animated dappled elliptical caustic patterns |
+| 5. Substrate | 3 | 120 varied pebbles (multi-size, multi-shade) with 2-line highlight at substrate top + depth fog above |
+| 6. Rock clusters | 4 | Foreground rock formations (if biome has them) |
+| 7. Placed decor | 5 | Player-placed items — lily-pad clusters, multi-stem plants, rock piles, coral branches, generic shapes with shading (baseSize = PX_SCALE × 8) |
+| 8. Equipment | 6 | Filter, heater, skimmer, UV sterilizer rendered as pixel art sprites from ICON_DATA with level indicator dots |
+| 9. Fish sprites | 7 | All fish, pixel-rendered with species data and FISH_BASE_SCALES |
+| 10. Movement-type sprites | 8 | Crawl (snail/shrimp on substrate), glass (pleco on walls, vertical), snake (moray undulation) |
+| 11. Food particles | 9 | Active food dropping/sinking |
+| 12. Bubbles | 10 | Ambient rising bubbles |
+| 13. Ambient particles | 11 | Floating dust motes |
+| 14. Dirt overlay | 12 | Seeded cell-based dirt texture + edge film — **only rendered above substrate line** (always visible when cleanliness < 95%) |
+| 15. Laser dot | 13 | During play mode only |
+| 16. Float text | 20 | "+10 coins" floating animations |
+| 17. Fish label/bubble | 21 | Tapped fish info overlay (level badge only for selectedFishId) |
+| 18. HUD | 30 | Coins, bars, tooltip — all icons rendered as pixel art |
+| 19. Tool dock / Tank nav | 40 | Bottom bar controls |
+| 20. Toast | 50 | Notification popups |
+| 21. Menu overlay | 60 | FAB menu grid with pixel art icons |
+| 22. Panels | 70 | Store, Inventory, Help, etc. |
 
 ### 19.3 Pixel Art System
 
@@ -1086,14 +1153,35 @@ Palette indices:
 
 Each fish species has a `px` array (2D grid of palette indices) and a `color` map. The renderer maps indices to actual colors at draw time, allowing easy palette variations.
 
+### 19.3.1 Pixel Icon System (ICON_DATA)
+
+All UI icons (HUD, menu, store, panels) use a unified pixel art icon system instead of emoji. The `ICON_DATA` dictionary maps icon names to 8×8 pixel grids with palette entries. Icons are rendered to canvas and cached as data URIs.
+
+**Available icons:** `coin`, `broom`, `food`, `fish`, `store`, `wrench`, `clipboard`, `house`, `help`, `laser`, `close`, `menu`, `lock`, `arrow_l`, `arrow_r`, `plant`, `decor`, `heater`, `filter`, `skimmer`, `uv`
+
+**Rendering pipeline:**
+1. `renderPixelIcon(name, size)` → draws icon to off-screen canvas, returns `data:image/png` URI
+2. `iconCache` stores rendered URIs to avoid recomputation
+3. `iconImg(name, size)` → returns `<img>` HTML string for use in panel templates
+4. `initPixelIcons()` → called during init, scans all `[data-icon]` elements and replaces content with rendered pixel art `<img>` tags
+
+**HTML usage:** Elements use `data-icon="name"` and optional `data-icon-size="N"` attributes. JS panels use `iconImg('name', size)` for inline icons.
+
 ### 19.4 Animation
 
 - Fish swim continuously with species-specific patterns
 - Fish direction flips sprites horizontally
-- Schooling fish share an anchor that drifts slowly
+- **Schooling:** Leader-following system — one fish per species leads, others follow with index-based offsets and sinusoidal variation
+- **Crawl:** Bottom-hugging movement at 0.25× speed, clamped to substrate
+- **Glass:** Wall-crawling at 0.4× speed, rendered vertically (head up), 12% switch sides
+- **Snake:** Serpentine undulation at 0.5× speed, bottom zone
+- **Wiggle:** Tapped fish stop and oscillate in place for 2 seconds
 - Bubbles rise with sine-wave wobble
 - Plants sway with subtle sine-based offset
-- Equipment has subtle animated indicators (filter bubbles, heater glow)
+- Equipment has rendered pixel art sprites from ICON_DATA with level indicator dots
+- Decor uses seeded RNG for consistent rendering across frames: lily-pad clusters for floating plants, multi-stem plants with varied leaves, rock piles with highlights, coral/anemone branching shapes
+- Pleco rotates when attached to glass walls
+- Food particles set anim.tx/ty to current position after fish consume to prevent snapping
 
 ---
 
@@ -1177,8 +1265,9 @@ In-widget help panel with structured chapters:
 
 9. **Store Rules**
    - Some items require tools or lifetime coins
-   - Tank space limits how many fish you can have
+   - Tank space limits how many fish you can have (schooling fish cost 0.5 space)
    - Selling returns a fraction of the purchase price
+   - Selling the last fish is allowed — tanks can have zero fish
 
 ---
 
@@ -1187,6 +1276,8 @@ In-widget help panel with structured chapters:
 ### 22.1 Debug Scenarios (Dev-Only)
 
 Available when `debug_mode` setting is enabled:
+
+**Action-based scenarios** (apply mutations to current state via `debug_scenario` action):
 
 | Scenario | Description |
 |---|---|
@@ -1203,22 +1294,61 @@ Available when `debug_mode` setting is enabled:
 | `fresh_start` | Full reset to initial state |
 | `all_unlocked` | Unlock all tanks with starter fish |
 
+**State-generator scenarios** (create full state snapshots via dropdown selector):
+
+| Scenario ID | Description |
+|---|---|
+| `default` | Fresh start — 1 guppy, 50 coins, 10 flakes |
+| `tier-2-ready` | Fresh tank with 600 coins, 3 leveled fish, ready to unlock tropical |
+| `tier-2-active` | Tropical active with 4 fish, heater, filter, decor |
+| `tier-3-endgame` | All tanks unlocked, saltwater active, 5 fish, full tool loadout |
+| `neglected-48h` | Dirty tank (15%), 2 weak fish, near-empty food |
+| `low-food` | Only 1 food item remaining, 2 hungry fish |
+| `dirty-near-threshold` | Cleanliness at 25%, 2 fish, 80 coins |
+| `dirty-big-tank` | Saltwater at 15% cleanliness, all tanks unlocked |
+| `rich` | 99999 coins, 2 fish, stocked food |
+| `tank-full` | Fresh tank at 8/8 space (6 fish) |
+| `tier-3-crowded` | Saltwater at 18/20 space (10 fish) |
+| `multi-tank-decorated` | All 3 tanks unlocked with fish, decor, and tools |
+
 ### 22.2 Sandbox Mock Integration
 
 The sandbox app (`apps/sandbox/`) must have updated mocks:
 
-- `aquariumMocks.js` needs scenarios matching the data model
-- `MockHomey.js` routes widget API calls to mock handlers
-- Mock state persists in localStorage for development testing
+- `aquariumMocks.js` contains both `applyDebugScenario()` (action-based) and `createScenarioState()` (state generators)
+- `MockHomey.js` routes widget API calls to mock handlers and passes `scenarioId`
+- Mock state persists in localStorage via `STORAGE_KEY = 'mock_aquarium_state_v2'`
+- **State persistence fix:** `resetAquariumScenario(scenarioId)` skips reset when the same scenario is already loaded, preventing React `useEffect` double-fire from clearing state mid-session
+- `_lastScenarioId` tracking ensures scenario state is only recreated on GET when the scenario actually changes
+- POST requests always use persisted state to avoid resetting on every action
 
 ### 22.3 Playwright E2E Tests
 
-Tests in `tests/e2e/games.spec.ts` verify:
+Two test files cover the aquarium widget:
+
+**`tests/e2e/games.spec.ts`** (60 tests) — Core functionality:
 - Widget loads without errors
 - HUD elements are visible
 - Menu opens/closes
 - Panels render content
 - Tool modes activate correctly
+- Store, inventory, tanks, upgrades, help panels
+- Feed mode, clean mode, laser mode
+- Debug scenario loading and state persistence
+
+**`tests/e2e/games-advanced.spec.ts`** (57 tests) — Visual overhaul & advanced flows:
+- Pixel icon system rendering (HUD, menu, FAB, bars, tank nav)
+- Store purchasing flow (buy fish/food/decor/tools, coin updates, persistence)
+- Tank navigation (multi-tank switching via nav buttons and tanks panel)
+- Debug scenario state persistence (purchases persist, scenario switching resets)
+- Decor system (inventory display, sell buttons, sell flow, growth info)
+- Inventory details (food stock, fish stats, pixel icons, sell fish)
+- Equipment panel (tools display, pixel icons, upgrades, utility creatures)
+- Laser mode activation and dismissal
+- Dirty tank visual rendering
+- Fish info display without emoji
+- Store tab navigation
+- Panel close behavior
 
 ---
 
@@ -1716,7 +1846,9 @@ Core systems must have unit tests. These live alongside the game code or in a te
 
 ### 27.2 E2E Tests (Playwright)
 
-Extending `tests/e2e/games.spec.ts`:
+Two test files in `tests/e2e/`:
+
+**`games.spec.ts`** (60 tests) — Core smoke tests:
 - Widget loads in 4:3 aspect ratio
 - HUD shows coins, cleanliness, hunger
 - Menu FAB opens/closes
@@ -1725,6 +1857,29 @@ Extending `tests/e2e/games.spec.ts`:
 - Fish are visible and tappable
 - Store shows items with prices
 - Tank switching works
+- All 12 debug scenarios load correctly
+
+**`games-advanced.spec.ts`** (57 tests) — Advanced validation:
+- Pixel icon system in HUD, menu, FAB, bars, tank nav
+- Store purchasing (fish, food, decor, tools) with coin verification
+- Tank navigation via nav buttons and tanks panel
+- Scenario state persistence across actions
+- Decor sell flow with coin tracking
+- Fish sell flow with list update verification
+- Equipment upgrades in rich scenario
+- Dirty tank visual and cleanliness bar colors
+- Fish info display without emoji text
+
+**`games-features.spec.ts`** (50 tests) — v1.2 feature validation:
+- Zero-fish tank: empty-tank scenario, sell last fish, buy first fish, empty inventory
+- Half-space schooling: 0.5 space cost in store, schooling showcase with 10+ tetras, capacity display
+- Movement types: movement-showcase scenario, crawl/glass traits in bubble, rendering without errors
+- Fish info panel: stats pills, earning info, sell button, weak warning, trait labels, auto-dismiss
+- Cleaning improvements: consistent dirt pattern, wiping works, saltwater cleaning
+- Floating plants: floating-decor scenario, inventory display, rendering without errors
+- New scenarios: empty-tank, movement-showcase, schooling-showcase, floating-decor
+- Visual rendering: no JS errors across all scenarios, proper dimensions, tier verification
+- Inventory sell flow: sell all fish, coin updates, sell last fish to empty
 
 ### 27.3 Sandbox Scenarios
 
@@ -1747,6 +1902,12 @@ Updated scenarios in `apps/sandbox/src/lib/scenarios.js`:
 - Clean mode active (dirty mask visible)
 - Feed mode active (food particles dropping)
 
+**New Features (v1.2):**
+- Empty tank (zero fish, decor present)
+- Movement showcase (all movement types: normal, crawl, glass, snake, schooling)
+- Schooling showcase (10 neon tetras + pleco + moon fish, demonstrates leader-following)
+- Floating decor (multiple floating plants with drift animation)
+
 ---
 
 ## Appendix A: Catalog Content Reference
@@ -1758,7 +1919,7 @@ Updated scenarios in `apps/sandbox/src/lib/scenarios.js`:
 |---|---|---|---|---|---|
 | `guppy` | Guppy | 15 | 2.5 | 1 | `basic_flakes`, `pellets` |
 | `goldfish` | Goldfish | 30 | 4.0 | 2 | `basic_flakes`, `pellets` |
-| `snail` | Mystery Snail | 40 | 0.5 | 1 | `algae_wafer`. Utility: reduces dirt by 15% |
+| `snail` | Mystery Snail | 40 | 0.5 | 1 | `algae_wafer`. Utility: dirt -15%, crawl movement |
 
 **Food:**
 | ID | Display Name | Price | Hunger | Sink |
@@ -1781,11 +1942,11 @@ Updated scenarios in `apps/sandbox/src/lib/scenarios.js`:
 **Fish:**
 | ID | Display Name | Price | Coins/hr | Space | Accepts | Requirements |
 |---|---|---|---|---|---|---|
-| `neon_tetra` | Neon Tetra | 25 | 3.2 | 1 | `tropical_flakes`, `bloodworms` | Schooling (prefers 3+) |
+| `neon_tetra` | Neon Tetra | 25 | 3.2 | **0.5** | `tropical_flakes`, `bloodworms` | Schooling, half-space |
 | `blue_eye` | Blue-Eye | 30 | 3.5 | 1 | `tropical_flakes`, `pellets` | — |
 | `moon_fish` | Moon Fish | 40 | 4.5 | 2 | `tropical_flakes`, `pellets`, `bloodworms` | — |
 | `discus` | Discus | 65 | 6.0 | 3 | `tropical_flakes`, `bloodworms` | Plant mass ≥ 3.0 (-25 penalty) |
-| `pleco` | Pleco | 45 | 1.5 | 2 | `algae_wafer` | Utility: reduces dirt by 10% |
+| `pleco` | Pleco | 45 | 1.5 | 2 | `algae_wafer` | Utility: reduces dirt 10%, glass movement |
 | `gourami` | Gourami | 55 | 5.5 | 2 | `tropical_flakes`, `pellets`, `bloodworms` | Floating plants required (-30 penalty) |
 
 **Food:**
@@ -1809,12 +1970,12 @@ Updated scenarios in `apps/sandbox/src/lib/scenarios.js`:
 |---|---|---|---|---|---|---|
 | `clownfish` | Clownfish | 50 | 5.5 | 3 | `marine_pellets`, `reef_flakes`, `frozen_brine` | Anemone required (-40 penalty) |
 | `blue_tang` | Blue Tang | 75 | 7.0 | 4 | `marine_pellets`, `reef_flakes` | — |
-| `green_chromis` | Green Chromis | 35 | 3.0 | 1 | `reef_flakes`, `frozen_brine` | Schooling (prefers 3+) |
+| `green_chromis` | Green Chromis | 35 | 3.0 | **0.5** | `reef_flakes`, `frozen_brine` | Schooling, half-space |
 | `firefish` | Firefish | 45 | 4.5 | 1 | `reef_flakes`, `frozen_brine` | — |
 | `royal_gramma` | Royal Gramma | 55 | 5.0 | 2 | `marine_pellets`, `reef_flakes` | — |
-| `banggai_cardinal` | Banggai Cardinalfish | 40 | 3.5 | 1 | `reef_flakes`, `frozen_brine` | Schooling (prefers 3+) |
-| `moray_eel` | Moray Eel | 120 | 10.0 | 6 | `marine_pellets`, `frozen_brine`, `live_shrimp` | Cave required (-55 penalty), max 1 |
-| `cleaner_shrimp` | Cleaner Shrimp | 60 | 2.0 | 1 | `reef_flakes` | Utility: reduces dirt by 8% |
+| `banggai_cardinal` | Banggai Cardinalfish | 40 | 3.5 | **0.5** | `reef_flakes`, `frozen_brine` | Schooling, half-space |
+| `moray_eel` | Moray Eel | 120 | 10.0 | 6 | `marine_pellets`, `frozen_brine`, `live_shrimp` | Cave required (-55), max 1, snake movement |
+| `cleaner_shrimp` | Cleaner Shrimp | 60 | 2.0 | 1 | `reef_flakes` | Utility: dirt -8%, crawl movement |
 
 **Food:**
 | ID | Display Name | Price | Hunger | Sink | Notes |

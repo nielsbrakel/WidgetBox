@@ -61,7 +61,7 @@ const CATALOG = {
                 fish: {
                     guppy: { name: 'Guppy', basePrice: 15, baseCoinPerHour: 2.5, hungerRate: 0.9, spaceCost: 1, diet: { accepts: ['basic_flakes', 'pellets'] }, preferences: { zonePreference: 'top' }, visuals: { spriteKey: 'guppy', sizeVarianceRange: [0.9, 1.1] } },
                     goldfish: { name: 'Goldfish', basePrice: 30, baseCoinPerHour: 4.0, hungerRate: 1.0, spaceCost: 2, diet: { accepts: ['basic_flakes', 'pellets'] }, preferences: { zonePreference: 'middle' }, visuals: { spriteKey: 'goldfish', sizeVarianceRange: [0.9, 1.1] } },
-                    snail: { name: 'Mystery Snail', basePrice: 40, baseCoinPerHour: 0.5, hungerRate: 0.5, spaceCost: 1, diet: { accepts: ['algae_wafer'] }, preferences: { zonePreference: 'bottom' }, utility: { dirtReduction: 0.15 }, visuals: { spriteKey: 'snail', sizeVarianceRange: [0.85, 1.0] } },
+                    snail: { name: 'Mystery Snail', basePrice: 40, baseCoinPerHour: 0.5, hungerRate: 0.5, spaceCost: 1, diet: { accepts: ['algae_wafer'] }, preferences: { zonePreference: 'bottom', movementType: 'crawl' }, utility: { dirtReduction: 0.15 }, visuals: { spriteKey: 'snail', sizeVarianceRange: [0.85, 1.0] } },
                 },
                 food: {
                     basic_flakes: { name: 'Basic Flakes', price: 3, hungerRestore: 30, xp: 5, sinkBehavior: 'slowSink' },
@@ -92,11 +92,11 @@ const CATALOG = {
             visuals: { waterTint: '#40b8d0', substrate: 'gravel', themeKey: 'tropical' },
             content: {
                 fish: {
-                    neon_tetra: { name: 'Neon Tetra', basePrice: 25, baseCoinPerHour: 3.2, hungerRate: 0.8, spaceCost: 1, diet: { accepts: ['tropical_flakes', 'bloodworms'] }, requirements: { tools: [...TROPICAL_TOOL_REQS] }, preferences: { zonePreference: 'middle', schooling: true }, visuals: { spriteKey: 'neon_tetra' } },
+                    neon_tetra: { name: 'Neon Tetra', basePrice: 25, baseCoinPerHour: 3.2, hungerRate: 0.8, spaceCost: 0.5, diet: { accepts: ['tropical_flakes', 'bloodworms'] }, requirements: { tools: [...TROPICAL_TOOL_REQS] }, preferences: { zonePreference: 'middle', schooling: true }, visuals: { spriteKey: 'neon_tetra' } },
                     blue_eye: { name: 'Blue-Eye', basePrice: 30, baseCoinPerHour: 3.5, hungerRate: 0.9, spaceCost: 1, diet: { accepts: ['tropical_flakes', 'pellets'] }, requirements: { tools: [...TROPICAL_TOOL_REQS] }, preferences: { zonePreference: 'top' }, visuals: { spriteKey: 'blue_eye' } },
                     moon_fish: { name: 'Moon Fish', basePrice: 40, baseCoinPerHour: 4.5, hungerRate: 1.0, spaceCost: 2, diet: { accepts: ['tropical_flakes', 'pellets', 'bloodworms'] }, requirements: { tools: [...TROPICAL_TOOL_REQS] }, preferences: { zonePreference: 'middle' }, visuals: { spriteKey: 'moon_fish' } },
                     discus: { name: 'Discus', basePrice: 65, baseCoinPerHour: 6.0, hungerRate: 1.1, spaceCost: 3, diet: { accepts: ['tropical_flakes', 'bloodworms'] }, requirements: { tools: [...TROPICAL_TOOL_REQS], plantMass: { minTotal: 3.0, penalty: 25, label: 'Needs plants' } }, preferences: { zonePreference: 'middle' }, visuals: { spriteKey: 'discus' } },
-                    pleco: { name: 'Pleco', basePrice: 45, baseCoinPerHour: 1.5, hungerRate: 0.6, spaceCost: 2, diet: { accepts: ['algae_wafer'] }, requirements: { tools: [...TROPICAL_TOOL_REQS] }, preferences: { zonePreference: 'bottom' }, utility: { dirtReduction: 0.10 }, visuals: { spriteKey: 'pleco' } },
+                    pleco: { name: 'Pleco', basePrice: 45, baseCoinPerHour: 1.5, hungerRate: 0.6, spaceCost: 2, diet: { accepts: ['algae_wafer'] }, requirements: { tools: [...TROPICAL_TOOL_REQS] }, preferences: { zonePreference: 'bottom', movementType: 'glass' }, utility: { dirtReduction: 0.10 }, visuals: { spriteKey: 'pleco' } },
                     gourami: { name: 'Gourami', basePrice: 55, baseCoinPerHour: 5.5, hungerRate: 1.0, spaceCost: 2, diet: { accepts: ['tropical_flakes', 'pellets', 'bloodworms'] }, requirements: { tools: [...TROPICAL_TOOL_REQS], floatingPlants: { minCount: 1, penalty: 30, label: 'Needs floating plants' } }, preferences: { zonePreference: 'top' }, visuals: { spriteKey: 'gourami' } },
                 },
                 food: {
@@ -134,12 +134,12 @@ const CATALOG = {
                 fish: {
                     clownfish: { name: 'Clownfish', basePrice: 50, baseCoinPerHour: 5.5, hungerRate: 1.0, spaceCost: 3, diet: { accepts: ['marine_pellets', 'reef_flakes', 'frozen_brine'] }, requirements: { tools: [...SALT_TOOL_REQS], decor: [{ decorId: 'anemone', penalty: 40 }] }, preferences: { nearDecor: 'anemone', zonePreference: 'middle' }, visuals: { spriteKey: 'clownfish' } },
                     blue_tang: { name: 'Blue Tang', basePrice: 75, baseCoinPerHour: 7.0, hungerRate: 1.1, spaceCost: 4, diet: { accepts: ['marine_pellets', 'reef_flakes'] }, requirements: { tools: [...SALT_TOOL_REQS] }, preferences: { zonePreference: 'middle' }, visuals: { spriteKey: 'blue_tang' } },
-                    green_chromis: { name: 'Green Chromis', basePrice: 35, baseCoinPerHour: 3.0, hungerRate: 0.8, spaceCost: 1, diet: { accepts: ['reef_flakes', 'frozen_brine'] }, requirements: { tools: [...SALT_TOOL_REQS] }, preferences: { zonePreference: 'middle', schooling: true }, visuals: { spriteKey: 'green_chromis' } },
+                    green_chromis: { name: 'Green Chromis', basePrice: 35, baseCoinPerHour: 3.0, hungerRate: 0.8, spaceCost: 0.5, diet: { accepts: ['reef_flakes', 'frozen_brine'] }, requirements: { tools: [...SALT_TOOL_REQS] }, preferences: { zonePreference: 'middle', schooling: true }, visuals: { spriteKey: 'green_chromis' } },
                     firefish: { name: 'Firefish', basePrice: 45, baseCoinPerHour: 4.5, hungerRate: 0.9, spaceCost: 1, diet: { accepts: ['reef_flakes', 'frozen_brine'] }, requirements: { tools: [...SALT_TOOL_REQS] }, preferences: { zonePreference: 'middle' }, visuals: { spriteKey: 'firefish' } },
                     royal_gramma: { name: 'Royal Gramma', basePrice: 55, baseCoinPerHour: 5.0, hungerRate: 0.9, spaceCost: 2, diet: { accepts: ['marine_pellets', 'reef_flakes'] }, requirements: { tools: [...SALT_TOOL_REQS] }, preferences: { zonePreference: 'bottom' }, visuals: { spriteKey: 'royal_gramma' } },
-                    banggai_cardinal: { name: 'Banggai Cardinalfish', basePrice: 40, baseCoinPerHour: 3.5, hungerRate: 0.8, spaceCost: 1, diet: { accepts: ['reef_flakes', 'frozen_brine'] }, requirements: { tools: [...SALT_TOOL_REQS] }, preferences: { zonePreference: 'middle', schooling: true }, visuals: { spriteKey: 'banggai_cardinal' } },
-                    moray_eel: { name: 'Moray Eel', basePrice: 120, baseCoinPerHour: 10.0, hungerRate: 1.3, spaceCost: 6, maxPerTank: 1, diet: { accepts: ['marine_pellets', 'frozen_brine', 'live_shrimp'] }, requirements: { tools: [...SALT_TOOL_REQS], decor: [{ decorId: 'cave', penalty: 55 }] }, preferences: { nearDecor: 'cave', zonePreference: 'bottom' }, visuals: { spriteKey: 'moray_eel' } },
-                    cleaner_shrimp: { name: 'Cleaner Shrimp', basePrice: 60, baseCoinPerHour: 2.0, hungerRate: 0.5, spaceCost: 1, diet: { accepts: ['reef_flakes'] }, requirements: { tools: [...SALT_TOOL_REQS] }, preferences: { zonePreference: 'bottom' }, utility: { dirtReduction: 0.08 }, visuals: { spriteKey: 'cleaner_shrimp' } },
+                    banggai_cardinal: { name: 'Banggai Cardinalfish', basePrice: 40, baseCoinPerHour: 3.5, hungerRate: 0.8, spaceCost: 0.5, diet: { accepts: ['reef_flakes', 'frozen_brine'] }, requirements: { tools: [...SALT_TOOL_REQS] }, preferences: { zonePreference: 'middle', schooling: true }, visuals: { spriteKey: 'banggai_cardinal' } },
+                    moray_eel: { name: 'Moray Eel', basePrice: 120, baseCoinPerHour: 10.0, hungerRate: 1.3, spaceCost: 6, maxPerTank: 1, diet: { accepts: ['marine_pellets', 'frozen_brine', 'live_shrimp'] }, requirements: { tools: [...SALT_TOOL_REQS], decor: [{ decorId: 'cave', penalty: 55 }] }, preferences: { nearDecor: 'cave', zonePreference: 'bottom', movementType: 'snake' }, visuals: { spriteKey: 'moray_eel' } },
+                    cleaner_shrimp: { name: 'Cleaner Shrimp', basePrice: 60, baseCoinPerHour: 2.0, hungerRate: 0.5, spaceCost: 1, diet: { accepts: ['reef_flakes'] }, requirements: { tools: [...SALT_TOOL_REQS] }, preferences: { zonePreference: 'bottom', movementType: 'crawl' }, utility: { dirtReduction: 0.08 }, visuals: { spriteKey: 'cleaner_shrimp' } },
                 },
                 food: {
                     marine_pellets: { name: 'Marine Pellets', price: 8, hungerRestore: 45, xp: 8, sinkBehavior: 'sink' },
@@ -431,7 +431,7 @@ function handleAction(save, type, payload) {
             tank.coins -= price; const fish = createFishInstance(payload.speciesId); tank.fish.push(fish);
             return { bought: true, fish, price };
         }
-        case 'sell_fish': { const idx = tank.fish.findIndex(f => f.id === payload.fishId); if (idx === -1) return { error: 'Fish not found' }; if (tank.fish.length <= 1) return { error: 'Cannot sell last fish' }; const f = tank.fish[idx]; const v = getSellReturn(f, tankCat); tank.coins += v; tank.fish.splice(idx, 1); return { sold: true, value: v }; }
+        case 'sell_fish': { const idx = tank.fish.findIndex(f => f.id === payload.fishId); if (idx === -1) return { error: 'Fish not found' }; const f = tank.fish[idx]; const v = getSellReturn(f, tankCat); tank.coins += v; tank.fish.splice(idx, 1); return { sold: true, value: v }; }
         case 'feed': { const food = tankCat.content.food[payload.foodId]; if (!food) return { error: 'Unknown food' }; if ((tank.foodStock[payload.foodId] || 0) <= 0) return { error: 'Out of stock' }; tank.foodStock[payload.foodId]--; return { fed: true, foodId: payload.foodId }; }
         case 'fish_consume': {
             const fish = tank.fish.find(f => f.id === payload.fishId); if (!fish) return { error: 'Fish not found' };
@@ -622,21 +622,201 @@ function createScenarioState(scenarioId) {
             s.tanks.salt.coins = 800;
             s.tanks.salt.toolsOwned = { filter_salt: 2, skimmer: 1, uv_sterilizer: 1 };
             s.tanks.salt.foodStock = { marine_pellets: 15, reef_flakes: 20, frozen_brine: 8 };
-            // Fill to 18/20 space
+            // Fill to 18/20 space (schooling fish count as 0.5)
             s.tanks.salt.fish = [
                 createFishInstance('clownfish', { hunger: 70 }), // 3
                 createFishInstance('blue_tang', { hunger: 65 }),  // 4
-                createFishInstance('green_chromis', { hunger: 60 }), // 1
-                createFishInstance('green_chromis', { hunger: 55 }), // 1
+                createFishInstance('green_chromis', { hunger: 60 }), // 0.5
+                createFishInstance('green_chromis', { hunger: 55 }), // 0.5
+                createFishInstance('green_chromis', { hunger: 50 }), // 0.5
+                createFishInstance('green_chromis', { hunger: 48 }), // 0.5
                 createFishInstance('firefish', { hunger: 50 }),  // 1
                 createFishInstance('royal_gramma', { hunger: 45 }), // 2
-                createFishInstance('banggai_cardinal', { hunger: 40 }), // 1
-                createFishInstance('banggai_cardinal', { hunger: 35 }), // 1
+                createFishInstance('banggai_cardinal', { hunger: 40 }), // 0.5
+                createFishInstance('banggai_cardinal', { hunger: 35 }), // 0.5
+                createFishInstance('banggai_cardinal', { hunger: 38 }), // 0.5
+                createFishInstance('banggai_cardinal', { hunger: 42 }), // 0.5
                 createFishInstance('clownfish', { hunger: 60 }), // 3
                 createFishInstance('cleaner_shrimp', { hunger: 80 }), // 1
-            ]; // 3+4+1+1+1+2+1+1+3+1 = 18
+            ]; // 3+4+0.5+0.5+0.5+0.5+1+2+0.5+0.5+0.5+0.5+3+1 = 18
             s.tanks.salt.decor = [createDecorInstance('anemone', 0.5, 0.7)];
             s.lifetime.coinsEarned = 6000;
+            return s;
+        }
+        case 'rich': {
+            const s = createInitialState();
+            s.tanks.fresh.coins = 99999;
+            s.tanks.fresh.foodStock = { basic_flakes: 50, pellets: 20 };
+            s.tanks.fresh.fish = [
+                createFishInstance('guppy', { level: 2, hunger: 80, bornAt: Date.now() - 7 * 86400000 }),
+                createFishInstance('goldfish', { level: 1, hunger: 75, bornAt: Date.now() - 3 * 86400000 }),
+            ];
+            return s;
+        }
+        case 'neglected-48h': {
+            const s = createInitialState();
+            s.tanks.fresh.cleanliness = 15;
+            s.tanks.fresh.coins = 30;
+            s.tanks.fresh.foodStock = { basic_flakes: 2 };
+            s.tanks.fresh.fish = [
+                createFishInstance('guppy', { hunger: 5, weak: true, health: 15, level: 2, bornAt: Date.now() - 10 * 86400000 }),
+                createFishInstance('goldfish', { hunger: 10, weak: true, health: 20, level: 1, bornAt: Date.now() - 5 * 86400000 }),
+            ];
+            return s;
+        }
+        case 'tier-2-ready': {
+            const s = createInitialState();
+            s.tanks.fresh.coins = 600;
+            s.tanks.fresh.fish = [
+                createFishInstance('guppy', { level: 4, hunger: 80, bornAt: Date.now() - 15 * 86400000 }),
+                createFishInstance('goldfish', { level: 3, hunger: 75, bornAt: Date.now() - 12 * 86400000 }),
+                createFishInstance('guppy', { level: 2, hunger: 70, bornAt: Date.now() - 8 * 86400000 }),
+            ];
+            s.tanks.fresh.foodStock = { basic_flakes: 15, pellets: 5 };
+            s.tanks.fresh.cleanliness = 75;
+            s.lifetime.coinsEarned = 800;
+            return s;
+        }
+        case 'multi-tank-decorated': {
+            const s = createInitialState();
+            s.tanks.fresh.unlocked = true;
+            s.tanks.tropical.unlocked = true;
+            s.tanks.salt.unlocked = true;
+            s.activeTankId = 'fresh';
+            s.tanks.fresh.coins = 300;
+            s.tanks.fresh.fish = [
+                createFishInstance('guppy', { level: 3, hunger: 80, bornAt: Date.now() - 12 * 86400000 }),
+                createFishInstance('goldfish', { level: 2, hunger: 70, bornAt: Date.now() - 8 * 86400000 }),
+            ];
+            s.tanks.fresh.decor = [
+                createDecorInstance('moss_ball', 0.3, 0.8),
+                createDecorInstance('driftwood', 0.7, 0.85),
+            ];
+            s.tanks.fresh.foodStock = { basic_flakes: 15, pellets: 5 };
+            s.tanks.tropical.fish = [
+                createFishInstance('neon_tetra', { level: 2, hunger: 65, bornAt: Date.now() - 10 * 86400000 }),
+                createFishInstance('pleco', { level: 1, hunger: 75, bornAt: Date.now() - 5 * 86400000 }),
+            ];
+            s.tanks.tropical.decor = [createDecorInstance('java_fern', 0.4, 0.8)];
+            s.tanks.tropical.coins = 200;
+            s.tanks.tropical.foodStock = { tropical_flakes: 10, pellets: 5 };
+            s.tanks.tropical.toolsOwned = { heater: 1 };
+            s.tanks.salt.fish = [
+                createFishInstance('clownfish', { level: 2, hunger: 60, bornAt: Date.now() - 8 * 86400000 }),
+                createFishInstance('green_chromis', { level: 1, hunger: 55, bornAt: Date.now() - 4 * 86400000 }),
+            ];
+            s.tanks.salt.decor = [
+                createDecorInstance('anemone', 0.5, 0.7),
+                createDecorInstance('brain_coral', 0.6, 0.85),
+            ];
+            s.tanks.salt.coins = 500;
+            s.tanks.salt.foodStock = { marine_pellets: 10, reef_flakes: 15 };
+            s.tanks.salt.toolsOwned = { filter_salt: 1 };
+            s.lifetime.coinsEarned = 3000;
+            return s;
+        }
+        case 'empty-tank': {
+            // Zero fish scenario — tests empty tank rendering & behavior
+            const s = createInitialState();
+            s.tanks.fresh.fish = [];
+            s.tanks.fresh.coins = 200;
+            s.tanks.fresh.foodStock = { basic_flakes: 5 };
+            s.tanks.fresh.decor = [createDecorInstance('moss_ball', 0.4, 0.85)];
+            return s;
+        }
+        case 'movement-showcase': {
+            // All movement types: normal, crawl, glass, snake, schooling
+            const s = createInitialState();
+            s.tanks.fresh.unlocked = true;
+            s.tanks.tropical.unlocked = true;
+            s.tanks.salt.unlocked = true;
+            s.activeTankId = 'salt';
+            s.tanks.salt.coins = 5000;
+            s.tanks.salt.toolsOwned = { filter_salt: 2, skimmer: 1, uv_sterilizer: 1 };
+            s.tanks.salt.foodStock = { marine_pellets: 20, reef_flakes: 20, frozen_brine: 10, live_shrimp: 5 };
+            s.tanks.salt.fish = [
+                createFishInstance('clownfish', { hunger: 80 }),            // normal middle
+                createFishInstance('cleaner_shrimp', { hunger: 75 }),       // crawl bottom
+                createFishInstance('moray_eel', { hunger: 70 }),            // snake bottom
+                createFishInstance('green_chromis', { hunger: 65 }),        // schooling middle (0.5)
+                createFishInstance('green_chromis', { hunger: 60 }),        // schooling middle (0.5)
+                createFishInstance('green_chromis', { hunger: 55 }),        // schooling middle (0.5)
+                createFishInstance('green_chromis', { hunger: 50 }),        // schooling middle (0.5)
+                createFishInstance('banggai_cardinal', { hunger: 70 }),     // schooling middle (0.5)
+                createFishInstance('banggai_cardinal', { hunger: 65 }),     // schooling middle (0.5)
+                createFishInstance('firefish', { hunger: 75 }),             // normal middle
+            ]; // 3+1+6+0.5+0.5+0.5+0.5+0.5+0.5+1 = 14
+            s.tanks.salt.decor = [createDecorInstance('anemone', 0.4, 0.7), createDecorInstance('cave', 0.7, 0.85)];
+            // Also add pleco to tropical for glass movement
+            s.tanks.tropical.toolsOwned = { heater: 1, filter_tropical: 1 };
+            s.tanks.tropical.fish = [
+                createFishInstance('pleco', { hunger: 80 }),                // glass bottom
+                createFishInstance('neon_tetra', { hunger: 70 }),           // schooling middle (0.5)
+                createFishInstance('neon_tetra', { hunger: 65 }),           // schooling middle (0.5)
+                createFishInstance('neon_tetra', { hunger: 60 }),           // schooling middle (0.5)
+                createFishInstance('neon_tetra', { hunger: 55 }),           // schooling middle (0.5)
+                createFishInstance('gourami', { hunger: 75 }),              // normal top
+            ];
+            s.tanks.tropical.decor = [createDecorInstance('floating_plants', 0.5, 0.1)];
+            s.tanks.tropical.coins = 500;
+            s.tanks.tropical.foodStock = { tropical_flakes: 15, pellets: 5, bloodworms: 5, algae_wafer: 5 };
+            s.lifetime.coinsEarned = 5000;
+            return s;
+        }
+        case 'schooling-showcase': {
+            // Large schools of small fish — tests half-space & leader following
+            const s = createInitialState();
+            s.tanks.fresh.unlocked = true;
+            s.tanks.tropical.unlocked = true;
+            s.tanks.salt.unlocked = true;
+            s.activeTankId = 'tropical';
+            s.tanks.tropical.coins = 1000;
+            s.tanks.tropical.toolsOwned = { heater: 1, filter_tropical: 2 };
+            s.tanks.tropical.foodStock = { tropical_flakes: 20, pellets: 10, bloodworms: 5 };
+            // 10 neon tetras (0.5 each = 5 space) + 2 moon fish (2 each = 4) + pleco (2) + discus (3) = 14/14
+            s.tanks.tropical.fish = [
+                createFishInstance('neon_tetra', { hunger: 90, level: 3 }),
+                createFishInstance('neon_tetra', { hunger: 85, level: 2 }),
+                createFishInstance('neon_tetra', { hunger: 80, level: 2 }),
+                createFishInstance('neon_tetra', { hunger: 75, level: 1 }),
+                createFishInstance('neon_tetra', { hunger: 70, level: 1 }),
+                createFishInstance('neon_tetra', { hunger: 88, level: 2 }),
+                createFishInstance('neon_tetra', { hunger: 82, level: 1 }),
+                createFishInstance('neon_tetra', { hunger: 78, level: 1 }),
+                createFishInstance('neon_tetra', { hunger: 72, level: 1 }),
+                createFishInstance('neon_tetra', { hunger: 68, level: 1 }),
+                createFishInstance('moon_fish', { hunger: 80, level: 2 }),
+                createFishInstance('pleco', { hunger: 85, level: 1 }),
+            ]; // 0.5*10 + 2 + 2 = 9/14 space
+            s.tanks.tropical.decor = [
+                createDecorInstance('java_fern', 0.2, 0.8),
+                createDecorInstance('amazon_sword', 0.5, 0.8),
+                createDecorInstance('floating_plants', 0.4, 0.1),
+            ];
+            s.lifetime.coinsEarned = 4000;
+            return s;
+        }
+        case 'floating-decor': {
+            // Tank with floating plants for drift animation testing
+            const s = createInitialState();
+            s.tanks.fresh.unlocked = true;
+            s.tanks.tropical.unlocked = true;
+            s.activeTankId = 'tropical';
+            s.tanks.tropical.coins = 500;
+            s.tanks.tropical.toolsOwned = { heater: 1 };
+            s.tanks.tropical.foodStock = { tropical_flakes: 10 };
+            s.tanks.tropical.fish = [
+                createFishInstance('neon_tetra', { hunger: 80 }),
+                createFishInstance('gourami', { hunger: 75 }),
+            ];
+            s.tanks.tropical.decor = [
+                createDecorInstance('floating_plants', 0.2, 0.1),
+                createDecorInstance('floating_plants', 0.5, 0.1),
+                createDecorInstance('floating_plants', 0.8, 0.1),
+                createDecorInstance('java_fern', 0.4, 0.8),
+                createDecorInstance('mossy_log', 0.7, 0.85),
+            ];
+            s.lifetime.coinsEarned = 1500;
             return s;
         }
         default:
@@ -664,18 +844,44 @@ function persistState(state) {
 
 // ── Main handler ─────────────────────────────────────────────────────
 
+// Track the last loaded scenario to detect changes
+let _lastScenarioId = null;
+
+export function resetAquariumScenario(scenarioId) {
+    // Skip reset if the widget already loaded this exact scenario — prevents
+    // React useEffect double-fire from clearing state mid-session.
+    if (scenarioId && scenarioId === _lastScenarioId) return;
+    _lastScenarioId = null;
+    try { localStorage.removeItem(STORAGE_KEY); } catch { /* ignore */ }
+}
+
 export function handleAquariumApi(widgetId, method, endpoint, body, scenarioId) {
     if (widgetId !== 'aquarium') return null;
 
     let state;
     let isNew = false;
 
-    if (scenarioId && scenarioId !== 'default') {
+    // Only create fresh scenario state on GET when scenario changes, or when there's no persisted state.
+    // POST requests always use persisted state to avoid resetting on every action.
+    if (method === 'GET' && scenarioId === 'default' && _lastScenarioId && _lastScenarioId !== 'default') {
+        // Switching back to default — create fresh state
+        state = createInitialState();
+        _lastScenarioId = 'default';
+        persistState(state);
+    } else if (method === 'GET' && scenarioId && scenarioId !== 'default' && scenarioId !== _lastScenarioId) {
         state = createScenarioState(scenarioId);
-        if (!state) state = loadPersistedState() || createInitialState();
+        if (state) {
+            _lastScenarioId = scenarioId;
+            persistState(state);
+        } else {
+            state = loadPersistedState() || createInitialState();
+            _lastScenarioId = scenarioId;
+        }
     } else {
         state = loadPersistedState();
         if (!state) { state = createInitialState(); isNew = true; }
+        // Track current scenario so resetAquariumScenario can skip redundant resets
+        if (method === 'GET' && scenarioId) _lastScenarioId = scenarioId;
     }
 
     if (method === 'GET') {

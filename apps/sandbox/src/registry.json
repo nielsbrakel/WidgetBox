@@ -725,6 +725,33 @@
     }
   },
   {
+    "id": "aquarium",
+    "app": "com.nielsvanbrakel.widgetbox-games",
+    "name": {
+      "en": "Aquarium",
+      "nl": "Aquarium"
+    },
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "reset_state",
+        "label": {
+          "en": "Reset Aquarium",
+          "nl": "Aquarium Resetten"
+        },
+        "value": false
+      }
+    ],
+    "isTransparent": false,
+    "height": "75%",
+    "path": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-games/widgets/aquarium/public/index.html",
+    "absolutePath": "/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-games/widgets/aquarium",
+    "locales": {
+      "en": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-games/locales/en.json",
+      "nl": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-games/locales/nl.json"
+    }
+  },
+  {
     "id": "spacer",
     "app": "com.nielsvanbrakel.widgetbox-layout",
     "name": {
@@ -756,33 +783,6 @@
     "locales": {
       "en": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-layout/locales/en.json",
       "nl": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-layout/locales/nl.json"
-    }
-  },
-  {
-    "id": "aquarium",
-    "app": "com.nielsvanbrakel.widgetbox-games",
-    "name": {
-      "en": "Aquarium",
-      "nl": "Aquarium"
-    },
-    "settings": [
-      {
-        "type": "checkbox",
-        "id": "reset_state",
-        "label": {
-          "en": "Reset Aquarium",
-          "nl": "Aquarium Resetten"
-        },
-        "value": false
-      }
-    ],
-    "isTransparent": false,
-    "height": "75%",
-    "path": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-games/widgets/aquarium/public/index.html",
-    "absolutePath": "/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-games/widgets/aquarium",
-    "locales": {
-      "en": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-games/locales/en.json",
-      "nl": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-games/locales/nl.json"
     }
   },
   {

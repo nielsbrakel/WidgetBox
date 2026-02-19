@@ -1,6 +1,6 @@
 import { SCENARIOS } from './scenarios';
 import { handleBuienradarApi } from './mocks/buienradarMocks';
-import { handleAquariumApi } from './mocks/aquariumMocks';
+import { handleAquariumApi, resetAquariumScenario } from './mocks/aquariumMocks';
 
 class SimpleEventEmitter {
     constructor() {
@@ -102,6 +102,10 @@ class MockHomey extends SimpleEventEmitter {
 
     setScenario(scenarioId) {
         this.activeScenario = scenarioId;
+        // Reset persisted mock state so the new scenario loads fresh
+        if (this.widgetId === 'aquarium') {
+            resetAquariumScenario(scenarioId);
+        }
     }
 
     async api(method, endpoint, body) {

@@ -34,12 +34,21 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a1628;font-family:
 #hudTooltipBody{opacity:.75;line-height:1.4}
 
 /* ═══════ FISH BUBBLE ═══════ */
-#fishBubble{position:absolute;background:rgba(10,22,40,.92);border:1px solid rgba(100,160,220,.3);border-radius:10px;padding:8px 12px;z-index:21;opacity:0;pointer-events:none;transition:opacity .2s;font-size:11px;white-space:nowrap}
-#fishBubble.visible{opacity:1}
-#fbName{font-weight:600;font-size:12px}
-#fbSpecies{opacity:.6;font-size:10px}
-#fbDetail{margin-top:4px;line-height:1.5}
-#fbStage{opacity:.6;font-size:10px}
+#fishBubble{position:absolute;background:rgba(10,22,40,.94);border:1px solid rgba(100,160,220,.35);border-radius:12px;padding:10px 14px;z-index:21;opacity:0;pointer-events:none;transition:opacity .2s;font-size:11px;min-width:150px;max-width:200px}
+#fishBubble.visible{opacity:1;pointer-events:auto}
+#fbName{font-weight:700;font-size:13px;margin-bottom:1px}
+#fbSpecies{opacity:.6;font-size:10px;margin-bottom:6px}
+#fbDetail{line-height:1.5}
+.fb-stats{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:3px}
+.fb-stat{font-size:10px;background:rgba(255,255,255,.08);padding:1px 6px;border-radius:4px}
+.fb-earn{font-size:10px;opacity:.7;margin-bottom:2px}
+.fb-warn{color:#ff8866;font-size:10px;font-weight:600;margin-top:2px}
+.fb-trait{font-size:9px;opacity:.5;margin-top:1px}
+.fb-actions{display:flex;gap:6px;margin-top:6px;padding-top:5px;border-top:1px solid rgba(100,160,220,.15)}
+.fb-btn{padding:3px 10px;border-radius:5px;border:none;font-size:10px;font-weight:600;cursor:pointer}
+.fb-sell{background:rgba(180,60,60,.5);color:#ffa0a0}
+.fb-sell:hover{background:rgba(200,70,70,.6)}
+#fbStage{}
 
 /* ═══════ DECOR CARD ═══════ */
 #decorCard{position:absolute;background:rgba(10,22,40,.94);border:1px solid rgba(100,160,220,.3);border-radius:10px;padding:10px 14px;z-index:22;opacity:0;pointer-events:none;transition:opacity .2s;font-size:11px;min-width:140px}
@@ -135,6 +144,11 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a1628;font-family:
 /* ═══════ RESET BUTTON ═══════ */
 .reset-btn{display:block;margin:16px auto 0;padding:8px 20px;background:rgba(180,50,50,.5);border:1px solid rgba(200,80,80,.4);border-radius:8px;color:#ffa0a0;font-size:12px;cursor:pointer}
 .reset-btn:hover{background:rgba(200,60,60,.6)}
+
+/* ═══════ PIXEL ICONS ═══════ */
+.hud-px-icon,.tn-btn{display:inline-flex;align-items:center;justify-content:center}
+.menu-icon{display:inline-flex;align-items:center;justify-content:center;font-size:0}
+.hud-px-icon img,.menu-icon img,.tn-btn img,#fab img{image-rendering:pixelated;display:block}
 </style>
 </head>
 <body>
@@ -146,17 +160,17 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a1628;font-family:
 
     <!-- HUD -->
     <div class="coin-display" id="coinDisplay">
-      <span id="coinIcon">🪙</span>
+      <span id="coinIcon" class="hud-px-icon" data-icon="coin"></span>
       <span id="coinCount">0</span>
     </div>
     <div id="hudRight">
       <div id="cleanBar" class="hud-bar">
-        <span class="hud-bar-label">🧹</span>
+        <span class="hud-bar-label hud-px-icon" data-icon="broom"></span>
         <div class="hud-bar-track"><div class="hud-bar-fill" id="cleanFill" style="width:100%;background:#4caf88"></div></div>
         <span class="hud-bar-val" id="cleanVal">100%</span>
       </div>
       <div id="hungerBar" class="hud-bar">
-        <span class="hud-bar-label">🍽</span>
+        <span class="hud-bar-label hud-px-icon" data-icon="food"></span>
         <div class="hud-bar-track"><div class="hud-bar-fill" id="hungerFill" style="width:100%;background:#e8a040"></div></div>
         <span class="hud-bar-val" id="hungerVal">100%</span>
       </div>
@@ -185,9 +199,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a1628;font-family:
 
     <!-- Tank nav -->
     <div id="tankNav" class="hidden">
-      <button id="tnPrev">◀</button>
+      <button id="tnPrev" class="tn-btn" data-icon="arrow_l"></button>
       <span id="tnLabel"></span>
-      <button id="tnNext">▶</button>
+      <button id="tnNext" class="tn-btn" data-icon="arrow_r"></button>
     </div>
 
     <!-- Bottom bar -->
@@ -195,19 +209,19 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a1628;font-family:
   </div>
 
   <!-- FAB -->
-  <button id="fab">☰</button>
+  <button id="fab" data-icon="menu"></button>
 
   <!-- Menu overlay -->
   <div id="menuOverlay">
     <div id="menuGrid">
-      <button class="menu-btn" data-action="feed"><span class="menu-icon">🐟</span>Feed</button>
-      <button class="menu-btn" data-action="clean"><span class="menu-icon">🧹</span>Clean</button>
-      <button class="menu-btn" data-action="laser"><span class="menu-icon">🔴</span>Play</button>
-      <button class="menu-btn" data-action="store"><span class="menu-icon">🛒</span>Store</button>
-      <button class="menu-btn" data-action="upgrades"><span class="menu-icon">🔧</span>Tools</button>
-      <button class="menu-btn" data-action="inventory"><span class="menu-icon">📋</span>Fish</button>
-      <button class="menu-btn" data-action="tanks"><span class="menu-icon">🏠</span>Tanks</button>
-      <button class="menu-btn" data-action="help"><span class="menu-icon">❓</span>Help</button>
+      <button class="menu-btn" data-action="feed"><span class="menu-icon" data-icon="fish"></span>Feed</button>
+      <button class="menu-btn" data-action="clean"><span class="menu-icon" data-icon="broom"></span>Clean</button>
+      <button class="menu-btn" data-action="laser"><span class="menu-icon" data-icon="laser"></span>Play</button>
+      <button class="menu-btn" data-action="store"><span class="menu-icon" data-icon="store"></span>Store</button>
+      <button class="menu-btn" data-action="upgrades"><span class="menu-icon" data-icon="wrench"></span>Tools</button>
+      <button class="menu-btn" data-action="inventory"><span class="menu-icon" data-icon="clipboard"></span>Fish</button>
+      <button class="menu-btn" data-action="tanks"><span class="menu-icon" data-icon="house"></span>Tanks</button>
+      <button class="menu-btn" data-action="help"><span class="menu-icon" data-icon="help"></span>Help</button>
     </div>
   </div>
 
@@ -256,37 +270,37 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a1628;font-family:
 const TANK_TIER_MAP = { fresh: '1', tropical: '2', salt: '3' };
 const BIOMES = {
   fresh: {
-    bg: ['#6ab8a0','#285848'], wall: '#1e4038', substrate: '#a89070',
+    bg: ['#5aad90','#1e4838'], wall: '#1a3830', substrate: '#9a8060',
     subH: 0.16, bubbleRate: 0.08, label: 'Fresh Starter',
   },
   tropical: {
-    bg: ['#38b0c8','#186068'], wall: '#104848', substrate: '#b0a080',
+    bg: ['#30a8c0','#145058'], wall: '#0c4040', substrate: '#a89870',
     subH: 0.14, bubbleRate: 0.12, label: 'Tropical Planted',
   },
   salt: {
-    bg: ['#2060a0','#0a2050'], wall: '#061430', substrate: '#e0d0b0',
+    bg: ['#1858a0','#081840'], wall: '#051028', substrate: '#d8c8a8',
     subH: 0.13, bubbleRate: 0.16, label: 'Saltwater Reef',
   },
 };
 
 const FISH_SPRITES = {
-  guppy:      { w:10, h:6, data:['0022200000','0213310000','2213451000','0213310000','0022100000','0002000000'] },
-  goldfish:   { w:12, h:8, data:['000220000000','002133100000','022134510000','221133110000','221133110000','022133100000','002211000000','000220000000'] },
-  snail:      { w:8,  h:6, data:['00333000','03333300','03334300','00444000','04110410','00100100'] },
-  neon_tetra: { w:10, h:6, data:['0011100000','0166351000','0116551000','0133610000','0011100000','0002000000'] },
-  blue_eye:   { w:10, h:6, data:['0011000000','0113510000','0113510000','0111310000','0011100000','0002000000'] },
-  moon_fish:  { w:12, h:8, data:['000011000000','001113100000','011133510000','011133110000','011133110000','011133100000','001111000000','000011000000'] },
-  discus:     { w:12, h:10, data:['000011000000','000113100000','001133100000','011134510000','011136310000','011136310000','011134510000','001133100000','000113100000','000011000000'] },
-  pleco:      { w:14, h:6, data:['00000000000000','00111111110000','01113345111000','01111111111000','00111111110000','00011000110000'] },
-  gourami:    { w:12, h:8, data:['000220000000','002113100000','021133510000','221133110000','221133110000','021133100000','002113000000','000220000000'] },
-  clownfish:  { w:12, h:8, data:['000220000000','002116100000','021163510000','221163110000','221136110000','021116100000','002116000000','000220000000'] },
-  blue_tang:  { w:14, h:10, data:['00000220000000','00002113000000','00021133100000','00211335100000','02211336310000','02211336310000','00211335100000','00021133100000','00002113000000','00000220000000'] },
-  green_chromis: { w:10, h:6, data:['0011100000','0113351000','0113150000','0111310000','0011100000','0002000000'] },
-  firefish:   { w:12, h:6, data:['000011000000','001113310000','011133510000','011133110000','001113300000','000022000000'] },
-  royal_gramma: { w:12, h:8, data:['000220000000','002113100000','021133510000','211133610000','261136110000','026113600000','002613000000','000220000000'] },
-  banggai_cardinal: { w:10, h:6, data:['0022000000','0213611000','2216451000','0213611000','0022000000','0002000000'] },
-  moray_eel:  { w:18, h:6, data:['000000000000000000','000011111111100000','001113334511110000','001111113111110000','000011111111100000','000000000000000000'] },
-  cleaner_shrimp: { w:10, h:6, data:['0000550000','0001133000','0013345100','0011331000','0001130000','0010010100'] },
+  guppy:      { w:12, h:7, data:['000222000000','002133500000','021344510000','213345510000','021333100000','002211000000','000020000000'] },
+  goldfish:   { w:14, h:9, data:['00002200000000','00021331000000','00221345100000','02213351100000','22113351100000','22113311000000','00221331000000','00022110000000','00002200000000'] },
+  snail:      { w:10, h:7, data:['0003333000','0033334300','0333343300','0034443000','0041104100','0410010400','0010001000'] },
+  neon_tetra: { w:12, h:7, data:['000111000000','016666510000','016655110000','011655100000','013361000000','001110000000','000020000000'] },
+  blue_eye:   { w:12, h:7, data:['000110000000','001135100000','011355100000','011335100000','011131000000','001110000000','000020000000'] },
+  moon_fish:  { w:14, h:9, data:['00000110000000','00011131000000','00113351000000','01113351100000','01113351100000','01113351100000','00113310000000','00011110000000','00000110000000'] },
+  discus:     { w:14, h:11, data:['00000110000000','00001131000000','00011331000000','00113451000000','01113631100000','01113631100000','01113631100000','00113451000000','00011331000000','00001131000000','00000110000000'] },
+  pleco:      { w:16, h:7, data:['0000000000000000','0001111111100000','0011334511110000','0111111111111000','0011111111110000','0001111111100000','0001100011000000'] },
+  gourami:    { w:14, h:9, data:['00002200000000','00021131000000','00211335100000','02211335100000','22113351100000','22113311000000','00211310000000','00021130000000','00002200000000'] },
+  clownfish:  { w:14, h:9, data:['00002200000000','00021161000000','00211635100000','02211636100000','22113636100000','22113616100000','00211161000000','00021160000000','00002200000000'] },
+  blue_tang:  { w:16, h:11, data:['0000002200000000','0000021130000000','0000211331000000','0002113351000000','0021133631100000','0211336631100000','0021133631100000','0002113351000000','0000211331000000','0000021130000000','0000002200000000'] },
+  green_chromis: { w:12, h:7, data:['000111000000','011335100000','011315000000','011131000000','001110000000','000020000000','000000000000'] },
+  firefish:   { w:14, h:7, data:['00000110000000','00011333100000','00113335100000','01113335100000','00113331000000','00001130000000','00000220000000'] },
+  royal_gramma: { w:14, h:9, data:['00002200000000','00021131000000','00211335100000','02111336100000','21113361100000','02611361000000','00261130000000','00026130000000','00002200000000'] },
+  banggai_cardinal: { w:12, h:7, data:['000220000000','021361100000','221645100000','021361100000','002200000000','000200000000','000000000000'] },
+  moray_eel:  { w:20, h:7, data:['00000000000000000000','00001111111111000000','00011333451111100000','00111111131111110000','00011111111111100000','00001111111111000000','00000000000000000000'] },
+  cleaner_shrimp: { w:12, h:7, data:['000005500000','000113300000','001334510000','001133100000','000113000000','001001010000','010001000000'] },
 };
 
 const FISH_PALETTES = {
@@ -317,6 +331,93 @@ const DECOR_COLORS = {
 };
 
 const ZONE_RANGES = { top:[0.08,0.35], middle:[0.25,0.65], bottom:[0.55,0.82], any:[0.15,0.75] };
+
+// Species base display scales (relative to PX_SCALE) — larger fish are bigger on screen
+const FISH_BASE_SCALES = {
+  guppy: 1.0, goldfish: 1.5, snail: 1.1,
+  neon_tetra: 0.9, blue_eye: 0.95, moon_fish: 1.4, discus: 1.7, pleco: 1.6, gourami: 1.4,
+  clownfish: 1.3, blue_tang: 1.6, green_chromis: 0.9, firefish: 1.1,
+  royal_gramma: 1.2, banggai_cardinal: 1.0, moray_eel: 2.2, cleaner_shrimp: 1.0,
+};
+
+// ═══════ PIXEL ICON SYSTEM ═══════
+// Pre-rendered pixel art icons replace all emojis for consistent style.
+// Each icon is a small sprite rendered to a Data URL at init.
+
+const ICON_DATA = {
+  coin: { w:7,h:7, pal:{1:'#b8860b',2:'#daa520',3:'#ffd700',4:'#ffe566'},
+    d:['0011100','0233320','1344431','1344431','1344431','0233320','0011100'] },
+  broom: { w:7,h:7, pal:{1:'#8B7355',2:'#A0522D',3:'#D2B48C',4:'#90EE90'},
+    d:['0004000','0004000','0034000','0134000','0113000','1113000','0110000'] },
+  food: { w:7,h:7, pal:{1:'#888',2:'#aaa',3:'#ccc',4:'#ddd'},
+    d:['0000000','0333300','3444430','3444430','3444430','0222200','0000000'] },
+  fish: { w:9,h:5, pal:{1:'#4488cc',2:'#66aaee',3:'#88ccff',4:'#224466',5:'#111'},
+    d:['001110000','012234000','123345100','012234000','001110000'] },
+  store: { w:7,h:7, pal:{1:'#666',2:'#888',3:'#aaa',4:'#ccc'},
+    d:['1100011','0100010','0222220','0344430','0344430','0344430','0222220'] },
+  wrench: { w:7,h:7, pal:{1:'#708090',2:'#a0b0c0',3:'#c0d0e0',4:'#506070'},
+    d:['0002200','0012300','0012300','0011000','0011000','0011000','0001000'] },
+  clipboard: { w:7,h:7, pal:{1:'#8B7355',2:'#D2B48C',3:'#FFF8DC',4:'#888'},
+    d:['0111100','1233310','1233310','1244410','1233310','1233310','0111100'] },
+  house: { w:7,h:7, pal:{1:'#4682B4',2:'#6495ED',3:'#87CEEB',4:'#ADD8E6'},
+    d:['0001000','0012100','0123210','1234321','0123210','0123210','0111110'] },
+  help: { w:7,h:7, pal:{1:'#5599dd',2:'#77bbff',3:'#99ddff',4:'#fff'},
+    d:['0111100','1222210','0002210','0022100','0022100','0000000','0022100'] },
+  laser: { w:7,h:7, pal:{1:'#800',2:'#c00',3:'#f44',4:'#f88'},
+    d:['0001000','0012100','0123210','1234321','0123210','0012100','0001000'] },
+  close: { w:5,h:5, pal:{1:'#999',2:'#ccc'},
+    d:['10001','02020','00200','02020','10001'] },
+  menu: { w:7,h:5, pal:{1:'#ccc',2:'#fff'},
+    d:['1111111','0000000','1111111','0000000','1111111'] },
+  lock: { w:7,h:7, pal:{1:'#888',2:'#aaa',3:'#daa520',4:'#ffd700'},
+    d:['0022200','0211200','0200200','0344430','0344430','0344430','0333300'] },
+  arrow_l: { w:5,h:7, pal:{1:'#aaa',2:'#ddd'},
+    d:['00010','00110','01210','12210','01210','00110','00010'] },
+  arrow_r: { w:5,h:7, pal:{1:'#aaa',2:'#ddd'},
+    d:['01000','01100','01210','01221','01210','01100','01000'] },
+  plant: { w:5,h:7, pal:{1:'#2d6b2d',2:'#3a8a3a',3:'#5cb85c',4:'#8fd88f'},
+    d:['00300','03430','34340','03430','00200','00100','00100'] },
+  decor: { w:7,h:5, pal:{1:'#666',2:'#888',3:'#aaa',4:'#ccc'},
+    d:['0023200','0234320','2344432','1233321','1111111'] },
+  heater: { w:5,h:9, pal:{1:'#aa3333',2:'#cc4444',3:'#ff6666',4:'#ffaa88'},
+    d:['01110','12221','12321','12321','12321','12321','12321','12221','01110'] },
+  filter: { w:7,h:9, pal:{1:'#556677',2:'#778899',3:'#99aabb',4:'#88bbff'},
+    d:['0111110','1222221','1234321','1222221','1234321','1222221','1234321','1222221','0111110'] },
+  skimmer: { w:5,h:9, pal:{1:'#999',2:'#bbb',3:'#ddd',4:'#fff'},
+    d:['01110','12221','13331','12221','12221','12221','13331','12221','01110'] },
+  uv: { w:5,h:9, pal:{1:'#6633cc',2:'#8855ee',3:'#aa77ff',4:'#ddbbff'},
+    d:['01110','12221','12321','13431','14341','13431','12321','12221','01110'] },
+};
+
+const iconCache = {};
+
+function renderPixelIcon(key, scale) {
+  const cacheKey = key + '_' + scale;
+  if (iconCache[cacheKey]) return iconCache[cacheKey];
+  const ic = ICON_DATA[key];
+  if (!ic) return '';
+  const c = document.createElement('canvas');
+  c.width = ic.w * scale; c.height = ic.h * scale;
+  const cx = c.getContext('2d');
+  cx.imageSmoothingEnabled = false;
+  for (let y = 0; y < ic.h; y++) {
+    for (let x = 0; x < ic.w; x++) {
+      const ch = ic.d[y][x];
+      if (ch === '0') continue;
+      cx.fillStyle = ic.pal[ch] || '#888';
+      cx.fillRect(x * scale, y * scale, scale, scale);
+    }
+  }
+  const url = c.toDataURL();
+  iconCache[cacheKey] = url;
+  return url;
+}
+
+function iconImg(key, size) {
+  const s = size || 16;
+  const scale = Math.max(2, Math.round(s / 7));
+  return `<img src="${renderPixelIcon(key, scale)}" width="${s}" height="${s}" style="image-rendering:pixelated;vertical-align:middle" alt="">`;
+}
 
 // ═══════ STATE ═══════
 
@@ -355,6 +456,11 @@ let laserActive = false;
 let laserStartTime = 0;
 // Tooltip
 let tooltipTimer = null;
+let selectedFishId = null; // only this fish shows level badge
+let selectedFishTimer = null;
+// Decor dragging state
+let draggingDecor = null; // { id, decorId, startX, startY }
+let floatingDriftPhase = 0; // for floating plant gentle drift
 // Game time
 let lastFrameTime = 0;
 let refreshTimer = null;
@@ -422,95 +528,244 @@ function renderSprite(sp, palette, scale, flip) {
 function renderEnvironment(biomeKey) {
   const b = BIOMES[biomeKey] || BIOMES.fresh;
 
-  // Water gradient
+  // Water gradient — deeper color transition
   const grad = ctx.createLinearGradient(0, 0, 0, H);
   grad.addColorStop(0, b.bg[0]);
-  grad.addColorStop(1, b.bg[1]);
+  grad.addColorStop(0.5, b.bg[1]);
+  grad.addColorStop(1, shadeColor(b.bg[1], -15));
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, W, H);
 
-  // Caustic light bands
+  // Underwater light rays from surface
   const time = Date.now() / 3000;
-  ctx.globalAlpha = 0.04;
+  ctx.globalAlpha = 0.03;
   ctx.fillStyle = '#ffffff';
-  for (let i = 0; i < 5; i++) {
-    const x = ((time * 15 + i * 80) % (W + 40)) - 20;
-    ctx.fillRect(x, 0, 12, H * 0.6);
+  for (let i = 0; i < 7; i++) {
+    const rayX = ((time * 12 + i * 65) % (W + 60)) - 30;
+    const rayW = 8 + Math.sin(time + i) * 4;
+    ctx.beginPath();
+    ctx.moveTo(rayX - rayW, 0);
+    ctx.lineTo(rayX + rayW, 0);
+    ctx.lineTo(rayX + rayW * 2.5, H * 0.7);
+    ctx.lineTo(rayX - rayW * 1.5, H * 0.7);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  // Caustic light patterns — animated dappled light
+  ctx.globalAlpha = 0.025;
+  for (let i = 0; i < 12; i++) {
+    const cx = Math.sin(time * 0.4 + i * 2.1) * W * 0.4 + W * 0.5;
+    const cy = Math.cos(time * 0.3 + i * 1.7) * H * 0.2 + H * 0.25;
+    const r = 15 + Math.sin(time * 0.8 + i) * 8;
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, r, r * 0.6, time * 0.1 + i, 0, Math.PI * 2);
+    ctx.fill();
   }
   ctx.globalAlpha = 1;
 
-  // Substrate
+  // Substrate — multi-layer for depth
   const subY = H * (1 - b.subH);
-  ctx.fillStyle = b.substrate;
+  // Dark substrate base
+  ctx.fillStyle = shadeColor(b.substrate, -20);
   ctx.fillRect(0, subY, W, H - subY);
-  // Substrate texture
+  // Lighter top layer
+  const subGrad = ctx.createLinearGradient(0, subY, 0, H);
+  subGrad.addColorStop(0, b.substrate);
+  subGrad.addColorStop(0.3, shadeColor(b.substrate, -10));
+  subGrad.addColorStop(1, shadeColor(b.substrate, -25));
+  ctx.fillStyle = subGrad;
+  ctx.fillRect(0, subY, W, H - subY);
+
+  // Substrate pebble texture — varied sizes and colors
   const rng = seededRng(42);
-  ctx.fillStyle = shadeColor(b.substrate, -15);
-  for (let i = 0; i < 60; i++) {
+  for (let i = 0; i < 120; i++) {
     const gx = rng() * W;
     const gy = subY + 2 + rng() * (H - subY - 4);
-    ctx.fillRect(gx, gy, 2, 1);
+    const shade = ((rng() - 0.5) * 40) | 0;
+    ctx.fillStyle = shadeColor(b.substrate, shade);
+    const pw = 1 + rng() * 3.5;
+    const ph = 0.8 + rng() * 1.5;
+    ctx.fillRect(gx, gy, pw, ph);
   }
+  // Substrate highlight line — softer
+  ctx.fillStyle = 'rgba(255,255,255,.08)';
+  ctx.fillRect(0, subY, W, 1.5);
+  ctx.fillStyle = 'rgba(255,255,255,.03)';
+  ctx.fillRect(0, subY + 1.5, W, 1);
 
-  // Water surface shimmer
-  ctx.globalAlpha = 0.06;
+  // Water surface shimmer — more dynamic
+  ctx.globalAlpha = 0.07;
   ctx.fillStyle = '#ffffff';
-  for (let i = 0; i < 8; i++) {
-    const sx = Math.sin(time * 0.8 + i * 1.2) * 20 + i * (W / 8);
-    ctx.fillRect(sx, 0, 30 + Math.sin(time + i) * 10, 3);
+  for (let i = 0; i < 10; i++) {
+    const sx = Math.sin(time * 0.8 + i * 1.2) * 25 + i * (W / 10);
+    const sw = 25 + Math.sin(time * 1.2 + i) * 12;
+    ctx.fillRect(sx, 0, sw, 2.5);
+    ctx.fillRect(sx + 5, 2.5, sw * 0.6, 1);
   }
   ctx.globalAlpha = 1;
+
+  // Depth fog near bottom — subtle dark gradient at bottom
+  const fogGrad = ctx.createLinearGradient(0, subY - 20, 0, subY);
+  fogGrad.addColorStop(0, 'rgba(0,0,0,0)');
+  fogGrad.addColorStop(1, 'rgba(0,0,0,.06)');
+  ctx.fillStyle = fogGrad;
+  ctx.fillRect(0, subY - 20, W, 20);
+
+  // Glass frame — subtle edge borders with inner reflection
+  ctx.strokeStyle = 'rgba(150,200,255,.06)';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(1, 1, W - 2, H - 2);
+  // Inner glass reflection strips — animated subtle shimmer
+  const reflAlpha = 0.02 + Math.sin(time * 0.5) * 0.01;
+  ctx.fillStyle = `rgba(150,200,255,${reflAlpha})`;
+  ctx.fillRect(0, 0, 4, H);
+  ctx.fillRect(W - 4, 0, 4, H);
+  // Top reflection
+  ctx.fillStyle = 'rgba(200,230,255,.04)';
+  ctx.fillRect(0, 0, W, 3);
 }
 
 // ═══════ RENDERING — DECOR ═══════
 
 function renderDecor(decors, biomeKey) {
   if (!decors || !tankCat) return;
-  const subY = H * (1 - (BIOMES[biomeKey]||BIOMES.fresh).subH);
+  const biome = BIOMES[biomeKey] || BIOMES.fresh;
+  const subY = H * (1 - biome.subH);
 
   for (const d of decors) {
     const def = tankCat.content?.decor?.[d.decorId];
     if (!def) continue;
     const color = DECOR_COLORS[d.decorId] || '#888';
     const x = d.x * W;
-    const baseSize = (d.size || 1) * PX_SCALE * 4;
+    const baseSize = Math.max(12, (d.size || 1) * PX_SCALE * 8);
 
     if (def.placement === 'top') {
-      // Floating plants — draw at water surface
-      ctx.fillStyle = color;
-      ctx.globalAlpha = 0.8;
-      ctx.beginPath();
-      ctx.ellipse(x, 6, baseSize * 1.2, 5, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.globalAlpha = 1;
-    } else if (def.growth) {
-      // Plant — vertical with slight curve
-      const ph = baseSize * 2.5;
-      const py = subY - ph;
-      ctx.fillStyle = color;
-      ctx.fillRect(x - 2, py, 4, ph);
-      // Leaves
-      ctx.beginPath();
-      for (let i = 0; i < 4; i++) {
-        const ly = py + ph * (0.15 + i * 0.2);
-        const dir = i % 2 === 0 ? 1 : -1;
-        ctx.moveTo(x, ly);
-        ctx.quadraticCurveTo(x + dir * baseSize * 0.6, ly - 4, x + dir * baseSize * 0.3, ly + 4);
+      // Floating plants — clusters of lily-pad shapes at surface
+      // Add gentle drift animation
+      const time = Date.now() / 4000;
+      const driftX = Math.sin(time + d.x * 10) * 3;
+      const driftY = Math.sin(time * 0.7 + d.x * 7) * 1.5;
+      ctx.save();
+      const rng = seededRng(Math.round(d.x * 10000));
+      for (let i = 0; i < 3; i++) {
+        const ox = x + driftX + (rng() - 0.5) * baseSize;
+        const r = baseSize * (0.3 + rng() * 0.3);
+        ctx.fillStyle = shadeColor(color, ((rng() - 0.5) * 30) | 0);
+        ctx.globalAlpha = 0.85;
+        ctx.beginPath();
+        ctx.ellipse(ox, 3 + driftY + rng() * 6, r, r * 0.4, rng() * 0.3, 0, Math.PI * 2);
+        ctx.fill();
+        // highlight
+        ctx.fillStyle = shadeColor(color, 30);
+        ctx.globalAlpha = 0.4;
+        ctx.beginPath();
+        ctx.ellipse(ox - r * 0.2, 2 + driftY + rng() * 4, r * 0.4, r * 0.2, 0, 0, Math.PI * 2);
+        ctx.fill();
       }
-      ctx.fillStyle = shadeColor(color, 15);
-      ctx.fill();
+      ctx.globalAlpha = 1;
+      ctx.restore();
+    } else if (def.growth) {
+      // Plant — draw stem with multiple leaves
+      const ph = baseSize * 2;
+      const baseY = subY;
+      const topY = baseY - ph;
+      const rng = seededRng(Math.round(d.x * 10000) + 99);
+
+      // Stems
+      const stemCount = 1 + Math.floor(rng() * 2);
+      for (let s = 0; s < stemCount; s++) {
+        const sx = x + (s - stemCount / 2) * 4;
+        ctx.strokeStyle = shadeColor(color, -20);
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(sx, baseY);
+        const cp1x = sx + (rng() - 0.5) * 12;
+        const cp1y = baseY - ph * 0.5;
+        ctx.quadraticCurveTo(cp1x, cp1y, sx + (rng() - 0.5) * 6, topY + rng() * ph * 0.2);
+        ctx.stroke();
+      }
+
+      // Leaves along stem
+      const leafCount = 4 + Math.floor(rng() * 4);
+      for (let i = 0; i < leafCount; i++) {
+        const t = (i + 0.5) / leafCount;
+        const ly = baseY - ph * t;
+        const lx = x + (rng() - 0.5) * 8;
+        const dir = i % 2 === 0 ? 1 : -1;
+        const leafW = baseSize * (0.3 + rng() * 0.2) * dir;
+        const leafH = baseSize * 0.15;
+        ctx.fillStyle = shadeColor(color, ((rng() - 0.5) * 25) | 0);
+        ctx.beginPath();
+        ctx.moveTo(lx, ly);
+        ctx.quadraticCurveTo(lx + leafW, ly - leafH, lx + leafW * 0.6, ly + leafH * 0.5);
+        ctx.quadraticCurveTo(lx + leafW * 0.3, ly + leafH, lx, ly);
+        ctx.fill();
+      }
     } else {
-      // Solid decor — draw as rounded shape at substrate
-      const dw = baseSize * 1.5;
-      const dh = baseSize * 0.8;
+      // Solid decor — draw proper shapes based on type
+      const dw = baseSize * 1.4;
+      const dh = baseSize * 0.9;
       const dy = subY - dh;
-      ctx.fillStyle = color;
-      ctx.beginPath();
-      ctx.moveTo(x - dw/2, subY);
-      ctx.quadraticCurveTo(x - dw/2, dy, x, dy - 3);
-      ctx.quadraticCurveTo(x + dw/2, dy, x + dw/2, subY);
-      ctx.closePath();
-      ctx.fill();
+
+      if (d.decorId.includes('rock') || d.decorId === 'live_rock') {
+        // Rocky pile with highlights
+        const rng = seededRng(Math.round(d.x * 10000) + 55);
+        for (let r = 0; r < 3; r++) {
+          const rx = x + (rng() - 0.5) * dw * 0.5;
+          const ry = subY - rng() * dh * 0.8;
+          const rw = dw * (0.3 + rng() * 0.3);
+          const rh = dh * (0.25 + rng() * 0.3);
+          ctx.fillStyle = shadeColor(color, ((rng() - 0.5) * 30) | 0);
+          ctx.beginPath();
+          ctx.ellipse(rx, ry, rw / 2, rh / 2, 0, Math.PI, 0);
+          ctx.fill();
+          ctx.fillStyle = shadeColor(color, 25);
+          ctx.globalAlpha = 0.3;
+          ctx.beginPath();
+          ctx.ellipse(rx - rw * 0.1, ry - rh * 0.15, rw * 0.25, rh * 0.15, 0, Math.PI, 0);
+          ctx.fill();
+          ctx.globalAlpha = 1;
+        }
+      } else if (d.decorId.includes('coral') || d.decorId === 'anemone' || d.decorId === 'sea_fan') {
+        // Coral/anemone style: branching shapes
+        const rng = seededRng(Math.round(d.x * 10000) + 77);
+        const branches = 3 + Math.floor(rng() * 3);
+        for (let b = 0; b < branches; b++) {
+          const bx = x + (rng() - 0.5) * dw * 0.4;
+          const by1 = subY;
+          const by2 = subY - dh * (0.5 + rng() * 0.5);
+          ctx.strokeStyle = shadeColor(color, ((rng() - 0.5) * 30) | 0);
+          ctx.lineWidth = 2 + rng() * 2;
+          ctx.lineCap = 'round';
+          ctx.beginPath();
+          ctx.moveTo(bx, by1);
+          ctx.quadraticCurveTo(bx + (rng() - 0.5) * dw * 0.3, (by1 + by2) / 2, bx + (rng() - 0.5) * dw * 0.2, by2);
+          ctx.stroke();
+          // Branch tip
+          ctx.fillStyle = shadeColor(color, 20);
+          ctx.beginPath();
+          ctx.arc(bx + (rng() - 0.5) * 4, by2, 2 + rng() * 2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      } else {
+        // Generic rounded shape (driftwood, chest, log, stump, cave, moss_ball)
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.moveTo(x - dw / 2, subY);
+        ctx.quadraticCurveTo(x - dw / 2, dy, x - dw * 0.1, dy - 3);
+        ctx.quadraticCurveTo(x + dw * 0.1, dy - 5, x + dw / 2, dy);
+        ctx.quadraticCurveTo(x + dw / 2, subY - 2, x + dw / 2, subY);
+        ctx.closePath();
+        ctx.fill();
+        // Shading highlight
+        ctx.fillStyle = shadeColor(color, 15);
+        ctx.globalAlpha = 0.4;
+        ctx.beginPath();
+        ctx.ellipse(x, dy + dh * 0.2, dw * 0.3, dh * 0.15, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+      }
     }
   }
 }
@@ -519,51 +774,68 @@ function renderDecor(decors, biomeKey) {
 
 function renderEquipment(toolsOwned) {
   if (!toolsOwned || !tankCat) return;
-  let eqX = W - 14;
+  let eqX = W - 10;
+  const iconKeys = { heater:'heater', filter_tropical:'filter', filter_salt:'filter', skimmer:'skimmer', uv_sterilizer:'uv' };
+
   for (const [toolId, level] of Object.entries(toolsOwned)) {
     if (level <= 0) continue;
-    const colors = { heater: '#cc3333', filter_tropical: '#778899', filter_salt: '#778899', skimmer: '#cccccc', uv_sterilizer: '#9966ff' };
-    ctx.fillStyle = colors[toolId] || '#888';
-    ctx.fillRect(eqX - 4, 20, 8, H * 0.4);
-    ctx.fillStyle = 'rgba(255,255,255,.15)';
-    ctx.fillRect(eqX - 3, 22, 2, H * 0.38);
-    eqX -= 14;
+    const iKey = iconKeys[toolId] || 'filter';
+    const ic = ICON_DATA[iKey];
+    if (!ic) continue;
+
+    const eqScale = Math.max(2, PX_SCALE - 1);
+    const eqW = ic.w * eqScale;
+    const eqH = ic.h * eqScale;
+    const eqY = 15;
+
+    // Draw equipment pixel art on right wall
+    for (let y = 0; y < ic.h; y++) {
+      for (let x = 0; x < ic.w; x++) {
+        const ch = ic.d[y][x];
+        if (ch === '0') continue;
+        ctx.fillStyle = ic.pal[ch] || '#888';
+        ctx.globalAlpha = 0.85;
+        ctx.fillRect(eqX - eqW + x * eqScale, eqY + y * eqScale, eqScale, eqScale);
+      }
+    }
+    ctx.globalAlpha = 1;
+
+    // Level indicator dots
+    if (level > 1) {
+      for (let i = 0; i < Math.min(level, 5); i++) {
+        ctx.fillStyle = '#ffd866';
+        ctx.fillRect(eqX - eqW / 2 - (level * 2) + i * 4, eqY + eqH + 3, 2, 2);
+      }
+    }
+
+    eqX -= eqW + 6;
   }
 }
 
 // ═══════ RENDERING — FISH ═══════
 
 function updateFishAnim(fish, dt) {
-  // Update schooling anchors: a shared slowly-drifting point per schooling species
-  const schoolingSpecies = new Set();
+  // ── Schooling: pick a leader per species, others follow it ──
+  const schoolingSpecies = new Map(); // speciesId → [fish instances]
   for (const f of fish) {
     const sp = tankCat?.content?.fish?.[f.speciesId];
-    if (sp?.preferences?.schooling) schoolingSpecies.add(f.speciesId);
+    if (sp?.preferences?.schooling) {
+      if (!schoolingSpecies.has(f.speciesId)) schoolingSpecies.set(f.speciesId, []);
+      schoolingSpecies.get(f.speciesId).push(f);
+    }
   }
-  for (const sid of schoolingSpecies) {
+  // Assign leader (first fish, or keep current leader if alive)
+  for (const [sid, members] of schoolingSpecies) {
     if (!schoolAnchors[sid]) {
       const sp = tankCat?.content?.fish?.[sid];
       const zone = ZONE_RANGES[sp?.preferences?.zonePreference || 'middle'] || ZONE_RANGES.middle;
-      schoolAnchors[sid] = {
-        x: 0.3 + Math.random() * 0.4,
-        y: zone[0] + Math.random() * (zone[1] - zone[0]),
-        tx: 0.3 + Math.random() * 0.4,
-        ty: zone[0] + Math.random() * (zone[1] - zone[0]),
-        zone,
-        timer: 0,
-      };
+      schoolAnchors[sid] = { leaderId: members[0].id, zone, timer: 0 };
     }
     const anchor = schoolAnchors[sid];
-    anchor.timer -= dt;
-    if (anchor.timer <= 0) {
-      anchor.tx = 0.15 + Math.random() * 0.7;
-      anchor.ty = anchor.zone[0] + Math.random() * (anchor.zone[1] - anchor.zone[0]);
-      anchor.timer = 4 + Math.random() * 6;
+    // Validate leader
+    if (!members.find(m => m.id === anchor.leaderId)) {
+      anchor.leaderId = members[0].id;
     }
-    const adx = anchor.tx - anchor.x;
-    const ady = anchor.ty - anchor.y;
-    anchor.x += adx * dt * 0.3;
-    anchor.y += ady * dt * 0.3;
   }
   // Prune stale anchors
   for (const sid of Object.keys(schoolAnchors)) {
@@ -576,6 +848,7 @@ function updateFishAnim(fish, dt) {
       const sp = tankCat?.content?.fish?.[f.speciesId];
       const zone = sp?.preferences?.zonePreference || 'middle';
       const range = ZONE_RANGES[zone] || ZONE_RANGES.middle;
+      const movType = sp?.preferences?.movementType || 'default';
       anim = {
         x: 0.1 + Math.random() * 0.8,
         y: range[0] + Math.random() * (range[1] - range[0]),
@@ -586,9 +859,28 @@ function updateFishAnim(fish, dt) {
         speed: 0.3 + Math.random() * 0.3,
         sizeVar: 0.9 + Math.random() * 0.2,
         zone: range,
+        movementType: movType,
+        wiggle: false,
+        wiggleTimer: 0,
       };
+      // Crawl types start on bottom
+      if (movType === 'crawl') {
+        anim.y = range[1] || 0.82;
+        anim.ty = anim.y;
+      }
       fishAnims[f.id] = anim;
     }
+
+    // Handle wiggle state (fish is being held/tapped)
+    if (anim.wiggle) {
+      anim.wiggleTimer -= dt;
+      anim.phase += dt * 18; // fast wiggle
+      if (anim.wiggleTimer <= 0) anim.wiggle = false;
+      continue; // Don't move while wiggling
+    }
+
+    const sp = tankCat?.content?.fish?.[f.speciesId];
+    const movType = anim.movementType || 'default';
 
     // Move toward target
     const dx = anim.tx - anim.x;
@@ -598,7 +890,6 @@ function updateFishAnim(fish, dt) {
     // Feed mode: swim toward nearest accepted food
     let chaseTarget = null;
     if (activeMode === 'feed' && foodParticles.length > 0 && f.hunger < 70) {
-      const sp = tankCat?.content?.fish?.[f.speciesId];
       const accepts = sp?.diet?.accepts || [];
       let nearest = null, nearDist = Infinity;
       for (const fp of foodParticles) {
@@ -612,8 +903,7 @@ function updateFishAnim(fish, dt) {
     }
     // Laser mode: chase laser
     if (activeMode === 'laser' && laserPos) {
-      const sp = tankCat?.content?.fish?.[f.speciesId];
-      if (f.speciesId !== 'moray_eel') {
+      if (movType !== 'snake' && movType !== 'crawl') {
         chaseTarget = { x: laserPos.x / W, y: laserPos.y / H };
       }
     }
@@ -622,28 +912,72 @@ function updateFishAnim(fish, dt) {
       anim.tx = chaseTarget.x;
       anim.ty = chaseTarget.y;
     } else if (dist < 0.03) {
-      // Schooling fish orbit the shared anchor
-      const sp = tankCat?.content?.fish?.[f.speciesId];
-      const anchor = sp?.preferences?.schooling ? schoolAnchors[f.speciesId] : null;
-      if (anchor) {
-        const offset = 0.08;
-        anim.tx = anchor.x + (Math.random() - 0.5) * offset * 2;
-        anim.ty = anchor.y + (Math.random() - 0.5) * offset;
-      } else {
+      // ── Movement type: CRAWL (snails, shrimp) ──
+      if (movType === 'crawl') {
+        // Stay on substrate bottom, move very slowly left/right
+        anim.tx = 0.06 + Math.random() * 0.88;
+        anim.ty = anim.zone[1] || 0.82; // stay at bottom of zone
+      }
+      // ── Movement type: GLASS (pleco) ──
+      else if (movType === 'glass') {
+        if (!anim._wallSide) anim._wallSide = Math.random() > 0.5 ? 'left' : 'right';
+        if (Math.random() < 0.12) anim._wallSide = anim._wallSide === 'left' ? 'right' : 'left';
+        anim.tx = anim._wallSide === 'left' ? 0.04 : 0.96;
+        anim.ty = 0.15 + Math.random() * 0.65;
+      }
+      // ── Movement type: SNAKE (moray eel) ──
+      else if (movType === 'snake') {
+        // Slow undulating movement near bottom/cave
+        anim.tx = 0.1 + Math.random() * 0.8;
+        anim.ty = Math.max(anim.zone[0], 0.5 + Math.random() * 0.32);
+      }
+      // ── Schooling fish: follow leader ──
+      else if (sp?.preferences?.schooling && schoolAnchors[f.speciesId]) {
+        const anchor = schoolAnchors[f.speciesId];
+        const leaderAnim = fishAnims[anchor.leaderId];
+        if (leaderAnim && f.id !== anchor.leaderId) {
+          // Follow leader with offset
+          const idx = (schoolingSpecies.get(f.speciesId) || []).indexOf(f);
+          const angle = (idx * 1.2) + anim.phase * 0.05;
+          const followDist = 0.06 + (idx % 3) * 0.03;
+          anim.tx = leaderAnim.x - leaderAnim.facing * followDist + Math.sin(angle) * 0.04;
+          anim.ty = leaderAnim.y + Math.cos(angle) * 0.03;
+        } else {
+          // Leader: normal swimming
+          anim.tx = 0.1 + Math.random() * 0.8;
+          anim.ty = anim.zone[0] + Math.random() * (anim.zone[1] - anim.zone[0]);
+        }
+      }
+      // ── Default movement ──
+      else {
         anim.tx = 0.08 + Math.random() * 0.84;
         anim.ty = anim.zone[0] + Math.random() * (anim.zone[1] - anim.zone[0]);
       }
     }
 
-    const spd = (chaseTarget ? 1.5 : 0.6) * anim.speed * dt;
+    // Speed varies by movement type
+    let baseSpd = (chaseTarget ? 1.5 : 0.6) * anim.speed;
+    if (movType === 'crawl') baseSpd *= 0.25; // snails are very slow
+    if (movType === 'snake') baseSpd *= 0.5; // eels are moderate
+    if (movType === 'glass') baseSpd *= 0.4; // plecos are slow
+    const spd = baseSpd * dt;
+
     anim.x += dx * spd * 2;
-    anim.y += dy * spd * 2 + Math.sin(anim.phase) * 0.0003;
-    anim.phase += dt * 3;
+    // Snake movement: add sinusoidal vertical oscillation
+    const yOsc = movType === 'snake'
+      ? Math.sin(anim.phase * 1.5) * 0.001
+      : Math.sin(anim.phase) * 0.0003;
+    anim.y += dy * spd * 2 + yOsc;
+    anim.phase += dt * (movType === 'snake' ? 5 : 3);
     if (Math.abs(dx) > 0.005) anim.facing = dx > 0 ? 1 : -1;
 
-    // Clamp
+    // Clamp — crawl types hug the bottom
     anim.x = Math.max(0.04, Math.min(0.96, anim.x));
-    anim.y = Math.max(0.05, Math.min(0.88, anim.y));
+    if (movType === 'crawl') {
+      anim.y = Math.max(anim.zone[1] - 0.03, Math.min(anim.zone[1] + 0.02, anim.y));
+    } else {
+      anim.y = Math.max(0.05, Math.min(0.88, anim.y));
+    }
   }
 }
 
@@ -655,6 +989,9 @@ function renderFish(fish) {
     return ay - by;
   });
 
+  const biome = BIOMES[activeTankId] || BIOMES.fresh;
+  const subY = H * (1 - biome.subH);
+
   for (const f of sorted) {
     const anim = fishAnims[f.id];
     if (!anim) continue;
@@ -662,11 +999,13 @@ function renderFish(fish) {
     if (!cached) continue;
 
     const img = anim.facing > 0 ? cached.right : cached.left;
-    const scale = anim.sizeVar;
+    const baseScale = FISH_BASE_SCALES[f.speciesId] || 1.0;
+    const scale = anim.sizeVar * baseScale;
     const drawW = img.width * scale;
     const drawH = img.height * scale;
     const px = anim.x * W - drawW / 2;
     const py = anim.y * H - drawH / 2;
+    const movType = anim.movementType || 'default';
 
     // Weak state: make grey/transparent
     if (f.weak) {
@@ -674,20 +1013,61 @@ function renderFish(fish) {
       ctx.filter = 'grayscale(0.8)';
     }
 
-    ctx.drawImage(img, px, py, drawW, drawH);
+    // Wiggle animation
+    if (anim.wiggle) {
+      ctx.save();
+      const wigAmt = Math.sin(anim.phase) * 3;
+      ctx.translate(anim.x * W, anim.y * H);
+      ctx.rotate(wigAmt * Math.PI / 180 * 4);
+      ctx.drawImage(img, -drawW / 2, -drawH / 2, drawW, drawH);
+      ctx.restore();
+    }
+    // Glass movement (pleco): draw attached to glass wall, oriented vertically
+    else if (movType === 'glass' && anim._wallSide) {
+      ctx.save();
+      const wallX = anim._wallSide === 'left' ? 4 + drawW * 0.3 : W - 4 - drawW * 0.3;
+      ctx.translate(wallX, anim.y * H);
+      // Head up, body along glass
+      const rot = anim._wallSide === 'left' ? -Math.PI / 2 : Math.PI / 2;
+      ctx.rotate(rot);
+      ctx.scale(anim.facing > 0 ? 1 : -1, 1); // flip for facing
+      ctx.drawImage(cached.right, -drawW / 2, -drawH / 2, drawW, drawH);
+      ctx.restore();
+    }
+    // Snake movement: sinusoidal body undulation
+    else if (movType === 'snake') {
+      ctx.save();
+      ctx.translate(anim.x * W, anim.y * H);
+      const undulate = Math.sin(anim.phase * 1.5) * 2;
+      ctx.rotate(undulate * Math.PI / 180);
+      ctx.drawImage(img, -drawW / 2, -drawH / 2, drawW, drawH);
+      ctx.restore();
+    }
+    // Crawl movement (snails, shrimp): on substrate
+    else if (movType === 'crawl') {
+      // Draw on top of substrate
+      const crawlY = subY - drawH * 0.6;
+      ctx.drawImage(img, anim.x * W - drawW / 2, crawlY, drawW, drawH);
+    }
+    // Default swim
+    else {
+      ctx.drawImage(img, px, py, drawW, drawH);
+    }
 
     if (f.weak) {
       ctx.globalAlpha = 1;
       ctx.filter = 'none';
     }
 
-    // Level badge
-    if (f.level > 1) {
-      ctx.fillStyle = 'rgba(0,0,0,.5)';
-      ctx.fillRect(px + drawW - 10, py - 2, 12, 10);
+    // Level badge — only show for selected (tapped) fish
+    if (f.level > 1 && f.id === selectedFishId) {
+      const badgeX = (movType === 'crawl') ? anim.x * W + drawW / 2 - 12 : px + drawW - 12;
+      const badgeY = (movType === 'crawl') ? subY - drawH * 0.6 - 2 : py - 2;
+      ctx.fillStyle = 'rgba(0,0,0,.6)';
+      ctx.fillRect(badgeX, badgeY, 16, 11);
       ctx.fillStyle = '#ffd866';
-      ctx.font = '8px sans-serif';
-      ctx.fillText(f.level, px + drawW - 8, py + 6);
+      ctx.font = 'bold 9px sans-serif';
+      ctx.fillText('L' + f.level, badgeX + 1, badgeY + 8);
     }
   }
 }
@@ -714,6 +1094,9 @@ function updateFoodParticles(dt) {
       const fdx = fp.x - anim.x * W;
       const fdy = fp.y - anim.y * H;
       if (Math.sqrt(fdx*fdx + fdy*fdy) < 18) {
+        // Keep fish at current position so it doesn't snap back
+        anim.tx = anim.x;
+        anim.ty = anim.y;
         API.doAction('fish_consume', { fishId: f.id, foodId: fp.foodId }).then(refreshState);
         showFloatText(fp.x, fp.y, '+fed');
         eaten = true;
@@ -780,17 +1163,41 @@ function initCleanMask(seed, gridW, gridH, dirtPercent) {
   cleanSeed = seed;
   cleanGridW = gridW; cleanGridH = gridH;
   cleanDirtyStart = dirtPercent;
-  const rng = seededRng(seed);
+  // Use same seed that produces the normal dirt overlay pattern so the
+  // clean-mode mask looks identical to the dirt that was already visible.
+  const rng = seededRng(activeTankId.length * 1000 + 7);
   cleanMask = [];
-  const maxX = gridW - 1, maxY = gridH - 1;
+  // Pre-sample the same RNG sequence used by the normal overlay (12×10 grid)
+  // to compute which coarse cells had dirt, then map to the finer clean grid.
+  const coarseCols = 12, coarseRows = 10;
+  const coarseDirty = [];
+  for (let cy = 0; cy < coarseRows; cy++) {
+    for (let cx = 0; cx < coarseCols; cx++) {
+      const show = rng() <= dirtPercent * 1.5;
+      // consume rest of rng calls that renderDirtOverlay does
+      rng(); rng(); rng(); rng(); rng();
+      coarseDirty.push(show);
+    }
+  }
+  // Build fine grid from coarse dirt map
+  const fineRng = seededRng(seed);
   for (let cy = 0; cy < gridH; cy++) {
     for (let cx = 0; cx < gridW; cx++) {
-      const isEdge = cx === 0 || cy === 0 || cx === maxX || cy === maxY;
-      const isCorner = (cx <= 1 || cx >= maxX - 1) && (cy <= 1 || cy >= maxY - 1);
+      // Map fine cell to coarse cell
+      const ccx = Math.floor(cx / gridW * coarseCols);
+      const ccy = Math.floor(cy / gridH * coarseRows);
+      const coarseIdx = ccy * coarseCols + ccx;
+      const inCoarseDirt = coarseDirty[coarseIdx] || false;
+
+      const isEdge = cx === 0 || cy === 0 || cx === gridW - 1 || cy === gridH - 1;
+      const isCorner = (cx <= 1 || cx >= gridW - 2) && (cy <= 1 || cy >= gridH - 2);
       let threshold = isCorner ? 0.25 : isEdge ? 0.40 : 0.55;
-      threshold *= (1 - dirtPercent * 0.6);
-      const dirty = rng() >= threshold;
-      const opacity = (0.08 + rng() * 0.12) * (1 + dirtPercent * 0.5);
+      // Cells in coarse-dirty areas are more likely to be dirty
+      if (inCoarseDirt) threshold *= 0.5;
+      else threshold *= (1 + dirtPercent * 0.5);
+      threshold *= (1 - dirtPercent * 0.4);
+      const dirty = fineRng() >= threshold;
+      const opacity = (0.08 + fineRng() * 0.12) * (1 + dirtPercent * 0.5);
       cleanMask.push({ dirty, opacity, cleaned: false });
     }
   }
@@ -798,8 +1205,11 @@ function initCleanMask(seed, gridW, gridH, dirtPercent) {
 
 function wipeCells(canvasX, canvasY, radius) {
   if (!cleanMask) return;
+  const biome = BIOMES[activeTankId] || BIOMES.fresh;
+  const subY = H * (1 - biome.subH);
+  if (canvasY > subY) return; // wiping below substrate does nothing
   const cellW = W / cleanGridW;
-  const cellH = H / cleanGridH;
+  const cellH = subY / cleanGridH; // grid maps to above-substrate area
   const cx = Math.floor(canvasX / cellW);
   const cy = Math.floor(canvasY / cellH);
   const r = Math.ceil(radius);
@@ -828,25 +1238,48 @@ function getCleanProgress() {
 
 function renderDirtOverlay() {
   dirtCtx.clearRect(0, 0, W, H);
+  const tank = gameState?.tanks?.[activeTankId];
+  const dirt = tank ? 1 - tank.cleanliness / 100 : 0;
+  const biome = BIOMES[activeTankId] || BIOMES.fresh;
+  const subY = H * (1 - biome.subH); // dirt only above substrate
+
   if (activeMode !== 'clean' || !cleanMask) {
-    // Simple dirt tint based on cleanliness
-    const tank = gameState?.tanks?.[activeTankId];
-    if (tank && tank.cleanliness < 90) {
-      const dirt = 1 - tank.cleanliness / 100;
-      dirtCtx.fillStyle = `rgba(80, 60, 30, ${dirt * 0.3})`;
-      dirtCtx.fillRect(0, 0, W, H);
+    // Always show dirt texture when tank is dirty (not just clean mode)
+    if (tank && tank.cleanliness < 95) {
+      const rng = seededRng(activeTankId.length * 1000 + 7);
+      const cellW = W / 12;
+      const cellH = subY / 10; // only above ground
+      for (let cy = 0; cy < 10; cy++) {
+        for (let cx = 0; cx < 12; cx++) {
+          if (rng() > dirt * 1.5) continue;
+          const ox = cx * cellW + rng() * cellW * 0.5;
+          const oy = cy * cellH + rng() * cellH * 0.5;
+          if (oy > subY - 4) continue; // skip substrate area
+          const w = cellW * (0.4 + rng() * 0.6);
+          const h = cellH * (0.3 + rng() * 0.5);
+          dirtCtx.fillStyle = `rgba(70,55,25,${dirt * 0.25 * (0.3 + rng() * 0.7)})`;
+          dirtCtx.fillRect(ox, oy, w, h);
+        }
+      }
+      // Edge film on glass (above substrate only)
+      dirtCtx.fillStyle = `rgba(60,45,20,${dirt * 0.15})`;
+      dirtCtx.fillRect(0, 0, W, 4);
+      dirtCtx.fillRect(0, 0, 3, subY);
+      dirtCtx.fillRect(W - 3, 0, 3, subY);
     }
     return;
   }
-  // Clean mode: render wipe mask
+  // Clean mode: render wipe mask (above substrate only)
   const cellW = W / cleanGridW;
-  const cellH = H / cleanGridH;
+  const cellH = subY / cleanGridH; // map grid to above-substrate area
   for (let cy = 0; cy < cleanGridH; cy++) {
     for (let cx = 0; cx < cleanGridW; cx++) {
       const cell = cleanMask[cy * cleanGridW + cx];
       if (!cell.dirty || cell.cleaned) continue;
+      const cellY = cy * cellH;
+      if (cellY + cellH > subY) continue; // don't draw on substrate
       dirtCtx.fillStyle = `rgba(80, 60, 30, ${cell.opacity})`;
-      dirtCtx.fillRect(cx * cellW, cy * cellH, cellW + 0.5, cellH + 0.5);
+      dirtCtx.fillRect(cx * cellW, cellY, cellW + 0.5, cellH + 0.5);
     }
   }
 }
@@ -943,17 +1376,57 @@ function showHudTooltip(title, body) {
 
 function showFishBubble(f, px, py) {
   $('decorCard').classList.remove('visible'); // dismiss decor card
+  // Track selected fish for level badge display
+  selectedFishId = f.id;
+  clearTimeout(selectedFishTimer);
+  selectedFishTimer = setTimeout(() => { selectedFishId = null; }, 8000);
+
   const fb = $('fishBubble');
   const c = f._computed || {};
+  const sp = tankCat?.content?.fish?.[f.speciesId];
   $('fbName').textContent = c.speciesName || f.speciesId;
   $('fbSpecies').textContent = `Lv.${f.level} ${c.lifeStage || ''}`;
-  $('fbDetail').innerHTML = `❤️ ${Math.round(f.health)} &nbsp; 😊 ${c.happiness ?? '?'} &nbsp; 🍽 ${Math.round(f.hunger)}<br>💰 ${c.coinRate ?? 0}/hr`;
-  $('fbStage').textContent = f.weak ? '⚠️ Weak' : '';
-  fb.style.left = Math.min(px, W - 140) + 'px';
-  fb.style.top = Math.max(py - 60, 4) + 'px';
+
+  // Build detailed info
+  let detailHtml = '';
+  detailHtml += `<div class="fb-stats">`;
+  detailHtml += `<span class="fb-stat">${iconImg('food', 10)} ${Math.round(f.hunger)}%</span>`;
+  detailHtml += `<span class="fb-stat">HP ${Math.round(f.health)}</span>`;
+  detailHtml += `<span class="fb-stat">Happy ${c.happiness ?? '?'}</span>`;
+  detailHtml += `</div>`;
+  detailHtml += `<div class="fb-earn">${iconImg('coin', 10)} ${c.coinRate ?? 0}/hr · XP ${f.xp}/${c.xpToNext || '?'}</div>`;
+  if (f.weak) detailHtml += `<div class="fb-warn">Weak — Feed & clean to recover!</div>`;
+  if (sp?.preferences?.schooling) detailHtml += `<div class="fb-trait">Schooling fish (0.5 space)</div>`;
+  if (sp?.preferences?.movementType === 'crawl') detailHtml += `<div class="fb-trait">Bottom crawler</div>`;
+  if (sp?.preferences?.movementType === 'glass') detailHtml += `<div class="fb-trait">Glass cleaner</div>`;
+  if (sp?.utility?.dirtReduction) detailHtml += `<div class="fb-trait">Reduces dirt by ${Math.round(sp.utility.dirtReduction * 100)}%</div>`;
+
+  // Action buttons
+  detailHtml += `<div class="fb-actions">`;
+  detailHtml += `<button class="fb-btn fb-sell" data-fb-sell="${f.id}">Sell</button>`;
+  detailHtml += `</div>`;
+
+  $('fbDetail').innerHTML = detailHtml;
+  $('fbStage').textContent = '';
+  fb.style.left = Math.min(px, W - 170) + 'px';
+  fb.style.top = Math.max(py - 90, 4) + 'px';
   fb.classList.add('visible');
   clearTimeout(fb._timer);
-  fb._timer = setTimeout(() => fb.classList.remove('visible'), 4000);
+  fb._timer = setTimeout(() => fb.classList.remove('visible'), 8000);
+
+  // Bind sell action
+  const sellBtn = fb.querySelector('[data-fb-sell]');
+  if (sellBtn) {
+    sellBtn.onclick = async (e) => {
+      e.stopPropagation();
+      const res = await API.doAction('sell_fish', { fishId: f.id });
+      if (res?.result?.error) { showToast(res.result.error); return; }
+      if (res?.result?.sold) { showToast(`Sold for ${res.result.value} coins`); }
+      fb.classList.remove('visible');
+      selectedFishId = null;
+      await refreshState();
+    };
+  }
 }
 
 // ═══════ DECOR CARD ═══════
@@ -1135,9 +1608,9 @@ async function finishClean() {
 
   if (r && r.coinsEarned > 0) {
     if (progress >= 0.95) {
-      showToast(`Tank cleaned! +${r.coinsEarned} coins 🪙`);
+      showToast(`Tank cleaned! +${r.coinsEarned} coins`);
     } else {
-      showToast(`Partially cleaned! +${r.coinsEarned} coins 🪙`);
+      showToast(`Partially cleaned! +${r.coinsEarned} coins`);
     }
   } else if (progress < 0.05) {
     showToast('Barely cleaned...');
@@ -1154,7 +1627,7 @@ function enterLaserMode() {
   laserStartTime = Date.now();
 
   const dock = $('toolDockContent');
-  dock.innerHTML = '<span>🔴 Move your finger to play! Fish love to chase the dot.</span>';
+  dock.innerHTML = '<span>Move your finger to play! Fish love to chase the dot.</span>';
   $('toolDock').classList.add('visible');
   $('fab').style.display = 'none';
 }
@@ -1165,7 +1638,7 @@ async function triggerLaserReward() {
   const res = await API.doAction('laser_pointer');
   const r = res?.result;
   if (r?.reward) {
-    showToast(`+${r.reward.coins} coins! Fish had fun! 🎉`);
+    showToast(`+${r.reward.coins} coins! Fish had fun!`);
     showFloatText(W / 2, H / 2, `+${r.reward.coins}`, '#ffd866');
     await refreshState();
   } else if (r?.cooldownRemaining) {
@@ -1230,14 +1703,14 @@ function populateStore() {
       const locked = !item.canBuy;
       const reqText = item.reqInfo?.length ? `<div class="s-desc" style="color:#e8a040;opacity:.8">⚠️ ${item.reqInfo.join(', ')}</div>` : '';
       html += `<div class="s-item ${locked && item.blockReason !== 'Not enough coins' ? 'locked' : ''}">
-        <div class="s-icon">🐟</div>
+        <div class="s-icon">${iconImg('fish', 20)}</div>
         <div class="s-info">
           <div class="s-name">${item.name}</div>
           <div class="s-desc">◆${item.spaceCost} space · ${item.baseCoinPerHour}/hr${item.ownedCount > 0 ? ' · ×' + item.ownedCount + ' owned' : ''}</div>
           ${reqText}
         </div>
         <button class="buy-btn primary" ${!item.canBuy ? 'disabled' : ''} data-buy-fish="${item.id}">
-          ${item.blockReason?.includes('full') || item.blockReason?.includes('Max') ? 'Full' : item.price + ' 🪙'}
+          ${item.blockReason?.includes('full') || item.blockReason?.includes('Max') ? 'Full' : item.price + ' ' + iconImg('coin', 12)}
         </button>
       </div>`;
     }
@@ -1245,13 +1718,13 @@ function populateStore() {
     html += '<div class="panel-section-title">Food</div>';
     for (const item of items) {
       html += `<div class="s-item">
-        <div class="s-icon">🍽</div>
+        <div class="s-icon">${iconImg('food', 20)}</div>
         <div class="s-info">
           <div class="s-name">${item.name}</div>
           <div class="s-desc">+${item.hungerRestore} hunger · Stock: ×${item.currentStock}</div>
         </div>
         <button class="buy-btn primary" ${!item.canBuy ? 'disabled' : ''} data-buy-food="${item.id}">
-          ${item.price * 5} 🪙 ×5
+          ${item.price * 5} ${iconImg('coin', 12)} ×5
         </button>
       </div>`;
     }
@@ -1265,7 +1738,7 @@ function populateStore() {
           <div class="s-desc">${item.placement} · ${item.growth ? 'grows' : 'static'}${item.blockReason ? ' · ' + item.blockReason : ''}</div>
         </div>
         <button class="buy-btn primary" ${!item.canBuy ? 'disabled' : ''} data-buy-decor="${item.id}">
-          ${item.price} 🪙
+          ${item.price} ${iconImg('coin', 12)}
         </button>
       </div>`;
     }
@@ -1273,13 +1746,13 @@ function populateStore() {
     html += '<div class="panel-section-title">Equipment</div>';
     for (const item of items) {
       html += `<div class="s-item">
-        <div class="s-icon">🔧</div>
+        <div class="s-icon">${iconImg('wrench', 20)}</div>
         <div class="s-info">
           <div class="s-name">${item.name}</div>
           <div class="s-desc">Level ${item.currentLevel}/${item.maxLevel}${item.maxed ? ' (Max)' : ''}</div>
         </div>
         <button class="buy-btn primary" ${!item.canBuy ? 'disabled' : ''} data-buy-tool="${item.id}">
-          ${item.maxed ? 'Max' : item.nextPrice + ' 🪙'}
+          ${item.maxed ? 'Max' : item.nextPrice + ' ' + iconImg('coin', 12)}
         </button>
       </div>`;
     }
@@ -1297,7 +1770,7 @@ function populateStore() {
     btn.onclick = async () => {
       const res = await API.doAction('buy_fish', { speciesId: btn.dataset.buyFish });
       if (res?.result?.error) { showToast(res.result.error); return; }
-      if (res?.result?.bought) showToast(`Bought ${btn.dataset.buyFish}! 🐟`);
+      if (res?.result?.bought) showToast(`Bought ${btn.dataset.buyFish}!`);
       await refreshState();
       populateStore();
     };
@@ -1315,7 +1788,7 @@ function populateStore() {
     btn.onclick = async () => {
       const res = await API.doAction('buy_decor', { decorId: btn.dataset.buyDecor });
       if (res?.result?.error) { showToast(res.result.error); return; }
-      if (res?.result?.bought) showToast('Decoration placed! 🎨');
+      if (res?.result?.bought) showToast('Decoration placed!');
       await refreshState();
       populateStore();
     };
@@ -1324,7 +1797,7 @@ function populateStore() {
     btn.onclick = async () => {
       const res = await API.doAction('buy_tool', { toolId: btn.dataset.buyTool });
       if (res?.result?.error) { showToast(res.result.error); return; }
-      if (res?.result?.bought) showToast(`Upgraded ${btn.dataset.buyTool}! 🔧`);
+      if (res?.result?.bought) showToast(`Upgraded ${btn.dataset.buyTool}!`);
       await refreshState();
       populateStore();
     };
@@ -1351,13 +1824,13 @@ function populateUpgrades() {
     const canBuy = !maxed && tank.coins >= (nextPrice || Infinity);
 
     html += `<div class="s-item">
-      <div class="s-icon">🔧</div>
+      <div class="s-icon">${iconImg('wrench', 20)}</div>
       <div class="s-info">
         <div class="s-name">${toolDef.name}</div>
         <div class="s-desc">Level ${level}/${toolDef.maxLevel}${maxed ? ' — Fully upgraded' : ''}</div>
       </div>
       <button class="buy-btn primary" ${!canBuy ? 'disabled' : ''} data-upgrade-tool="${toolId}">
-        ${maxed ? 'Max' : nextPrice + ' 🪙'}
+        ${maxed ? 'Max' : nextPrice + ' ' + iconImg('coin', 12)}
       </button>
     </div>`;
   }
@@ -1372,7 +1845,7 @@ function populateUpgrades() {
     for (const f of utilFish) {
       const sp = tankCat.content?.fish?.[f.speciesId];
       html += `<div class="s-item">
-        <div class="s-icon">🐌</div>
+        <div class="s-icon">${iconImg('wrench', 18)}</div>
         <div class="s-info">
           <div class="s-name">${sp.name}</div>
           <div class="s-desc">Reduces dirt by ${Math.round((sp.utility.dirtReduction||0)*100)}%</div>
@@ -1387,7 +1860,7 @@ function populateUpgrades() {
     btn.onclick = async () => {
       const res = await API.doAction('buy_tool', { toolId: btn.dataset.upgradeTool });
       if (res?.result?.error) { showToast(res.result.error); return; }
-      if (res?.result?.bought) showToast('Tool upgraded! 🔧');
+      if (res?.result?.bought) showToast('Tool upgraded!');
       await refreshState();
       populateUpgrades();
     };
@@ -1408,7 +1881,7 @@ function populateInventory() {
     for (const [fid, fdef] of Object.entries(tankCat.content?.food || {})) {
       const qty = tank.foodStock?.[fid] || 0;
       html += `<div class="s-item">
-        <div class="s-icon">🍽</div>
+        <div class="s-icon">${iconImg('food', 18)}</div>
         <div class="s-info">
           <div class="s-name">${fdef.name}</div>
           <div class="s-desc">Stock: ×${qty}</div>
@@ -1425,12 +1898,12 @@ function populateInventory() {
       const c = f._computed || {};
       const sp = tankCat.content?.fish?.[f.speciesId];
       html += `<div class="s-item">
-        <div class="s-icon">🐟</div>
+        <div class="s-icon">${iconImg('fish', 18)}</div>
         <div class="s-info">
           <div class="s-name">${c.speciesName || f.speciesId} ${f.weak ? '⚠️' : ''}</div>
-          <div class="s-desc">Lv.${f.level} ${c.lifeStage||''} · 😊${c.happiness??'?'} · 🍽${Math.round(f.hunger)} · 💰${c.coinRate||0}/hr</div>
+          <div class="s-desc">Lv.${f.level} ${c.lifeStage||''} · H:${c.happiness??'?'} · F:${Math.round(f.hunger)} · ${c.coinRate||0}/hr</div>
         </div>
-        ${fish.length > 1 ? `<button class="sell-btn" data-sell-fish="${f.id}">Sell</button>` : ''}
+        <button class="sell-btn" data-sell-fish="${f.id}">Sell</button>
       </div>`;
     }
   }
@@ -1483,7 +1956,7 @@ function populateTanks() {
     const isCurrent = t.tankId === activeTankId;
     const b = BIOMES[t.tankId] || {};
     html += `<div class="s-item ${isCurrent ? 'active-tank' : ''}">
-      <div class="s-icon">${t.unlocked ? '🐠' : '🔒'}</div>
+      <div class="s-icon">${t.unlocked ? iconImg('fish', 18) : iconImg('lock', 18)}</div>
       <div class="s-info">
         <div class="s-name">${t.name}${isCurrent ? ' — Current' : ''}</div>
         <div class="s-desc">${t.unlocked ? `${t.fishCount} fish · ${t.usedSpace}/${t.spaceCapacity} space · ${t.coins} coins` : t.unlockLabel}</div>
@@ -1512,7 +1985,7 @@ function populateTanks() {
       const res = await API.doAction('unlock_tank', { tankId: btn.dataset.unlockTank });
       if (res?.result?.error) { showToast(res.result.error); return; }
       if (res?.result?.unlocked) {
-        showToast(`Unlocked ${res.result.tankName}! 🎉`);
+        showToast(`Unlocked ${res.result.tankName}!`);
         await refreshState();
         populateTanks();
       }
@@ -1569,7 +2042,7 @@ function populateHelp() {
       Fish prices increase for each one you already own. Selling returns a fraction of the purchase price.
       Tools can't be sold — they're permanent upgrades.
     </p>
-    <button class="reset-btn" id="resetBtn">🗑 Reset Aquarium</button>
+    <button class="reset-btn" id="resetBtn">Reset Aquarium</button>
   `;
 
   $('resetBtn').onclick = async () => {
@@ -1668,8 +2141,14 @@ function setupInput() {
     } else if (activeMode === 'feed') {
       dropFood(pos.x, pos.y);
     } else {
-      // Normal mode: check fish tap
-      checkFishTap(pos.x, pos.y);
+      // Normal mode: check decor drag first, then fish tap
+      const hitDecor = hitTestDecor(pos.x, pos.y);
+      if (hitDecor && !hitDecor._isFloating) {
+        draggingDecor = { id: hitDecor.id, decorId: hitDecor.decorId, offsetX: 0, offsetY: 0 };
+      } else {
+        draggingDecor = null;
+        checkFishTap(pos.x, pos.y);
+      }
     }
   }
 
@@ -1683,11 +2162,30 @@ function setupInput() {
       renderDirtOverlay();
     } else if (activeMode === 'laser') {
       laserPos = pos;
+    } else if (draggingDecor) {
+      // Move decor visually during drag
+      const tank = gameState?.tanks?.[activeTankId];
+      if (tank) {
+        const d = tank.decor.find(d => d.id === draggingDecor.id);
+        if (d) {
+          d.x = Math.max(0.05, Math.min(0.95, pos.x / W));
+          d.y = Math.max(0.05, Math.min(0.95, pos.y / H));
+        }
+      }
     }
     lastDragPos = pos;
   }
 
   function onPointerUp(e) {
+    if (draggingDecor) {
+      // Commit decor position to server
+      const tank = gameState?.tanks?.[activeTankId];
+      const d = tank?.decor?.find(d => d.id === draggingDecor.id);
+      if (d) {
+        API.doAction('move_decor', { decorInstanceId: d.id, x: d.x, y: d.y });
+      }
+      draggingDecor = null;
+    }
     isDragging = false;
     if (activeMode === 'clean') {
       // Auto-complete check
@@ -1733,8 +2231,17 @@ function checkFishTap(px, py) {
     const anim = fishAnims[f.id];
     if (!anim) continue;
     const fx = anim.x * W, fy = anim.y * H;
-    if (Math.abs(px - fx) < 20 && Math.abs(py - fy) < 15) {
-      showFishBubble(f, fx, fy);
+    // For crawl types, adjust hit position to substrate
+    const biome = BIOMES[activeTankId] || BIOMES.fresh;
+    const subYp = H * (1 - biome.subH);
+    const effectiveY = (anim.movementType === 'crawl') ? subYp - 5 : fy;
+    if (Math.abs(px - fx) < 20 && Math.abs(py - effectiveY) < 15) {
+      // Trigger wiggle animation
+      if (anim) {
+        anim.wiggle = true;
+        anim.wiggleTimer = 2.0; // wiggle for 2 seconds
+      }
+      showFishBubble(f, fx, effectiveY);
       return;
     }
   }
@@ -1746,14 +2253,14 @@ function checkFishTap(px, py) {
     const dd = tankCat?.content?.decor?.[d.decorId];
     if (!dd) continue;
     const dx = d.x * W;
-    const baseSize = (d.size || 1) * PX_SCALE * 4;
+    const baseSize = Math.max(12, (d.size || 1) * PX_SCALE * 8);
     let hitW, hitH, hitX, hitY;
     if (dd.placement === 'top') {
-      hitW = baseSize * 2.4; hitH = 14; hitX = dx; hitY = 6;
+      hitW = baseSize * 2; hitH = 16; hitX = dx; hitY = 6;
     } else if (dd.growth) {
-      hitW = baseSize * 1.2; hitH = baseSize * 5; hitX = dx; hitY = subY - hitH;
+      hitW = baseSize * 1.5; hitH = baseSize * 4; hitX = dx; hitY = subY - hitH;
     } else {
-      hitW = baseSize * 3; hitH = baseSize * 1.6; hitX = dx; hitY = subY - baseSize * 0.8;
+      hitW = baseSize * 2.8; hitH = baseSize * 1.8; hitX = dx; hitY = subY - baseSize * 0.9;
     }
     if (Math.abs(px - hitX) < hitW / 2 && py > hitY - 4 && py < hitY + hitH + 4) {
       showDecorCard(d, px, py);
@@ -1763,6 +2270,35 @@ function checkFishTap(px, py) {
   // No fish/decor tapped — dismiss popups
   $('fishBubble').classList.remove('visible');
   $('decorCard').classList.remove('visible');
+}
+
+function hitTestDecor(px, py) {
+  const tank = gameState?.tanks?.[activeTankId];
+  const decors = tank?.decor || [];
+  const biome = BIOMES[activeTankId] || BIOMES.fresh;
+  const subY = H * (1 - biome.subH);
+  for (const d of decors) {
+    const dd = tankCat?.content?.decor?.[d.decorId];
+    if (!dd) continue;
+    const dx = d.x * W;
+    const baseSize = Math.max(12, (d.size || 1) * PX_SCALE * 8);
+    let hitW, hitH, hitX, hitY;
+    if (dd.placement === 'top') {
+      hitW = baseSize * 2; hitH = 16; hitX = dx; hitY = 6;
+      // Mark floating plants
+      d._isFloating = true;
+    } else if (dd.growth) {
+      hitW = baseSize * 1.5; hitH = baseSize * 4; hitX = dx; hitY = subY - hitH;
+      d._isFloating = false;
+    } else {
+      hitW = baseSize * 2.8; hitH = baseSize * 1.8; hitX = dx; hitY = subY - baseSize * 0.9;
+      d._isFloating = false;
+    }
+    if (Math.abs(px - hitX) < hitW / 2 && py > hitY - 4 && py < hitY + hitH + 4) {
+      return d;
+    }
+  }
+  return null;
 }
 
 async function switchTankNav(dir) {
@@ -1885,6 +2421,20 @@ function shadeColor(hex, amt) {
   return `rgb(${r},${g},${b})`;
 }
 
+// ═══════ PIXEL ICON INIT ═══════
+
+function initPixelIcons() {
+  document.querySelectorAll('[data-icon]').forEach(el => {
+    const key = el.dataset.icon;
+    if (!ICON_DATA[key]) return;
+    let size = 14;
+    if (el.classList.contains('menu-icon')) size = 24;
+    else if (el.id === 'fab') size = 20;
+    else if (el.classList.contains('tn-btn')) size = 12;
+    el.innerHTML = iconImg(key, size);
+  });
+}
+
 // ═══════ INIT ═══════
 
 async function init(homey) {
@@ -1897,6 +2447,7 @@ async function init(homey) {
 
   await API.init();
   setupInput();
+  initPixelIcons();
   resizeCanvas();
 
   // Check reset setting
@@ -1915,7 +2466,7 @@ async function init(homey) {
 
     // Show "while you were away" if significant idle earnings
     if (res.simResult?.coinsEarned > 5) {
-      showToast(`While away: +${res.simResult.coinsEarned} coins earned! 🪙`, 4000);
+      showToast(`While away: +${res.simResult.coinsEarned} coins earned!`, 4000);
     }
   }
 

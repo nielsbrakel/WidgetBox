@@ -30,6 +30,10 @@ export const SCENARIOS = {
         'tank-full':            { label: 'Fresh Full (8/8)',           type: 'mock', group: 'Test Scenarios' },
         'tier-3-crowded':       { label: 'Saltwater Crowded (18/20)',  type: 'mock', group: 'Test Scenarios' },
         'multi-tank-decorated': { label: 'Multi-Tank Decorated',       type: 'mock', group: 'Test Scenarios' },
+        'empty-tank':           { label: 'Empty Tank (0 fish)',        type: 'mock', group: 'New Features' },
+        'movement-showcase':    { label: 'Movement Types Showcase',    type: 'mock', group: 'New Features' },
+        'schooling-showcase':   { label: 'Schooling Fish (10 tetras)', type: 'mock', group: 'New Features' },
+        'floating-decor':       { label: 'Floating Plants & Decor',    type: 'mock', group: 'New Features' },
     }
 };
 
