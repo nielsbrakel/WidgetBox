@@ -174,6 +174,11 @@ export class GamesPage extends SandboxPage {
         await this.iframe.locator(`[data-close="${panelId}"]`).click();
     }
 
+    async switchStoreTab(tab: string) {
+        await this.iframe.locator(`.store-tab[data-tab="${tab}"]`).click();
+        await this.page.waitForTimeout(200);
+    }
+
     async selectScenario(value: string) {
         await this.scenarioSelect.selectOption(value);
         // Wait for widget reload

@@ -52,9 +52,9 @@ test.describe('Games App — Aquarium Widget', () => {
             await expect(buttons).toHaveCount(8);
         });
 
-        test('should have laser button locked at tier 1', async () => {
+        test('should have laser button available at tier 1', async () => {
             await games.openMenu();
-            await expect(games.menuBtn('laser')).toHaveClass(/locked/);
+            await expect(games.menuBtn('laser')).toBeVisible();
         });
     });
 
@@ -68,20 +68,21 @@ test.describe('Games App — Aquarium Widget', () => {
             await expect(games.storePanel).not.toHaveClass(/visible/);
         });
 
-        test('should show fish species and food items', async () => {
+        test('should show fish species on fish tab', async () => {
             await games.openStore();
             const items = games.storeList.locator('.s-item');
-            // 8 fish + 2 foods (flakes, pellets) + 3 cold water decorations
+            // Fresh tank has 3 fish: guppy, goldfish, snail
             const count = await items.count();
-            expect(count).toBeGreaterThanOrEqual(10);
+            expect(count).toBe(3);
         });
 
-        test('should show locked species with lock styling', async () => {
+        test('should show locked species when tank is full', async () => {
+            await games.selectScenario('tank-full');
             await games.openStore();
             const locked = games.storeList.locator('.s-item.locked');
             const lockedCount = await locked.count();
-            // At tier 1 Cold Water, 6 species locked (guppy, neon_tetra, betta, angelfish, clownfish, tang)
-            expect(lockedCount).toBe(6);
+            // All 3 fresh species locked (tank full)
+            expect(lockedCount).toBe(3);
         });
 
         test('should show buy button for available fish', async () => {
@@ -91,9 +92,9 @@ test.describe('Games App — Aquarium Widget', () => {
             expect(count).toBeGreaterThan(0);
         });
 
-        test('should show decorations section', async () => {
+        test('should show decorations tab', async () => {
             await games.openStore();
-            await expect(games.storeList).toContainText('Decoration');
+            await expect(games.storeList).toContainText('Decorations');
         });
     });
 
@@ -239,7 +240,7 @@ test.describe('Games App — Aquarium Widget', () => {
             await games.openHelp();
             await expect(games.helpPanel).toHaveClass(/visible/);
             const body = games.iframe.locator('#helpBody');
-            await expect(body).toContainText('Overview');
+            await expect(body).toContainText('Getting Started');
             await expect(body).toContainText('Feeding');
             await expect(body).toContainText('Cleaning');
         });
@@ -253,13 +254,13 @@ test.describe('Games App — Aquarium Widget', () => {
         test('should mention multiple tanks in help', async () => {
             await games.openHelp();
             const body = games.iframe.locator('#helpBody');
-            await expect(body).toContainText('Multiple Tanks');
+            await expect(body).toContainText('Tanks & Switching');
         });
 
         test('should mention decorations in help', async () => {
             await games.openHelp();
             const body = games.iframe.locator('#helpBody');
-            await expect(body).toContainText('Decorations');
+            await expect(body).toContainText('Decor & Plants');
         });
     });
 
@@ -273,9 +274,9 @@ test.describe('Games App — Aquarium Widget', () => {
 
         test('should show all three tank tiers', async () => {
             await games.openTanks();
-            await expect(games.tanksList).toContainText('Cold Water');
-            await expect(games.tanksList).toContainText('Tropical');
-            await expect(games.tanksList).toContainText('Sea Water');
+            await expect(games.tanksList).toContainText('Fresh Starter');
+            await expect(games.tanksList).toContainText('Tropical Planted');
+            await expect(games.tanksList).toContainText('Saltwater Reef');
         });
 
         test('should show current tank as active', async () => {
@@ -285,10 +286,10 @@ test.describe('Games App — Aquarium Widget', () => {
             await expect(activeTank).toContainText('Current');
         });
 
-        test('should show locked tanks with unlock price', async () => {
+        test('should show locked tanks with unlock labels', async () => {
             await games.openTanks();
-            // Tier 2 and 3 should show unlock prices
-            await expect(games.tanksList).toContainText('200');
+            // Tier 2 requires 500 lifetime coins
+            await expect(games.tanksList).toContainText('500');
         });
     });
 
@@ -307,8 +308,8 @@ test.describe('Games App — Aquarium Widget', () => {
 
         test('should show fish in tank', async () => {
             await games.openInventory();
-            // Default state has 1 goldfish (cold water starter)
-            await expect(games.inventoryList).toContainText('Goldfish');
+            // Default state has 1 guppy (fresh starter)
+            await expect(games.inventoryList).toContainText('Guppy');
         });
     });
 
@@ -329,10 +330,10 @@ test.describe('Games App — Aquarium Widget', () => {
             expect(coins).toBeGreaterThanOrEqual(1000);
         });
 
-        test('should show snails in tier 2 upgrades', async () => {
+        test('should show utility fish in tier 2 upgrades', async () => {
             await games.selectScenario('tier-2-active');
             await games.openUpgrades();
-            await expect(games.upgradesList).toContainText('Snail');
+            await expect(games.upgradesList).toContainText('Pleco');
         });
 
         test('should show equipment upgrades at tier 2', async () => {
@@ -344,7 +345,7 @@ test.describe('Games App — Aquarium Widget', () => {
         test('should load tank-full scenario with full capacity', async () => {
             await games.selectScenario('tank-full');
             await games.openStore();
-            await expect(games.storeCap).toContainText('6/6');
+            await expect(games.storeCap).toContainText('8/8');
         });
 
         test('should disable fish buy buttons when tank is full', async () => {
@@ -352,8 +353,8 @@ test.describe('Games App — Aquarium Widget', () => {
             await games.openStore();
             const fullBtns = games.storeList.locator('.buy-btn', { hasText: 'Full' });
             const fullCount = await fullBtns.count();
-            // Cold Water has 2 species (goldfish, koi) both showing Full
-            expect(fullCount).toBe(2);
+            // Fresh has 3 species (guppy, goldfish, snail) all showing Full
+            expect(fullCount).toBe(3);
         });
 
         test('should load low-food scenario with minimal food stock', async () => {
@@ -399,23 +400,25 @@ test.describe('Games App — Aquarium Widget', () => {
         test('should show decorations in endgame inventory', async () => {
             await games.selectScenario('tier-3-endgame');
             await games.openInventory();
-            // Tier 3 endgame has decorations: Castle, Coral Rock, Anchor
+            // Tier 3 endgame has decorations: Anemone, Brain Coral, Staghorn Coral
             await expect(games.inventoryList).toContainText('Decoration');
         });
 
-        test('should show biome-specific decorations in cold water store', async () => {
+        test('should show biome-specific decorations in fresh store', async () => {
             await games.openStore();
-            // Cold Water should show cold water decorations (Rock Pile, Driftwood, Stone Bridge)
+            await games.switchStoreTab('decor');
+            // Fresh should show fresh decorations
             await expect(games.storeList).toContainText('Rock Pile');
             await expect(games.storeList).toContainText('Driftwood');
         });
 
-        test('should show biome-specific decorations in sea water store', async () => {
+        test('should show biome-specific decorations in saltwater store', async () => {
             await games.selectScenario('tier-3-endgame');
             await games.openStore();
-            // Sea Water should show sea water decorations
-            await expect(games.storeList).toContainText('Coral Rock');
-            await expect(games.storeList).toContainText('Sea Anemone');
+            await games.switchStoreTab('decor');
+            // Saltwater should show salt decorations
+            await expect(games.storeList).toContainText('Anemone');
+            await expect(games.storeList).toContainText('Live Rock');
         });
 
         test('should show all tanks as full-screen layout', async () => {
@@ -462,7 +465,7 @@ test.describe('Games App — Aquarium Widget', () => {
         test('should show space usage in store header', async () => {
             await games.openStore();
             await expect(games.storeCap).toBeVisible();
-            await expect(games.storeCap).toContainText('/6');
+            await expect(games.storeCap).toContainText('/8');
         });
 
         test('should show spaceCost in store item descriptions', async () => {

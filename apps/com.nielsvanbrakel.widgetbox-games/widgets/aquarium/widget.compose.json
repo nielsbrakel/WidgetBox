@@ -4,10 +4,10 @@
         "nl": "Aquarium"
     },
     "description": {
-        "en": "A cozy ambient aquarium companion",
-        "nl": "Een gezellig ambient aquarium"
+        "en": "A cozy idle aquarium game",
+        "nl": "Een gezellig idle aquarium spel"
     },
-    "height": 300,
+    "height": "75%",
     "transparent": false,
     "settings": [
         {

@@ -777,7 +777,7 @@
       }
     ],
     "isTransparent": false,
-    "height": 300,
+    "height": "75%",
     "path": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-games/widgets/aquarium/public/index.html",
     "absolutePath": "/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-games/widgets/aquarium",
     "locales": {
