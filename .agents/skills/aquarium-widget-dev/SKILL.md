@@ -28,7 +28,7 @@ apps/com.nielsvanbrakel.widgetbox-games/
 ├── app.json                        # Generated from .homeycompose/app.json
 ├── .homeycompose/app.json          # Source of truth for app metadata
 ├── package.json                    # Scripts: homey:run, homey:install, homey:build
-├── AQUARIUM_SPEC.md             # Full game specification (v1.2.0)
+├── AQUARIUM_SPEC.md             # Full game specification (v1.3.0)
 ├── locales/
 │   ├── en.json                     # English translations
 │   └── nl.json                     # Dutch translations
@@ -48,6 +48,7 @@ apps/sandbox/src/lib/scenarios.js              # Dev scenarios for testing
 tests/e2e/games.spec.ts                        # Playwright E2E tests (60 tests)
 tests/e2e/games-advanced.spec.ts               # Advanced E2E tests (57 tests)
 tests/e2e/games-features.spec.ts               # v1.2 feature E2E tests (50 tests)
+tests/e2e/games-design.spec.ts                 # v1.3 design overhaul E2E tests (45 tests)
 tests/pages/GamesPage.ts                       # Page object for E2E
 ```
 
@@ -146,7 +147,8 @@ type FishSpecies = {
   diet: { accepts: FoodId[] };        // foods this fish eats; all others ignored
   requirements?: { decor?; tools?; plantMass?; floatingPlants? };
   preferences?: {
-    nearDecor?; zonePreference?;
+    nearDecor?;                       // decor type this fish claims as territory
+    zonePreference?;
     schooling?: boolean;              // leader-following groups, 0.5 space
     movementType?: 'default' | 'crawl' | 'glass' | 'snake';  // movement behavior
   };
@@ -302,7 +304,7 @@ fishPrice = basePrice × growthFactor ^ ownedCountOfSpecies
 ## Rendering Layers (Bottom to Top)
 
 1. Water gradient (3-stop, biome-specific) → 2. Glass frame (animated shimmer + reflections) → 3. Back silhouettes → 3.5. Light rays (7 animated) → 4. Caustic light (12 animated ellipses) → 5. Substrate (120 varied pebbles + 2-line highlight + depth fog) →
-6. Rock clusters → 7. Decor (seeded RNG, varied shapes, draggable in normal mode, floating plants with sinusoidal drift) → 8. Equipment (pixel art sprites from ICON_DATA + level dots) → 9. Fish (FISH_BASE_SCALES applied) → 10. Movement-type sprites (crawl/glass/snake) →
+6. Rock clusters → 7. **Back decor layer** (every 3rd item, 55% opacity — behind fish for depth) → 8. Equipment (pixel art sprites from ICON_DATA + level dots) → 9. Fish (FISH_BASE_SCALES applied) → 10. Movement-type sprites (crawl/glass/snake) → 10.5. **Front decor layer** (remaining items, full opacity — in front of fish for depth) →
 11. Food particles → 12. Bubbles → 13. Ambient particles → 14. Dirt overlay (seeded cells + edge film, **above substrate only**, visible when cleanliness < 95%) →
 15. Laser dot → 16. Float text → 17. Fish bubble (stats pills, earning info, traits, sell button) → 18. HUD (pixel art icons) →
 19. Tool dock → 20. Toast → 21. Menu (pixel art icons) → 22. Panels
@@ -412,10 +414,11 @@ Required test files and what they cover:
 
 ### E2E Tests (Playwright)
 
-Three test files:
+Four test files:
 - `tests/e2e/games.spec.ts` (60 tests) — Core smoke tests: widget loads, HUD, menu, panels, tool modes, scenarios
 - `tests/e2e/games-advanced.spec.ts` (57 tests) — Advanced: pixel icons, store purchasing, tank nav, scenario persistence, decor/fish sell, equipment upgrades, dirty tank visuals
 - `tests/e2e/games-features.spec.ts` (50 tests) — v1.2 features: zero-fish tanks, half-space schooling, movement types, fish info panel, cleaning improvements, floating plants, new scenarios, visual rendering, inventory sell flow
+- `tests/e2e/games-design.spec.ts` (45 tests) — v1.3 design overhaul: fish size differentiation, layered decor rendering, territorial fish behavior, plant trim & move, visual rendering stability, decor store integration, tank navigation, long-running stability
 
 Page object at `tests/pages/GamesPage.ts`.
 
@@ -424,7 +427,7 @@ Must verify: widget loads, HUD visible, menu works, panels render, tool modes ac
 ### Sandbox Mocks
 
 Located at `apps/sandbox/src/lib/mocks/aquariumMocks.js`. Contains:
-- `createScenarioState(scenarioId)` — 16 full state generators (default, tier-2-ready, tier-2-active, tier-3-endgame, neglected-48h, low-food, dirty-near-threshold, dirty-big-tank, rich, tank-full, tier-3-crowded, multi-tank-decorated, empty-tank, movement-showcase, schooling-showcase, floating-decor)
+- `createScenarioState(scenarioId)` — 19 full state generators (default, tier-2-ready, tier-2-active, tier-3-endgame, neglected-48h, low-food, dirty-near-threshold, dirty-big-tank, rich, tank-full, tier-3-crowded, multi-tank-decorated, empty-tank, movement-showcase, schooling-showcase, floating-decor, territorial-showcase, lush-planted, size-showcase)
 - `applyDebugScenario(save, scenario)` — 12 mutation actions
 - `handleAquariumApi()` — Main handler with `_lastScenarioId` tracking
 - `resetAquariumScenario(scenarioId)` — Skips reset when same scenario already loaded (prevents React useEffect double-fire)
@@ -461,7 +464,65 @@ Fish have species-dependent movement controlled by `movementType` in catalog pre
 
 **Fish interaction:** Tap → wiggle in place (2s) → info bubble with stats pills, earning info, traits, sell button → auto-dismiss after 8s.
 
-**Decor interaction:** Drag-to-move non-floating decor in normal mode. Floating plants drift autonomously with sinusoidal animation.
+**Decor interaction:** Drag-to-move non-floating decor in normal mode. Floating plants drift autonomously with sinusoidal animation. Tap decor to open Decor Card popup (name, size, actions: Trim/Move/Sell).
+
+## Territorial Fish Behavior
+
+Fish with `nearDecor` preference defend their claimed decor zone:
+
+| Species | Claims | Behavior |
+|---|---|---|
+| `clownfish` | `anemone` | Anemone defense |
+| `moray_eel` | `cave` | Cave lurking, dashes at intruders |
+| `firefish` | `brain_coral` | Coral territory |
+| `royal_gramma` | `cave` | Cave entrance defense |
+
+**Implementation:**
+1. Each frame builds `claimedDecorZones` — map of decor positions to owner fish
+2. Owner fish "claims" a zone radius around their preferred decor (decorSize × 0.15 normalized)
+3. Trespassers entering a claimed zone get `dashSpeed = 3.0` (flee)
+4. Owners dash toward trespassers with `dashSpeed = 2.5`
+5. `dashSpeed` decays: `dashSpeed *= (1 - dt * 2)` — burst-then-slow
+6. Speed integration: `baseSpd *= (1 + dashSpeed)`
+7. Same-species fish are not chased
+
+This creates emergent behavior: fish naturally spread out to avoid territorial zones.
+
+## Fish Size Design
+
+Fish sprites use dramatically different dimensions and FISH_BASE_SCALES to create visual size hierarchy:
+
+| Category | Scale Range | Sprite Size | Species |
+|---|---|---|---|
+| Tiny | 0.65-0.75 | 8×4 to 8×6 | Neon Tetra, Green Chromis, Snail, Shrimp |
+| Small | 0.85 | 10×6 to 10×8 | Guppy, Blue-Eye, Banggai Cardinal |
+| Medium | 1.0-1.2 | 12×6 to 14×4 | Firefish, Royal Gramma, Clownfish, Cleaner Shrimp |
+| Large | 1.3-1.8 | 14×10 to 18×12 | Gourami, Goldfish, Moon Fish, Pleco, Blue Tang |
+| Very Large | 2.0-2.8 | 16×14 to 28×5 | Discus, Moray Eel |
+
+**Design principles:**
+- Tiny schooling fish (0.65 scale) look natural in groups of 10+
+- Large fish (1.8+ scale) visually dominate the tank
+- Each sprite has a distinctive shape: moon fish is tall/round, moray is long/thin, discus is disc-shaped
+- Scale multiplier amplifies the sprite dimension differences
+
+## Layered Decoration Rendering
+
+Decorations are split into two render layers for depth:
+
+1. **`renderDecorBack(decors, biomeKey)`** — Every 3rd decor item rendered at 55% opacity **before fish** (fish swim in front)
+2. **`renderDecorFront(decors, biomeKey)`** — Remaining decor items at full opacity **after fish** (fish swim behind)
+3. **`drawDecorItem(d, def, color, x, baseSize, subY, biomeKey, isBack)`** — Shared rendering with `isBack` controlling opacity
+
+**Game loop order:** environment → decorBack → equipment → fish → decorFront → food → bubbles → laser → dirt
+
+**Enhanced decor rendering:**
+- Floating plants: 4-6 lily pads with leaf veins, dangling roots
+- Plants: 2-3 stems with 6-11 leaves on quadratic Bézier curves, 2.5× height
+- Rocks: 4-5 boulders with drop shadows
+- Coral/Anemone: 5-8 animated swaying branches with sub-branches
+- Cave: Dark arch with interior shading and rim highlights
+- Driftwood: Gnarled shape with wood grain texture and moss patches
 
 ## Common Patterns
 
@@ -519,7 +580,7 @@ function seededRng(seed) {
 - [ ] Translations added to both `en.json` and `nl.json`
 - [ ] Sandbox mocks updated if data model changed
 - [ ] Unit tests written and passing for affected systems
-- [ ] E2E tests pass (`npx playwright test tests/e2e/games.spec.ts tests/e2e/games-advanced.spec.ts tests/e2e/games-features.spec.ts`)
+- [ ] E2E tests pass (`npx playwright test tests/e2e/games.spec.ts tests/e2e/games-advanced.spec.ts tests/e2e/games-features.spec.ts tests/e2e/games-design.spec.ts`)
 - [ ] Widget renders correctly in sandbox (`pnpm run dev` from root)
 - [ ] Fish layer remains visible during clean mode
 - [ ] Happiness penalties are clearly shown in fish details

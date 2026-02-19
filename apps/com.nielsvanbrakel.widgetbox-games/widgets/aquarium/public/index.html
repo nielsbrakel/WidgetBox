@@ -284,23 +284,45 @@ const BIOMES = {
 };
 
 const FISH_SPRITES = {
-  guppy:      { w:12, h:7, data:['000222000000','002133500000','021344510000','213345510000','021333100000','002211000000','000020000000'] },
-  goldfish:   { w:14, h:9, data:['00002200000000','00021331000000','00221345100000','02213351100000','22113351100000','22113311000000','00221331000000','00022110000000','00002200000000'] },
-  snail:      { w:10, h:7, data:['0003333000','0033334300','0333343300','0034443000','0041104100','0410010400','0010001000'] },
-  neon_tetra: { w:12, h:7, data:['000111000000','016666510000','016655110000','011655100000','013361000000','001110000000','000020000000'] },
-  blue_eye:   { w:12, h:7, data:['000110000000','001135100000','011355100000','011335100000','011131000000','001110000000','000020000000'] },
-  moon_fish:  { w:14, h:9, data:['00000110000000','00011131000000','00113351000000','01113351100000','01113351100000','01113351100000','00113310000000','00011110000000','00000110000000'] },
-  discus:     { w:14, h:11, data:['00000110000000','00001131000000','00011331000000','00113451000000','01113631100000','01113631100000','01113631100000','00113451000000','00011331000000','00001131000000','00000110000000'] },
-  pleco:      { w:16, h:7, data:['0000000000000000','0001111111100000','0011334511110000','0111111111111000','0011111111110000','0001111111100000','0001100011000000'] },
-  gourami:    { w:14, h:9, data:['00002200000000','00021131000000','00211335100000','02211335100000','22113351100000','22113311000000','00211310000000','00021130000000','00002200000000'] },
-  clownfish:  { w:14, h:9, data:['00002200000000','00021161000000','00211635100000','02211636100000','22113636100000','22113616100000','00211161000000','00021160000000','00002200000000'] },
-  blue_tang:  { w:16, h:11, data:['0000002200000000','0000021130000000','0000211331000000','0002113351000000','0021133631100000','0211336631100000','0021133631100000','0002113351000000','0000211331000000','0000021130000000','0000002200000000'] },
-  green_chromis: { w:12, h:7, data:['000111000000','011335100000','011315000000','011131000000','001110000000','000020000000','000000000000'] },
-  firefish:   { w:14, h:7, data:['00000110000000','00011333100000','00113335100000','01113335100000','00113331000000','00001130000000','00000220000000'] },
-  royal_gramma: { w:14, h:9, data:['00002200000000','00021131000000','00211335100000','02111336100000','21113361100000','02611361000000','00261130000000','00026130000000','00002200000000'] },
-  banggai_cardinal: { w:12, h:7, data:['000220000000','021361100000','221645100000','021361100000','002200000000','000200000000','000000000000'] },
-  moray_eel:  { w:20, h:7, data:['00000000000000000000','00001111111111000000','00011333451111100000','00111111131111110000','00011111111111100000','00001111111111000000','00000000000000000000'] },
-  cleaner_shrimp: { w:12, h:7, data:['000005500000','000113300000','001334510000','001133100000','000113000000','001001010000','010001000000'] },
+  // ── FRESH TANK ──
+  // Guppy: tiny, fan-shaped tail, rounded body (12×7 → 10×6 small)
+  guppy: { w:10, h:6, data:['0022200000','0213350000','2133551000','2133510000','0213300000','0022000000'] },
+  // Goldfish: plump oval body, flowing double tail, bigger (16×10)
+  goldfish: { w:16, h:10, data:['0000022000000000','0000213100000000','0002133510000000','0221345510000000','2213455110002200','2213355100002200','2213351000000000','0021331000000000','0002211000000000','0000220000000000'] },
+  // Snail: spiral shell on back, stubby body, antennae (10×8)
+  snail: { w:10, h:8, data:['0000433000','0004344300','0043434300','0043443000','0033330000','0411104100','4100010040','0100001000'] },
+
+  // ── TROPICAL TANK ──
+  // Neon Tetra: tiny torpedo, bright blue stripe + red tail (8×4 very small)
+  neon_tetra: { w:8, h:4, data:['01665100','16655100','16331100','01110200'] },
+  // Blue-Eye: small, big eye accent (10×6)
+  blue_eye: { w:10, h:6, data:['0011100000','0115351000','1153551000','1153351000','0113310000','0011200000'] },
+  // Moon Fish: tall disc body, crescent shape, distinctive (14×12)
+  moon_fish: { w:14, h:12, data:['00000110000000','00001131000000','00011331000000','00113351000000','01113351100000','11133551100000','11133551100000','01113351100000','00113351000000','00011331000000','00001131000000','00000110000000'] },
+  // Discus: large round disc, vertical stripes (16×14)
+  discus: { w:16, h:14, data:['0000001100000000','0000011310000000','0000113610000000','0001136310000000','0011363610000000','0113636310000000','1113663611000000','1113663611000000','0113636310000000','0011363610000000','0001136310000000','0000113610000000','0000011310000000','0000001100000000'] },
+  // Pleco: long flat body, big head, sucker mouth, whiskers (18×7)
+  pleco: { w:18, h:7, data:['000000000000000000','000111111111100000','001133345111110000','011114511111111100','001133345111110000','000111111111100000','000110001100000000'] },
+  // Gourami: oval with long feeler fins trailing below (14×10)
+  gourami: { w:14, h:10, data:['00002200000000','00021131000000','00211335100000','02211335100000','22113351100000','22113311000000','00211310000000','00021100000000','00001020000000','00000010000000'] },
+
+  // ── SALTWATER TANK ──
+  // Clownfish: classic orange-white bands, recognizable (14×9)
+  clownfish: { w:14, h:9, data:['00002200000000','00021161000000','00211636100000','02116361600000','22163616100000','02116361600000','00211636100000','00021161000000','00002200000000'] },
+  // Blue Tang: larger oval, yellow tail accent, very blue (18×12)
+  blue_tang: { w:18, h:12, data:['000000022000000000','000000211300000000','000002113310000000','000021133510000000','000211336310000000','002113366311000000','002113366311000000','000211336310000000','000021133510000000','000002113310000000','000000211300000000','000000022000000000'] },
+  // Green Chromis: small oval, solid green, schooling (8×5)
+  green_chromis: { w:8, h:5, data:['01113100','11335100','11335100','01131000','00120000'] },
+  // Firefish: elongated, tall first dorsal fin, gradient body (16×8)
+  firefish: { w:16, h:8, data:['0000003000000000','0000013300000000','0001133351000000','0011333351000000','0113333510000000','0011333100000000','0001133000000000','0000022000000000'] },
+  // Royal Gramma: half purple half yellow, vivid split (14×9)
+  royal_gramma: { w:14, h:9, data:['00002200000000','00064131000000','00641335100000','06641336100000','66113661100000','06641336100000','00641135000000','00064130000000','00002200000000'] },
+  // Banggai Cardinalfish: vertical black-white stripes, long fins (12×8)
+  banggai_cardinal: { w:12, h:8, data:['000220000000','002161100000','021645610000','216456100000','021645610000','002161100000','000220000000','000020000000'] },
+  // Moray Eel: LONG serpentine body, small head, gaping mouth (28×5)
+  moray_eel: { w:28, h:5, data:['0000000000000000000000000000','0000111111111111111111110000','0005133333333333333333331000','0000111111111111111111110000','0000000000000000000000000000'] },
+  // Cleaner Shrimp: long antennae, segmented body, pincers (14×7)
+  cleaner_shrimp: { w:14, h:7, data:['00000550000050','00001133000000','00013345100000','00113351000000','00011330000000','00100101000000','01000010100000'] },
 };
 
 const FISH_PALETTES = {
@@ -332,12 +354,12 @@ const DECOR_COLORS = {
 
 const ZONE_RANGES = { top:[0.08,0.35], middle:[0.25,0.65], bottom:[0.55,0.82], any:[0.15,0.75] };
 
-// Species base display scales (relative to PX_SCALE) — larger fish are bigger on screen
+// Species base display scales — dramatic size differences for realism
 const FISH_BASE_SCALES = {
-  guppy: 1.0, goldfish: 1.5, snail: 1.1,
-  neon_tetra: 0.9, blue_eye: 0.95, moon_fish: 1.4, discus: 1.7, pleco: 1.6, gourami: 1.4,
-  clownfish: 1.3, blue_tang: 1.6, green_chromis: 0.9, firefish: 1.1,
-  royal_gramma: 1.2, banggai_cardinal: 1.0, moray_eel: 2.2, cleaner_shrimp: 1.0,
+  guppy: 0.85, goldfish: 1.6, snail: 1.0,
+  neon_tetra: 0.65, blue_eye: 0.8, moon_fish: 1.7, discus: 2.0, pleco: 1.8, gourami: 1.5,
+  clownfish: 1.3, blue_tang: 1.8, green_chromis: 0.65, firefish: 1.2,
+  royal_gramma: 1.2, banggai_cardinal: 0.85, moray_eel: 2.8, cleaner_shrimp: 0.9,
 };
 
 // ═══════ PIXEL ICON SYSTEM ═══════
@@ -433,6 +455,8 @@ let activeTankId = 'fresh';
 let fishAnims = {};
 // Schooling anchors per species
 let schoolAnchors = {};
+// Territorial dash state per fish
+let territorialDash = {}; // { fishId: { targetId, dashTimer, returnTimer } }
 // Particles
 let bubbles = [];
 let foodParticles = [];
@@ -626,146 +650,303 @@ function renderEnvironment(biomeKey) {
   ctx.fillRect(0, 0, W, 3);
 }
 
-// ═══════ RENDERING — DECOR ═══════
+// ═══════ RENDERING — DECOR (Layered: back decor → fish → front decor) ═══════
 
-function renderDecor(decors, biomeKey) {
+// Draw BACK layer decor (fish swim in front of these)
+function renderDecorBack(decors, biomeKey) {
   if (!decors || !tankCat) return;
   const biome = BIOMES[biomeKey] || BIOMES.fresh;
   const subY = H * (1 - biome.subH);
+  // Back layer: large plants, corals — rendered at 60% opacity for depth
+  for (const d of decors) {
+    const def = tankCat.content?.decor?.[d.decorId];
+    if (!def) continue;
+    if (def.placement === 'top') continue; // floating always in front
+    const color = DECOR_COLORS[d.decorId] || '#888';
+    const x = d.x * W;
+    const baseSize = Math.max(16, (d.size || 1) * PX_SCALE * 10);
+    // Only render roughly half the decor in the back (based on index)
+    const idx = decors.indexOf(d);
+    if (idx % 3 !== 0) continue; // every 3rd decor drawn behind fish
+    ctx.globalAlpha = 0.55; // faded depth effect
+    drawDecorItem(d, def, color, x, baseSize, subY, biomeKey, true);
+    ctx.globalAlpha = 1;
+  }
+}
 
+// Draw FRONT layer decor (in front of fish)
+function renderDecorFront(decors, biomeKey) {
+  if (!decors || !tankCat) return;
+  const biome = BIOMES[biomeKey] || BIOMES.fresh;
+  const subY = H * (1 - biome.subH);
   for (const d of decors) {
     const def = tankCat.content?.decor?.[d.decorId];
     if (!def) continue;
     const color = DECOR_COLORS[d.decorId] || '#888';
     const x = d.x * W;
-    const baseSize = Math.max(12, (d.size || 1) * PX_SCALE * 8);
+    const baseSize = Math.max(16, (d.size || 1) * PX_SCALE * 10);
+    const idx = decors.indexOf(d);
+    if (idx % 3 === 0) continue; // skip back-layer items
+    drawDecorItem(d, def, color, x, baseSize, subY, biomeKey, false);
+  }
+}
 
-    if (def.placement === 'top') {
-      // Floating plants — clusters of lily-pad shapes at surface
-      // Add gentle drift animation
-      const time = Date.now() / 4000;
-      const driftX = Math.sin(time + d.x * 10) * 3;
-      const driftY = Math.sin(time * 0.7 + d.x * 7) * 1.5;
-      ctx.save();
-      const rng = seededRng(Math.round(d.x * 10000));
-      for (let i = 0; i < 3; i++) {
-        const ox = x + driftX + (rng() - 0.5) * baseSize;
-        const r = baseSize * (0.3 + rng() * 0.3);
-        ctx.fillStyle = shadeColor(color, ((rng() - 0.5) * 30) | 0);
-        ctx.globalAlpha = 0.85;
-        ctx.beginPath();
-        ctx.ellipse(ox, 3 + driftY + rng() * 6, r, r * 0.4, rng() * 0.3, 0, Math.PI * 2);
-        ctx.fill();
-        // highlight
-        ctx.fillStyle = shadeColor(color, 30);
-        ctx.globalAlpha = 0.4;
-        ctx.beginPath();
-        ctx.ellipse(ox - r * 0.2, 2 + driftY + rng() * 4, r * 0.4, r * 0.2, 0, 0, Math.PI * 2);
-        ctx.fill();
-      }
-      ctx.globalAlpha = 1;
-      ctx.restore();
-    } else if (def.growth) {
-      // Plant — draw stem with multiple leaves
-      const ph = baseSize * 2;
-      const baseY = subY;
-      const topY = baseY - ph;
-      const rng = seededRng(Math.round(d.x * 10000) + 99);
+function drawDecorItem(d, def, color, x, baseSize, subY, biomeKey, isBack) {
+  if (def.placement === 'top') {
+    // ── Floating plants: lush lily-pad clusters at surface ──
+    const time = Date.now() / 4000;
+    const driftX = Math.sin(time + d.x * 10) * 4;
+    const driftY = Math.sin(time * 0.7 + d.x * 7) * 2;
+    ctx.save();
+    const rng = seededRng(Math.round(d.x * 10000));
+    const clusterSize = 4 + Math.floor(rng() * 3); // 4-6 pads per cluster
+    for (let i = 0; i < clusterSize; i++) {
+      const ox = x + driftX + (rng() - 0.5) * baseSize * 1.3;
+      const r = baseSize * (0.25 + rng() * 0.35);
+      // Main pad
+      const padShade = ((rng() - 0.5) * 20) | 0;
+      ctx.fillStyle = shadeColor(color, padShade);
+      ctx.globalAlpha = isBack ? 0.5 : 0.88;
+      ctx.beginPath();
+      ctx.ellipse(ox, 4 + driftY + rng() * 8, r, r * 0.45, rng() * 0.3, 0, Math.PI * 2);
+      ctx.fill();
+      // Leaf vein
+      ctx.strokeStyle = shadeColor(color, -15);
+      ctx.lineWidth = 0.6;
+      ctx.beginPath();
+      ctx.moveTo(ox - r * 0.5, 4 + driftY + rng() * 4);
+      ctx.lineTo(ox + r * 0.4, 4 + driftY + rng() * 4);
+      ctx.stroke();
+      // Highlight spot
+      ctx.fillStyle = shadeColor(color, 35);
+      ctx.globalAlpha = isBack ? 0.2 : 0.4;
+      ctx.beginPath();
+      ctx.ellipse(ox - r * 0.2, 2 + driftY + rng() * 4, r * 0.3, r * 0.15, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    // Roots dangling down into water
+    ctx.globalAlpha = isBack ? 0.15 : 0.25;
+    ctx.strokeStyle = shadeColor(color, -30);
+    ctx.lineWidth = 1;
+    const rootRng = seededRng(Math.round(d.x * 10000) + 42);
+    for (let r = 0; r < 3; r++) {
+      const rx = x + driftX + (rootRng() - 0.5) * baseSize * 0.8;
+      const rootLen = 15 + rootRng() * 25;
+      ctx.beginPath();
+      ctx.moveTo(rx, 10 + driftY);
+      ctx.quadraticCurveTo(rx + (rootRng()-0.5)*8, 10 + rootLen*0.5, rx + (rootRng()-0.5)*4, 10 + rootLen);
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+    ctx.restore();
+  } else if (def.growth) {
+    // ── Plants: lush, tall, multi-stem with dense leaves ──
+    const ph = baseSize * 2.5; // taller plants
+    const baseY = subY;
+    const topY = baseY - ph;
+    const rng = seededRng(Math.round(d.x * 10000) + 99);
 
-      // Stems
-      const stemCount = 1 + Math.floor(rng() * 2);
-      for (let s = 0; s < stemCount; s++) {
-        const sx = x + (s - stemCount / 2) * 4;
-        ctx.strokeStyle = shadeColor(color, -20);
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(sx, baseY);
-        const cp1x = sx + (rng() - 0.5) * 12;
-        const cp1y = baseY - ph * 0.5;
-        ctx.quadraticCurveTo(cp1x, cp1y, sx + (rng() - 0.5) * 6, topY + rng() * ph * 0.2);
-        ctx.stroke();
-      }
+    // Multiple stems for fullness
+    const stemCount = 2 + Math.floor(rng() * 3);
+    for (let s = 0; s < stemCount; s++) {
+      const sx = x + (rng() - 0.5) * baseSize * 0.6;
+      const curveCp = sx + (rng() - 0.5) * 20;
+      const topX = sx + (rng() - 0.5) * 10;
+      const stemTopY = topY + rng() * ph * 0.25;
+      // Stem
+      ctx.strokeStyle = shadeColor(color, -25);
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(sx, baseY);
+      ctx.quadraticCurveTo(curveCp, baseY - ph * 0.5, topX, stemTopY);
+      ctx.stroke();
 
-      // Leaves along stem
-      const leafCount = 4 + Math.floor(rng() * 4);
+      // Dense leaves along stem
+      const leafCount = 6 + Math.floor(rng() * 5);
       for (let i = 0; i < leafCount; i++) {
-        const t = (i + 0.5) / leafCount;
-        const ly = baseY - ph * t;
-        const lx = x + (rng() - 0.5) * 8;
-        const dir = i % 2 === 0 ? 1 : -1;
-        const leafW = baseSize * (0.3 + rng() * 0.2) * dir;
-        const leafH = baseSize * 0.15;
-        ctx.fillStyle = shadeColor(color, ((rng() - 0.5) * 25) | 0);
+        const t = (i + 0.3) / leafCount;
+        // Position along the quadratic curve
+        const u = t;
+        const ly = baseY * (1-u)*(1-u) + (baseY - ph*0.5) * 2*u*(1-u) + stemTopY * u*u;
+        const lx = sx * (1-u)*(1-u) + curveCp * 2*u*(1-u) + topX * u*u;
+        const dir = (i % 2 === 0 ? 1 : -1) * (0.8 + rng() * 0.4);
+        const leafW = baseSize * (0.35 + rng() * 0.25) * dir;
+        const leafH = baseSize * (0.12 + rng() * 0.08);
+        const shade = ((rng() - 0.5) * 30) | 0;
+        ctx.fillStyle = shadeColor(color, shade);
+        ctx.globalAlpha = isBack ? 0.5 : 0.9;
         ctx.beginPath();
         ctx.moveTo(lx, ly);
-        ctx.quadraticCurveTo(lx + leafW, ly - leafH, lx + leafW * 0.6, ly + leafH * 0.5);
-        ctx.quadraticCurveTo(lx + leafW * 0.3, ly + leafH, lx, ly);
+        ctx.quadraticCurveTo(lx + leafW * 0.8, ly - leafH * 1.2, lx + leafW * 0.5, ly + leafH * 0.3);
+        ctx.quadraticCurveTo(lx + leafW * 0.2, ly + leafH * 0.8, lx, ly);
         ctx.fill();
+        // Leaf vein
+        ctx.strokeStyle = shadeColor(color, -12);
+        ctx.lineWidth = 0.4;
+        ctx.globalAlpha = isBack ? 0.2 : 0.35;
+        ctx.beginPath();
+        ctx.moveTo(lx, ly);
+        ctx.lineTo(lx + leafW * 0.45, ly + leafH * 0.1);
+        ctx.stroke();
+      }
+    }
+    ctx.globalAlpha = 1;
+  } else {
+    // ── Solid decor — larger, more detailed ──
+    const dw = baseSize * 1.8;
+    const dh = baseSize * 1.2;
+    const dy = subY - dh;
+
+    if (d.decorId.includes('rock') || d.decorId === 'live_rock') {
+      // Rocky pile: 4-5 overlapping boulders with shadows
+      const rng = seededRng(Math.round(d.x * 10000) + 55);
+      const rockCount = 4 + Math.floor(rng() * 2);
+      for (let r = 0; r < rockCount; r++) {
+        const rx = x + (rng() - 0.5) * dw * 0.6;
+        const ry = subY - rng() * dh * 0.9 - 2;
+        const rw = dw * (0.25 + rng() * 0.3);
+        const rh = dh * (0.2 + rng() * 0.25);
+        // Shadow
+        ctx.fillStyle = 'rgba(0,0,0,.12)';
+        ctx.beginPath();
+        ctx.ellipse(rx + 2, ry + 2, rw/2, rh/2, 0, Math.PI, 0);
+        ctx.fill();
+        // Rock body
+        ctx.fillStyle = shadeColor(color, ((rng() - 0.5) * 35) | 0);
+        ctx.beginPath();
+        ctx.ellipse(rx, ry, rw/2, rh/2, rng()*0.3, Math.PI, 0);
+        ctx.fill();
+        // Highlight
+        ctx.fillStyle = shadeColor(color, 30);
+        ctx.globalAlpha = isBack ? 0.15 : 0.35;
+        ctx.beginPath();
+        ctx.ellipse(rx - rw*0.12, ry - rh*0.2, rw*0.2, rh*0.12, 0, Math.PI, 0);
+        ctx.fill();
+        ctx.globalAlpha = isBack ? 0.55 : 1;
+      }
+    } else if (d.decorId.includes('coral') || d.decorId === 'anemone' || d.decorId === 'sea_fan') {
+      // Coral/anemone: dense branching, swaying tips
+      const rng = seededRng(Math.round(d.x * 10000) + 77);
+      const branches = 5 + Math.floor(rng() * 4);
+      const sway = Math.sin(Date.now() / 2000 + d.x * 5) * 2;
+      for (let b = 0; b < branches; b++) {
+        const bx = x + (rng() - 0.5) * dw * 0.5;
+        const by1 = subY;
+        const height = dh * (0.5 + rng() * 0.5);
+        const by2 = subY - height;
+        const tipX = bx + (rng() - 0.5) * dw * 0.2 + sway;
+        ctx.strokeStyle = shadeColor(color, ((rng() - 0.5) * 30) | 0);
+        ctx.lineWidth = 2.5 + rng() * 2;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(bx, by1);
+        ctx.quadraticCurveTo(bx + (rng()-0.5)*dw*0.3, (by1+by2)/2, tipX, by2);
+        ctx.stroke();
+        // Bulbous tip
+        ctx.fillStyle = shadeColor(color, 25);
+        ctx.beginPath();
+        ctx.arc(tipX, by2, 2.5 + rng()*3, 0, Math.PI*2);
+        ctx.fill();
+        // Sub-branches for anemone
+        if (d.decorId === 'anemone' && rng() > 0.4) {
+          const subX = tipX + (rng()-0.5)*10 + sway*0.5;
+          const subY2 = by2 - 5 - rng()*10;
+          ctx.strokeStyle = shadeColor(color, 15);
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.moveTo(tipX, by2);
+          ctx.lineTo(subX, subY2);
+          ctx.stroke();
+          ctx.fillStyle = shadeColor(color, 35);
+          ctx.beginPath();
+          ctx.arc(subX, subY2, 1.5+rng(), 0, Math.PI*2);
+          ctx.fill();
+        }
+      }
+    } else if (d.decorId === 'cave') {
+      // Cave: large dark arch, moody interior
+      const caveW = dw * 1.3;
+      const caveH = dh * 1.1;
+      // Shadow
+      ctx.fillStyle = 'rgba(0,0,0,.2)';
+      ctx.beginPath();
+      ctx.ellipse(x + 2, subY - caveH*0.3, caveW/2, caveH*0.6, 0, Math.PI, 0);
+      ctx.fill();
+      // Outer rock
+      ctx.fillStyle = shadeColor(color, -10);
+      ctx.beginPath();
+      ctx.moveTo(x - caveW/2, subY);
+      ctx.quadraticCurveTo(x - caveW/2, subY - caveH, x, subY - caveH - 4);
+      ctx.quadraticCurveTo(x + caveW/2, subY - caveH, x + caveW/2, subY);
+      ctx.closePath();
+      ctx.fill();
+      // Dark interior opening
+      ctx.fillStyle = 'rgba(5,5,15,.7)';
+      ctx.beginPath();
+      ctx.ellipse(x, subY - caveH*0.25, caveW*0.3, caveH*0.35, 0, Math.PI, 0);
+      ctx.closePath();
+      ctx.fill();
+      // Highlight on top
+      ctx.fillStyle = shadeColor(color, 20);
+      ctx.globalAlpha = isBack ? 0.2 : 0.4;
+      ctx.beginPath();
+      ctx.ellipse(x - caveW*0.1, subY - caveH*0.7, caveW*0.2, caveH*0.12, -0.2, 0, Math.PI*2);
+      ctx.fill();
+      ctx.globalAlpha = isBack ? 0.55 : 1;
+    } else if (d.decorId.includes('wood') || d.decorId === 'mossy_log' || d.decorId === 'hollow_stump') {
+      // Driftwood/logs: gnarled branching shape
+      const rng = seededRng(Math.round(d.x * 10000) + 33);
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.moveTo(x - dw/2, subY - 2);
+      ctx.quadraticCurveTo(x - dw*0.3, dy - 8, x - dw*0.1, dy - 4);
+      ctx.quadraticCurveTo(x + dw*0.2, dy - 12, x + dw*0.4, dy);
+      ctx.quadraticCurveTo(x + dw/2, subY - 6, x + dw/2, subY);
+      ctx.closePath();
+      ctx.fill();
+      // Wood grain texture lines
+      ctx.strokeStyle = shadeColor(color, -15);
+      ctx.lineWidth = 0.5;
+      ctx.globalAlpha = isBack ? 0.2 : 0.4;
+      for (let g = 0; g < 4; g++) {
+        const gy = dy + g * dh * 0.2 + rng() * 5;
+        ctx.beginPath();
+        ctx.moveTo(x - dw*0.3, gy);
+        ctx.quadraticCurveTo(x, gy - 2 + rng()*4, x + dw*0.3, gy + rng()*3);
+        ctx.stroke();
+      }
+      ctx.globalAlpha = isBack ? 0.55 : 1;
+      // Moss coating on top
+      if (d.decorId === 'mossy_log') {
+        const mossRng = seededRng(Math.round(d.x * 10000) + 88);
+        ctx.fillStyle = '#3a8a3a';
+        ctx.globalAlpha = isBack ? 0.35 : 0.65;
+        for (let m = 0; m < 8; m++) {
+          const mx = x - dw*0.3 + mossRng() * dw * 0.6;
+          const my = dy - 2 + mossRng() * 6;
+          ctx.beginPath();
+          ctx.arc(mx, my, 2 + mossRng()*3, 0, Math.PI*2);
+          ctx.fill();
+        }
+        ctx.globalAlpha = isBack ? 0.55 : 1;
       }
     } else {
-      // Solid decor — draw proper shapes based on type
-      const dw = baseSize * 1.4;
-      const dh = baseSize * 0.9;
-      const dy = subY - dh;
-
-      if (d.decorId.includes('rock') || d.decorId === 'live_rock') {
-        // Rocky pile with highlights
-        const rng = seededRng(Math.round(d.x * 10000) + 55);
-        for (let r = 0; r < 3; r++) {
-          const rx = x + (rng() - 0.5) * dw * 0.5;
-          const ry = subY - rng() * dh * 0.8;
-          const rw = dw * (0.3 + rng() * 0.3);
-          const rh = dh * (0.25 + rng() * 0.3);
-          ctx.fillStyle = shadeColor(color, ((rng() - 0.5) * 30) | 0);
-          ctx.beginPath();
-          ctx.ellipse(rx, ry, rw / 2, rh / 2, 0, Math.PI, 0);
-          ctx.fill();
-          ctx.fillStyle = shadeColor(color, 25);
-          ctx.globalAlpha = 0.3;
-          ctx.beginPath();
-          ctx.ellipse(rx - rw * 0.1, ry - rh * 0.15, rw * 0.25, rh * 0.15, 0, Math.PI, 0);
-          ctx.fill();
-          ctx.globalAlpha = 1;
-        }
-      } else if (d.decorId.includes('coral') || d.decorId === 'anemone' || d.decorId === 'sea_fan') {
-        // Coral/anemone style: branching shapes
-        const rng = seededRng(Math.round(d.x * 10000) + 77);
-        const branches = 3 + Math.floor(rng() * 3);
-        for (let b = 0; b < branches; b++) {
-          const bx = x + (rng() - 0.5) * dw * 0.4;
-          const by1 = subY;
-          const by2 = subY - dh * (0.5 + rng() * 0.5);
-          ctx.strokeStyle = shadeColor(color, ((rng() - 0.5) * 30) | 0);
-          ctx.lineWidth = 2 + rng() * 2;
-          ctx.lineCap = 'round';
-          ctx.beginPath();
-          ctx.moveTo(bx, by1);
-          ctx.quadraticCurveTo(bx + (rng() - 0.5) * dw * 0.3, (by1 + by2) / 2, bx + (rng() - 0.5) * dw * 0.2, by2);
-          ctx.stroke();
-          // Branch tip
-          ctx.fillStyle = shadeColor(color, 20);
-          ctx.beginPath();
-          ctx.arc(bx + (rng() - 0.5) * 4, by2, 2 + rng() * 2, 0, Math.PI * 2);
-          ctx.fill();
-        }
-      } else {
-        // Generic rounded shape (driftwood, chest, log, stump, cave, moss_ball)
-        ctx.fillStyle = color;
-        ctx.beginPath();
-        ctx.moveTo(x - dw / 2, subY);
-        ctx.quadraticCurveTo(x - dw / 2, dy, x - dw * 0.1, dy - 3);
-        ctx.quadraticCurveTo(x + dw * 0.1, dy - 5, x + dw / 2, dy);
-        ctx.quadraticCurveTo(x + dw / 2, subY - 2, x + dw / 2, subY);
-        ctx.closePath();
-        ctx.fill();
-        // Shading highlight
-        ctx.fillStyle = shadeColor(color, 15);
-        ctx.globalAlpha = 0.4;
-        ctx.beginPath();
-        ctx.ellipse(x, dy + dh * 0.2, dw * 0.3, dh * 0.15, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.globalAlpha = 1;
-      }
+      // Generic (treasure_chest, moss_ball, etc.) — rounder, more prominent
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.moveTo(x - dw/2, subY);
+      ctx.quadraticCurveTo(x - dw/2, dy - 2, x - dw*0.1, dy - 6);
+      ctx.quadraticCurveTo(x + dw*0.1, dy - 8, x + dw/2, dy);
+      ctx.quadraticCurveTo(x + dw/2, subY - 2, x + dw/2, subY);
+      ctx.closePath();
+      ctx.fill();
+      // Shading highlight
+      ctx.fillStyle = shadeColor(color, 18);
+      ctx.globalAlpha = isBack ? 0.2 : 0.45;
+      ctx.beginPath();
+      ctx.ellipse(x, dy + dh*0.2, dw*0.25, dh*0.12, 0, 0, Math.PI*2);
+      ctx.fill();
+      ctx.globalAlpha = isBack ? 0.55 : 1;
     }
   }
 }
@@ -842,6 +1023,21 @@ function updateFishAnim(fish, dt) {
     if (!schoolingSpecies.has(sid)) delete schoolAnchors[sid];
   }
 
+  // ── Territorial behavior: find fish near other fish's claimed decor ──
+  // Build map of claimed decor positions
+  const claimedDecorZones = []; // { fishId, x, y, radius, speciesId }
+  const tank = gameState?.tanks?.[activeTankId];
+  const decors = tank?.decor || [];
+  for (const f of fish) {
+    const sp = tankCat?.content?.fish?.[f.speciesId];
+    const nearDecor = sp?.preferences?.nearDecor;
+    if (!nearDecor) continue;
+    // Find the decor this fish claims
+    const claimed = decors.find(d => d.decorId === nearDecor);
+    if (!claimed) continue;
+    claimedDecorZones.push({ fishId: f.id, x: claimed.x, y: claimed.y * 0.85, radius: 0.12, speciesId: f.speciesId });
+  }
+
   for (const f of fish) {
     let anim = fishAnims[f.id];
     if (!anim) {
@@ -862,6 +1058,7 @@ function updateFishAnim(fish, dt) {
         movementType: movType,
         wiggle: false,
         wiggleTimer: 0,
+        dashSpeed: 0, // territorial dash boost
       };
       // Crawl types start on bottom
       if (movType === 'crawl') {
@@ -881,6 +1078,58 @@ function updateFishAnim(fish, dt) {
 
     const sp = tankCat?.content?.fish?.[f.speciesId];
     const movType = anim.movementType || 'default';
+
+    // ── Territorial: check if this fish is inside someone else's claimed zone ──
+    let beingChased = false;
+    for (const zone of claimedDecorZones) {
+      if (zone.fishId === f.id) continue; // own zone
+      if (zone.speciesId === f.speciesId) continue; // same species OK
+      const distToDecor = Math.sqrt((anim.x - zone.x)*(anim.x - zone.x) + (anim.y - zone.y)*(anim.y - zone.y));
+      if (distToDecor < zone.radius) {
+        // This fish is trespassing! Flee away from the decor
+        const fleeAngle = Math.atan2(anim.y - zone.y, anim.x - zone.x);
+        anim.tx = Math.max(0.08, Math.min(0.92, anim.x + Math.cos(fleeAngle) * 0.25));
+        anim.ty = Math.max(0.08, Math.min(0.85, anim.y + Math.sin(fleeAngle) * 0.15));
+        anim.dashSpeed = 3.0; // flee fast
+        beingChased = true;
+        break;
+      }
+    }
+
+    // ── Territorial: owner dashes at intruders near its claimed decor ──
+    const myNearDecor = sp?.preferences?.nearDecor;
+    if (myNearDecor && !beingChased) {
+      const myDecor = decors.find(d => d.decorId === myNearDecor);
+      if (myDecor) {
+        // Check if any other-species fish is near my decor
+        let intruder = null;
+        let intruderDist = Infinity;
+        for (const of2 of fish) {
+          if (of2.id === f.id || of2.speciesId === f.speciesId) continue;
+          const oa = fishAnims[of2.id];
+          if (!oa) continue;
+          const d2 = Math.sqrt((oa.x - myDecor.x)*(oa.x - myDecor.x) + (oa.y - myDecor.y*0.85)*(oa.y - myDecor.y*0.85));
+          if (d2 < 0.14 && d2 < intruderDist) { intruder = of2; intruderDist = d2; }
+        }
+        if (intruder) {
+          // Dash toward the intruder to chase it away
+          const ia = fishAnims[intruder.id];
+          if (ia) {
+            anim.tx = ia.x;
+            anim.ty = ia.y;
+            anim.dashSpeed = 2.5;
+          }
+        } else if (anim.dashSpeed > 0.1) {
+          // Return to near decor
+          anim.tx = myDecor.x + (Math.random() - 0.5) * 0.08;
+          anim.ty = myDecor.y * 0.85 + (Math.random() - 0.5) * 0.06;
+          anim.dashSpeed *= 0.92; // slow down return
+        }
+      }
+    }
+    // Decay dash speed
+    if (anim.dashSpeed > 0) anim.dashSpeed *= (1 - dt * 2);
+    if (anim.dashSpeed < 0.05) anim.dashSpeed = 0;
 
     // Move toward target
     const dx = anim.tx - anim.x;
@@ -955,11 +1204,12 @@ function updateFishAnim(fish, dt) {
       }
     }
 
-    // Speed varies by movement type
+    // Speed varies by movement type + territorial dash boost
     let baseSpd = (chaseTarget ? 1.5 : 0.6) * anim.speed;
     if (movType === 'crawl') baseSpd *= 0.25; // snails are very slow
     if (movType === 'snake') baseSpd *= 0.5; // eels are moderate
     if (movType === 'glass') baseSpd *= 0.4; // plecos are slow
+    baseSpd *= (1 + (anim.dashSpeed || 0)); // territorial dash boost
     const spd = baseSpd * dt;
 
     anim.x += dx * spd * 2;
@@ -2362,12 +2612,13 @@ function gameLoop(timestamp) {
   updateFoodParticles(dt);
   updateBubbles(dt, activeTankId);
 
-  // Render
+  // Render (layered: back decor → equipment → fish → front decor → particles)
   ctx.clearRect(0, 0, W, H);
   renderEnvironment(activeTankId);
-  renderDecor(tank?.decor, activeTankId);
+  renderDecorBack(tank?.decor, activeTankId);
   renderEquipment(tank?.toolsOwned);
   renderFish(fish);
+  renderDecorFront(tank?.decor, activeTankId);
   renderFoodParticles();
   renderBubbles();
   renderLaser();

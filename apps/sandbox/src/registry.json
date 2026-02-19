@@ -159,6 +159,183 @@
     }
   },
   {
+    "id": "timer",
+    "app": "com.nielsvanbrakel.widgetbox-utilities",
+    "name": {
+      "en": "Timer",
+      "nl": "Timer"
+    },
+    "settings": [
+      {
+        "id": "allowAddingTimers",
+        "type": "checkbox",
+        "label": {
+          "en": "Allow adding new timers",
+          "nl": "Nieuwe timers toevoegen toestaan"
+        },
+        "value": true
+      },
+      {
+        "id": "defaultHours",
+        "type": "number",
+        "label": {
+          "en": "Default timer hours",
+          "nl": "Standaard timer uren"
+        },
+        "hint": {
+          "en": "Hours for new timers (0-23)",
+          "nl": "Uren voor nieuwe timers (0-23)"
+        },
+        "min": 0,
+        "max": 23,
+        "value": 0
+      },
+      {
+        "id": "defaultMinutes",
+        "type": "number",
+        "label": {
+          "en": "Default timer minutes",
+          "nl": "Standaard timer minuten"
+        },
+        "hint": {
+          "en": "Minutes for new timers (0-59)",
+          "nl": "Minuten voor nieuwe timers (0-59)"
+        },
+        "min": 0,
+        "max": 59,
+        "value": 5
+      },
+      {
+        "id": "defaultSeconds",
+        "type": "number",
+        "label": {
+          "en": "Default timer seconds",
+          "nl": "Standaard timer seconden"
+        },
+        "hint": {
+          "en": "Seconds for new timers (0-59)",
+          "nl": "Seconden voor nieuwe timers (0-59)"
+        },
+        "min": 0,
+        "max": 59,
+        "value": 0
+      },
+      {
+        "id": "initialTimers",
+        "type": "number",
+        "label": {
+          "en": "Number of timers to start with",
+          "nl": "Aantal timers bij starten"
+        },
+        "hint": {
+          "en": "How many timers to show when the widget first loads",
+          "nl": "Hoeveel timers worden getoond wanneer de widget wordt geladen"
+        },
+        "min": 1,
+        "max": 10,
+        "value": 1
+      },
+      {
+        "id": "maxTimers",
+        "type": "number",
+        "label": {
+          "en": "Maximum count",
+          "nl": "Aantal timers"
+        },
+        "hint": {
+          "en": "Maximum number of timers that can be active at once (1-10)",
+          "nl": "Maximaal aantal timers dat tegelijk actief kan zijn (1-10)"
+        },
+        "min": 1,
+        "max": 10,
+        "value": 3
+      }
+    ],
+    "isTransparent": false,
+    "height": 200,
+    "path": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-utilities/widgets/timer/public/index.html",
+    "absolutePath": "/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-utilities/widgets/timer",
+    "locales": {
+      "en": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-utilities/locales/en.json",
+      "nl": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-utilities/locales/nl.json"
+    }
+  },
+  {
+    "id": "stopwatch",
+    "app": "com.nielsvanbrakel.widgetbox-utilities",
+    "name": {
+      "en": "Stopwatch",
+      "nl": "Stopwatch"
+    },
+    "settings": [
+      {
+        "id": "allowAddingStopwatches",
+        "type": "checkbox",
+        "label": {
+          "en": "Allow adding stopwatches",
+          "nl": "Stopwatches toevoegen toestaan"
+        },
+        "value": true
+      },
+      {
+        "id": "maxStopwatches",
+        "type": "number",
+        "label": {
+          "en": "Maximum stopwatches",
+          "nl": "Maximaal aantal stopwatches"
+        },
+        "hint": {
+          "en": "Maximum number of stopwatches that can run simultaneously (1-5)",
+          "nl": "Maximaal aantal stopwatches dat tegelijk kan draaien (1-5)"
+        },
+        "min": 1,
+        "max": 10,
+        "value": 3
+      },
+      {
+        "id": "initialStopwatches",
+        "type": "number",
+        "label": {
+          "en": "Number of stopwatches to start with",
+          "nl": "Aantal stopwatches bij starten"
+        },
+        "hint": {
+          "en": "How many stopwatches to show when the widget first loads",
+          "nl": "Hoeveel stopwatches worden getoond wanneer de widget wordt geladen"
+        },
+        "min": 1,
+        "max": 5,
+        "value": 1
+      },
+      {
+        "id": "showLaps",
+        "type": "checkbox",
+        "label": {
+          "en": "Show lap times",
+          "nl": "Toon rondetijden"
+        },
+        "value": false
+      },
+      {
+        "id": "showMilliseconds",
+        "type": "checkbox",
+        "label": {
+          "en": "Show milliseconds",
+          "nl": "Toon milliseconden"
+        },
+        "value": true
+      }
+    ],
+    "isTransparent": false,
+    "height": 200,
+    "path": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-utilities/widgets/stopwatch/public/index.html",
+    "absolutePath": "/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-utilities/widgets/stopwatch",
+    "locales": {
+      "en": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-utilities/locales/en.json",
+      "nl": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-utilities/locales/nl.json"
+    }
+  },
+  {
     "id": "windy",
     "app": "com.nielsvanbrakel.widgetbox-windy",
     "name": {
@@ -548,210 +725,6 @@
     }
   },
   {
-    "id": "timer",
-    "app": "com.nielsvanbrakel.widgetbox-utilities",
-    "name": {
-      "en": "Timer",
-      "nl": "Timer"
-    },
-    "settings": [
-      {
-        "id": "allowAddingTimers",
-        "type": "checkbox",
-        "label": {
-          "en": "Allow adding new timers",
-          "nl": "Nieuwe timers toevoegen toestaan"
-        },
-        "value": true
-      },
-      {
-        "id": "defaultHours",
-        "type": "number",
-        "label": {
-          "en": "Default timer hours",
-          "nl": "Standaard timer uren"
-        },
-        "hint": {
-          "en": "Hours for new timers (0-23)",
-          "nl": "Uren voor nieuwe timers (0-23)"
-        },
-        "min": 0,
-        "max": 23,
-        "value": 0
-      },
-      {
-        "id": "defaultMinutes",
-        "type": "number",
-        "label": {
-          "en": "Default timer minutes",
-          "nl": "Standaard timer minuten"
-        },
-        "hint": {
-          "en": "Minutes for new timers (0-59)",
-          "nl": "Minuten voor nieuwe timers (0-59)"
-        },
-        "min": 0,
-        "max": 59,
-        "value": 5
-      },
-      {
-        "id": "defaultSeconds",
-        "type": "number",
-        "label": {
-          "en": "Default timer seconds",
-          "nl": "Standaard timer seconden"
-        },
-        "hint": {
-          "en": "Seconds for new timers (0-59)",
-          "nl": "Seconden voor nieuwe timers (0-59)"
-        },
-        "min": 0,
-        "max": 59,
-        "value": 0
-      },
-      {
-        "id": "initialTimers",
-        "type": "number",
-        "label": {
-          "en": "Number of timers to start with",
-          "nl": "Aantal timers bij starten"
-        },
-        "hint": {
-          "en": "How many timers to show when the widget first loads",
-          "nl": "Hoeveel timers worden getoond wanneer de widget wordt geladen"
-        },
-        "min": 1,
-        "max": 10,
-        "value": 1
-      },
-      {
-        "id": "maxTimers",
-        "type": "number",
-        "label": {
-          "en": "Maximum count",
-          "nl": "Aantal timers"
-        },
-        "hint": {
-          "en": "Maximum number of timers that can be active at once (1-10)",
-          "nl": "Maximaal aantal timers dat tegelijk actief kan zijn (1-10)"
-        },
-        "min": 1,
-        "max": 10,
-        "value": 3
-      }
-    ],
-    "isTransparent": false,
-    "height": 200,
-    "path": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-utilities/widgets/timer/public/index.html",
-    "absolutePath": "/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-utilities/widgets/timer",
-    "locales": {
-      "en": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-utilities/locales/en.json",
-      "nl": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-utilities/locales/nl.json"
-    }
-  },
-  {
-    "id": "stopwatch",
-    "app": "com.nielsvanbrakel.widgetbox-utilities",
-    "name": {
-      "en": "Stopwatch",
-      "nl": "Stopwatch"
-    },
-    "settings": [
-      {
-        "id": "allowAddingStopwatches",
-        "type": "checkbox",
-        "label": {
-          "en": "Allow adding stopwatches",
-          "nl": "Stopwatches toevoegen toestaan"
-        },
-        "value": true
-      },
-      {
-        "id": "maxStopwatches",
-        "type": "number",
-        "label": {
-          "en": "Maximum stopwatches",
-          "nl": "Maximaal aantal stopwatches"
-        },
-        "hint": {
-          "en": "Maximum number of stopwatches that can run simultaneously (1-5)",
-          "nl": "Maximaal aantal stopwatches dat tegelijk kan draaien (1-5)"
-        },
-        "min": 1,
-        "max": 10,
-        "value": 3
-      },
-      {
-        "id": "initialStopwatches",
-        "type": "number",
-        "label": {
-          "en": "Number of stopwatches to start with",
-          "nl": "Aantal stopwatches bij starten"
-        },
-        "hint": {
-          "en": "How many stopwatches to show when the widget first loads",
-          "nl": "Hoeveel stopwatches worden getoond wanneer de widget wordt geladen"
-        },
-        "min": 1,
-        "max": 5,
-        "value": 1
-      },
-      {
-        "id": "showLaps",
-        "type": "checkbox",
-        "label": {
-          "en": "Show lap times",
-          "nl": "Toon rondetijden"
-        },
-        "value": false
-      },
-      {
-        "id": "showMilliseconds",
-        "type": "checkbox",
-        "label": {
-          "en": "Show milliseconds",
-          "nl": "Toon milliseconden"
-        },
-        "value": true
-      }
-    ],
-    "isTransparent": false,
-    "height": 200,
-    "path": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-utilities/widgets/stopwatch/public/index.html",
-    "absolutePath": "/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-utilities/widgets/stopwatch",
-    "locales": {
-      "en": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-utilities/locales/en.json",
-      "nl": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-utilities/locales/nl.json"
-    }
-  },
-  {
-    "id": "aquarium",
-    "app": "com.nielsvanbrakel.widgetbox-games",
-    "name": {
-      "en": "Aquarium",
-      "nl": "Aquarium"
-    },
-    "settings": [
-      {
-        "type": "checkbox",
-        "id": "reset_state",
-        "label": {
-          "en": "Reset Aquarium",
-          "nl": "Aquarium Resetten"
-        },
-        "value": false
-      }
-    ],
-    "isTransparent": false,
-    "height": "75%",
-    "path": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-games/widgets/aquarium/public/index.html",
-    "absolutePath": "/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-games/widgets/aquarium",
-    "locales": {
-      "en": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-games/locales/en.json",
-      "nl": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-games/locales/nl.json"
-    }
-  },
-  {
     "id": "spacer",
     "app": "com.nielsvanbrakel.widgetbox-layout",
     "name": {
@@ -783,6 +756,33 @@
     "locales": {
       "en": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-layout/locales/en.json",
       "nl": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-layout/locales/nl.json"
+    }
+  },
+  {
+    "id": "aquarium",
+    "app": "com.nielsvanbrakel.widgetbox-games",
+    "name": {
+      "en": "Aquarium",
+      "nl": "Aquarium"
+    },
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "reset_state",
+        "label": {
+          "en": "Reset Aquarium",
+          "nl": "Aquarium Resetten"
+        },
+        "value": false
+      }
+    ],
+    "isTransparent": false,
+    "height": "75%",
+    "path": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-games/widgets/aquarium/public/index.html",
+    "absolutePath": "/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-games/widgets/aquarium",
+    "locales": {
+      "en": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-games/locales/en.json",
+      "nl": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-games/locales/nl.json"
     }
   },
   {

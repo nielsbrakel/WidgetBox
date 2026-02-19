@@ -34,6 +34,15 @@ export class GamesPage extends SandboxPage {
     get fbDetail() { return this.iframe.locator('#fbDetail'); }
     get fbStage() { return this.iframe.locator('#fbStage'); }
 
+    // ── Decor card ───────────────────────────────────────────────────────
+
+    get decorCard() { return this.iframe.locator('#decorCard'); }
+    get dcName() { return this.iframe.locator('#dcName'); }
+    get dcInfo() { return this.iframe.locator('#dcInfo'); }
+    get dcActions() { return this.iframe.locator('#dcActions'); }
+    get dcTrimBtn() { return this.iframe.locator('[data-trim-decor]'); }
+    get dcSellBtn() { return this.iframe.locator('[data-sell-decor-card]'); }
+
     // ── FAB & Menu ───────────────────────────────────────────────────────
 
     get fab() { return this.iframe.locator('#fab'); }

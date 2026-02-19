@@ -34,6 +34,9 @@ export const SCENARIOS = {
         'movement-showcase':    { label: 'Movement Types Showcase',    type: 'mock', group: 'New Features' },
         'schooling-showcase':   { label: 'Schooling Fish (10 tetras)', type: 'mock', group: 'New Features' },
         'floating-decor':       { label: 'Floating Plants & Decor',    type: 'mock', group: 'New Features' },
+        'territorial-showcase': { label: 'Territorial Fish Behavior',  type: 'mock', group: 'Design Overhaul' },
+        'lush-planted':         { label: 'Lush Planted Tank (Depth)',  type: 'mock', group: 'Design Overhaul' },
+        'size-showcase':        { label: 'Fish Size Showcase',         type: 'mock', group: 'Design Overhaul' },
     }
 };
 

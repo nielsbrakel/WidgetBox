@@ -135,8 +135,8 @@ const CATALOG = {
                     clownfish: { name: 'Clownfish', basePrice: 50, baseCoinPerHour: 5.5, hungerRate: 1.0, spaceCost: 3, diet: { accepts: ['marine_pellets', 'reef_flakes', 'frozen_brine'] }, requirements: { tools: [...SALT_TOOL_REQS], decor: [{ decorId: 'anemone', penalty: 40 }] }, preferences: { nearDecor: 'anemone', zonePreference: 'middle' }, visuals: { spriteKey: 'clownfish' } },
                     blue_tang: { name: 'Blue Tang', basePrice: 75, baseCoinPerHour: 7.0, hungerRate: 1.1, spaceCost: 4, diet: { accepts: ['marine_pellets', 'reef_flakes'] }, requirements: { tools: [...SALT_TOOL_REQS] }, preferences: { zonePreference: 'middle' }, visuals: { spriteKey: 'blue_tang' } },
                     green_chromis: { name: 'Green Chromis', basePrice: 35, baseCoinPerHour: 3.0, hungerRate: 0.8, spaceCost: 0.5, diet: { accepts: ['reef_flakes', 'frozen_brine'] }, requirements: { tools: [...SALT_TOOL_REQS] }, preferences: { zonePreference: 'middle', schooling: true }, visuals: { spriteKey: 'green_chromis' } },
-                    firefish: { name: 'Firefish', basePrice: 45, baseCoinPerHour: 4.5, hungerRate: 0.9, spaceCost: 1, diet: { accepts: ['reef_flakes', 'frozen_brine'] }, requirements: { tools: [...SALT_TOOL_REQS] }, preferences: { zonePreference: 'middle' }, visuals: { spriteKey: 'firefish' } },
-                    royal_gramma: { name: 'Royal Gramma', basePrice: 55, baseCoinPerHour: 5.0, hungerRate: 0.9, spaceCost: 2, diet: { accepts: ['marine_pellets', 'reef_flakes'] }, requirements: { tools: [...SALT_TOOL_REQS] }, preferences: { zonePreference: 'bottom' }, visuals: { spriteKey: 'royal_gramma' } },
+                    firefish: { name: 'Firefish', basePrice: 45, baseCoinPerHour: 4.5, hungerRate: 0.9, spaceCost: 1, diet: { accepts: ['reef_flakes', 'frozen_brine'] }, requirements: { tools: [...SALT_TOOL_REQS] }, preferences: { nearDecor: 'brain_coral', zonePreference: 'middle' }, visuals: { spriteKey: 'firefish' } },
+                    royal_gramma: { name: 'Royal Gramma', basePrice: 55, baseCoinPerHour: 5.0, hungerRate: 0.9, spaceCost: 2, diet: { accepts: ['marine_pellets', 'reef_flakes'] }, requirements: { tools: [...SALT_TOOL_REQS] }, preferences: { nearDecor: 'cave', zonePreference: 'bottom' }, visuals: { spriteKey: 'royal_gramma' } },
                     banggai_cardinal: { name: 'Banggai Cardinalfish', basePrice: 40, baseCoinPerHour: 3.5, hungerRate: 0.8, spaceCost: 0.5, diet: { accepts: ['reef_flakes', 'frozen_brine'] }, requirements: { tools: [...SALT_TOOL_REQS] }, preferences: { zonePreference: 'middle', schooling: true }, visuals: { spriteKey: 'banggai_cardinal' } },
                     moray_eel: { name: 'Moray Eel', basePrice: 120, baseCoinPerHour: 10.0, hungerRate: 1.3, spaceCost: 6, maxPerTank: 1, diet: { accepts: ['marine_pellets', 'frozen_brine', 'live_shrimp'] }, requirements: { tools: [...SALT_TOOL_REQS], decor: [{ decorId: 'cave', penalty: 55 }] }, preferences: { nearDecor: 'cave', zonePreference: 'bottom', movementType: 'snake' }, visuals: { spriteKey: 'moray_eel' } },
                     cleaner_shrimp: { name: 'Cleaner Shrimp', basePrice: 60, baseCoinPerHour: 2.0, hungerRate: 0.5, spaceCost: 1, diet: { accepts: ['reef_flakes'] }, requirements: { tools: [...SALT_TOOL_REQS] }, preferences: { zonePreference: 'bottom', movementType: 'crawl' }, utility: { dirtReduction: 0.08 }, visuals: { spriteKey: 'cleaner_shrimp' } },
@@ -186,8 +186,8 @@ function createFishInstance(speciesId, overrides) {
     };
 }
 
-function createDecorInstance(decorId, x, y) {
-    return { id: generateId(), decorId, x: x ?? (0.2 + Math.random() * 0.6), y: y ?? 0.85, size: 1.0, placedAt: Date.now(), state: {} };
+function createDecorInstance(decorId, x, y, overrides) {
+    return { id: generateId(), decorId, x: x ?? (0.2 + Math.random() * 0.6), y: y ?? 0.85, size: 1.0, placedAt: Date.now(), state: {}, ...(overrides || {}) };
 }
 
 function createInitialState() {
@@ -817,6 +817,115 @@ function createScenarioState(scenarioId) {
                 createDecorInstance('mossy_log', 0.7, 0.85),
             ];
             s.lifetime.coinsEarned = 1500;
+            return s;
+        }
+        case 'territorial-showcase': {
+            // Fish defending their claimed decor zones — clownfish → anemone, moray → cave, firefish → coral, royal_gramma → cave
+            const s = createInitialState();
+            s.tanks.fresh.unlocked = true;
+            s.tanks.tropical.unlocked = true;
+            s.tanks.salt.unlocked = true;
+            s.activeTankId = 'salt';
+            s.tanks.salt.coins = 3000;
+            s.tanks.salt.toolsOwned = { filter_salt: 2, skimmer: 1, uv_sterilizer: 1 };
+            s.tanks.salt.foodStock = { marine_pellets: 20, reef_flakes: 20, frozen_brine: 10 };
+            s.tanks.salt.fish = [
+                createFishInstance('clownfish', { hunger: 85 }),           // defends anemone
+                createFishInstance('moray_eel', { hunger: 80 }),           // defends cave
+                createFishInstance('firefish', { hunger: 75 }),            // defends coral
+                createFishInstance('royal_gramma', { hunger: 70 }),        // also claims cave area
+                createFishInstance('blue_tang', { hunger: 80 }),           // intruder — no territory
+                createFishInstance('blue_tang', { hunger: 75 }),           // intruder — no territory
+                createFishInstance('green_chromis', { hunger: 60 }),       // small schooling
+                createFishInstance('green_chromis', { hunger: 55 }),       // small schooling
+                createFishInstance('green_chromis', { hunger: 50 }),       // small schooling
+                createFishInstance('banggai_cardinal', { hunger: 65 }),    // schooling
+            ]; // 3+6+1+2+4+4+0.5+0.5+0.5+0.5 = 22 — over capacity but good for showing territory
+            s.tanks.salt.decor = [
+                createDecorInstance('anemone', 0.25, 0.7),
+                createDecorInstance('cave', 0.75, 0.85),
+                createDecorInstance('brain_coral', 0.5, 0.75),
+                createDecorInstance('live_rock', 0.4, 0.85),
+            ];
+            s.lifetime.coinsEarned = 5000;
+            return s;
+        }
+        case 'lush-planted': {
+            // Densely planted tank with layered decorations demonstrating depth rendering
+            const s = createInitialState();
+            s.tanks.fresh.unlocked = true;
+            s.tanks.tropical.unlocked = true;
+            s.activeTankId = 'tropical';
+            s.tanks.tropical.coins = 2000;
+            s.tanks.tropical.toolsOwned = { heater: 1, filter_tropical: 2 };
+            s.tanks.tropical.foodStock = { tropical_flakes: 20, pellets: 10, bloodworms: 5, algae_wafer: 5 };
+            s.tanks.tropical.fish = [
+                createFishInstance('discus', { hunger: 85, level: 2 }),
+                createFishInstance('neon_tetra', { hunger: 80 }),
+                createFishInstance('neon_tetra', { hunger: 75 }),
+                createFishInstance('neon_tetra', { hunger: 70 }),
+                createFishInstance('neon_tetra', { hunger: 65 }),
+                createFishInstance('gourami', { hunger: 80, level: 2 }),
+                createFishInstance('pleco', { hunger: 85 }),
+            ]; // 3+0.5*4+2+2 = 9/14
+            s.tanks.tropical.decor = [
+                createDecorInstance('java_fern', 0.15, 0.8, { size: 2.5 }),
+                createDecorInstance('amazon_sword', 0.35, 0.8, { size: 3.0 }),
+                createDecorInstance('java_fern', 0.55, 0.8, { size: 2.0 }),
+                createDecorInstance('amazon_sword', 0.75, 0.8, { size: 2.8 }),
+                createDecorInstance('floating_plants', 0.3, 0.1),
+                createDecorInstance('floating_plants', 0.7, 0.1),
+                createDecorInstance('mossy_log', 0.5, 0.85),
+                createDecorInstance('hollow_stump', 0.85, 0.85),
+            ];
+            s.lifetime.coinsEarned = 3000;
+            return s;
+        }
+        case 'size-showcase': {
+            // All fish sizes on display — from tiny tetras to massive moray
+            const s = createInitialState();
+            s.tanks.fresh.unlocked = true;
+            s.tanks.tropical.unlocked = true;
+            s.tanks.salt.unlocked = true;
+            s.activeTankId = 'salt';
+            s.tanks.salt.coins = 5000;
+            s.tanks.salt.toolsOwned = { filter_salt: 2, skimmer: 1, uv_sterilizer: 1 };
+            s.tanks.salt.foodStock = { marine_pellets: 20, reef_flakes: 20, frozen_brine: 10, live_shrimp: 5 };
+            s.tanks.salt.fish = [
+                createFishInstance('green_chromis', { hunger: 80 }),       // tiny (0.65 scale)
+                createFishInstance('green_chromis', { hunger: 75 }),       // tiny
+                createFishInstance('banggai_cardinal', { hunger: 70 }),    // small (0.85 scale)
+                createFishInstance('clownfish', { hunger: 85 }),           // medium (1.1 scale)
+                createFishInstance('firefish', { hunger: 75 }),            // medium
+                createFishInstance('blue_tang', { hunger: 80 }),           // large (1.8 scale)
+                createFishInstance('moray_eel', { hunger: 70 }),           // very large (2.8 scale)
+                createFishInstance('cleaner_shrimp', { hunger: 80 }),      // crawling
+            ];
+            s.tanks.salt.decor = [
+                createDecorInstance('anemone', 0.3, 0.7),
+                createDecorInstance('cave', 0.7, 0.85),
+                createDecorInstance('brain_coral', 0.5, 0.75),
+            ];
+            // Also populate tropical with different sizes
+            s.tanks.tropical.toolsOwned = { heater: 1, filter_tropical: 1 };
+            s.tanks.tropical.fish = [
+                createFishInstance('neon_tetra', { hunger: 80 }),          // tiny (0.65 scale)
+                createFishInstance('neon_tetra', { hunger: 75 }),
+                createFishInstance('neon_tetra', { hunger: 70 }),
+                createFishInstance('blue_eye', { hunger: 80 }),            // small (0.85)
+                createFishInstance('gourami', { hunger: 85 }),             // medium (1.1)
+                createFishInstance('moon_fish', { hunger: 80 }),           // large (1.7)
+                createFishInstance('discus', { hunger: 75, level: 2 }),    // very large (2.0)
+                createFishInstance('pleco', { hunger: 85 }),               // large crawler (1.8)
+            ];
+            s.tanks.tropical.decor = [
+                createDecorInstance('java_fern', 0.3, 0.8),
+                createDecorInstance('amazon_sword', 0.6, 0.8),
+                createDecorInstance('floating_plants', 0.5, 0.1),
+            ];
+            s.tanks.tropical.coins = 1000;
+            s.tanks.tropical.foodStock = { tropical_flakes: 15, pellets: 5, bloodworms: 5, algae_wafer: 5 };
+            s.lifetime.coinsEarned = 5000;
             return s;
         }
         default:

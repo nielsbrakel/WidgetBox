@@ -370,7 +370,7 @@ const CATALOG = {
             hungerRate: 0.9, spaceCost: 1,
             diet: { accepts: ['reef_flakes', 'frozen_brine'] },
             requirements: { tools: [...SALT_TOOL_REQS] },
-            preferences: { zonePreference: 'middle' },
+            preferences: { nearDecor: 'brain_coral', zonePreference: 'middle' },
             visuals: { spriteKey: 'firefish', sizeVarianceRange: [0.9, 1.1] },
           },
           royal_gramma: {
@@ -378,7 +378,7 @@ const CATALOG = {
             hungerRate: 0.9, spaceCost: 2,
             diet: { accepts: ['marine_pellets', 'reef_flakes'] },
             requirements: { tools: [...SALT_TOOL_REQS] },
-            preferences: { zonePreference: 'bottom' },
+            preferences: { nearDecor: 'cave', zonePreference: 'bottom' },
             visuals: { spriteKey: 'royal_gramma', sizeVarianceRange: [0.9, 1.1] },
           },
           banggai_cardinal: {

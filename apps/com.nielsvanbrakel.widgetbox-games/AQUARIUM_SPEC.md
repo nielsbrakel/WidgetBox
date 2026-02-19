@@ -2,8 +2,8 @@
 
 **App:** `com.nielsvanbrakel.widgetbox-games` (Homey WidgetBox)
 **Widget:** `aquarium`
-**Spec version:** 1.2.0
-**Last updated:** 2025-07-18
+**Spec version:** 1.3.0
+**Last updated:** 2025-07-23
 
 > See [docs/changelog/](docs/changelog/) for a history of spec changes between versions.
 
@@ -597,6 +597,33 @@ Fish have species-dependent movement patterns. The `movementType` field in catal
 - Weak fish drift slowly, muted colors
 - **Wiggle on tap:** When a fish is tapped, it stops swimming and wiggles in place (rotation oscillation) for 2 seconds while showing the info bubble
 
+### 8.5 Territorial Behavior
+
+Fish with a `nearDecor` preference in their catalog entry will claim a zone around their preferred decor item and defend it from other fish.
+
+**How it works:**
+1. On each animation frame, the system builds `claimedDecorZones` — a map of decor positions to their owner fish
+2. A fish "claims" a zone if it has `nearDecor` matching a placed decor type and is within range
+3. If another fish (trespasser) enters a claimed zone, the owner dashes toward the trespasser (`dashSpeed = 2.5`) and the trespasser flees (`dashSpeed = 3.0`)
+4. `dashSpeed` decays over time: `dashSpeed *= (1 - dt * 2)`, creating a burst-then-slow effect
+5. The dash speed multiplies into the fish's base movement speed: `baseSpd *= (1 + dashSpeed)`
+
+**Territorial species:**
+
+| Species | Preferred Decor | Behavior |
+|---|---|---|
+| `clownfish` | `anemone` | Classic anemone defense |
+| `moray_eel` | `cave` | Lurks in cave, dashes at intruders |
+| `firefish` | `brain_coral` | Guards coral territory |
+| `royal_gramma` | `cave` | Defends cave entrance |
+
+**Zone mechanics:**
+- Zone radius is proportional to decor base size (decorSize × 0.15 normalized)
+- Multiple fish can claim different decor items simultaneously
+- Non-territorial fish will flee when they wander into claimed zones
+- Fish that are the same species as the owner are not chased
+- The system creates emergent behavior: fish naturally spread out to avoid territorial zones
+
 **Zero-fish tanks:**
 - Tanks are allowed to have zero fish. Selling the last fish is permitted.
 - The sell button always appears in inventory — no minimum fish restriction.
@@ -604,19 +631,30 @@ Fish have species-dependent movement patterns. The `movementType` field in catal
 
 **Species Base Scales (`FISH_BASE_SCALES`):**
 
-Each species has a display scale multiplier applied during rendering so fish appear at species-appropriate sizes:
+Each species has a display scale multiplier applied during rendering so fish appear at species-appropriate sizes. Sprite dimensions vary dramatically (8×4 for tiny schooling fish to 28×5 for moray eel) and scales amplify this further:
 
-| Species | Scale | Species | Scale |
+| Species | Scale | Sprite | Category |
 |---|---|---|---|
-| `guppy` | 1.0 | `neon_tetra` | 0.9 |
-| `goldfish` | 1.5 | `moon_fish` | 1.6 |
-| `snail` | 0.8 | `pleco` | 1.8 |
-| `shrimp` | 0.7 | `gourami` | 1.4 |
-| `discus` | 1.8 | `clownfish` | 1.3 |
-| `green_chromis` | 0.9 | `firefish` | 1.0 |
-| `blue_tang` | 1.7 | `royal_gramma` | 1.1 |
-| `moray_eel` | 2.2 | `banggai_cardinal` | 1.0 |
-| `cleaner_shrimp` | 0.8 |
+| `neon_tetra` | 0.65 | 8×4 | Tiny schooling |
+| `green_chromis` | 0.65 | 8×5 | Tiny schooling |
+| `shrimp` | 0.7 | 10×5 | Tiny crawl |
+| `snail` | 0.75 | 8×6 | Tiny crawl |
+| `guppy` | 0.85 | 10×6 | Small |
+| `blue_eye` | 0.85 | 10×6 | Small |
+| `banggai_cardinal` | 0.85 | 10×8 | Small schooling |
+| `firefish` | 1.1 | 12×6 | Medium |
+| `royal_gramma` | 1.1 | 12×6 | Medium |
+| `clownfish` | 1.2 | 12×8 | Medium |
+| `cleaner_shrimp` | 1.0 | 14×4 | Medium crawl |
+| `gourami` | 1.3 | 14×10 | Medium-large |
+| `goldfish` | 1.6 | 16×10 | Large |
+| `moon_fish` | 1.7 | 14×12 | Large (tall) |
+| `pleco` | 1.8 | 16×8 | Large (flat) |
+| `blue_tang` | 1.8 | 18×12 | Large |
+| `discus` | 2.0 | 16×14 | Very large (disc) |
+| `moray_eel` | 2.8 | 28×5 | Huge (serpentine) |
+
+**Design philosophy:** Fish should be immediately recognizable at a glance. Tiny schooling fish (neon tetras, green chromis) are deliberately small so schools of 10+ look natural. Large fish (discus, moray eel) dominate the visual space. The combination of unique sprite shapes plus scale multipliers creates dramatic size differentiation.
 
 **Level badges:** Level badges (Lv.N) are only shown for the currently tapped fish (`selectedFishId`), with a 5-second auto-clear timer. This prevents visual clutter.
 
@@ -1121,10 +1159,11 @@ The tank fills the **entire** 4:3 viewport. No desk, no frame, no border. The aq
 | 4. Caustic light | 2 | 12 animated dappled elliptical caustic patterns |
 | 5. Substrate | 3 | 120 varied pebbles (multi-size, multi-shade) with 2-line highlight at substrate top + depth fog above |
 | 6. Rock clusters | 4 | Foreground rock formations (if biome has them) |
-| 7. Placed decor | 5 | Player-placed items — lily-pad clusters, multi-stem plants, rock piles, coral branches, generic shapes with shading (baseSize = PX_SCALE × 8) |
+| 7. **Back decor layer** | 5 | Every 3rd decor item rendered at 55% opacity (behind fish for depth) |
 | 8. Equipment | 6 | Filter, heater, skimmer, UV sterilizer rendered as pixel art sprites from ICON_DATA with level indicator dots |
 | 9. Fish sprites | 7 | All fish, pixel-rendered with species data and FISH_BASE_SCALES |
 | 10. Movement-type sprites | 8 | Crawl (snail/shrimp on substrate), glass (pleco on walls, vertical), snake (moray undulation) |
+| 10.5. **Front decor layer** | 8.5 | Remaining decor items at full opacity (in front of fish for depth) |
 | 11. Food particles | 9 | Active food dropping/sinking |
 | 12. Bubbles | 10 | Ambient rising bubbles |
 | 13. Ambient particles | 11 | Floating dust motes |
@@ -1179,7 +1218,8 @@ All UI icons (HUD, menu, store, panels) use a unified pixel art icon system inst
 - Bubbles rise with sine-wave wobble
 - Plants sway with subtle sine-based offset
 - Equipment has rendered pixel art sprites from ICON_DATA with level indicator dots
-- Decor uses seeded RNG for consistent rendering across frames: lily-pad clusters for floating plants, multi-stem plants with varied leaves, rock piles with highlights, coral/anemone branching shapes
+- **Layered decor rendering:** Decor is split into back (every 3rd item, 55% opacity) and front (remaining items, full opacity) layers. Fish swim between these layers, creating a natural depth effect. `renderDecorBack()` runs before fish, `renderDecorFront()` runs after fish in the game loop.
+- Decor rendering is highly detailed: floating plants have 4-6 lily pads with leaf veins and dangling roots; plants have 2-3 stems with 6-11 leaves along quadratic Bézier curves at 2.5× height; rocks have 4-5 boulders with drop shadows; coral/anemone items have 5-8 animated swaying branches with sub-branches; caves render as dark arches with interior shading and rim highlights; driftwood shows gnarled profiles with wood grain texture and moss patches
 - Pleco rotates when attached to glass walls
 - Food particles set anim.tx/ty to current position after fish consume to prevent snapping
 
@@ -1846,7 +1886,7 @@ Core systems must have unit tests. These live alongside the game code or in a te
 
 ### 27.2 E2E Tests (Playwright)
 
-Two test files in `tests/e2e/`:
+Four test files in `tests/e2e/`:
 
 **`games.spec.ts`** (60 tests) — Core smoke tests:
 - Widget loads in 4:3 aspect ratio
@@ -1881,6 +1921,15 @@ Two test files in `tests/e2e/`:
 - Visual rendering: no JS errors across all scenarios, proper dimensions, tier verification
 - Inventory sell flow: sell all fish, coin updates, sell last fish to empty
 
+**`games-design.spec.ts`** (45 tests) — v1.3 design overhaul validation:
+- Fish size differentiation: tiny schooling fish visible, large fish (discus/moray) visually dominant, all 18 species render at correct scales, size-showcase scenario loads all sizes
+- Layered decoration rendering: lush-planted scenario renders, back/front decor layers create depth, large plants fill visual space, multiple decor types coexist
+- Territorial fish behavior: territorial-showcase loads, clownfish/moray/firefish/royal_gramma listed in store, canvas renders continuously without errors during territorial interactions
+- Plant trim & move: decor card popup on tap, trim button present for growable plants, move interaction via drag, sell decor flow with coin update
+- Visual rendering stability: all design scenarios render without JS errors, proper 4:3 dimensions, 10-second sustained rendering tests for territorial, size, and lush-planted scenarios
+- Decor store integration: anemone/cave/brain_coral purchasable, decor appears in inventory after purchase
+- Tank navigation: navigate between tanks in multi-tank scenarios, verify biome-specific content loads
+
 ### 27.3 Sandbox Scenarios
 
 Updated scenarios in `apps/sandbox/src/lib/scenarios.js`:
@@ -1907,6 +1956,11 @@ Updated scenarios in `apps/sandbox/src/lib/scenarios.js`:
 - Movement showcase (all movement types: normal, crawl, glass, snake, schooling)
 - Schooling showcase (10 neon tetras + pleco + moon fish, demonstrates leader-following)
 - Floating decor (multiple floating plants with drift animation)
+
+**Design Overhaul (v1.3):**
+- Territorial showcase (10 salt fish defending anemone, cave, and brain coral zones)
+- Lush planted (dense tropical tank with 8 decor items — oversized plants, floating plants, mossy log, hollow stump)
+- Size showcase (all fish sizes from tiny chromis to huge moray in salt + tetras to discus in tropical)
 
 ---
 
@@ -1971,8 +2025,8 @@ Updated scenarios in `apps/sandbox/src/lib/scenarios.js`:
 | `clownfish` | Clownfish | 50 | 5.5 | 3 | `marine_pellets`, `reef_flakes`, `frozen_brine` | Anemone required (-40 penalty) |
 | `blue_tang` | Blue Tang | 75 | 7.0 | 4 | `marine_pellets`, `reef_flakes` | — |
 | `green_chromis` | Green Chromis | 35 | 3.0 | **0.5** | `reef_flakes`, `frozen_brine` | Schooling, half-space |
-| `firefish` | Firefish | 45 | 4.5 | 1 | `reef_flakes`, `frozen_brine` | — |
-| `royal_gramma` | Royal Gramma | 55 | 5.0 | 2 | `marine_pellets`, `reef_flakes` | — |
+| `firefish` | Firefish | 45 | 4.5 | 1 | `reef_flakes`, `frozen_brine` | Territorial: Brain Coral |
+| `royal_gramma` | Royal Gramma | 55 | 5.0 | 2 | `marine_pellets`, `reef_flakes` | Territorial: Cave |
 | `banggai_cardinal` | Banggai Cardinalfish | 40 | 3.5 | **0.5** | `reef_flakes`, `frozen_brine` | Schooling, half-space |
 | `moray_eel` | Moray Eel | 120 | 10.0 | 6 | `marine_pellets`, `frozen_brine`, `live_shrimp` | Cave required (-55), max 1, snake movement |
 | `cleaner_shrimp` | Cleaner Shrimp | 60 | 2.0 | 1 | `reef_flakes` | Utility: dirt -8%, crawl movement |
