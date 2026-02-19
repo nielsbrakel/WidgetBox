@@ -41,7 +41,17 @@
       },
       "height": 300,
       "transparent": false,
-      "settings": [],
+      "settings": [
+        {
+          "type": "checkbox",
+          "id": "reset_state",
+          "label": {
+            "en": "Reset Aquarium",
+            "nl": "Aquarium Resetten"
+          },
+          "value": false
+        }
+      ],
       "api": {
         "getState": {
           "method": "GET",

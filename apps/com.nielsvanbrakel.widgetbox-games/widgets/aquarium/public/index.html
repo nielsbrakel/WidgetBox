@@ -7,28 +7,13 @@
 *{margin:0;padding:0;box-sizing:border-box}
 body,html{overflow:hidden;touch-action:manipulation;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#1a2332;width:100%;height:100%}
 .widget-container{position:relative;width:100%;height:100%;overflow:hidden;display:flex;align-items:center;justify-content:center;transition:background 0.4s,opacity 0.3s ease}
-.widget-container[data-tier="1"]{background:#6ea8c9}
-.widget-container[data-tier="2"]{background:#6ea8c9}
-.widget-container[data-tier="3"]{background:#1a2332}
-.desk-surface{position:absolute;bottom:0;left:0;right:0;display:none;z-index:1}
-.widget-container[data-tier="1"] .desk-surface{display:block;height:33.3%;background:#8a5a2b;border-top:2px solid #6a3a1b}
-.widget-container[data-tier="2"] .desk-surface{display:block;height:33.3%;background:#8a5a2b;border-top:2px solid #6a3a1b}
-.widget-container[data-tier="3"] .desk-surface{display:block;height:12%;background:#263238;border-top:2px solid #37474F}
-.desk-items{position:absolute;bottom:0;left:0;right:0;height:30%;z-index:3;pointer-events:none;display:none}
-.widget-container[data-tier="1"] .desk-items,.widget-container[data-tier="2"] .desk-items{display:block}
-.desk-item{position:absolute;image-rendering:pixelated}
-.room-pixel-item{position:absolute;image-rendering:pixelated;pointer-events:none}
-.tank-wrap{position:absolute;overflow:hidden;z-index:2;transition:all 0.3s ease}
+.widget-container[data-tier="1"]{background:#a8c8d8}
+.widget-container[data-tier="2"]{background:#1a6a8a}
+.widget-container[data-tier="3"]{background:#0a2a40}
+.tank-wrap{position:absolute;overflow:hidden;z-index:2;transition:all 0.3s ease;width:100%;height:100%;left:0;top:0;border-radius:0;border:none}
 canvas#tank{display:block;width:100%;height:100%;image-rendering:pixelated}
-#dirtCanvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:5;opacity:0.85;border-radius:inherit}
+#dirtCanvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:5;opacity:0.85}
 .tank-wrap.cleaning #dirtCanvas{pointer-events:auto}
-.widget-container[data-tier="1"] .tank-wrap{width:52%;aspect-ratio:1;left:50%;transform:translateX(-50%);top:8%;border-radius:44%;overflow:visible;border:none;background:#4fb3d8}
-.widget-container[data-tier="1"] .tank-wrap canvas{clip-path:inset(0 round 44%)}
-.widget-container[data-tier="1"] .tank-wrap::after{content:none}
-.widget-container[data-tier="1"] .tank-wrap::before{content:none}
-.widget-container[data-tier="2"] .tank-wrap{border-radius:0;width:72%;height:52%;left:50%;transform:translateX(-50%);top:4%;overflow:hidden;border:none;background:linear-gradient(180deg,#5fd3ff 0%,#2a8db8 100%)}
-.widget-container[data-tier="3"] .tank-wrap{border-radius:0;width:92%;height:78%;left:4%;top:4%;border:none;overflow:hidden;background:linear-gradient(180deg,#5fd3ff 0%,#2a8db8 100%)}
-.pixel-frame{position:absolute;pointer-events:none;z-index:4;image-rendering:pixelated}
 .hud{position:absolute;top:0;left:0;right:0;z-index:10;pointer-events:none}
 .coin-display{position:absolute;top:8px;left:8px;display:flex;align-items:center;gap:4px;background:rgba(0,0,0,0.45);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);padding:3px 8px;border-radius:10px;color:#FFD54F;font-size:12px;font-weight:700;pointer-events:auto;cursor:pointer;font-variant-numeric:tabular-nums}
 .coin-icon{width:12px;height:12px;background:#FFD54F;border-radius:50%;border:1.5px solid #F9A825;flex-shrink:0}
@@ -130,7 +115,6 @@ canvas#tank{display:block;width:100%;height:100%;image-rendering:pixelated}
 <body>
 <div class="loading" id="loading">Loading aquarium...</div>
 <div class="widget-container" id="widgetContainer" data-tier="1">
-<div class="desk-surface"></div>
 <div class="tank-wrap" id="tankWrap">
   <canvas id="tank"></canvas>
   <canvas id="dirtCanvas"></canvas>
@@ -195,7 +179,7 @@ canvas#tank{display:block;width:100%;height:100%;image-rendering:pixelated}
 <div class="bottom-bar" id="bottomBar">
   <div class="tank-nav" id="tankNav">
     <button class="tn-arrow" id="tnPrev">&#x2039;</button>
-    <div class="tn-label" id="tnLabel">Fishbowl</div>
+    <div class="tn-label" id="tnLabel">Cold Water</div>
     <button class="tn-arrow" id="tnNext">&#x203A;</button>
   </div>
   <div class="tool-dock" id="toolDock"></div>
@@ -206,12 +190,17 @@ canvas#tank{display:block;width:100%;height:100%;image-rendering:pixelated}
 // Aquarium Widget - Frontend (Iteration 5 - Multi-Tank)
 
 var SPECIES = {
-  guppy:      { name:'Guppy',       tier:1, baseCoin:2.5,  spaceCost:1, waterType:'fresh', color:{body:'#FF7043',tail:'#FFB74D'} },
-  goldfish:   { name:'Goldfish',     tier:1, baseCoin:3.8,  spaceCost:2, waterType:'fresh', color:{body:'#FF8F00',tail:'#FFB300'} },
-  neon_tetra: { name:'Neon Tetra',   tier:2, baseCoin:3.2,  spaceCost:1, waterType:'fresh', color:{body:'#29B6F6',tail:'#E53935'} },
-  betta:      { name:'Betta',        tier:2, baseCoin:5.0,  spaceCost:2, waterType:'fresh', color:{body:'#7E57C2',tail:'#B39DDB'} },
-  angelfish:  { name:'Angelfish',    tier:3, baseCoin:6.5,  spaceCost:4, waterType:'fresh', color:{body:'#ECEFF1',tail:'#B0BEC5'} },
-  clownfish:  { name:'Clownfish',    tier:3, baseCoin:5.8,  spaceCost:3, waterType:'salt',  color:{body:'#FF7043',tail:'#FFFFFF'} }
+  // Cold water
+  goldfish:   { name:'Goldfish',     tier:1, baseCoin:2.5,  spaceCost:2, waterType:'cold',     color:{body:'#FF8F00',tail:'#FFB300'} },
+  koi:        { name:'Koi',          tier:1, baseCoin:4.0,  spaceCost:3, waterType:'cold',     color:{body:'#E53935',tail:'#FFFFFF'} },
+  // Tropical
+  guppy:      { name:'Guppy',        tier:2, baseCoin:2.5,  spaceCost:1, waterType:'tropical', color:{body:'#FF7043',tail:'#FFB74D'} },
+  neon_tetra: { name:'Neon Tetra',   tier:2, baseCoin:3.2,  spaceCost:1, waterType:'tropical', color:{body:'#29B6F6',tail:'#E53935'} },
+  betta:      { name:'Betta',        tier:2, baseCoin:5.0,  spaceCost:2, waterType:'tropical', color:{body:'#7E57C2',tail:'#B39DDB'} },
+  angelfish:  { name:'Angelfish',    tier:2, baseCoin:6.0,  spaceCost:3, waterType:'tropical', color:{body:'#ECEFF1',tail:'#B0BEC5'} },
+  // Sea water
+  clownfish:  { name:'Clownfish',    tier:3, baseCoin:5.5,  spaceCost:3, waterType:'sea',      color:{body:'#FF7043',tail:'#FFFFFF'} },
+  tang:       { name:'Blue Tang',    tier:3, baseCoin:7.0,  spaceCost:4, waterType:'sea',      color:{body:'#1565C0',tail:'#FFD54F'} }
 };
 
 var FOOD_ICONS = { flakes:'\u{1F342}', pellets:'\u{1F7E4}', premium_flakes:'\u2728' };
@@ -280,36 +269,73 @@ var FISH_PX = {
     [1,1,1,2,1,1,2,1,1,1,1,0],
     [0,1,1,2,4,1,2,1,4,1,1,0],
     [0,0,1,2,1,1,2,1,1,1,0,0],
-    [0,0,0,0,1,0,0,0,1,0,0,0]] }
+    [0,0,0,0,1,0,0,0,1,0,0,0]] },
+  koi: { w:16, h:10, eye:[4,12], px:[
+    [0,0,0,0,0,0,0,0,3,3,0,0,0,0,0,0],
+    [0,0,2,0,0,0,3,3,1,1,1,1,0,0,0,0],
+    [0,2,2,2,0,3,1,1,1,1,1,1,1,0,0,0],
+    [2,2,0,2,3,1,1,1,1,1,1,1,1,1,0,0],
+    [2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
+    [2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
+    [2,2,0,1,1,1,1,1,1,4,1,1,1,1,0,0],
+    [0,2,2,2,1,1,1,1,4,1,4,1,1,0,0,0],
+    [0,0,2,0,0,1,1,1,1,1,1,1,0,0,0,0],
+    [0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0]] },
+  tang: { w:13, h:10, eye:[4,9], px:[
+    [0,0,0,0,0,0,0,0,3,0,0,0,0],
+    [0,0,0,0,0,3,3,1,1,1,0,0,0],
+    [0,0,2,0,3,1,1,1,1,1,1,0,0],
+    [0,2,2,3,1,1,1,1,1,1,1,1,0],
+    [2,2,1,1,1,1,1,1,1,1,1,1,0],
+    [2,2,1,1,1,1,1,1,1,1,1,1,0],
+    [0,2,2,1,1,1,1,1,4,1,1,1,0],
+    [0,0,2,0,1,1,1,4,1,4,1,0,0],
+    [0,0,0,0,0,1,1,1,1,1,0,0,0],
+    [0,0,0,0,0,0,0,2,2,0,0,0,0]] }
 };
 
 var SNAIL_PX = [[0,0,2,0],[0,2,3,2],[1,1,2,2],[1,1,1,1]];
-var GRAVEL_COLORS = ['#c8b07a','#bfa56e','#d4bc86','#b89a62','#a89060','#c0a878','#d6c490','#b0945a'];
-var PLANT_COLORS  = ['#3fa34d','#2fa36d','#1f6a4a','#2E7D32','#4CAF50'];
+var BIOME_GRAVEL = {
+  1: ['#8a8a80','#9e9e94','#7a7a72','#b0b0a8','#a0a098','#888880'],
+  2: ['#c8b07a','#bfa56e','#d4bc86','#b89a62','#a89060','#c0a878','#d6c490','#b0945a'],
+  3: ['#e0d8c0','#d4ccb0','#c8c0a8','#f0e8d0','#dcd4bc','#ece4cc']
+};
+var BIOME_PLANTS = {
+  1: ['#3a7a2a','#2a6620','#4a8a3a'],
+  2: ['#3fa34d','#2fa36d','#1f6a4a','#2E7D32','#4CAF50'],
+  3: ['#e03060','#ff5080','#4a90cc','#60b0e0']
+};
 
 // ── Grid layout system (64×48 base grid) ─────────────────────────────────────
 var GRID_W = 64, GRID_H = 48;
 var DIRT_GRID_W = 16, DIRT_GRID_H = 12;
 
 var SWIM_ZONES = {
-  1: { minX: 0.10, maxX: 0.90, minY: 0.10, maxY: 0.75 },
-  2: { minX: 0.05, maxX: 0.95, minY: 0.05, maxY: 0.82 },
-  3: { minX: 0.05, maxX: 0.95, minY: 0.05, maxY: 0.88 }
+  1: { minX: 0.03, maxX: 0.97, minY: 0.05, maxY: 0.85 },
+  2: { minX: 0.03, maxX: 0.97, minY: 0.05, maxY: 0.85 },
+  3: { minX: 0.03, maxX: 0.97, minY: 0.05, maxY: 0.88 }
 };
 
 var DECO_PX = {
+  // Cold water
+  rock_pile:     { w:7, h:5, c:['#78909C','#90A4AE','#B0BEC5'], px:[[0,0,3,0,3,0,0],[0,3,1,3,1,3,0],[3,1,2,1,2,1,3],[1,1,1,2,1,1,1],[0,1,1,1,1,1,0]] },
+  driftwood:     { w:9, h:5, c:['#5D4037','#8D6E63','#A1887F'], px:[[0,0,0,3,0,0,0,0,0],[0,3,3,1,1,1,3,0,0],[3,1,2,2,1,2,1,1,3],[0,1,1,2,2,2,1,1,0],[0,0,1,1,1,1,1,0,0]] },
+  stone_bridge:  { w:9, h:7, c:['#607D8B','#78909C','#B0BEC5'], px:[[0,0,3,3,3,3,3,0,0],[0,3,1,1,1,1,1,3,0],[3,1,2,1,1,1,2,1,3],[1,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,1],[1,1,0,0,0,0,0,1,1],[0,1,0,0,0,0,0,1,0]] },
+  // Tropical
   plant_fern:    { w:5, h:9, c:['#2E7D32','#43A047','#66BB6A'], px:[[0,0,3,0,0],[0,3,1,0,0],[0,1,1,3,0],[3,1,1,0,0],[0,2,1,3,0],[0,1,1,0,0],[0,0,1,0,0],[0,0,2,0,0],[0,0,2,0,0]] },
-  plant_grass:   { w:3, h:10, c:['#388E3C','#66BB6A','#81C784'], px:[[0,3,0],[3,0,3],[0,1,0],[1,0,3],[0,1,0],[0,1,0],[0,1,0],[0,2,0],[0,2,0],[0,2,0]] },
   plant_anubias: { w:7, h:6, c:['#1B5E20','#4CAF50','#81C784'], px:[[0,3,3,0,3,3,0],[3,1,1,3,1,1,3],[0,1,1,1,1,1,0],[0,0,1,1,1,0,0],[0,0,0,2,0,0,0],[0,0,0,2,0,0,0]] },
   shipwreck:     { w:9, h:7, c:['#5D4037','#8D6E63','#A1887F'], px:[[0,0,0,3,0,0,0,0,0],[0,0,3,1,1,0,0,0,0],[0,3,1,2,1,1,0,0,0],[1,1,2,2,2,1,1,0,0],[1,2,2,2,2,2,1,0,0],[1,1,1,2,2,2,1,1,1],[0,0,0,1,1,1,0,0,0]] },
-  bubbler:       { w:3, h:7, c:['#78909C','#B0BEC5','#CFD8DC'], px:[[0,3,0],[3,1,1],[1,2,1],[1,2,1],[1,1,1],[0,2,0],[2,0,2]] },
-  castle:        { w:7, h:8, c:['#9E9E9E','#BDBDBD','#E0E0E0'], px:[[3,0,3,0,3,0,3],[1,0,1,3,1,0,1],[1,1,1,2,1,1,1],[0,1,2,2,2,1,0],[0,1,2,0,2,1,0],[0,1,1,0,1,1,0],[0,1,1,1,1,1,0],[1,1,1,1,1,1,1]] },
   treasure:      { w:7, h:5, c:['#5D4037','#FFD54F','#FFF176'], px:[[0,1,1,1,1,1,0],[1,3,2,3,2,3,1],[1,1,1,1,1,1,1],[1,2,1,3,1,2,1],[1,1,1,1,1,1,1]] },
-  coral_rock:    { w:7, h:6, c:['#E91E63','#F48FB1','#F8BBD0'], px:[[0,0,3,0,3,0,0],[0,3,1,3,1,3,0],[3,2,1,2,1,2,3],[1,1,2,1,2,1,1],[0,1,1,1,1,1,0],[0,0,1,1,1,0,0]] }
+  bubbler:       { w:3, h:7, c:['#78909C','#B0BEC5','#CFD8DC'], px:[[0,3,0],[3,1,1],[1,2,1],[1,2,1],[1,1,1],[0,2,0],[2,0,2]] },
+  // Sea water
+  coral_rock:    { w:7, h:6, c:['#E91E63','#F48FB1','#F8BBD0'], px:[[0,0,3,0,3,0,0],[0,3,1,3,1,3,0],[3,2,1,2,1,2,3],[1,1,2,1,2,1,1],[0,1,1,1,1,1,0],[0,0,1,1,1,0,0]] },
+  sea_anemone:   { w:7, h:7, c:['#AB47BC','#CE93D8','#E1BEE7'], px:[[3,0,3,0,3,0,3],[1,3,1,3,1,3,1],[0,1,0,1,0,1,0],[0,1,0,1,0,1,0],[0,0,1,1,1,0,0],[0,0,0,2,0,0,0],[0,0,0,2,0,0,0]] },
+  castle:        { w:7, h:8, c:['#9E9E9E','#BDBDBD','#E0E0E0'], px:[[3,0,3,0,3,0,3],[1,0,1,3,1,0,1],[1,1,1,2,1,1,1],[0,1,2,2,2,1,0],[0,1,2,0,2,1,0],[0,1,1,0,1,1,0],[0,1,1,1,1,1,0],[1,1,1,1,1,1,1]] },
+  anchor:        { w:7, h:9, c:['#455A64','#607D8B','#78909C'], px:[[0,0,0,3,0,0,0],[0,0,3,1,3,0,0],[0,0,0,1,0,0,0],[0,0,0,1,0,0,0],[0,0,0,1,0,0,0],[3,1,1,1,1,1,3],[1,2,0,0,0,2,1],[0,1,1,0,1,1,0],[0,0,0,0,0,0,0]] }
 };
 
 // ── Room pixel art per tier ──────────────────────────────────────────────────
-// (Pixel art frames drawn dynamically in buildRoomScene via canvas)
+// (Full-screen biome tanks — no frames needed)
 
 // ── Globals ──────────────────────────────────────────────────────────────────
 
@@ -447,63 +473,49 @@ function initEnvironment() {
   var tier = getActiveTier();
   gravelData = [];
   plants = [];
+  var gravel = BIOME_GRAVEL[tier] || BIOME_GRAVEL[1];
+  var plantCols = BIOME_PLANTS[tier] || BIOME_PLANTS[1];
+
+  // All biomes: full-screen substrate starting at 82% height
+  var subTop = H * 0.82;
+  var cols = Math.ceil(W / PIXEL);
+  var subRows = Math.ceil((H - subTop) / PIXEL);
+  for (var r = 0; r < subRows; r++) {
+    for (var c = 0; c < cols; c++) {
+      var col = pick(gravel);
+      if (Math.random() < 0.12) col = darkenColor(col, 15);
+      gravelData.push({ x: c * PIXEL, y: subTop + r * PIXEL, color: col });
+    }
+  }
 
   if (tier === 1) {
-    // Fishbowl: sandy ellipse gravel at bottom of bowl (grid y32→36 mapped to canvas)
-    var gravelTop = H * 0.72;
-    var gravelBot = H * 0.92;
-    var gravelCx = W / 2;
-    var gravelRx = W * 0.38;
-    for (var gy = gravelTop; gy < gravelBot; gy += PIXEL) {
-      var ratio = (gy - gravelTop) / (gravelBot - gravelTop);
-      var rowRx = gravelRx * (0.6 + ratio * 0.4);
-      for (var gx = gravelCx - rowRx; gx < gravelCx + rowRx; gx += PIXEL) {
-        var col = pick(GRAVEL_COLORS);
-        if (Math.random() < 0.15) col = '#a89060'; // darker speckle
-        gravelData.push({ x: gx, y: gy, color: col });
-      }
-    }
-    // Small plant at ~center-left (spec: base at grid 30,32)
-    var plantX = W * 0.42;
-    plants.push({ x: plantX, stemH: 6, leaves: [
-      { y: 2, dir: -1, len: 2 }, { y: 4, dir: 1, len: 2 }, { y: 5, dir: -1, len: 1 }
-    ], color: '#3fa34d' });
-
-  } else if (tier === 2) {
-    // Small aquarium: substrate rectangle at bottom (grid y30→34)
-    var subTop = H * 0.70;
-    var cols = Math.ceil(W / PIXEL);
-    var subRows = Math.ceil((H - subTop) / PIXEL);
-    for (var r = 0; r < subRows; r++) {
-      for (var c = 0; c < cols; c++) {
-        var col2 = pick(GRAVEL_COLORS);
-        if (Math.random() < 0.12) col2 = '#a89060';
-        gravelData.push({ x: c * PIXEL, y: subTop + r * PIXEL, color: col2 });
-      }
-    }
-    // Several plants at decoration anchor positions
-    var anchors = [0.20, 0.40, 0.60, 0.75];
+    // Cold Water: sparse dark plants (3 plants)
+    var anchors = [0.25, 0.55, 0.80];
     for (var ai = 0; ai < anchors.length; ai++) {
       var px = W * anchors[ai];
-      var stemH = 5 + Math.floor(Math.random() * 4);
+      var stemH = 4 + Math.floor(Math.random() * 3);
       var lvs = [];
       for (var j = 1; j < stemH; j += 2) {
-        if (Math.random() > 0.25) lvs.push({ y: j, dir: Math.random() > 0.5 ? 1 : -1, len: 2 + Math.floor(Math.random() * 3) });
+        if (Math.random() > 0.3) lvs.push({ y: j, dir: Math.random() > 0.5 ? 1 : -1, len: 1 + Math.floor(Math.random() * 2) });
       }
-      plants.push({ x: px, stemH: stemH, leaves: lvs, color: pick(PLANT_COLORS) });
+      plants.push({ x: px, stemH: stemH, leaves: lvs, color: pick(plantCols) });
+    }
+
+  } else if (tier === 2) {
+    // Tropical: lush plants at multiple anchor positions
+    var anchors2 = [0.12, 0.28, 0.42, 0.58, 0.72, 0.88];
+    for (var ai2 = 0; ai2 < anchors2.length; ai2++) {
+      var px2 = W * anchors2[ai2];
+      var stemH2 = 5 + Math.floor(Math.random() * 5);
+      var lvs2 = [];
+      for (var j2 = 1; j2 < stemH2; j2 += 2) {
+        if (Math.random() > 0.2) lvs2.push({ y: j2, dir: Math.random() > 0.5 ? 1 : -1, len: 2 + Math.floor(Math.random() * 3) });
+      }
+      plants.push({ x: px2, stemH: stemH2, leaves: lvs2, color: pick(plantCols) });
     }
 
   } else {
-    // Big tank: layered depth — back plants, mid plants, foreground rocks + substrate
-    var subTop3 = H * 0.80;
-    var cols3 = Math.ceil(W / PIXEL);
-    var subRows3 = Math.ceil((H - subTop3) / PIXEL);
-    for (var r3 = 0; r3 < subRows3; r3++) {
-      for (var c3 = 0; c3 < cols3; c3++) {
-        gravelData.push({ x: c3 * PIXEL, y: subTop3 + r3 * PIXEL, color: pick(GRAVEL_COLORS) });
-      }
-    }
-    // Back layer plants — dark green silhouettes (spec #1f6a4a)
+    // Sea Water: layered depth — back corals, mid corals, foreground
     for (var bi = 0; bi < 8; bi++) {
       var bpx = 10 + Math.random() * (W - 20);
       var bstem = 8 + Math.floor(Math.random() * 6);
@@ -511,9 +523,8 @@ function initEnvironment() {
       for (var bj = 1; bj < bstem; bj += 2) {
         blvs.push({ y: bj, dir: Math.random() > 0.5 ? 1 : -1, len: 3 + Math.floor(Math.random() * 3) });
       }
-      plants.push({ x: bpx, stemH: bstem, leaves: blvs, color: '#1f6a4a', layer: 'back' });
+      plants.push({ x: bpx, stemH: bstem, leaves: blvs, color: darkenColor(pick(plantCols), 20), layer: 'back' });
     }
-    // Mid layer plants — brighter green (spec #2fa36d)
     for (var mi = 0; mi < 6; mi++) {
       var mpx = 15 + Math.random() * (W - 30);
       var mstem = 5 + Math.floor(Math.random() * 5);
@@ -521,7 +532,7 @@ function initEnvironment() {
       for (var mj = 1; mj < mstem; mj += 2) {
         if (Math.random() > 0.3) mlvs.push({ y: mj, dir: Math.random() > 0.5 ? 1 : -1, len: 2 + Math.floor(Math.random() * 3) });
       }
-      plants.push({ x: mpx, stemH: mstem, leaves: mlvs, color: '#2fa36d', layer: 'mid' });
+      plants.push({ x: mpx, stemH: mstem, leaves: mlvs, color: pick(plantCols), layer: 'mid' });
     }
   }
 }
@@ -531,8 +542,9 @@ var rockClusters = [];
 
 function initRockClusters() {
   rockClusters = [];
-  if (getActiveTier() !== 3) return;
-  var clusterCount = 3 + Math.floor(Math.random() * 2);
+  var tier = getActiveTier();
+  if (tier === 2) return; // Tropical has no rocks
+  var clusterCount = tier === 1 ? (2 + Math.floor(Math.random() * 2)) : (3 + Math.floor(Math.random() * 2));
   for (var i = 0; i < clusterCount; i++) {
     var cx = W * (0.1 + (i / clusterCount) * 0.8);
     var cy = H * 0.82;
@@ -559,18 +571,20 @@ function drawEnvironment() {
   // ── Water background gradient (drawn on canvas for depth) ──
   var grad = ctx.createLinearGradient(0, 0, 0, H);
   if (tier === 1) {
-    grad.addColorStop(0, '#5ad0ec');
-    grad.addColorStop(0.5, '#3aadcc');
-    grad.addColorStop(1, '#2690aa');
+    // Cold Water: pale blue
+    grad.addColorStop(0, '#d4e8f0');
+    grad.addColorStop(0.5, '#a8c8d8');
+    grad.addColorStop(1, '#7ab0c0');
   } else if (tier === 2) {
+    // Tropical: vibrant
     grad.addColorStop(0, '#50c8e8');
     grad.addColorStop(0.4, '#359ec0');
     grad.addColorStop(1, '#1d7a98');
   } else {
-    grad.addColorStop(0, '#45bcd8');
-    grad.addColorStop(0.35, '#2e92b2');
-    grad.addColorStop(0.75, '#1d6e8a');
-    grad.addColorStop(1, '#155a72');
+    // Sea Water: deep blue
+    grad.addColorStop(0, '#1a4a6a');
+    grad.addColorStop(0.4, '#0d3050');
+    grad.addColorStop(1, '#061828');
   }
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, W, H);
@@ -635,9 +649,7 @@ function drawEnvironment() {
     var p = plants[pi];
     if (p.layer === 'mid') continue; // draw mid later
     var baseY;
-    if (tier === 1) baseY = H * 0.72 - PIXEL;
-    else if (tier === 2) baseY = H * 0.70 - PIXEL;
-    else baseY = H * 0.80 - PIXEL;
+    baseY = H * 0.82 - PIXEL;
     // Subtle sway
     var sway = Math.sin(time2 + p.x * 0.01) * 1.2;
     // Stem — 2px wide for larger plants
@@ -675,7 +687,7 @@ function drawEnvironment() {
   for (var pi2 = 0; pi2 < plants.length; pi2++) {
     var p2 = plants[pi2];
     if (p2.layer !== 'mid') continue;
-    var by2 = H * 0.80 - PIXEL;
+    var by2 = H * 0.82 - PIXEL;
     var sway2 = Math.sin(time2 * 1.2 + p2.x * 0.015) * 1.0;
     ctx.fillStyle = darkenColor(p2.color, 15);
     for (var j2 = 0; j2 < p2.stemH; j2++) {
@@ -732,7 +744,7 @@ function drawEnvironment() {
   ctx.restore();
 
   // ── Depth shadow at gravel line ──
-  var grLineY = tier === 1 ? H * 0.72 : tier === 2 ? H * 0.70 : H * 0.80;
+  var grLineY = H * 0.82;
   ctx.save();
   var shGrad = ctx.createLinearGradient(0, grLineY - PIXEL * 2, 0, grLineY + PIXEL * 2);
   shGrad.addColorStop(0, 'rgba(0,0,0,0)');
@@ -749,7 +761,7 @@ function drawDecorations() {
   var decos = getActiveDecorations();
   if (!decos || decos.length === 0) return;
   var tier = getActiveTier();
-  var baseY = tier === 1 ? H * 0.72 : tier === 2 ? H * 0.70 : H * 0.80;
+  var baseY = H * 0.82;
 
   for (var di = 0; di < decos.length; di++) {
     var deco = decos[di];
@@ -847,7 +859,7 @@ function drawEquipment() {
   // Bubble maker: tier 3 bottom-right — with animated bubble hint
   if (tier === 3 && upg.filterLevel > 0) {
     var bx = W - PIXEL * 6;
-    var bby = H * 0.80;
+    var bby = H * 0.82;
     ctx.fillStyle = '#607D8B';
     ctx.fillRect(bx, bby, PIXEL * 3, PIXEL * 2);
     ctx.fillStyle = '#78909C';
@@ -860,358 +872,6 @@ function drawEquipment() {
       var bxOff = Math.sin(btime * 0.5 + bi) * PIXEL * 0.4;
       ctx.fillRect(bx + PIXEL + bxOff, bby - bi * PIXEL * 2, PIXEL, PIXEL);
     }
-  }
-}
-
-// ── Room scene (pixel art frames & decorations) ─────────────────────────────
-
-function drawPixelRect(ctx, x, y, w, h, color) {
-  ctx.fillStyle = color;
-  ctx.fillRect(x, y, w, h);
-}
-
-function fillPixelEllipse(ctx, cx, cy, rx, ry, p) {
-  for (var row = -ry; row <= ry; row += p) {
-    var ratio = (row * row) / (ry * ry);
-    if (ratio > 1) continue;
-    var xSpan = rx * Math.sqrt(1 - ratio);
-    var startX = Math.round((cx - xSpan) / p) * p;
-    var endX = Math.round((cx + xSpan) / p) * p;
-    ctx.fillRect(startX, Math.round((cy + row) / p) * p, endX - startX + p, p);
-  }
-}
-
-function buildRoomScene() {
-  // Remove old pixel frame overlays
-  var old = widgetContainer.querySelectorAll('.pixel-frame,.room-pixel-item');
-  for (var i = 0; i < old.length; i++) old[i].remove();
-
-  var tier = getActiveTier();
-  var cw = widgetContainer.clientWidth || 478;
-  var ch = widgetContainer.clientHeight || 359;
-  // Chunky pixel size – at least 4px for visible pixel art steps
-  var P = Math.max(4, Math.round(cw / 100));
-
-  if (tier === 1) buildBowlFrame(cw, ch, P);
-  else if (tier === 2) buildAquariumFrame(cw, ch, P);
-  else if (tier === 3) buildBigTankFrame(cw, ch, P);
-}
-
-function addFrameCanvas(w, h, css) {
-  var c = document.createElement('canvas');
-  c.className = 'pixel-frame';
-  c.width = w; c.height = h;
-  c.style.width = w + 'px';
-  c.style.height = h + 'px';
-  for (var k in css) { if (css.hasOwnProperty(k)) c.style[k] = css[k]; }
-  widgetContainer.appendChild(c);
-  return c;
-}
-
-// ── Tier 1: Fishbowl with pixel art outline ─────────────────────────────────
-
-function buildBowlFrame(cw, ch, P) {
-  var bowlSize = Math.round(cw * 0.52);
-  var bowlX = Math.round((cw - bowlSize) / 2);
-  var bowlY = Math.round(ch * 0.08);
-
-  var pad = P * 6;
-  var fw = bowlSize + pad * 2;
-  var fh = bowlSize + pad * 2 + P * 6;
-  var c = addFrameCanvas(fw, fh, {
-    left: (bowlX - pad) + 'px',
-    top: (bowlY - pad) + 'px'
-  });
-  var ctx = c.getContext('2d');
-  var cx = fw / 2;
-  var cy = pad + bowlSize / 2;
-  var rx = bowlSize / 2;
-  var ry = bowlSize / 2;
-
-  // Layer 1: Outermost outline — darker cyan (#2c6f88)
-  ctx.fillStyle = '#2c6f88';
-  fillPixelEllipse(ctx, cx, cy, rx + P * 3, ry + P * 3, P);
-
-  // Layer 2: Glass body — lighter aqua tint
-  ctx.fillStyle = '#80d4ec';
-  fillPixelEllipse(ctx, cx, cy, rx + P * 1, ry + P * 1, P);
-
-  // Layer 3: Inner edge — dark cyan
-  ctx.fillStyle = '#1f5f78';
-  fillPixelEllipse(ctx, cx, cy, rx - P * 1, ry - P * 1, P);
-
-  // Layer 4: Clear inside so fish canvas shows through
-  ctx.globalCompositeOperation = 'destination-out';
-  ctx.fillStyle = '#000';
-  fillPixelEllipse(ctx, cx, cy, rx - P * 2, ry - P * 2, P);
-  ctx.globalCompositeOperation = 'source-over';
-
-  // Glass highlight — white at 30% opacity (spec: 2px stripe)
-  ctx.fillStyle = 'rgba(255,255,255,0.3)';
-  var hlX = cx - rx * 0.3;
-  var hlY = cy - ry * 0.5;
-  ctx.fillRect(Math.round(hlX / P) * P, Math.round(hlY / P) * P, P, P * 3);
-  ctx.fillRect(Math.round(hlX / P) * P - P, Math.round(hlY / P) * P + P, P, P * 2);
-
-  // Waterline highlight — light cyan (#9fe8ff)
-  var wlY = cy - ry * 0.6;
-  var wlX1 = cx - rx * 0.75;
-  var wlX2 = cx + rx * 0.75;
-  ctx.fillStyle = '#9fe8ff';
-  for (var wx = Math.round(wlX1 / P) * P; wx <= wlX2; wx += P) {
-    ctx.fillRect(wx, Math.round(wlY / P) * P, P, P);
-  }
-
-  // Top rim / opening
-  var rimW = Math.round(bowlSize * 0.62);
-  var rimX = cx - rimW / 2;
-  var rimTop = cy - ry - P * 2;
-  // Rim outline
-  drawPixelRect(ctx, Math.round(rimX / P) * P - P, rimTop - P, rimW + P * 2, P * 5, '#2c6f88');
-  // Rim body
-  drawPixelRect(ctx, Math.round(rimX / P) * P, rimTop, rimW, P * 3, '#d0e8f0');
-  // Rim highlight
-  drawPixelRect(ctx, Math.round(rimX / P) * P, rimTop, rimW, P, '#e0f0f8');
-  // Rim shadow line
-  drawPixelRect(ctx, Math.round(rimX / P) * P, rimTop + P * 2, rimW, P, '#5a8a9a');
-
-  // Bowl base / flat bottom
-  var baseY = cy + ry + P;
-  var baseW = Math.round(bowlSize * 0.5);
-  var baseX = cx - baseW / 2;
-  drawPixelRect(ctx, Math.round(baseX / P) * P - P, baseY, baseW + P * 2, P * 2, '#2c6f88');
-  drawPixelRect(ctx, Math.round(baseX / P) * P, baseY + P * 2, baseW, P * 2, '#4a7a8a');
-  drawPixelRect(ctx, Math.round(baseX / P) * P + P, baseY + P * 2, baseW - P * 2, P, '#6a9aaa');
-
-  addTablePixelArt(cw, ch, P, 1);
-}
-
-// ── Tier 2: Rectangular aquarium with frame, hood & wooden stand ────────────
-
-function buildAquariumFrame(cw, ch, P) {
-  var tw = Math.round(cw * 0.72);
-  var th = Math.round(ch * 0.52);
-  var tx = Math.round((cw - tw) / 2);
-  var ty = Math.round(ch * 0.04);
-
-  var pad = P * 8;
-  var fw = tw + pad * 2;
-  var fhTotal = th + P * 24;
-  var c = addFrameCanvas(fw, fhTotal, {
-    left: (tx - pad) + 'px',
-    top: (ty - P * 8) + 'px'
-  });
-  var ctx = c.getContext('2d');
-  var ix = pad;
-  var iy = P * 8;
-
-  // ── Hood / light fixture ──
-  var hoodW = tw + P * 6;
-  var hoodX = ix - P * 3;
-  drawPixelRect(ctx, hoodX - P, iy - P * 7, hoodW + P * 2, P * 5, '#2b3a42');
-  drawPixelRect(ctx, hoodX, iy - P * 6, hoodW, P * 3, '#D8D0C0');
-  drawPixelRect(ctx, hoodX + P, iy - P * 6, hoodW - P * 2, P, '#E5DFD5');
-  drawPixelRect(ctx, hoodX, iy - P * 3, hoodW, P, '#B8B0A0');
-  drawPixelRect(ctx, hoodX, iy - P * 2, hoodW, P, '#7A746A');
-
-  // ── Tank frame — dark slate (#2b3a42) ──
-  var frameT = P * 3;
-  drawPixelRect(ctx, ix - frameT, iy - P, tw + frameT * 2, frameT, '#2b3a42');
-  drawPixelRect(ctx, ix - frameT, iy + th - P, tw + frameT * 2, frameT, '#2b3a42');
-  drawPixelRect(ctx, ix - frameT, iy - P, frameT, th + frameT - P, '#2b3a42');
-  drawPixelRect(ctx, ix + tw, iy - P, frameT, th + frameT - P, '#2b3a42');
-
-  // Inner frame accent
-  drawPixelRect(ctx, ix - P, iy + frameT - P * 2, P, th - frameT * 2 + P * 2, '#3b4a52');
-  drawPixelRect(ctx, ix + tw - P, iy + frameT - P * 2, P, th - frameT * 2 + P * 2, '#3b4a52');
-
-  // ── Waterline highlight — light cyan (#9fe8ff) ──
-  var wlY2 = iy + Math.round(th * 0.08);
-  drawPixelRect(ctx, ix, wlY2, tw, P, 'rgba(159,232,255,0.4)');
-
-  // ── Wooden stand / cabinet ──
-  var standY = iy + th + frameT - P;
-  var standW = tw + frameT * 2;
-  var standX = ix - frameT;
-  var standH = P * 8;
-  drawPixelRect(ctx, standX - P, standY, standW + P * 2, P * 2, '#6B4D2E');
-  drawPixelRect(ctx, standX, standY, standW, P, '#A08060');
-  drawPixelRect(ctx, standX, standY + P * 2, standW, standH, '#5D3E1E');
-  drawPixelRect(ctx, standX + P * 2, standY + P * 4, standW - P * 4, P, '#7B5D3E');
-  drawPixelRect(ctx, standX + P * 3, standY + P * 6, standW - P * 6, P, '#7B5D3E');
-  drawPixelRect(ctx, standX + Math.round(standW / 2) - P / 2, standY + P * 3, P, standH - P * 3, '#4D2E0E');
-  var kY = standY + Math.round(standH / 2);
-  drawPixelRect(ctx, standX + Math.round(standW * 0.3), kY, P, P, '#C0A080');
-  drawPixelRect(ctx, standX + Math.round(standW * 0.7), kY, P, P, '#C0A080');
-  drawPixelRect(ctx, standX - P, standY + P * 2 + standH, standW + P * 2, P, '#3D1E0E');
-  drawPixelRect(ctx, standX + P, standY + P * 3 + standH, P * 2, P * 2, '#4D2E0E');
-  drawPixelRect(ctx, standX + standW - P * 3, standY + P * 3 + standH, P * 2, P * 2, '#4D2E0E');
-
-  // Glass reflection
-  drawPixelRect(ctx, ix + P * 2, iy + P * 2, P, P * 4, 'rgba(255,255,255,0.2)');
-  drawPixelRect(ctx, ix + P * 3, iy + P, P, P * 3, 'rgba(255,255,255,0.15)');
-
-  addTablePixelArt(cw, ch, P, 2);
-}
-
-// ── Tier 3: Big professional tank with sleek frame ──────────────────────────
-
-function buildBigTankFrame(cw, ch, P) {
-  var tw = Math.round(cw * 0.92);
-  var th = Math.round(ch * 0.78);
-  var tx = Math.round(cw * 0.04);
-  var ty = Math.round(ch * 0.04);
-
-  var pad = P * 5;
-  var fw = tw + pad * 2;
-  var fh = th + P * 14;
-  var c = addFrameCanvas(fw, fh, {
-    left: (tx - pad) + 'px',
-    top: (ty - P * 4) + 'px'
-  });
-  var ctx = c.getContext('2d');
-  var ix = pad;
-  var iy = P * 4;
-
-  // ── Modern light bar ──
-  var barW = tw + P * 4;
-  var barX = ix - P * 2;
-  drawPixelRect(ctx, barX, iy - P * 4, barW, P * 3, '#1f2a30');
-  drawPixelRect(ctx, barX + P, iy - P * 3, barW - P * 2, P, '#2a3a40');
-  // LED indicators
-  drawPixelRect(ctx, barX + Math.round(barW * 0.4), iy - P * 4, P * 2, P, '#4FC3F7');
-  drawPixelRect(ctx, barX + Math.round(barW * 0.6), iy - P * 4, P * 2, P, '#4FC3F7');
-
-  // ── Frame — dark (#1f2a30) ──
-  var frameT = P * 2;
-  drawPixelRect(ctx, ix - frameT, iy - P, tw + frameT * 2, frameT, '#1f2a30');
-  drawPixelRect(ctx, ix - frameT, iy + th - P, tw + frameT * 2, frameT, '#1f2a30');
-  drawPixelRect(ctx, ix - frameT, iy - P, frameT, th + frameT, '#1f2a30');
-  drawPixelRect(ctx, ix + tw, iy - P, frameT, th + frameT, '#1f2a30');
-  // Inner accent
-  drawPixelRect(ctx, ix - P, iy + P, P, th - P * 3, '#2a3a40');
-  drawPixelRect(ctx, ix + tw - P, iy + P, P, th - P * 3, '#2a3a40');
-
-  // ── Waterline highlight — light cyan (#9fe8ff) ──
-  var wlY3 = iy + Math.round(th * 0.06);
-  drawPixelRect(ctx, ix, wlY3, tw, P, 'rgba(159,232,255,0.35)');
-
-  // ── Sleek stand ──
-  var standY = iy + th + frameT - P;
-  var standW = tw + frameT * 2;
-  var standX = ix - frameT;
-  drawPixelRect(ctx, standX - P, standY, standW + P * 2, P * 2, '#1a2530');
-  drawPixelRect(ctx, standX, standY, standW, P, '#2a3a40');
-  drawPixelRect(ctx, standX, standY + P * 2, standW, P * 3, '#1a2530');
-  drawPixelRect(ctx, standX + P * 2, standY + P * 3, standW - P * 4, P, '#2a3a40');
-  // Feet
-  drawPixelRect(ctx, standX + P, standY + P * 5, P * 3, P * 2, '#1a2530');
-  drawPixelRect(ctx, standX + standW - P * 4, standY + P * 5, P * 3, P * 2, '#1a2530');
-}
-
-// ── Table decorations per tier (with wall & desk textures) ──────────────────
-
-function addTablePixelArt(cw, ch, P, tier) {
-  var c = document.createElement('canvas');
-  c.className = 'room-pixel-item';
-  c.width = cw; c.height = ch;
-  c.style.cssText = 'position:absolute;left:0;top:0;width:' + cw + 'px;height:' + ch + 'px;pointer-events:none;image-rendering:pixelated;z-index:3';
-  widgetContainer.appendChild(c);
-  var ctx = c.getContext('2d');
-
-  // ── Wall texture: subtle horizontal darker stripes every 6 grid units ──
-  var gu = ch / GRID_H;
-  var wallBottomPx = Math.round(ch * 0.667);
-  var stripeH = Math.max(1, Math.round(gu * 0.4));
-  for (var sy = 0; sy < wallBottomPx; sy += Math.round(6 * gu)) {
-    ctx.fillStyle = 'rgba(0,0,0,0.05)';
-    ctx.fillRect(0, sy, cw, stripeH);
-  }
-
-  // ── Desk texture: vertical plank lines every 8 grid units ──
-  var plankLine = Math.max(1, Math.round(gu * 0.3));
-  for (var plx = 0; plx < cw; plx += Math.round(8 * gu)) {
-    ctx.fillStyle = 'rgba(0,0,0,0.07)';
-    ctx.fillRect(plx, wallBottomPx, plankLine, ch - wallBottomPx);
-  }
-  // Desk edge highlight
-  ctx.fillStyle = 'rgba(255,255,255,0.04)';
-  ctx.fillRect(0, wallBottomPx + 2, cw, Math.max(1, Math.round(gu * 0.5)));
-
-  if (tier === 1) {
-    var tableY = Math.round(ch * 0.82);
-
-    // Window (upper left)
-    var wx = Math.round(cw * 0.04), wy = Math.round(ch * 0.04);
-    var ww = P * 7, wh = P * 9;
-    drawPixelRect(ctx, wx - P, wy - P, ww + P * 2, wh + P * 2, '#5D4037');
-    drawPixelRect(ctx, wx, wy, ww, wh, '#87CEEB');
-    drawPixelRect(ctx, wx + Math.round(ww / 2) - Math.round(P / 2), wy, P, wh, '#5D4037');
-    drawPixelRect(ctx, wx, wy + Math.round(wh / 2) - Math.round(P / 2), ww, P, '#5D4037');
-    drawPixelRect(ctx, wx + P, wy + P, Math.round(ww / 2) - P * 2, Math.round(wh / 2) - P * 2, '#AED8F0');
-    // Curtain accents
-    drawPixelRect(ctx, wx - P * 2, wy - P, P, wh + P * 2, '#D4A06A');
-    drawPixelRect(ctx, wx + ww + P, wy - P, P, wh + P * 2, '#D4A06A');
-    drawPixelRect(ctx, wx - P * 2, wy - P * 2, ww + P * 4 + P, P, '#C4905A');
-
-    // Books stack (left side of desk)
-    var bx = Math.round(cw * 0.06), by = tableY;
-    drawPixelRect(ctx, bx, by - P * 4, P * 8, P * 2, '#C62828');
-    drawPixelRect(ctx, bx + P, by - P * 4, P * 6, P, '#E53935');
-    drawPixelRect(ctx, bx + P, by - P * 7, P * 7, P * 2, '#1565C0');
-    drawPixelRect(ctx, bx + P * 2, by - P * 7, P * 5, P, '#1E88E5');
-    drawPixelRect(ctx, bx, by - P * 9, P * 8, P * 2, '#2E7D32');
-    drawPixelRect(ctx, bx + P, by - P * 9, P * 6, P, '#43A047');
-
-    // Coffee mug (right side)
-    var mx = Math.round(cw * 0.80), my = tableY;
-    drawPixelRect(ctx, mx, my - P * 6, P * 5, P * 6, '#E0E0E0');
-    drawPixelRect(ctx, mx + P, my - P * 5, P * 3, P * 4, '#F5F5F5');
-    drawPixelRect(ctx, mx + P * 5, my - P * 5, P * 2, P, '#BDBDBD');
-    drawPixelRect(ctx, mx + P * 5, my - P * 3, P * 2, P, '#BDBDBD');
-    drawPixelRect(ctx, mx + P * 6, my - P * 5, P, P * 3, '#BDBDBD');
-    drawPixelRect(ctx, mx + P, my - P * 6, P * 3, P, '#5D4037');
-
-    // Small potted plant (far right)
-    var ppx = Math.round(cw * 0.90), ppy = tableY;
-    drawPixelRect(ctx, ppx, ppy - P * 4, P * 4, P * 4, '#A1887F');
-    drawPixelRect(ctx, ppx + P, ppy - P * 3, P * 2, P * 2, '#795548');
-    drawPixelRect(ctx, ppx + P, ppy - P * 6, P * 2, P * 2, '#4CAF50');
-    drawPixelRect(ctx, ppx, ppy - P * 7, P, P * 2, '#66BB6A');
-    drawPixelRect(ctx, ppx + P * 3, ppy - P * 7, P, P * 2, '#43A047');
-    drawPixelRect(ctx, ppx + P, ppy - P * 8, P * 2, P, '#81C784');
-
-  } else if (tier === 2) {
-    var tableY = Math.round(ch * 0.78);
-
-    // Window (upper right)
-    var wx2 = Math.round(cw * 0.82), wy2 = Math.round(ch * 0.02);
-    var ww2 = P * 8, wh2 = P * 10;
-    drawPixelRect(ctx, wx2 - P, wy2 - P, ww2 + P * 2, wh2 + P * 2, '#4E342E');
-    drawPixelRect(ctx, wx2, wy2, ww2, wh2, '#90CAF9');
-    drawPixelRect(ctx, wx2 + Math.round(ww2 / 2) - Math.round(P / 2), wy2, P, wh2, '#4E342E');
-    drawPixelRect(ctx, wx2, wy2 + Math.round(wh2 / 2) - Math.round(P / 2), ww2, P, '#4E342E');
-    // Sky gradient in window
-    drawPixelRect(ctx, wx2 + P, wy2 + P, Math.round(ww2 / 2) - P * 2, Math.round(wh2 / 2) - P * 2, '#B3D9F7');
-    drawPixelRect(ctx, wx2 + Math.round(ww2 / 2) + P, wy2 + P, Math.round(ww2 / 2) - P * 2, Math.round(wh2 / 2) - P * 2, '#B3D9F7');
-
-    // Potted plant (left side)
-    var px2 = Math.round(cw * 0.03), py2 = tableY;
-    drawPixelRect(ctx, px2, py2 - P * 5, P * 6, P * 5, '#A1887F');
-    drawPixelRect(ctx, px2 + P, py2 - P * 4, P * 4, P * 3, '#8D6E63');
-    drawPixelRect(ctx, px2 + P * 2, py2 - P * 8, P * 2, P * 3, '#4CAF50');
-    drawPixelRect(ctx, px2 + P, py2 - P * 9, P, P * 2, '#66BB6A');
-    drawPixelRect(ctx, px2 + P * 4, py2 - P * 9, P, P * 2, '#388E3C');
-    drawPixelRect(ctx, px2 + P * 2, py2 - P * 10, P * 2, P, '#81C784');
-
-    // Photo frame (right side, above desk)
-    var fx = Math.round(cw * 0.87), fy = tableY;
-    drawPixelRect(ctx, fx, fy - P * 7, P * 6, P * 7, '#5D4037');
-    drawPixelRect(ctx, fx + P, fy - P * 6, P * 4, P * 5, '#795548');
-    drawPixelRect(ctx, fx + P, fy - P * 6, P * 4, P * 2, '#87CEEB');
-    drawPixelRect(ctx, fx + P * 2, fy - P * 4, P * 2, P, '#FFCCBC');
-    drawPixelRect(ctx, fx + P * 3, fy, P, P * 2, '#5D4037');
-    drawPixelRect(ctx, fx + P * 2, fy + P * 2, P * 3, P, '#5D4037');
   }
 }
 
@@ -1305,15 +965,6 @@ function generateDirtMask() {
   var s = seed;
   function seededRnd() { s = (s * 16807 + 0) % 2147483647; return (s & 0x7fffffff) / 2147483647; }
 
-  // For tier 1 (fishbowl), clip dirt to circular bowl shape
-  var isBowl = getActiveTier() === 1;
-  if (isBowl) {
-    dirtMaskCtx.save();
-    dirtMaskCtx.beginPath();
-    dirtMaskCtx.arc(W / 2, H / 2, Math.min(W, H) * 0.48, 0, 6.28);
-    dirtMaskCtx.clip();
-  }
-
   // 16×12 logical cell grid — each cell is independently dirty
   var cellW = W / DIRT_GRID_W;
   var cellH = H / DIRT_GRID_H;
@@ -1353,7 +1004,6 @@ function generateDirtMask() {
   dirtMaskCtx.fillRect(W - edgeW, 0, edgeW, H);
   dirtMaskCtx.fillRect(0, 0, W, edgeW * 0.6);
 
-  if (isBowl) { dirtMaskCtx.restore(); }
   dirtMaskGenerated = true;
 }
 
@@ -1879,7 +1529,7 @@ function buildInventoryPanel() {
           var otherTid = gameState.unlockedTanks[ti];
           if (otherTid === gameState.activeTankId) continue;
           if (sp && sp.tier > otherTid) continue;
-          var tName = otherTid === 1 ? 'Bowl' : otherTid === 2 ? 'Mini' : 'Big';
+          var tName = otherTid === 1 ? 'Cold' : otherTid === 2 ? 'Tropical' : 'Sea';
           moveBtns += '<button class="move-btn" data-fish="' + f.id + '" data-to="' + otherTid + '">\u2192 ' + tName + '</button>';
         }
       }
@@ -1972,14 +1622,14 @@ function buildTanksPanel() {
 
 function buildHelpPanel() {
   $('helpBody').innerHTML = ''
-    + helpSec('Overview', 'Create your own slice of tranquility! Feed your fish, keep the tank clean, and unlock bigger tanks with more species.')
-    + helpSec('Multiple Tanks', 'Start with a fishbowl, then unlock the small aquarium and big tank. Each tank has its own fish and upgrades. Switch using the arrows at the bottom or the Tanks panel.')
+    + helpSec('Overview', 'Create your own slice of tranquility! Feed your fish, keep the tank clean, and unlock new biome tanks with unique species.')
+    + helpSec('Multiple Tanks', 'Start with a Cold Water tank, then unlock the Tropical and Sea Water tanks. Each biome has its own species and decorations. Switch using the arrows at the bottom or the Tanks panel.')
     + helpSec('Feeding Tool', 'Open the menu and tap Feed. Select a food type from the dock, then tap inside the tank to drop food. Fish will swim to it!')
     + helpSec('Cleaning Tool', 'Tap Clean, then swipe across the tank to wipe away algae. Tap the close button when done.')
-    + helpSec('Laser Pointer', 'Available in Big Tank. Drag to move the red dot. Rewards once every 6 hours. Tap close to stop.')
-    + helpSec('Decorations', 'Buy decorations in the Store to customize your tanks. Sell them from the Inventory panel.')
-    + helpSec('Fish Movement', 'Move fish between tanks from the Inventory panel. Species must be compatible with the target tank tier.')
-    + helpSec('Space Cost', 'Each species uses different space: Guppies 1, Goldfish 2, Neon Tetras 1, Bettas 2, Clownfish 3, Angelfish 4.')
+    + helpSec('Laser Pointer', 'Available in Sea Water tank. Drag to move the red dot. Rewards once every 6 hours. Tap close to stop.')
+    + helpSec('Decorations', 'Buy biome-specific decorations in the Store to customize your tanks. Sell them from the Inventory panel.')
+    + helpSec('Fish Movement', 'Move fish between tanks from the Inventory panel. Species must be compatible with the target tank\'s biome.')
+    + helpSec('Space Cost', 'Each species uses different space: Guppies 1, Neon Tetras 1, Goldfish 2, Bettas 2, Koi 3, Clownfish 3, Angelfish 3, Tang 4.')
     + helpSec('Upgrades', 'Filter reduces dirt. Auto-Feeder feeds fish automatically. Food Silo increases storage. Snails eat algae.')
     + helpSec('Reset', '<button class="reset-btn" onclick="confirmReset()">Reset All Progress</button>');
 }
@@ -2115,8 +1765,7 @@ function reinitializeTank() {
   closeFishBubble();
   foodObjects = [];
   bubbles = [];
-  // Defer scene build so layout dimensions are final
-  requestAnimationFrame(function() { buildRoomScene(); });
+
 }
 
 function doAction(type, payload) {
@@ -2297,7 +1946,7 @@ function initAfterWidgetId() {
     var w2 = document.documentElement.clientWidth || 300;
     var h2 = Math.round(w2 * 0.75);
     homey.setHeight(h2);
-    setTimeout(function() { resizeCanvas(); initEnvironment(); initRockClusters(); initAmbientParticles(); redrawDirt(); buildRoomScene(); }, 100);
+    setTimeout(function() { resizeCanvas(); initEnvironment(); initRockClusters(); initAmbientParticles(); redrawDirt(); }, 100);
   });
 
   if (homey.on) { homey.on('settings.set', function(key, val) { if (key === 'reset_state' && val === true) confirmReset(); }); }

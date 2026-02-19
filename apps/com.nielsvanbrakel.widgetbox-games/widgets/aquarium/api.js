@@ -62,18 +62,18 @@ const CONSTANTS = {
 
 const TANKS = {
   1: {
-    name: 'Fishbowl', spaceCapacity: 6,
-    allowedSpecies: ['guppy', 'goldfish'],
+    name: 'Cold Water', waterType: 'cold', spaceCapacity: 6,
+    allowedSpecies: ['goldfish', 'koi'],
     features: ['feed', 'clean', 'store'],
   },
   2: {
-    name: 'Small Aquarium', spaceCapacity: 10,
-    allowedSpecies: ['guppy', 'goldfish', 'neon_tetra', 'betta'],
+    name: 'Tropical', waterType: 'tropical', spaceCapacity: 12,
+    allowedSpecies: ['guppy', 'neon_tetra', 'betta', 'angelfish'],
     features: ['feed', 'clean', 'store', 'snails', 'filter', 'autofeeder', 'silo'],
   },
   3: {
-    name: 'Big Freshwater Tank', spaceCapacity: 20,
-    allowedSpecies: ['guppy', 'goldfish', 'neon_tetra', 'betta', 'angelfish', 'clownfish'],
+    name: 'Sea Water', waterType: 'sea', spaceCapacity: 20,
+    allowedSpecies: ['clownfish', 'tang'],
     features: ['feed', 'clean', 'store', 'snails', 'filter', 'autofeeder', 'silo', 'laser'],
   },
 };
@@ -81,12 +81,17 @@ const TANKS = {
 // ── Species ──────────────────────────────────────────────────────────────────
 
 const SPECIES = {
-  guppy:      { name: 'Guppy',      basePrice: 15, baseCoinPerHour: 2.5, hungerRate: 1.0, tier: 1, spaceCost: 1, swimPatterns: ['school'],         zones: ['top','middle'],    favoriteFoods: ['flakes','pellets'],         color: { body:'#FF7043', tail:'#FFB74D' } },
-  goldfish:   { name: 'Goldfish',    basePrice: 25, baseCoinPerHour: 3.8, hungerRate: 1.2, tier: 1, spaceCost: 2, swimPatterns: ['drift','glide'],  zones: ['middle','bottom'], favoriteFoods: ['pellets','flakes'],         color: { body:'#FF8F00', tail:'#FFB300' } },
-  neon_tetra: { name: 'Neon Tetra',  basePrice: 30, baseCoinPerHour: 3.2, hungerRate: 0.9, tier: 2, spaceCost: 1, swimPatterns: ['school'],         zones: ['middle'],          favoriteFoods: ['flakes','premium_flakes'], color: { body:'#29B6F6', tail:'#E53935' } },
-  betta:      { name: 'Betta',       basePrice: 45, baseCoinPerHour: 5.0, hungerRate: 1.3, tier: 2, spaceCost: 2, swimPatterns: ['dart','circle'],  zones: ['top','middle'],    favoriteFoods: ['pellets','premium_flakes'],color: { body:'#7E57C2', tail:'#B39DDB' } },
-  angelfish:  { name: 'Angelfish',   basePrice: 70, baseCoinPerHour: 6.5, hungerRate: 1.1, tier: 3, spaceCost: 4, swimPatterns: ['glide','drift'],  zones: ['middle'],          favoriteFoods: ['premium_flakes','pellets'],color: { body:'#ECEFF1', tail:'#B0BEC5' } },
-  clownfish:  { name: 'Clownfish',   basePrice: 60, baseCoinPerHour: 5.8, hungerRate: 1.0, tier: 3, spaceCost: 3, swimPatterns: ['circle','zigzag'],zones: ['bottom','middle'], favoriteFoods: ['pellets','premium_flakes'],color: { body:'#FF7043', tail:'#FFFFFF' } },
+  // Cold water
+  goldfish:   { name: 'Goldfish',    basePrice: 15, baseCoinPerHour: 2.5, hungerRate: 1.0, tier: 1, spaceCost: 2, waterType: 'cold',     swimPatterns: ['drift','glide'],  zones: ['middle','bottom'], favoriteFoods: ['pellets','flakes'],         color: { body:'#FF8F00', tail:'#FFB300' } },
+  koi:        { name: 'Koi',         basePrice: 30, baseCoinPerHour: 4.0, hungerRate: 1.2, tier: 1, spaceCost: 3, waterType: 'cold',     swimPatterns: ['glide','drift'],  zones: ['middle','bottom'], favoriteFoods: ['pellets','premium_flakes'], color: { body:'#E53935', tail:'#FFFFFF' } },
+  // Tropical
+  guppy:      { name: 'Guppy',       basePrice: 15, baseCoinPerHour: 2.5, hungerRate: 0.9, tier: 2, spaceCost: 1, waterType: 'tropical', swimPatterns: ['school'],         zones: ['top','middle'],    favoriteFoods: ['flakes','pellets'],         color: { body:'#FF7043', tail:'#FFB74D' } },
+  neon_tetra: { name: 'Neon Tetra',  basePrice: 25, baseCoinPerHour: 3.2, hungerRate: 0.9, tier: 2, spaceCost: 1, waterType: 'tropical', swimPatterns: ['school'],         zones: ['middle'],          favoriteFoods: ['flakes','premium_flakes'], color: { body:'#29B6F6', tail:'#E53935' } },
+  betta:      { name: 'Betta',       basePrice: 45, baseCoinPerHour: 5.0, hungerRate: 1.3, tier: 2, spaceCost: 2, waterType: 'tropical', swimPatterns: ['dart','circle'],  zones: ['top','middle'],    favoriteFoods: ['pellets','premium_flakes'],color: { body:'#7E57C2', tail:'#B39DDB' } },
+  angelfish:  { name: 'Angelfish',   basePrice: 65, baseCoinPerHour: 6.0, hungerRate: 1.1, tier: 2, spaceCost: 3, waterType: 'tropical', swimPatterns: ['glide','drift'],  zones: ['middle'],          favoriteFoods: ['premium_flakes','pellets'],color: { body:'#ECEFF1', tail:'#B0BEC5' } },
+  // Sea water
+  clownfish:  { name: 'Clownfish',   basePrice: 50, baseCoinPerHour: 5.5, hungerRate: 1.0, tier: 3, spaceCost: 3, waterType: 'sea',      swimPatterns: ['circle','zigzag'],zones: ['bottom','middle'], favoriteFoods: ['pellets','premium_flakes'],color: { body:'#FF7043', tail:'#FFFFFF' } },
+  tang:       { name: 'Blue Tang',   basePrice: 75, baseCoinPerHour: 7.0, hungerRate: 1.1, tier: 3, spaceCost: 4, waterType: 'sea',      swimPatterns: ['glide','drift'],  zones: ['middle','top'],    favoriteFoods: ['premium_flakes','pellets'],color: { body:'#1565C0', tail:'#FFD54F' } },
 };
 
 // ── Foods ────────────────────────────────────────────────────────────────────
@@ -108,14 +113,21 @@ const UPGRADES = {
 // ── Decorations ──────────────────────────────────────────────────────────────
 
 const DECORATIONS = {
-  plant_fern:    { name: 'Fern',          price: 25,  sellValue: 8,   minTier: 1 },
-  plant_grass:   { name: 'Sea Grass',     price: 30,  sellValue: 10,  minTier: 1 },
-  plant_anubias: { name: 'Anubias',       price: 40,  sellValue: 13,  minTier: 2 },
-  shipwreck:     { name: 'Shipwreck',     price: 80,  sellValue: 25,  minTier: 2 },
-  bubbler:       { name: 'Bubble Maker',  price: 60,  sellValue: 20,  minTier: 2 },
-  castle:        { name: 'Castle',        price: 120, sellValue: 40,  minTier: 3 },
-  treasure:      { name: 'Treasure Chest',price: 100, sellValue: 33,  minTier: 2 },
-  coral_rock:    { name: 'Coral Rock',    price: 50,  sellValue: 16,  minTier: 3 },
+  // Cold water
+  rock_pile:     { name: 'Rock Pile',     price: 20,  sellValue: 7,   waterType: 'cold' },
+  driftwood:     { name: 'Driftwood',     price: 35,  sellValue: 12,  waterType: 'cold' },
+  stone_bridge:  { name: 'Stone Bridge',  price: 50,  sellValue: 16,  waterType: 'cold' },
+  // Tropical
+  plant_fern:    { name: 'Fern',          price: 25,  sellValue: 8,   waterType: 'tropical' },
+  plant_anubias: { name: 'Anubias',       price: 40,  sellValue: 13,  waterType: 'tropical' },
+  shipwreck:     { name: 'Shipwreck',     price: 80,  sellValue: 25,  waterType: 'tropical' },
+  treasure:      { name: 'Treasure Chest',price: 100, sellValue: 33,  waterType: 'tropical' },
+  bubbler:       { name: 'Bubble Maker',  price: 60,  sellValue: 20,  waterType: 'tropical' },
+  // Sea water
+  coral_rock:    { name: 'Coral Rock',    price: 50,  sellValue: 16,  waterType: 'sea' },
+  sea_anemone:   { name: 'Sea Anemone',   price: 70,  sellValue: 23,  waterType: 'sea' },
+  castle:        { name: 'Castle',        price: 120, sellValue: 40,  waterType: 'sea' },
+  anchor:        { name: 'Anchor',        price: 90,  sellValue: 30,  waterType: 'sea' },
 };
 
 // ── Fish names ───────────────────────────────────────────────────────────────
@@ -191,7 +203,7 @@ function createTankState(tier) {
 
 function createInitialState() {
   const tank1 = createTankState(1);
-  tank1.fish = [createFish('guppy', [])];
+  tank1.fish = [createFish('goldfish', [])];
   return {
     version: 3,
     coins: CONSTANTS.STARTING_COINS,
@@ -349,7 +361,7 @@ function buildStoreCatalog(state, tankId) {
     .map(([id, food]) => ({ foodId: id, name: food.name, price: food.price, hungerRestore: food.hungerRestore }));
 
   const decorations = Object.entries(DECORATIONS)
-    .filter(([, dec]) => dec.minTier <= tankId)
+    .filter(([, dec]) => dec.waterType === tankDef.waterType)
     .map(([id, dec]) => ({ decorationId: id, name: dec.name, price: dec.price, sellValue: dec.sellValue }));
 
   return { fish, foods, decorations };
@@ -610,7 +622,7 @@ function handleAction(state, type, payload) {
       const { decorationType } = payload;
       const dec = DECORATIONS[decorationType];
       if (!dec) return { error: 'Unknown decoration' };
-      if (dec.minTier > tid) return { error: 'Not available for this tank tier' };
+      if (dec.waterType !== tankDef.waterType) return { error: 'Not available for this tank biome' };
       if (state.coins < dec.price) return { error: 'Not enough coins' };
       state.coins -= dec.price;
       const decObj = { id: generateId(), type: decorationType, x: 0.2 + Math.random() * 0.6 };

@@ -1,442 +1,709 @@
 'use strict';
 
-// ── Catalogs (inline for simplicity) ──────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
+// Aquarium Widget — Server-side API (Homey SDK 3)
+// Multi-tank architecture: players own separate fishbowl / aquarium / big tank,
+// each with independent fish populations, upgrades, cleanliness & decorations.
+// Coins & food stock are shared globally.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// ── Constants ────────────────────────────────────────────────────────────────
 
 const CONSTANTS = {
-    BASE_DIRTY_RATE: 0.45,      // cleanliness lost per hour (base)
-    DIRTY_PER_FISH: 0.10,       // additional dirt per fish per hour
-    TIER_BASE: 3.2,
-    FISH_INFLATION_BASE: 1.18,
-    CLEAN_RESTORE: 45,          // cleanliness restored on clean action
-    CLEAN_BONUS_BASE: 10,       // base coin bonus from cleaning
-    CLEAN_BONUS_SCALE: 0.6,     // bonus scale based on dirt
-    SELL_RETURN_RATE: 0.30,     // 30% return on sell
-    WEAK_HUNGER_THRESHOLD: 10,
-    WEAK_CLEANLINESS_THRESHOLD: 10,
-    WEAK_HEALTH_THRESHOLD: 15,
-    RECOVERY_HUNGER: 35,
-    RECOVERY_CLEANLINESS: 30,
-    HEALTH_REGEN_RATE: 2,       // health per hour when conditions good
-    HEALTH_REGEN_HUNGER_MIN: 40,
-    HEALTH_REGEN_CLEAN_MIN: 40,
-    STARTING_COINS: 50,
-    STARTING_FLAKES: 10,
-    XP_PER_FEED: 8,
-    XP_PER_LEVEL: 100,
-    MAX_LEVEL: 10,
-    LEVEL_COIN_BONUS: 0.12,     // +12% coins per level
+  BASE_DIRTY_RATE: 0.45,
+  DIRTY_PER_FISH: 0.10,
+  CLEAN_RESTORE: 45,
+  CLEAN_BONUS_BASE: 10,
+  CLEAN_BONUS_SCALE: 0.6,
+  CLEAN_XP_PER_FISH: 2,
+  CLEAN_COOLDOWN_MS: 2 * 3600000,
+
+  TIER_BASE: 3.2,
+  FISH_INFLATION_BASE: 1.18,
+  SELL_RETURN_RATE: 0.30,
+  STARTING_COINS: 50,
+  STARTING_FLAKES: 10,
+
+  WEAK_HUNGER_THRESHOLD: 10,
+  WEAK_CLEANLINESS_THRESHOLD: 10,
+  WEAK_HEALTH_THRESHOLD: 15,
+  RECOVERY_HUNGER: 35,
+  RECOVERY_CLEANLINESS: 30,
+  HEALTH_REGEN_RATE: 2,
+  HEALTH_REGEN_HUNGER_MIN: 40,
+  HEALTH_REGEN_CLEAN_MIN: 40,
+
+  XP_PER_FEED: 8,
+  XP_BASE: 30,
+  XP_PER_LEVEL_SCALE: 14,
+  MAX_LEVEL: 10,
+  LEVEL_COIN_BONUS: 0.12,
+
+  MAX_SNAILS: 2,
+  SNAIL_PRICE: 40,
+  SNAIL_DIRTY_REDUCTION: 0.15,
+
+  FILTER_PRICES: [60, 150],
+  FILTER_DIRTY_REDUCTION: [0.20, 0.30],
+  AUTOFEEDER_PRICES: [80, 200],
+  AUTOFEEDER_INTERVAL_HOURS: [6, 4],
+  SILO_PRICES: [50, 120],
+  SILO_CAPACITY_MULT: [1.5, 2.0],
+  BASE_FOOD_CAPACITY: 30,
+
+  TANK_UNLOCK_PRICES: { 2: 200, 3: 2000 },
+
+  LASER_COOLDOWN_MS: 6 * 3600000,
+  LASER_REWARD_COINS: 50,
+  LASER_REWARD_XP: 10,
 };
+
+// ── Tank definitions ─────────────────────────────────────────────────────────
 
 const TANKS = {
-    1: { capacity: 3, name: 'Fishbowl', allowedSpecies: ['guppy', 'goldfish'] },
-    2: { capacity: 5, name: 'Small Aquarium', allowedSpecies: ['guppy', 'goldfish', 'neonTetra', 'betta', 'corydoras'] },
-    3: { capacity: 10, name: 'Big Freshwater Tank', allowedSpecies: ['guppy', 'goldfish', 'neonTetra', 'betta', 'corydoras', 'angelfish', 'pleco', 'discus'] },
+  1: {
+    name: 'Cold Water', waterType: 'cold', spaceCapacity: 6,
+    allowedSpecies: ['goldfish', 'koi'],
+    features: ['feed', 'clean', 'store'],
+  },
+  2: {
+    name: 'Tropical', waterType: 'tropical', spaceCapacity: 12,
+    allowedSpecies: ['guppy', 'neon_tetra', 'betta', 'angelfish'],
+    features: ['feed', 'clean', 'store', 'snails', 'filter', 'autofeeder', 'silo'],
+  },
+  3: {
+    name: 'Sea Water', waterType: 'sea', spaceCapacity: 20,
+    allowedSpecies: ['clownfish', 'tang'],
+    features: ['feed', 'clean', 'store', 'snails', 'filter', 'autofeeder', 'silo', 'laser'],
+  },
 };
+
+// ── Species ──────────────────────────────────────────────────────────────────
 
 const SPECIES = {
-    guppy: {
-        name: 'Guppy',
-        basePrice: 15,
-        baseCoinPerHour: 2.5,
-        hungerRate: 1.0,
-        tier: 1,
-        swimPatterns: ['drift', 'dart', 'zigzag'],
-        zones: ['top', 'middle'],
-        favoriteFoods: ['flakes', 'pellets'],
-        colors: [
-            { body: '#FF7043', tail: '#FFB74D' },
-            { body: '#42A5F5', tail: '#90CAF9' },
-            { body: '#AB47BC', tail: '#CE93D8' },
-            { body: '#66BB6A', tail: '#A5D6A7' },
-            { body: '#FFA726', tail: '#FFCC80' },
-        ],
-    },
-    goldfish: {
-        name: 'Goldfish',
-        basePrice: 25,
-        baseCoinPerHour: 3.8,
-        hungerRate: 1.2,
-        tier: 1,
-        swimPatterns: ['drift', 'glide'],
-        zones: ['middle', 'bottom'],
-        favoriteFoods: ['pellets', 'flakes'],
-        colors: [
-            { body: '#FF8F00', tail: '#FFB300' },
-            { body: '#F4511E', tail: '#FF8A65' },
-            { body: '#FFD54F', tail: '#FFF176' },
-        ],
-    },
+  // Cold water
+  goldfish:   { name: 'Goldfish',    basePrice: 15, baseCoinPerHour: 2.5, hungerRate: 1.0, tier: 1, spaceCost: 2, waterType: 'cold',     swimPatterns: ['drift','glide'],  zones: ['middle','bottom'], favoriteFoods: ['pellets','flakes'],         color: { body:'#FF8F00', tail:'#FFB300' } },
+  koi:        { name: 'Koi',         basePrice: 30, baseCoinPerHour: 4.0, hungerRate: 1.2, tier: 1, spaceCost: 3, waterType: 'cold',     swimPatterns: ['glide','drift'],  zones: ['middle','bottom'], favoriteFoods: ['pellets','premium_flakes'], color: { body:'#E53935', tail:'#FFFFFF' } },
+  // Tropical
+  guppy:      { name: 'Guppy',       basePrice: 15, baseCoinPerHour: 2.5, hungerRate: 0.9, tier: 2, spaceCost: 1, waterType: 'tropical', swimPatterns: ['school'],         zones: ['top','middle'],    favoriteFoods: ['flakes','pellets'],         color: { body:'#FF7043', tail:'#FFB74D' } },
+  neon_tetra: { name: 'Neon Tetra',  basePrice: 25, baseCoinPerHour: 3.2, hungerRate: 0.9, tier: 2, spaceCost: 1, waterType: 'tropical', swimPatterns: ['school'],         zones: ['middle'],          favoriteFoods: ['flakes','premium_flakes'], color: { body:'#29B6F6', tail:'#E53935' } },
+  betta:      { name: 'Betta',       basePrice: 45, baseCoinPerHour: 5.0, hungerRate: 1.3, tier: 2, spaceCost: 2, waterType: 'tropical', swimPatterns: ['dart','circle'],  zones: ['top','middle'],    favoriteFoods: ['pellets','premium_flakes'],color: { body:'#7E57C2', tail:'#B39DDB' } },
+  angelfish:  { name: 'Angelfish',   basePrice: 65, baseCoinPerHour: 6.0, hungerRate: 1.1, tier: 2, spaceCost: 3, waterType: 'tropical', swimPatterns: ['glide','drift'],  zones: ['middle'],          favoriteFoods: ['premium_flakes','pellets'],color: { body:'#ECEFF1', tail:'#B0BEC5' } },
+  // Sea water
+  clownfish:  { name: 'Clownfish',   basePrice: 50, baseCoinPerHour: 5.5, hungerRate: 1.0, tier: 3, spaceCost: 3, waterType: 'sea',      swimPatterns: ['circle','zigzag'],zones: ['bottom','middle'], favoriteFoods: ['pellets','premium_flakes'],color: { body:'#FF7043', tail:'#FFFFFF' } },
+  tang:       { name: 'Blue Tang',   basePrice: 75, baseCoinPerHour: 7.0, hungerRate: 1.1, tier: 3, spaceCost: 4, waterType: 'sea',      swimPatterns: ['glide','drift'],  zones: ['middle','top'],    favoriteFoods: ['premium_flakes','pellets'],color: { body:'#1565C0', tail:'#FFD54F' } },
 };
+
+// ── Foods ────────────────────────────────────────────────────────────────────
 
 const FOODS = {
-    flakes: { name: 'Flakes', price: 3, hungerRestore: 30, xpBonus: 1.0 },
-    pellets: { name: 'Pellets', price: 6, hungerRestore: 45, xpBonus: 1.5 },
+  flakes:         { name: 'Flakes',         price: 3,  hungerRestore: 30, xpBonus: 1.0, tier: 1 },
+  pellets:        { name: 'Pellets',        price: 6,  hungerRestore: 45, xpBonus: 1.5, tier: 1 },
+  premium_flakes: { name: 'Premium Flakes', price: 12, hungerRestore: 60, xpBonus: 2.0, tier: 2 },
 };
 
-// ── Fish name generator ───────────────────────────────────────────────
+// ── Equipment upgrades ───────────────────────────────────────────────────────
+
+const UPGRADES = {
+  filter:     { name: 'Filter',      icon: '\u{1F527}', maxLevel: 2, minTier: 2, prices: CONSTANTS.FILTER_PRICES,     descriptions: ['Reduces dirt by 20%','Reduces dirt by 30%'] },
+  autoFeeder: { name: 'Auto-Feeder', icon: '\u{1F916}', maxLevel: 2, minTier: 2, prices: CONSTANTS.AUTOFEEDER_PRICES, descriptions: ['Auto-feeds every 6h','Auto-feeds every 4h'] },
+  foodSilo:   { name: 'Food Silo',   icon: '\u{1F3D7}', maxLevel: 2, minTier: 2, prices: CONSTANTS.SILO_PRICES,       descriptions: ['+50% food capacity','+100% food capacity'] },
+};
+
+// ── Decorations ──────────────────────────────────────────────────────────────
+
+const DECORATIONS = {
+  // Cold water
+  rock_pile:     { name: 'Rock Pile',     price: 20,  sellValue: 7,   waterType: 'cold' },
+  driftwood:     { name: 'Driftwood',     price: 35,  sellValue: 12,  waterType: 'cold' },
+  stone_bridge:  { name: 'Stone Bridge',  price: 50,  sellValue: 16,  waterType: 'cold' },
+  // Tropical
+  plant_fern:    { name: 'Fern',          price: 25,  sellValue: 8,   waterType: 'tropical' },
+  plant_anubias: { name: 'Anubias',       price: 40,  sellValue: 13,  waterType: 'tropical' },
+  shipwreck:     { name: 'Shipwreck',     price: 80,  sellValue: 25,  waterType: 'tropical' },
+  treasure:      { name: 'Treasure Chest',price: 100, sellValue: 33,  waterType: 'tropical' },
+  bubbler:       { name: 'Bubble Maker',  price: 60,  sellValue: 20,  waterType: 'tropical' },
+  // Sea water
+  coral_rock:    { name: 'Coral Rock',    price: 50,  sellValue: 16,  waterType: 'sea' },
+  sea_anemone:   { name: 'Sea Anemone',   price: 70,  sellValue: 23,  waterType: 'sea' },
+  castle:        { name: 'Castle',        price: 120, sellValue: 40,  waterType: 'sea' },
+  anchor:        { name: 'Anchor',        price: 90,  sellValue: 30,  waterType: 'sea' },
+};
+
+// ── Fish names ───────────────────────────────────────────────────────────────
 
 const FISH_NAMES = [
-    'Bubbles', 'Splash', 'Nemo', 'Goldie', 'Finn', 'Coral',
-    'Shimmer', 'Dash', 'Pip', 'Sunny', 'Luna', 'Pearl',
-    'Twirl', 'Ziggy', 'Drift', 'Sparkle', 'Pebbles', 'Glow',
-    'Ripple', 'Skipper', 'Waddle', 'Mochi', 'Tofu', 'Bean',
-    'Biscuit', 'Poppy', 'Clover', 'Maple', 'Olive', 'Sage',
+  'Bubbles','Splash','Nemo','Goldie','Finn','Coral','Shimmer','Dash','Pip','Sunny',
+  'Luna','Pearl','Twirl','Ziggy','Drift','Sparkle','Pebbles','Glow','Azure','Ruby',
+  'Jade','Storm','Whisper','Breeze','Mochi','Sushi','Tofu','Maple','Clover','Sky',
 ];
 
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
+function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+function randomChoice(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+function generateId() { return `f_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`; }
+
+function getUsedSpace(tank) {
+  return tank.fish.reduce((sum, f) => sum + (SPECIES[f.speciesId]?.spaceCost || 1), 0);
+}
+
+function xpToNextLevel(level) {
+  return CONSTANTS.XP_BASE + CONSTANTS.XP_PER_LEVEL_SCALE * (level - 1);
+}
+
+function getLifeStage(fish) {
+  const ageDays = (Date.now() - fish.bornAt) / 86400000;
+  if (ageDays < 2) return { stage: 'Baby', coinMult: 0.90 };
+  if (ageDays < 7) return { stage: 'Child', coinMult: 1.00 };
+  return { stage: 'Adult', coinMult: 1.05 };
+}
+
+function getAgeDays(fish) {
+  return (Date.now() - fish.bornAt) / 86400000;
+}
+
 function generateFishName(existingNames) {
-    const available = FISH_NAMES.filter(n => !existingNames.includes(n));
-    if (available.length === 0) {
-        return `Fish ${Math.floor(Math.random() * 1000)}`;
-    }
-    return available[Math.floor(Math.random() * available.length)];
+  const available = FISH_NAMES.filter(n => !existingNames.includes(n));
+  return available.length > 0 ? randomChoice(available) : `Fish ${Math.floor(Math.random() * 1000)}`;
 }
 
-// ── Utility helpers ───────────────────────────────────────────────────
-
-function clamp(val, min, max) {
-    return Math.max(min, Math.min(max, val));
+function createFish(speciesId, existingNames) {
+  const species = SPECIES[speciesId];
+  if (!species) throw new Error(`Unknown species: ${speciesId}`);
+  return {
+    id: generateId(), speciesId,
+    name: generateFishName(existingNames),
+    bornAt: Date.now(),
+    level: 1, xp: 0,
+    hunger: 85 + Math.floor(Math.random() * 15),
+    health: 100, weak: false,
+    favoriteFoodId: randomChoice(species.favoriteFoods),
+    swimPattern: randomChoice(species.swimPatterns),
+    zone: randomChoice(species.zones),
+    color: species.color,
+    sizeVariance: 0.95 + Math.random() * 0.10,
+    lifetimeCoins: 0,
+  };
 }
 
-function lerp(a, b, t) {
-    return a + (b - a) * clamp(t, 0, 1);
-}
+// ── State factory ────────────────────────────────────────────────────────────
 
-function randomChoice(arr) {
-    return arr[Math.floor(Math.random() * arr.length)];
+function createTankState(tier) {
+  return {
+    fish: [],
+    cleanliness: 100,
+    upgrades: { filterLevel: 0, autoFeederLevel: 0, foodSiloLevel: 0 },
+    snails: 0,
+    decorations: [],
+    lastCleaned: 0,
+    lastLaserReward: 0,
+  };
 }
-
-function generateId() {
-    return `f_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-}
-
-// ── Create fresh state ────────────────────────────────────────────────
 
 function createInitialState() {
-    const now = Date.now();
-    const starterFish = createFish('guppy', [], now);
-
-    return {
-        version: 1,
-        tankTier: 1,
-        coins: CONSTANTS.STARTING_COINS,
-        lastSeenAt: now,
-        cleanliness: 100,
-        foodStock: { flakes: CONSTANTS.STARTING_FLAKES, pellets: 0 },
-        upgrades: { filterLevel: 0, autoFeederLevel: 0, foodSiloLevel: 0 },
-        snails: 0,
-        fish: [starterFish],
-        stats: { coinsEarnedLifetime: 0, streakDays: 0 },
-    };
+  const tank1 = createTankState(1);
+  tank1.fish = [createFish('goldfish', [])];
+  return {
+    version: 3,
+    coins: CONSTANTS.STARTING_COINS,
+    activeTankId: 1,
+    unlockedTanks: [1],
+    lastSeenAt: Date.now(),
+    foodStock: { flakes: CONSTANTS.STARTING_FLAKES, pellets: 0, premium_flakes: 0 },
+    tanks: { 1: tank1 },
+    stats: { coinsEarnedLifetime: 0, fishPurchasedLifetime: 1, streakDays: 0 },
+  };
 }
 
-function createFish(speciesId, existingNames, now) {
-    const species = SPECIES[speciesId];
-    if (!species) throw new Error(`Unknown species: ${speciesId}`);
+// ── Migration from v2 state ──────────────────────────────────────────────────
 
-    const color = randomChoice(species.colors);
-    return {
-        id: generateId(),
-        speciesId,
-        name: generateFishName(existingNames),
-        bornAt: now,
-        level: 1,
-        xp: 0,
-        hunger: 85 + Math.floor(Math.random() * 15), // 85-100
-        health: 100,
-        weak: false,
-        favoriteFoodId: randomChoice(species.favoriteFoods),
-        swimPattern: randomChoice(species.swimPatterns),
-        zone: randomChoice(species.zones),
-        color,
-        sizeVariance: 0.95 + Math.random() * 0.10, // ±5%
-        lifetimeCoins: 0,
-    };
+function migrateState(state) {
+  if (!state || state.version >= 3) return state;
+  // v2 had flat structure: tankTier, fish[], upgrades, cleanliness, snails at root
+  const oldTier = state.tankTier || 1;
+  const tank = createTankState(oldTier);
+  tank.fish = state.fish || [];
+  tank.cleanliness = state.cleanliness != null ? state.cleanliness : 100;
+  tank.upgrades = state.upgrades || { filterLevel: 0, autoFeederLevel: 0, foodSiloLevel: 0 };
+  tank.snails = state.snails || 0;
+  tank.lastCleaned = state.lastCleaned || 0;
+  tank.lastLaserReward = state.lastLaserReward || 0;
+
+  const unlockedTanks = [];
+  for (let t = 1; t <= oldTier; t++) unlockedTanks.push(t);
+
+  return {
+    version: 3,
+    coins: state.coins || 0,
+    activeTankId: oldTier,
+    unlockedTanks,
+    lastSeenAt: state.lastSeenAt || Date.now(),
+    foodStock: state.foodStock || { flakes: 0, pellets: 0, premium_flakes: 0 },
+    tanks: { [oldTier]: tank },
+    stats: state.stats || { coinsEarnedLifetime: 0, fishPurchasedLifetime: 0, streakDays: 0 },
+  };
 }
 
-// ── Simulation engine ─────────────────────────────────────────────────
+// ── Pricing ──────────────────────────────────────────────────────────────────
 
-function simulate(state) {
-    const now = Date.now();
-    const dtHours = (now - state.lastSeenAt) / 3600000;
-
-    if (dtHours <= 0) {
-        state.lastSeenAt = now;
-        return { coinsEarned: 0, dtHours: 0 };
-    }
-
-    // Cap simulation to 7 days max to prevent absurd values
-    const cappedDt = Math.min(dtHours, 168);
-    const aliveFishCount = state.fish.length;
-
-    // ── Dirt decay ──
-    const dirtyRate = CONSTANTS.BASE_DIRTY_RATE + aliveFishCount * CONSTANTS.DIRTY_PER_FISH;
-    state.cleanliness = clamp(state.cleanliness - cappedDt * dirtyRate, 0, 100);
-
-    // ── Per-fish simulation ──
-    let totalCoinsEarned = 0;
-
-    for (const fish of state.fish) {
-        const species = SPECIES[fish.speciesId];
-
-        // Hunger decay
-        fish.hunger = clamp(fish.hunger - cappedDt * species.hungerRate, 0, 100);
-
-        // Weak state check
-        const shouldBeWeak = (
-            fish.hunger <= CONSTANTS.WEAK_HUNGER_THRESHOLD ||
-            state.cleanliness <= CONSTANTS.WEAK_CLEANLINESS_THRESHOLD ||
-            fish.health <= CONSTANTS.WEAK_HEALTH_THRESHOLD
-        );
-
-        if (shouldBeWeak) {
-            fish.weak = true;
-        } else if (
-            fish.weak &&
-            fish.hunger >= CONSTANTS.RECOVERY_HUNGER &&
-            state.cleanliness >= CONSTANTS.RECOVERY_CLEANLINESS
-        ) {
-            fish.weak = false;
-        }
-
-        // Health regen when conditions are good
-        if (
-            fish.hunger > CONSTANTS.HEALTH_REGEN_HUNGER_MIN &&
-            state.cleanliness > CONSTANTS.HEALTH_REGEN_CLEAN_MIN
-        ) {
-            fish.health = clamp(fish.health + cappedDt * CONSTANTS.HEALTH_REGEN_RATE, 0, 100);
-        }
-
-        // Coin generation (only if not weak)
-        if (!fish.weak) {
-            const levelMult = 1 + CONSTANTS.LEVEL_COIN_BONUS * (fish.level - 1);
-            const cleanMult = lerp(0.7, 1.2, state.cleanliness / 100);
-            const hungerMult = lerp(0.3, 1.1, fish.hunger / 100);
-            const coinsFromFish = species.baseCoinPerHour * levelMult * cleanMult * hungerMult * cappedDt;
-            totalCoinsEarned += coinsFromFish;
-            fish.lifetimeCoins += coinsFromFish;
-        }
-    }
-
-    state.coins += totalCoinsEarned;
-    state.stats.coinsEarnedLifetime += totalCoinsEarned;
-    state.lastSeenAt = now;
-
-    return { coinsEarned: Math.floor(totalCoinsEarned), dtHours: cappedDt };
+function getTotalFishCount(state) {
+  let total = 0;
+  for (const tid of state.unlockedTanks) {
+    if (state.tanks[tid]) total += state.tanks[tid].fish.length;
+  }
+  return total;
 }
-
-// ── Fish pricing ──────────────────────────────────────────────────────
 
 function getFishPrice(speciesId, totalFishOwned) {
-    const species = SPECIES[speciesId];
-    if (!species) return Infinity;
-
-    const tierMult = Math.pow(CONSTANTS.TIER_BASE, species.tier - 1);
-    const inflation = Math.pow(CONSTANTS.FISH_INFLATION_BASE, totalFishOwned);
-    return Math.ceil(species.basePrice * tierMult * inflation);
+  const species = SPECIES[speciesId];
+  if (!species) return Infinity;
+  return Math.ceil(species.basePrice * Math.pow(CONSTANTS.TIER_BASE, species.tier - 1) * Math.pow(CONSTANTS.FISH_INFLATION_BASE, totalFishOwned));
 }
 
-function getSellValue(speciesId, totalFishOwned) {
-    const price = getFishPrice(speciesId, Math.max(0, totalFishOwned - 1));
-    return Math.floor(price * CONSTANTS.SELL_RETURN_RATE);
+function getFoodCapacity(state, tankId) {
+  const tank = state.tanks[tankId];
+  if (!tank) return CONSTANTS.BASE_FOOD_CAPACITY;
+  const siloLevel = tank.upgrades.foodSiloLevel || 0;
+  const mult = siloLevel > 0 ? CONSTANTS.SILO_CAPACITY_MULT[siloLevel - 1] : 1.0;
+  return Math.floor(CONSTANTS.BASE_FOOD_CAPACITY * mult);
 }
 
-// ── Action handlers ───────────────────────────────────────────────────
+function getEffectiveDirtyRate(tank) {
+  let rate = CONSTANTS.BASE_DIRTY_RATE + tank.fish.length * CONSTANTS.DIRTY_PER_FISH;
+  rate *= (1 - tank.snails * CONSTANTS.SNAIL_DIRTY_REDUCTION);
+  const filterLevel = tank.upgrades.filterLevel || 0;
+  if (filterLevel > 0) rate *= (1 - CONSTANTS.FILTER_DIRTY_REDUCTION[filterLevel - 1]);
+  return Math.max(rate, 0.05);
+}
 
-function handleFeed(state, payload) {
-    const { foodId } = payload;
-    const food = FOODS[foodId];
-    if (!food) return { error: 'Unknown food' };
-    if (!state.foodStock[foodId] || state.foodStock[foodId] <= 0) {
-        return { error: 'No food available' };
+// ── Simulation (runs per-tank for all unlocked tanks) ────────────────────────
+
+function simulate(state) {
+  const now = Date.now();
+  const dtHours = Math.min((now - state.lastSeenAt) / 3600000, 168);
+  if (dtHours <= 0) { state.lastSeenAt = now; return { coinsEarned: 0, dtHours: 0 }; }
+
+  let totalCoinsEarned = 0;
+
+  for (const tidStr of state.unlockedTanks) {
+    const tid = Number(tidStr);
+    const tank = state.tanks[tid];
+    if (!tank) continue;
+    const tankDef = TANKS[tid];
+    if (!tankDef) continue;
+
+    // Dirt decay
+    const dirtyRate = getEffectiveDirtyRate(tank);
+    tank.cleanliness = clamp(tank.cleanliness - dtHours * dirtyRate, 0, 100);
+
+    // Auto-feeder
+    const autoFeederLevel = tank.upgrades.autoFeederLevel || 0;
+    if (autoFeederLevel > 0 && dtHours > 0) {
+      const interval = CONSTANTS.AUTOFEEDER_INTERVAL_HOURS[autoFeederLevel - 1];
+      const feedCycles = Math.floor(dtHours / interval);
+      for (let c = 0; c < feedCycles; c++) {
+        const foodId = state.foodStock.flakes > 0 ? 'flakes' : state.foodStock.pellets > 0 ? 'pellets' : state.foodStock.premium_flakes > 0 ? 'premium_flakes' : null;
+        if (!foodId) break;
+        state.foodStock[foodId]--;
+        const hungryFish = [...tank.fish].sort((a, b) => a.hunger - b.hunger)[0];
+        if (hungryFish) hungryFish.hunger = clamp(hungryFish.hunger + FOODS[foodId].hungerRestore * 0.8, 0, 100);
+      }
     }
 
-    state.foodStock[foodId]--;
-    let fedCount = 0;
+    // Per-fish simulation
+    for (const fish of tank.fish) {
+      const species = SPECIES[fish.speciesId];
+      fish.hunger = clamp(fish.hunger - dtHours * species.hungerRate, 0, 100);
+      const shouldBeWeak = fish.hunger <= CONSTANTS.WEAK_HUNGER_THRESHOLD || tank.cleanliness <= CONSTANTS.WEAK_CLEANLINESS_THRESHOLD;
+      if (shouldBeWeak && !fish.weak) { fish.weak = true; fish.health = clamp(fish.health - 20, 0, 100); }
+      if (!shouldBeWeak && fish.weak && fish.hunger >= CONSTANTS.RECOVERY_HUNGER && tank.cleanliness >= CONSTANTS.RECOVERY_CLEANLINESS) { fish.weak = false; }
+      if (!fish.weak && fish.hunger >= CONSTANTS.HEALTH_REGEN_HUNGER_MIN && tank.cleanliness >= CONSTANTS.HEALTH_REGEN_CLEAN_MIN) {
+        fish.health = clamp(fish.health + CONSTANTS.HEALTH_REGEN_RATE * dtHours, 0, 100);
+      }
 
-    for (const fish of state.fish) {
-        if (fish.hunger < 95) {
-            const isFavorite = fish.favoriteFoodId === foodId;
-            const restoreAmount = isFavorite ? food.hungerRestore * 1.3 : food.hungerRestore;
-            fish.hunger = clamp(fish.hunger + restoreAmount, 0, 100);
+      // Coin generation
+      const lifeStage = getLifeStage(fish);
+      const levelBonus = 1 + fish.level * CONSTANTS.LEVEL_COIN_BONUS;
+      const hungerMod = fish.hunger > 50 ? 1.0 : fish.hunger > 20 ? 0.5 : 0.1;
+      const cleanMod = tank.cleanliness > 50 ? 1.0 : tank.cleanliness > 20 ? 0.5 : 0.1;
+      const weakMod = fish.weak ? 0.1 : 1.0;
+      const coins = species.baseCoinPerHour * lifeStage.coinMult * levelBonus * hungerMod * cleanMod * weakMod * dtHours;
+      fish.lifetimeCoins = (fish.lifetimeCoins || 0) + coins;
+      totalCoinsEarned += coins;
+    }
+  }
 
-            // XP gain
-            const xpGain = CONSTANTS.XP_PER_FEED * food.xpBonus * (isFavorite ? 1.5 : 1);
-            fish.xp += xpGain;
+  state.coins += totalCoinsEarned;
+  state.stats.coinsEarnedLifetime += totalCoinsEarned;
+  state.lastSeenAt = now;
+  return { coinsEarned: Math.floor(totalCoinsEarned), dtHours };
+}
 
-            // Level up check
-            while (fish.xp >= CONSTANTS.XP_PER_LEVEL && fish.level < CONSTANTS.MAX_LEVEL) {
-                fish.xp -= CONSTANTS.XP_PER_LEVEL;
-                fish.level++;
-            }
+// ── Build catalog responses ──────────────────────────────────────────────────
 
-            fedCount++;
+function buildStoreCatalog(state, tankId) {
+  const tankDef = TANKS[tankId];
+  if (!tankDef) return { fish: [], foods: [] };
+  const totalFish = getTotalFishCount(state);
+
+  const fish = Object.entries(SPECIES).map(([id, sp]) => ({
+    speciesId: id, name: sp.name,
+    price: getFishPrice(id, totalFish),
+    baseCoinPerHour: sp.baseCoinPerHour,
+    spaceCost: sp.spaceCost,
+    locked: !tankDef.allowedSpecies.includes(id),
+    requiredTier: sp.tier,
+  }));
+
+  const foods = Object.entries(FOODS)
+    .filter(([, food]) => food.tier <= tankId)
+    .map(([id, food]) => ({ foodId: id, name: food.name, price: food.price, hungerRestore: food.hungerRestore }));
+
+  const decorations = Object.entries(DECORATIONS)
+    .filter(([, dec]) => dec.waterType === tankDef.waterType)
+    .map(([id, dec]) => ({ decorationId: id, name: dec.name, price: dec.price, sellValue: dec.sellValue }));
+
+  return { fish, foods, decorations };
+}
+
+function buildUpgradesCatalog(state, tankId) {
+  const tank = state.tanks[tankId];
+  const tankDef = TANKS[tankId];
+  if (!tank || !tankDef) return {};
+  const result = { upgrades: [], allMaxed: false };
+
+  // Equipment upgrades
+  for (const [id, upg] of Object.entries(UPGRADES)) {
+    const levelKey = id === 'filter' ? 'filterLevel' : id === 'autoFeeder' ? 'autoFeederLevel' : 'foodSiloLevel';
+    const currentLevel = tank.upgrades[levelKey] || 0;
+    if (currentLevel >= upg.maxLevel) continue;
+    const locked = !tankDef.features.includes(id === 'foodSilo' ? 'silo' : id);
+    result.upgrades.push({
+      id, name: upg.name, icon: upg.icon,
+      currentLevel, maxLevel: upg.maxLevel,
+      nextPrice: upg.prices[currentLevel], nextDescription: upg.descriptions[currentLevel],
+      canBuy: !locked && state.coins >= upg.prices[currentLevel],
+      locked, requiredTier: upg.minTier,
+    });
+  }
+
+  // Snails (per-tank)
+  if (tankDef.features.includes('snails')) {
+    result.snails = { current: tank.snails, max: CONSTANTS.MAX_SNAILS, price: CONSTANTS.SNAIL_PRICE, canBuy: tank.snails < CONSTANTS.MAX_SNAILS && state.coins >= CONSTANTS.SNAIL_PRICE };
+  }
+
+  result.allMaxed = result.upgrades.length === 0 && (!result.snails || result.snails.current >= result.snails.max);
+  return result;
+}
+
+function buildTanksList(state) {
+  return Object.entries(TANKS).map(([tidStr, def]) => {
+    const tid = Number(tidStr);
+    const unlocked = state.unlockedTanks.includes(tid);
+    const tank = state.tanks[tid];
+    const fishCount = tank ? tank.fish.length : 0;
+    const usedSpace = tank ? getUsedSpace(tank) : 0;
+    const unlockPrice = CONSTANTS.TANK_UNLOCK_PRICES[tid] || 0;
+    const canUnlock = !unlocked && state.coins >= unlockPrice;
+    // Unlock requirements (simplified): tier 2 needs 3 adults or 800 lifetime coins; tier 3 needs 2000 lifetime coins
+    let meetsRequirements = true;
+    let requirementsDesc = '';
+    if (tid === 2 && !unlocked) {
+      const allFish = [];
+      for (const t of state.unlockedTanks) { if (state.tanks[t]) allFish.push(...state.tanks[t].fish); }
+      const adultCount = allFish.filter(f => getLifeStage(f).stage === 'Adult').length;
+      meetsRequirements = (allFish.length >= 3 || state.stats.coinsEarnedLifetime >= 800) && adultCount >= 2;
+      requirementsDesc = 'Own 3 fish OR earn 800 lifetime coins, and have 2+ adults';
+    } else if (tid === 3 && !unlocked) {
+      meetsRequirements = state.stats.coinsEarnedLifetime >= 2000;
+      requirementsDesc = 'Earn 2000 lifetime coins';
+    }
+    return {
+      tankId: tid, name: def.name, spaceCapacity: def.spaceCapacity,
+      unlocked, fishCount, usedSpace,
+      unlockPrice, canUnlock: canUnlock && meetsRequirements,
+      meetsRequirements, requirementsDesc,
+      isActive: state.activeTankId === tid,
+    };
+  });
+}
+
+// ── Response builder ─────────────────────────────────────────────────────────
+
+function buildResponse(state, result) {
+  const tid = state.activeTankId;
+  const tank = state.tanks[tid];
+  const tankDef = TANKS[tid];
+  return {
+    state,
+    tankInfo: { tankId: tid, ...tankDef },
+    activeTank: tank,
+    storeCatalog: buildStoreCatalog(state, tid),
+    upgradesCatalog: buildUpgradesCatalog(state, tid),
+    tanksList: buildTanksList(state),
+    foodCapacity: getFoodCapacity(state, tid),
+    result: result || {},
+  };
+}
+
+// ── Action handler ───────────────────────────────────────────────────────────
+
+function handleAction(state, type, payload) {
+  const tid = state.activeTankId;
+  const tank = state.tanks[tid];
+  const tankDef = TANKS[tid];
+  if (!tank || !tankDef) return { error: 'Invalid tank' };
+
+  switch (type) {
+    // ── Switch tank view ─────────────────────────────────────────────────
+    case 'switch_tank': {
+      const { tankId } = payload;
+      if (!state.unlockedTanks.includes(tankId)) return { error: 'Tank not unlocked' };
+      if (!state.tanks[tankId]) return { error: 'Tank not found' };
+      state.activeTankId = tankId;
+      return { switched: true, tankId };
+    }
+
+    // ── Unlock new tank ──────────────────────────────────────────────────
+    case 'unlock_tank': {
+      const { tankId } = payload;
+      if (state.unlockedTanks.includes(tankId)) return { error: 'Already unlocked' };
+      const price = CONSTANTS.TANK_UNLOCK_PRICES[tankId];
+      if (!price) return { error: 'Invalid tank' };
+      if (state.coins < price) return { error: 'Not enough coins' };
+      state.coins -= price;
+      state.unlockedTanks.push(tankId);
+      state.unlockedTanks.sort();
+      state.tanks[tankId] = createTankState(tankId);
+      state.activeTankId = tankId;
+      return { unlocked: true, tankId, tankName: TANKS[tankId].name };
+    }
+
+    // ── Buy fish (into active tank) ──────────────────────────────────────
+    case 'buy_fish': {
+      const { speciesId } = payload;
+      const species = SPECIES[speciesId];
+      if (!species) return { error: 'Unknown species' };
+      const usedSpace = getUsedSpace(tank);
+      if (usedSpace + species.spaceCost > tankDef.spaceCapacity) return { error: `Tank is full (${usedSpace}/${tankDef.spaceCapacity} space)` };
+      if (!tankDef.allowedSpecies.includes(speciesId)) return { error: 'Species not available for this tank' };
+      const price = getFishPrice(speciesId, getTotalFishCount(state));
+      if (state.coins < price) return { error: 'Not enough coins' };
+      state.coins -= price;
+      const existingNames = tank.fish.map(f => f.name);
+      const fish = createFish(speciesId, existingNames);
+      tank.fish.push(fish);
+      state.stats.fishPurchasedLifetime++;
+      return { fish };
+    }
+
+    // ── Sell fish ────────────────────────────────────────────────────────
+    case 'sell_fish': {
+      const { fishId } = payload;
+      const idx = tank.fish.findIndex(f => f.id === fishId);
+      if (idx === -1) return { error: 'Fish not found in this tank' };
+      if (tank.fish.length <= 1) return { error: 'You need at least one fish per tank' };
+      const fish = tank.fish[idx];
+      const species = SPECIES[fish.speciesId];
+      const value = Math.ceil(getFishPrice(fish.speciesId, getTotalFishCount(state)) * CONSTANTS.SELL_RETURN_RATE * (1 + fish.level * 0.05));
+      state.coins += value;
+      tank.fish.splice(idx, 1);
+      return { fishName: fish.name, value };
+    }
+
+    // ── Move fish between tanks ──────────────────────────────────────────
+    case 'move_fish': {
+      const { fishId, toTankId } = payload;
+      if (!state.unlockedTanks.includes(toTankId)) return { error: 'Target tank not unlocked' };
+      const fromTank = tank;
+      const toTank = state.tanks[toTankId];
+      const toTankDef = TANKS[toTankId];
+      if (!toTank || !toTankDef) return { error: 'Invalid target tank' };
+      const idx = fromTank.fish.findIndex(f => f.id === fishId);
+      if (idx === -1) return { error: 'Fish not found' };
+      const fish = fromTank.fish[idx];
+      if (!toTankDef.allowedSpecies.includes(fish.speciesId)) return { error: `${SPECIES[fish.speciesId]?.name || fish.speciesId} not allowed in ${toTankDef.name}` };
+      const usedSpace = getUsedSpace(toTank);
+      const species = SPECIES[fish.speciesId];
+      if (usedSpace + species.spaceCost > toTankDef.spaceCapacity) return { error: `${toTankDef.name} is full` };
+      fromTank.fish.splice(idx, 1);
+      toTank.fish.push(fish);
+      return { moved: true, fishName: fish.name, toTankName: toTankDef.name };
+    }
+
+    // ── Feed ─────────────────────────────────────────────────────────────
+    case 'feed': {
+      const { foodId } = payload;
+      const food = FOODS[foodId];
+      if (!food) return { error: 'Unknown food' };
+      if ((state.foodStock[foodId] || 0) <= 0) return { error: 'Out of stock' };
+      state.foodStock[foodId]--;
+      return { fed: true };
+    }
+
+    case 'fish_consume': {
+      const { fishId, foodId } = payload;
+      const fish = tank.fish.find(f => f.id === fishId);
+      const food = FOODS[foodId];
+      if (!fish || !food) return {};
+      fish.hunger = clamp(fish.hunger + food.hungerRestore, 0, 100);
+      const xpGain = CONSTANTS.XP_PER_FEED * food.xpBonus * (fish.favoriteFoodId === foodId ? 1.5 : 1.0);
+      fish.xp += xpGain;
+      while (fish.level < CONSTANTS.MAX_LEVEL && fish.xp >= xpToNextLevel(fish.level)) {
+        fish.xp -= xpToNextLevel(fish.level);
+        fish.level++;
+      }
+      return { fish };
+    }
+
+    // ── Clean ────────────────────────────────────────────────────────────
+    case 'clean': {
+      const now = Date.now();
+      if (now - tank.lastCleaned < CONSTANTS.CLEAN_COOLDOWN_MS && tank.cleanliness >= 90) {
+        return { error: 'Tank was recently cleaned', cooldownRemaining: CONSTANTS.CLEAN_COOLDOWN_MS - (now - tank.lastCleaned) };
+      }
+      const pct = clamp(payload.percentCleaned || 0, 0, 100);
+      if (pct <= 0) return { cleanliness: tank.cleanliness, bonus: 0 };
+      const before = tank.cleanliness;
+      const restore = (100 - before) * (pct / 100);
+      tank.cleanliness = clamp(before + restore, 0, 100);
+      tank.lastCleaned = now;
+      const improvement = tank.cleanliness - before;
+      const bonus = improvement > 10 ? Math.ceil(CONSTANTS.CLEAN_BONUS_BASE * Math.pow(improvement / 100, CONSTANTS.CLEAN_BONUS_SCALE) * tank.fish.length) : 0;
+      state.coins += bonus;
+      for (const fish of tank.fish) {
+        fish.xp += Math.ceil(CONSTANTS.CLEAN_XP_PER_FISH * (pct / 100));
+        while (fish.level < CONSTANTS.MAX_LEVEL && fish.xp >= xpToNextLevel(fish.level)) { fish.xp -= xpToNextLevel(fish.level); fish.level++; }
+      }
+      return { cleanliness: tank.cleanliness, bonus, percentCleaned: pct };
+    }
+
+    // ── Buy food ─────────────────────────────────────────────────────────
+    case 'buy_food': {
+      const { foodId, quantity } = payload;
+      const food = FOODS[foodId];
+      if (!food) return { error: 'Unknown food' };
+      const qty = quantity || 5;
+      const cost = food.price * qty;
+      if (state.coins < cost) return { error: 'Not enough coins' };
+      state.coins -= cost;
+      state.foodStock[foodId] = (state.foodStock[foodId] || 0) + qty;
+      return { foodId, quantity: qty };
+    }
+
+    // ── Buy snail ────────────────────────────────────────────────────────
+    case 'buy_snail': {
+      if (!tankDef.features.includes('snails')) return { error: 'Snails not available' };
+      if (tank.snails >= CONSTANTS.MAX_SNAILS) return { error: 'Max snails reached' };
+      if (state.coins < CONSTANTS.SNAIL_PRICE) return { error: 'Not enough coins' };
+      state.coins -= CONSTANTS.SNAIL_PRICE;
+      tank.snails++;
+      return { snails: tank.snails };
+    }
+
+    // ── Buy upgrade ──────────────────────────────────────────────────────
+    case 'buy_upgrade': {
+      const { upgradeId } = payload;
+      const upg = UPGRADES[upgradeId];
+      if (!upg) return { error: 'Unknown upgrade' };
+      const levelKey = upgradeId === 'filter' ? 'filterLevel' : upgradeId === 'autoFeeder' ? 'autoFeederLevel' : 'foodSiloLevel';
+      const current = tank.upgrades[levelKey] || 0;
+      if (current >= upg.maxLevel) return { error: 'Already max level' };
+      const price = upg.prices[current];
+      if (state.coins < price) return { error: 'Not enough coins' };
+      state.coins -= price;
+      tank.upgrades[levelKey] = current + 1;
+      return { upgraded: upgradeId, level: current + 1 };
+    }
+
+    // ── Buy decoration ───────────────────────────────────────────────────
+    case 'buy_decoration': {
+      const { decorationType } = payload;
+      const dec = DECORATIONS[decorationType];
+      if (!dec) return { error: 'Unknown decoration' };
+      if (dec.waterType !== tankDef.waterType) return { error: 'Not available for this tank biome' };
+      if (state.coins < dec.price) return { error: 'Not enough coins' };
+      state.coins -= dec.price;
+      const decObj = { id: generateId(), type: decorationType, x: 0.2 + Math.random() * 0.6 };
+      tank.decorations.push(decObj);
+      return { decoration: decObj };
+    }
+
+    // ── Sell decoration ──────────────────────────────────────────────────
+    case 'sell_decoration': {
+      const { decorationId } = payload;
+      const idx = tank.decorations.findIndex(d => d.id === decorationId);
+      if (idx === -1) return { error: 'Decoration not found' };
+      const dec = tank.decorations[idx];
+      const decDef = DECORATIONS[dec.type];
+      const value = decDef ? decDef.sellValue : 0;
+      state.coins += value;
+      tank.decorations.splice(idx, 1);
+      return { sold: true, value, decorationType: dec.type };
+    }
+
+    // ── Laser pointer ────────────────────────────────────────────────────
+    case 'laser_pointer': {
+      if (!tankDef.features.includes('laser')) return {};
+      const now = Date.now();
+      if (now - tank.lastLaserReward >= CONSTANTS.LASER_COOLDOWN_MS) {
+        tank.lastLaserReward = now;
+        state.coins += CONSTANTS.LASER_REWARD_COINS;
+        for (const fish of tank.fish) {
+          fish.xp += CONSTANTS.LASER_REWARD_XP;
+          while (fish.level < CONSTANTS.MAX_LEVEL && fish.xp >= xpToNextLevel(fish.level)) { fish.xp -= xpToNextLevel(fish.level); fish.level++; }
         }
+        return { reward: { coins: CONSTANTS.LASER_REWARD_COINS, xp: CONSTANTS.LASER_REWARD_XP } };
+      }
+      return { reward: null };
     }
 
-    return { success: true, fedCount };
-}
-
-function handleClean(state) {
-    const dirtyMissing = 100 - state.cleanliness;
-    const bonus = Math.floor(CONSTANTS.CLEAN_BONUS_BASE + CONSTANTS.CLEAN_BONUS_SCALE * dirtyMissing);
-
-    state.cleanliness = clamp(state.cleanliness + CONSTANTS.CLEAN_RESTORE, 0, 100);
-    state.coins += bonus;
-    state.stats.coinsEarnedLifetime += bonus;
-
-    return { success: true, bonus, newCleanliness: state.cleanliness };
-}
-
-function handleBuyFish(state, payload) {
-    const { speciesId } = payload;
-    const tank = TANKS[state.tankTier];
-
-    if (state.fish.length >= tank.capacity) {
-        return { error: 'Tank is full' };
-    }
-    if (!tank.allowedSpecies.includes(speciesId)) {
-        return { error: 'Species not available for this tank' };
+    // ── Reset state ──────────────────────────────────────────────────────
+    case 'reset_state': {
+      const fresh = createInitialState();
+      Object.assign(state, fresh);
+      return { reset: true };
     }
 
-    const price = getFishPrice(speciesId, state.fish.length);
-    if (state.coins < price) {
-        return { error: 'Not enough coins' };
-    }
-
-    state.coins -= price;
-    const existingNames = state.fish.map(f => f.name);
-    const newFish = createFish(speciesId, existingNames, Date.now());
-    state.fish.push(newFish);
-
-    return { success: true, fish: newFish, price };
+    default:
+      return { error: `Unknown action: ${type}` };
+  }
 }
 
-function handleSellFish(state, payload) {
-    const { fishId } = payload;
-    const fishIndex = state.fish.findIndex(f => f.id === fishId);
-    if (fishIndex === -1) return { error: 'Fish not found' };
-    if (state.fish.length <= 1) return { error: 'Cannot sell your last fish' };
-
-    const fish = state.fish[fishIndex];
-    const value = getSellValue(fish.speciesId, state.fish.length);
-    state.coins += value;
-    state.fish.splice(fishIndex, 1);
-
-    return { success: true, value, fishName: fish.name };
-}
-
-function handleBuyFood(state, payload) {
-    const { foodId, quantity = 1 } = payload;
-    const food = FOODS[foodId];
-    if (!food) return { error: 'Unknown food' };
-
-    const totalCost = food.price * quantity;
-    if (state.coins < totalCost) return { error: 'Not enough coins' };
-
-    state.coins -= totalCost;
-    state.foodStock[foodId] = (state.foodStock[foodId] || 0) + quantity;
-
-    return { success: true, totalCost };
-}
-
-// ── API endpoints ─────────────────────────────────────────────────────
+// ── Homey SDK API endpoint ───────────────────────────────────────────────────
 
 module.exports = {
-    async getState({ homey, query }) {
-        const { widgetId } = query;
-        if (!widgetId) throw new Error('Missing widgetId');
+  async getState({ homey, query }) {
+    const widgetId = query.widgetId || 'default';
+    const storeKey = `aquarium_${widgetId}`;
+    let state = await homey.settings.get(storeKey);
+    let isNew = false;
 
-        const key = `aquarium_${widgetId}`;
-        let state = homey.settings.get(key);
-        let isNew = false;
+    if (!state) {
+      state = createInitialState();
+      isNew = true;
+    } else if (state.version < 3) {
+      state = migrateState(state);
+    }
 
-        if (!state) {
-            state = createInitialState();
-            isNew = true;
-        }
+    const simResult = simulate(state);
+    await homey.settings.set(storeKey, state);
+    return { ...buildResponse(state), simResult, isNew };
+  },
 
-        // Run simulation
-        const simResult = simulate(state);
+  async doAction({ homey, body, query }) {
+    const widgetId = query.widgetId || 'default';
+    const storeKey = `aquarium_${widgetId}`;
+    let state = await homey.settings.get(storeKey);
 
-        // Persist updated state
-        homey.settings.set(key, state);
+    if (!state) state = createInitialState();
+    else if (state.version < 3) state = migrateState(state);
 
-        // Build store catalog for the frontend
-        const tank = TANKS[state.tankTier];
-        const storeCatalog = {
-            fish: tank.allowedSpecies.map(sid => ({
-                speciesId: sid,
-                ...SPECIES[sid],
-                price: getFishPrice(sid, state.fish.length),
-            })),
-            foods: Object.entries(FOODS).map(([id, f]) => ({ foodId: id, ...f })),
-        };
+    const { type, payload } = body || {};
+    const result = handleAction(state, type, payload || {});
 
-        return {
-            state,
-            simResult,
-            isNew,
-            storeCatalog,
-            tankInfo: tank,
-        };
-    },
-
-    async doAction({ homey, query, body }) {
-        const { widgetId } = query;
-        if (!widgetId) throw new Error('Missing widgetId');
-
-        const key = `aquarium_${widgetId}`;
-        let state = homey.settings.get(key);
-
-        if (!state) {
-            state = createInitialState();
-        }
-
-        // Run simulation first
-        simulate(state);
-
-        // Handle action
-        const { type, payload = {} } = body;
-        let result;
-
-        switch (type) {
-            case 'feed':
-                result = handleFeed(state, payload);
-                break;
-            case 'clean':
-                result = handleClean(state);
-                break;
-            case 'buy_fish':
-                result = handleBuyFish(state, payload);
-                break;
-            case 'sell_fish':
-                result = handleSellFish(state, payload);
-                break;
-            case 'buy_food':
-                result = handleBuyFood(state, payload);
-                break;
-            default:
-                result = { error: `Unknown action: ${type}` };
-        }
-
-        // Persist & rebuild store catalog
-        homey.settings.set(key, state);
-
-        const tank = TANKS[state.tankTier];
-        const storeCatalog = {
-            fish: tank.allowedSpecies.map(sid => ({
-                speciesId: sid,
-                ...SPECIES[sid],
-                price: getFishPrice(sid, state.fish.length),
-            })),
-            foods: Object.entries(FOODS).map(([id, f]) => ({ foodId: id, ...f })),
-        };
-
-        return {
-            result,
-            state,
-            storeCatalog,
-            tankInfo: tank,
-        };
-    },
+    await homey.settings.set(storeKey, state);
+    return buildResponse(state, result);
+  },
 };

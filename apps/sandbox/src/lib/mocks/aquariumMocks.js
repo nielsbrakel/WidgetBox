@@ -1,7 +1,7 @@
 /**
  * Mock handler for the Aquarium widget API.
- * Multi-tank architecture (v3): players own separate fishbowl / aquarium / big tank,
- * each with independent fish populations, upgrades, cleanliness & decorations.
+ * Multi-tank biome architecture (v3): players own separate Cold Water / Tropical / Sea Water tanks,
+ * each with biome-specific species, decorations, and independent fish populations, upgrades & cleanliness.
  * Coins & food stock are shared globally.
  */
 
@@ -73,18 +73,18 @@ function xpToNextLevel(level) {
 
 const TANKS = {
     1: {
-        name: 'Fishbowl', spaceCapacity: 6,
-        allowedSpecies: ['guppy', 'goldfish'],
+        name: 'Cold Water', waterType: 'cold', spaceCapacity: 6,
+        allowedSpecies: ['goldfish', 'koi'],
         features: ['feed', 'clean', 'store'],
     },
     2: {
-        name: 'Small Aquarium', spaceCapacity: 10,
-        allowedSpecies: ['guppy', 'goldfish', 'neon_tetra', 'betta'],
+        name: 'Tropical', waterType: 'tropical', spaceCapacity: 12,
+        allowedSpecies: ['guppy', 'neon_tetra', 'betta', 'angelfish'],
         features: ['feed', 'clean', 'store', 'snails', 'filter', 'autofeeder', 'silo'],
     },
     3: {
-        name: 'Big Freshwater Tank', spaceCapacity: 20,
-        allowedSpecies: ['guppy', 'goldfish', 'neon_tetra', 'betta', 'angelfish', 'clownfish'],
+        name: 'Sea Water', waterType: 'sea', spaceCapacity: 20,
+        allowedSpecies: ['clownfish', 'tang'],
         features: ['feed', 'clean', 'store', 'snails', 'filter', 'autofeeder', 'silo', 'laser'],
     },
 };
@@ -92,12 +92,17 @@ const TANKS = {
 // ── Species ──────────────────────────────────────────────────────────
 
 const SPECIES = {
-    guppy:      { name: 'Guppy',      basePrice: 15, baseCoinPerHour: 2.5, hungerRate: 1.0, tier: 1, spaceCost: 1, waterType: 'fresh', swimPatterns: ['school'],         zones: ['top','middle'],    favoriteFoods: ['flakes','pellets'],         color: { body:'#FF7043', tail:'#FFB74D' } },
-    goldfish:   { name: 'Goldfish',    basePrice: 25, baseCoinPerHour: 3.8, hungerRate: 1.2, tier: 1, spaceCost: 2, waterType: 'fresh', swimPatterns: ['drift','glide'],  zones: ['middle','bottom'], favoriteFoods: ['pellets','flakes'],         color: { body:'#FF8F00', tail:'#FFB300' } },
-    neon_tetra: { name: 'Neon Tetra',  basePrice: 30, baseCoinPerHour: 3.2, hungerRate: 0.9, tier: 2, spaceCost: 1, waterType: 'fresh', swimPatterns: ['school'],         zones: ['middle'],          favoriteFoods: ['flakes','premium_flakes'], color: { body:'#29B6F6', tail:'#E53935' } },
-    betta:      { name: 'Betta',       basePrice: 45, baseCoinPerHour: 5.0, hungerRate: 1.3, tier: 2, spaceCost: 2, waterType: 'fresh', swimPatterns: ['dart','circle'],  zones: ['top','middle'],    favoriteFoods: ['pellets','premium_flakes'],color: { body:'#7E57C2', tail:'#B39DDB' } },
-    angelfish:  { name: 'Angelfish',   basePrice: 70, baseCoinPerHour: 6.5, hungerRate: 1.1, tier: 3, spaceCost: 4, waterType: 'fresh', swimPatterns: ['glide','drift'],  zones: ['middle'],          favoriteFoods: ['premium_flakes','pellets'],color: { body:'#ECEFF1', tail:'#B0BEC5' } },
-    clownfish:  { name: 'Clownfish',   basePrice: 60, baseCoinPerHour: 5.8, hungerRate: 1.0, tier: 3, spaceCost: 3, waterType: 'salt',  swimPatterns: ['circle','zigzag'],zones: ['bottom','middle'], favoriteFoods: ['pellets','premium_flakes'],color: { body:'#FF7043', tail:'#FFFFFF' } },
+    // Cold water
+    goldfish:   { name: 'Goldfish',    basePrice: 15, baseCoinPerHour: 2.5, hungerRate: 1.0, tier: 1, spaceCost: 2, waterType: 'cold',     swimPatterns: ['drift','glide'],  zones: ['middle','bottom'], favoriteFoods: ['pellets','flakes'],         color: { body:'#FF8F00', tail:'#FFB300' } },
+    koi:        { name: 'Koi',         basePrice: 30, baseCoinPerHour: 4.0, hungerRate: 1.2, tier: 1, spaceCost: 3, waterType: 'cold',     swimPatterns: ['glide','drift'],  zones: ['middle','bottom'], favoriteFoods: ['pellets','premium_flakes'], color: { body:'#E53935', tail:'#FFFFFF' } },
+    // Tropical
+    guppy:      { name: 'Guppy',       basePrice: 15, baseCoinPerHour: 2.5, hungerRate: 0.9, tier: 2, spaceCost: 1, waterType: 'tropical', swimPatterns: ['school'],         zones: ['top','middle'],    favoriteFoods: ['flakes','pellets'],         color: { body:'#FF7043', tail:'#FFB74D' } },
+    neon_tetra: { name: 'Neon Tetra',  basePrice: 25, baseCoinPerHour: 3.2, hungerRate: 0.9, tier: 2, spaceCost: 1, waterType: 'tropical', swimPatterns: ['school'],         zones: ['middle'],          favoriteFoods: ['flakes','premium_flakes'], color: { body:'#29B6F6', tail:'#E53935' } },
+    betta:      { name: 'Betta',       basePrice: 45, baseCoinPerHour: 5.0, hungerRate: 1.3, tier: 2, spaceCost: 2, waterType: 'tropical', swimPatterns: ['dart','circle'],  zones: ['top','middle'],    favoriteFoods: ['pellets','premium_flakes'],color: { body:'#7E57C2', tail:'#B39DDB' } },
+    angelfish:  { name: 'Angelfish',   basePrice: 65, baseCoinPerHour: 6.0, hungerRate: 1.1, tier: 2, spaceCost: 3, waterType: 'tropical', swimPatterns: ['glide','drift'],  zones: ['middle'],          favoriteFoods: ['premium_flakes','pellets'],color: { body:'#ECEFF1', tail:'#B0BEC5' } },
+    // Sea water
+    clownfish:  { name: 'Clownfish',   basePrice: 50, baseCoinPerHour: 5.5, hungerRate: 1.0, tier: 3, spaceCost: 3, waterType: 'sea',      swimPatterns: ['circle','zigzag'],zones: ['bottom','middle'], favoriteFoods: ['pellets','premium_flakes'],color: { body:'#FF7043', tail:'#FFFFFF' } },
+    tang:       { name: 'Blue Tang',   basePrice: 75, baseCoinPerHour: 7.0, hungerRate: 1.1, tier: 3, spaceCost: 4, waterType: 'sea',      swimPatterns: ['glide','drift'],  zones: ['middle','top'],    favoriteFoods: ['premium_flakes','pellets'],color: { body:'#1565C0', tail:'#FFD54F' } },
 };
 
 // ── Foods ────────────────────────────────────────────────────────────
@@ -119,14 +124,21 @@ const UPGRADES = {
 // ── Decorations ──────────────────────────────────────────────────────
 
 const DECORATIONS = {
-    plant_fern:    { name: 'Fern',          price: 25,  sellValue: 8,   minTier: 1 },
-    plant_grass:   { name: 'Sea Grass',     price: 30,  sellValue: 10,  minTier: 1 },
-    plant_anubias: { name: 'Anubias',       price: 40,  sellValue: 13,  minTier: 2 },
-    shipwreck:     { name: 'Shipwreck',     price: 80,  sellValue: 25,  minTier: 2 },
-    bubbler:       { name: 'Bubble Maker',  price: 60,  sellValue: 20,  minTier: 2 },
-    castle:        { name: 'Castle',        price: 120, sellValue: 40,  minTier: 3 },
-    treasure:      { name: 'Treasure Chest',price: 100, sellValue: 33,  minTier: 2 },
-    coral_rock:    { name: 'Coral Rock',    price: 50,  sellValue: 16,  minTier: 3 },
+    // Cold water
+    rock_pile:     { name: 'Rock Pile',     price: 20,  sellValue: 7,   waterType: 'cold' },
+    driftwood:     { name: 'Driftwood',     price: 35,  sellValue: 12,  waterType: 'cold' },
+    stone_bridge:  { name: 'Stone Bridge',  price: 50,  sellValue: 16,  waterType: 'cold' },
+    // Tropical
+    plant_fern:    { name: 'Fern',          price: 25,  sellValue: 8,   waterType: 'tropical' },
+    plant_anubias: { name: 'Anubias',       price: 40,  sellValue: 13,  waterType: 'tropical' },
+    shipwreck:     { name: 'Shipwreck',     price: 80,  sellValue: 25,  waterType: 'tropical' },
+    treasure:      { name: 'Treasure Chest',price: 100, sellValue: 33,  waterType: 'tropical' },
+    bubbler:       { name: 'Bubble Maker',  price: 60,  sellValue: 20,  waterType: 'tropical' },
+    // Sea water
+    coral_rock:    { name: 'Coral Rock',    price: 50,  sellValue: 16,  waterType: 'sea' },
+    sea_anemone:   { name: 'Sea Anemone',   price: 70,  sellValue: 23,  waterType: 'sea' },
+    castle:        { name: 'Castle',        price: 120, sellValue: 40,  waterType: 'sea' },
+    anchor:        { name: 'Anchor',        price: 90,  sellValue: 30,  waterType: 'sea' },
 };
 
 // ── Fish names ───────────────────────────────────────────────────────
@@ -197,7 +209,7 @@ function createTankState(_tier) {
 
 function createInitialState() {
     const tank1 = createTankState(1);
-    tank1.fish = [createFish('guppy', [])];
+    tank1.fish = [createFish('goldfish', [])];
     return {
         version: 3,
         coins: CONSTANTS.STARTING_COINS,
@@ -255,7 +267,7 @@ function buildStoreCatalog(state, tankId) {
         .map(([id, food]) => ({ foodId: id, name: food.name, price: food.price, hungerRestore: food.hungerRestore }));
 
     const decorations = Object.entries(DECORATIONS)
-        .filter(([, dec]) => dec.minTier <= tankId)
+        .filter(([, dec]) => dec.waterType === tankDef.waterType)
         .map(([id, dec]) => ({ decorationId: id, name: dec.name, price: dec.price, sellValue: dec.sellValue }));
 
     return { fish, foods, decorations };
@@ -439,10 +451,6 @@ function handleAction(state, type, payload) {
             const usedSpace = getUsedSpace(tank);
             if (usedSpace + species.spaceCost > tankDef.spaceCapacity) return { error: `Tank is full (${usedSpace}/${tankDef.spaceCapacity} space)` };
             if (!tankDef.allowedSpecies.includes(speciesId)) return { error: 'Species not available for this tank' };
-            // Water type check — cannot mix freshwater and saltwater
-            const newWaterType = species.waterType || 'fresh';
-            const existingWaterType = tank.fish.length > 0 ? (SPECIES[tank.fish[0].speciesId]?.waterType || 'fresh') : null;
-            if (existingWaterType && newWaterType !== existingWaterType) return { error: `Cannot mix ${newWaterType}water and ${existingWaterType}water fish` };
             const price = getFishPrice(speciesId, getTotalFishCount(state));
             if (state.coins < price) return { error: 'Not enough coins' };
             state.coins -= price;
@@ -476,10 +484,6 @@ function handleAction(state, type, payload) {
             if (idx === -1) return { error: 'Fish not found' };
             const fish = fromTank.fish[idx];
             if (!toTankDef.allowedSpecies.includes(fish.speciesId)) return { error: `${SPECIES[fish.speciesId]?.name || fish.speciesId} not allowed in ${toTankDef.name}` };
-            // Water type check for target tank
-            const fishWaterType = SPECIES[fish.speciesId]?.waterType || 'fresh';
-            const targetWaterType = toTank.fish.length > 0 ? (SPECIES[toTank.fish[0].speciesId]?.waterType || 'fresh') : null;
-            if (targetWaterType && fishWaterType !== targetWaterType) return { error: `Cannot mix ${fishWaterType}water and ${targetWaterType}water fish` };
             const usedSpace = getUsedSpace(toTank);
             const species = SPECIES[fish.speciesId];
             if (usedSpace + species.spaceCost > toTankDef.spaceCapacity) return { error: `${toTankDef.name} is full` };
@@ -572,7 +576,7 @@ function handleAction(state, type, payload) {
             const { decorationType } = payload;
             const dec = DECORATIONS[decorationType];
             if (!dec) return { error: 'Unknown decoration' };
-            if (dec.minTier > tid) return { error: 'Not available for this tank tier' };
+            if (dec.waterType !== tankDef.waterType) return { error: 'Not available for this tank biome' };
             if (state.coins < dec.price) return { error: 'Not enough coins' };
             state.coins -= dec.price;
             const decObj = { id: generateId(), type: decorationType, x: 0.2 + Math.random() * 0.6 };
@@ -630,7 +634,7 @@ function createScenarioState(scenarioId) {
             const names = [];
             const fish = [];
             for (let i = 0; i < 3; i++) {
-                const f = createFish(i < 2 ? 'guppy' : 'goldfish', names, {
+                const f = createFish('goldfish', names, {
                     bornAt: Date.now() - (10 + i * 3) * 86400000,
                     level: 3 + i, hunger: 60 + Math.floor(Math.random() * 30),
                 });
@@ -650,7 +654,7 @@ function createScenarioState(scenarioId) {
         case 'tier-2-active': {
             const names = [];
             const fish1 = []; const fish2 = [];
-            const specs1 = ['guppy', 'goldfish'];
+            const specs1 = ['goldfish', 'koi'];
             const specs2 = ['neon_tetra', 'neon_tetra', 'betta'];
             for (let i = 0; i < specs1.length; i++) {
                 const f = createFish(specs1[i], names, {
@@ -682,16 +686,16 @@ function createScenarioState(scenarioId) {
         case 'tier-3-endgame': {
             const names = [];
             const fish1 = []; const fish2 = []; const fish3 = [];
-            // Bowl: 1 guppy
-            const f1 = createFish('guppy', names, { bornAt: Date.now() - 30 * 86400000, level: 6, hunger: 70 });
+            // Cold Water: 1 goldfish
+            const f1 = createFish('goldfish', names, { bornAt: Date.now() - 30 * 86400000, level: 6, hunger: 70 });
             names.push(f1.name); fish1.push(f1);
-            // Aquarium: betta + neon_tetra
+            // Tropical: betta + neon_tetra
             for (const sp of ['betta', 'neon_tetra']) {
                 const f = createFish(sp, names, { bornAt: Date.now() - 25 * 86400000, level: 5, hunger: 65 });
                 names.push(f.name); fish2.push(f);
             }
-            // Big tank: 5 fish
-            for (const sp of ['angelfish', 'clownfish', 'neon_tetra', 'guppy', 'goldfish']) {
+            // Sea Water: 5 fish (clownfish + tang)
+            for (const sp of ['clownfish', 'tang', 'clownfish', 'tang', 'clownfish']) {
                 const f = createFish(sp, names, {
                     bornAt: Date.now() - (20 + fish3.length * 5) * 86400000,
                     level: 5 + Math.floor(fish3.length * 0.7),
@@ -701,7 +705,7 @@ function createScenarioState(scenarioId) {
                 names.push(f.name); fish3.push(f);
             }
             const tank1 = createTankState(1); tank1.fish = fish1; tank1.cleanliness = 95;
-            tank1.decorations = [{ id: generateId(), type: 'plant_fern', x: 0.3 }];
+            tank1.decorations = [{ id: generateId(), type: 'rock_pile', x: 0.3 }];
             const tank2 = createTankState(2); tank2.fish = fish2; tank2.cleanliness = 88;
             tank2.upgrades = { filterLevel: 2, autoFeederLevel: 1, foodSiloLevel: 1 };
             tank2.snails = 1;
@@ -709,7 +713,7 @@ function createScenarioState(scenarioId) {
             const tank3 = createTankState(3); tank3.fish = fish3; tank3.cleanliness = 90;
             tank3.upgrades = { filterLevel: 2, autoFeederLevel: 2, foodSiloLevel: 2 };
             tank3.snails = 2;
-            tank3.decorations = [{ id: generateId(), type: 'castle', x: 0.4 }, { id: generateId(), type: 'coral_rock', x: 0.7 }, { id: generateId(), type: 'treasure', x: 0.15 }];
+            tank3.decorations = [{ id: generateId(), type: 'castle', x: 0.4 }, { id: generateId(), type: 'coral_rock', x: 0.7 }, { id: generateId(), type: 'sea_anemone', x: 0.15 }];
             return {
                 version: 3, coins: 3200, activeTankId: 3, unlockedTanks: [1, 2, 3],
                 lastSeenAt: Date.now(),
@@ -723,7 +727,7 @@ function createScenarioState(scenarioId) {
             const names = [];
             const fish = [];
             for (let i = 0; i < 2; i++) {
-                const f = createFish('guppy', names, {
+                const f = createFish('goldfish', names, {
                     bornAt: Date.now() - 14 * 86400000, level: 2,
                     hunger: 5 + Math.floor(Math.random() * 10), health: 20, weak: true,
                 });
@@ -744,7 +748,7 @@ function createScenarioState(scenarioId) {
             const names = [];
             const fish = [];
             for (let i = 0; i < 3; i++) {
-                const f = createFish(i === 0 ? 'guppy' : 'goldfish', names, {
+                const f = createFish('goldfish', names, {
                     bornAt: Date.now() - (3 + i) * 86400000, level: 4, hunger: 90,
                 });
                 names.push(f.name); fish.push(f);
@@ -763,7 +767,7 @@ function createScenarioState(scenarioId) {
         case 'tank-full': {
             const names = [];
             const fish = [];
-            const specs = ['goldfish', 'goldfish', 'guppy', 'guppy'];
+            const specs = ['goldfish', 'goldfish', 'goldfish'];
             for (let i = 0; i < specs.length; i++) {
                 const f = createFish(specs[i], names, {
                     bornAt: Date.now() - (5 + i * 2) * 86400000, level: 3,
@@ -785,8 +789,8 @@ function createScenarioState(scenarioId) {
         case 'low-food': {
             const names = [];
             const fish = [];
-            for (let i = 0; i < 3; i++) {
-                const f = createFish(i === 0 ? 'goldfish' : 'guppy', names, {
+            for (let i = 0; i < 2; i++) {
+                const f = createFish('goldfish', names, {
                     bornAt: Date.now() - (8 + i) * 86400000, level: 2 + i,
                     hunger: 15 + Math.floor(Math.random() * 15),
                 });
@@ -807,7 +811,7 @@ function createScenarioState(scenarioId) {
             const names = [];
             const fish = [];
             for (let i = 0; i < 2; i++) {
-                const f = createFish('guppy', names, {
+                const f = createFish('goldfish', names, {
                     bornAt: Date.now() - (6 + i) * 86400000, level: 2,
                     hunger: 50 + Math.floor(Math.random() * 20),
                 });
@@ -827,7 +831,8 @@ function createScenarioState(scenarioId) {
         case 'tier-3-crowded': {
             const names = [];
             const fish3 = [];
-            const specs = ['angelfish', 'clownfish', 'betta', 'betta', 'neon_tetra', 'neon_tetra', 'guppy', 'goldfish', 'guppy', 'guppy'];
+            // Sea water species only for tank 3: tang(4)*3 + clownfish(3)*2 = 18/20
+            const specs = ['tang', 'tang', 'clownfish', 'tang', 'clownfish'];
             for (let i = 0; i < specs.length; i++) {
                 const f = createFish(specs[i], names, {
                     bornAt: Date.now() - (15 + i * 3) * 86400000,
@@ -839,7 +844,7 @@ function createScenarioState(scenarioId) {
             }
             // Populate all 3 tanks
             const tank1 = createTankState(1);
-            tank1.fish = [createFish('guppy', names, { bornAt: Date.now() - 20 * 86400000, level: 4, hunger: 70 })];
+            tank1.fish = [createFish('goldfish', names, { bornAt: Date.now() - 20 * 86400000, level: 4, hunger: 70 })];
             names.push(tank1.fish[0].name);
             tank1.cleanliness = 85;
 
@@ -854,7 +859,7 @@ function createScenarioState(scenarioId) {
             tank3.fish = fish3; tank3.cleanliness = 70;
             tank3.upgrades = { filterLevel: 2, autoFeederLevel: 1, foodSiloLevel: 1 };
             tank3.snails = 2;
-            tank3.decorations = [{ id: generateId(), type: 'castle', x: 0.3 }, { id: generateId(), type: 'bubbler', x: 0.7 }];
+            tank3.decorations = [{ id: generateId(), type: 'castle', x: 0.3 }, { id: generateId(), type: 'coral_rock', x: 0.7 }];
 
             return {
                 version: 3, coins: 1800, activeTankId: 3, unlockedTanks: [1, 2, 3],
@@ -867,17 +872,17 @@ function createScenarioState(scenarioId) {
 
         case 'multi-tank-decorated': {
             const names = [];
-            // Bowl with decorations
+            // Cold Water tank with cold decorations
             const tank1 = createTankState(1);
-            const f1 = createFish('guppy', names, { bornAt: Date.now() - 12 * 86400000, level: 4, hunger: 80 });
+            const f1 = createFish('goldfish', names, { bornAt: Date.now() - 12 * 86400000, level: 4, hunger: 80 });
             names.push(f1.name);
             tank1.fish = [f1]; tank1.cleanliness = 92;
             tank1.decorations = [
-                { id: generateId(), type: 'plant_fern', x: 0.2 },
-                { id: generateId(), type: 'plant_grass', x: 0.7 },
+                { id: generateId(), type: 'rock_pile', x: 0.2 },
+                { id: generateId(), type: 'driftwood', x: 0.7 },
             ];
 
-            // Aquarium with decorations
+            // Tropical tank with tropical decorations
             const tank2 = createTankState(2);
             for (const sp of ['neon_tetra', 'neon_tetra', 'betta']) {
                 const f = createFish(sp, names, { bornAt: Date.now() - 15 * 86400000, level: 4, hunger: 75 });
@@ -905,7 +910,8 @@ function createScenarioState(scenarioId) {
         case 'dirty-big-tank': {
             const names = [];
             const fish3 = [];
-            const specs3 = ['angelfish', 'clownfish', 'betta', 'neon_tetra', 'guppy', 'goldfish'];
+            // Sea water species for tank 3
+            const specs3 = ['clownfish', 'tang', 'clownfish', 'tang', 'clownfish'];
             for (let i = 0; i < specs3.length; i++) {
                 const f = createFish(specs3[i], names, {
                     bornAt: Date.now() - (10 + i * 2) * 86400000,
@@ -915,10 +921,10 @@ function createScenarioState(scenarioId) {
                 names.push(f.name); fish3.push(f);
             }
             const tank1 = createTankState(1);
-            tank1.fish = [createFish('guppy', [], { bornAt: Date.now() - 5 * 86400000, level: 2, hunger: 70 })];
+            tank1.fish = [createFish('goldfish', [], { bornAt: Date.now() - 5 * 86400000, level: 2, hunger: 70 })];
             tank1.cleanliness = 80;
             const tank2 = createTankState(2);
-            tank2.fish = [createFish('goldfish', ['Goldie'], { bornAt: Date.now() - 8 * 86400000, level: 3, hunger: 65 })];
+            tank2.fish = [createFish('betta', ['Goldie'], { bornAt: Date.now() - 8 * 86400000, level: 3, hunger: 65 })];
             tank2.cleanliness = 60;
             const tank3 = createTankState(3);
             tank3.fish = fish3;

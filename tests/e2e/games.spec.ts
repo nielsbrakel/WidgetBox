@@ -29,7 +29,7 @@ test.describe('Games App — Aquarium Widget', () => {
             await expect(games.hungerBar).toBeVisible();
         });
 
-        test('should start as tier 1 fishbowl', async () => {
+        test('should start as tier 1 cold water tank', async () => {
             const tier = await games.getTankTier();
             expect(tier).toBe('1');
         });
@@ -71,17 +71,17 @@ test.describe('Games App — Aquarium Widget', () => {
         test('should show fish species and food items', async () => {
             await games.openStore();
             const items = games.storeList.locator('.s-item');
-            // 6 fish + 2 foods (flakes, pellets at tier 1) + 2 decorations (fern, sea grass at tier 1)
+            // 8 fish + 2 foods (flakes, pellets) + 3 cold water decorations
             const count = await items.count();
-            expect(count).toBeGreaterThanOrEqual(8);
+            expect(count).toBeGreaterThanOrEqual(10);
         });
 
         test('should show locked species with lock styling', async () => {
             await games.openStore();
             const locked = games.storeList.locator('.s-item.locked');
             const lockedCount = await locked.count();
-            // At tier 1, 4 species locked (neon_tetra, betta, angelfish, clownfish)
-            expect(lockedCount).toBe(4);
+            // At tier 1 Cold Water, 6 species locked (guppy, neon_tetra, betta, angelfish, clownfish, tang)
+            expect(lockedCount).toBe(6);
         });
 
         test('should show buy button for available fish', async () => {
@@ -273,9 +273,9 @@ test.describe('Games App — Aquarium Widget', () => {
 
         test('should show all three tank tiers', async () => {
             await games.openTanks();
-            await expect(games.tanksList).toContainText('Fishbowl');
-            await expect(games.tanksList).toContainText('Small Aquarium');
-            await expect(games.tanksList).toContainText('Big Freshwater Tank');
+            await expect(games.tanksList).toContainText('Cold Water');
+            await expect(games.tanksList).toContainText('Tropical');
+            await expect(games.tanksList).toContainText('Sea Water');
         });
 
         test('should show current tank as active', async () => {
@@ -307,8 +307,8 @@ test.describe('Games App — Aquarium Widget', () => {
 
         test('should show fish in tank', async () => {
             await games.openInventory();
-            // Default state has 1 guppy
-            await expect(games.inventoryList).toContainText('Guppy');
+            // Default state has 1 goldfish (cold water starter)
+            await expect(games.inventoryList).toContainText('Goldfish');
         });
     });
 
@@ -352,6 +352,7 @@ test.describe('Games App — Aquarium Widget', () => {
             await games.openStore();
             const fullBtns = games.storeList.locator('.buy-btn', { hasText: 'Full' });
             const fullCount = await fullBtns.count();
+            // Cold Water has 2 species (goldfish, koi) both showing Full
             expect(fullCount).toBe(2);
         });
 
@@ -398,8 +399,31 @@ test.describe('Games App — Aquarium Widget', () => {
         test('should show decorations in endgame inventory', async () => {
             await games.selectScenario('tier-3-endgame');
             await games.openInventory();
-            // Tier 3 endgame has decorations: Castle, Coral Rock, Treasure
+            // Tier 3 endgame has decorations: Castle, Coral Rock, Anchor
             await expect(games.inventoryList).toContainText('Decoration');
+        });
+
+        test('should show biome-specific decorations in cold water store', async () => {
+            await games.openStore();
+            // Cold Water should show cold water decorations (Rock Pile, Driftwood, Stone Bridge)
+            await expect(games.storeList).toContainText('Rock Pile');
+            await expect(games.storeList).toContainText('Driftwood');
+        });
+
+        test('should show biome-specific decorations in sea water store', async () => {
+            await games.selectScenario('tier-3-endgame');
+            await games.openStore();
+            // Sea Water should show sea water decorations
+            await expect(games.storeList).toContainText('Coral Rock');
+            await expect(games.storeList).toContainText('Sea Anemone');
+        });
+
+        test('should show all tanks as full-screen layout', async () => {
+            // All tiers should use the same full-screen tank layout (no fishbowl)
+            const tier1 = await games.getTankTier();
+            expect(tier1).toBe('1');
+            await expect(games.tankWrap).toBeVisible();
+            await expect(games.canvas).toBeVisible();
         });
     });
 
