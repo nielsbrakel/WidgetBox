@@ -182,6 +182,10 @@ const CATALOG = {
             name: 'Treasure Chest', price: 50, placement: 'bottom',
             visuals: { spriteKey: 'treasure_chest' },
           },
+          sunken_ship: {
+            name: 'Sunken Ship', price: 75, placement: 'bottom', maxPerTank: 1,
+            visuals: { spriteKey: 'sunken_ship' },
+          },
         },
         tools: {},
       },
@@ -189,7 +193,7 @@ const CATALOG = {
         sections: [
           { id: 'fish', order: ['guppy', 'goldfish', 'snail'] },
           { id: 'food', order: ['basic_flakes', 'pellets', 'algae_wafer'] },
-          { id: 'decor', order: ['hornwort', 'vallisneria', 'anubias', 'moss_ball', 'rock_pile', 'driftwood', 'treasure_chest'] },
+          { id: 'decor', order: ['hornwort', 'vallisneria', 'anubias', 'moss_ball', 'rock_pile', 'driftwood', 'treasure_chest', 'sunken_ship'] },
           { id: 'tools', order: [] },
         ],
       },
@@ -223,7 +227,7 @@ const CATALOG = {
           },
           blue_eye: {
             name: 'Blue-Eye', basePrice: 30, baseCoinPerHour: 3.5,
-            hungerRate: 0.9, spaceCost: 1,
+            hungerRate: 0.9, spaceCost: 0.5,
             diet: { accepts: ['tropical_flakes', 'pellets'] },
             requirements: { tools: [...TROPICAL_TOOL_REQS] },
             preferences: { zonePreference: 'top' },
@@ -1626,10 +1630,10 @@ function applyFullGrownTank(save, tankId) {
     tank.foodStock[fid] = 50;
   }
 
-  // All tools at level 3
+  // All tools at max level
   tank.toolsOwned = {};
-  for (const tid of Object.keys(tankCat.content.tools || {})) {
-    tank.toolsOwned[tid] = 3;
+  for (const [tid, tDef] of Object.entries(tankCat.content.tools || {})) {
+    tank.toolsOwned[tid] = tDef.maxLevel || 1;
   }
 
   tank.cleanliness = 100;

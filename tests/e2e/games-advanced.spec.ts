@@ -379,12 +379,15 @@ test.describe('Games App — Aquarium Advanced', () => {
             await expect(games.storeList).toBeVisible();
         });
 
-        test('should show pixel icon images in store panel', async () => {
+        test('should show colored circle icons in store fish tab', async () => {
             await games.selectScenario('tier-2-active');
             await games.openStore();
-            const icons = games.storeList.locator('.s-icon img');
+            const icons = games.storeList.locator('.s-icon');
             const count = await icons.count();
             expect(count).toBeGreaterThan(0);
+            // Fish tab uses colored circles, not img elements
+            const firstText = await icons.first().textContent();
+            expect(firstText?.trim()).toBe('●');
         });
 
         test('should show tools tab with tool items', async () => {

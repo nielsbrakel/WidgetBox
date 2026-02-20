@@ -47,7 +47,8 @@ apps/sandbox/src/lib/scenarios.js              # Dev scenarios for testing
 tests/e2e/games.spec.ts                        # Playwright E2E tests (60 tests)
 tests/e2e/games-advanced.spec.ts               # Advanced E2E tests (57 tests)
 tests/e2e/games-features.spec.ts               # v1.2 feature E2E tests (50 tests)
-tests/e2e/games-design.spec.ts                 # v1.3 design overhaul E2E tests (45 tests)
+tests/e2e/games-design.spec.ts                 # v1.3 design overhaul E2E tests (56 tests)
+tests/e2e/games-v2.spec.ts                     # v2 visual overhaul E2E tests (40+ tests)
 tests/pages/GamesPage.ts                       # Page object for E2E
 ```
 
@@ -208,7 +209,7 @@ The game currently ships with three biomes, designed with room for future expans
 
 | Tank | ID | Unlock | Capacity | Key Content |
 |---|---|---|---|---|
-| Fresh Starter | `fresh` | Free | 8 | Guppy, Goldfish, Snail, Hornwort, Vallisneria, Anubias, Treasure Chest |
+| Fresh Starter | `fresh` | Free | 8 | Guppy, Goldfish, Snail, Hornwort, Vallisneria, Anubias, Treasure Chest, Sunken Ship, Driftwood (spider wood) |
 | Tropical Planted | `tropical` | 1500 lifetime coins | 14 | Neon Tetra, Discus, Gourami, Cryptocoryne, Ludwigia, Heater/Filter required |
 | Saltwater Reef | `salt` | 5000 lifetime + Heater | 20 | Clownfish, Blue Tang, Chromis, Firefish, Gramma, Banggai, Moray Eel, Cleaner Shrimp. Filter/Skimmer/UV Sterilizer required |
 
@@ -304,7 +305,7 @@ fishPrice = basePrice × growthFactor ^ ownedCountOfSpecies
 ## Rendering Layers (Bottom to Top)
 
 1. Water gradient (3-stop, biome-specific) → 2. Glass frame (animated shimmer + reflections) → 3. Back silhouettes → 3.5. Light rays (7 animated, 95% tank height) → 3.6. Animated water surface (sine wave at y=5, amplitude 2.2+1.0, shimmer) → 4. Caustic light (12 animated ellipses) → 5. Substrate (120 varied pebbles + 2-line highlight + depth fog) →
-6. Rock clusters → 7. **Back decor layer** (every 3rd item, 55% opacity — behind fish for depth) → 8. Equipment (pixel art sprites from ICON_DATA + level dots) → 9. Fish (FISH_BASE_SCALES applied) → 10. Movement-type sprites (crawl/glass/snake) → 10.5. **Front decor layer** (remaining items, full opacity — in front of fish for depth) →
+6. Rock clusters → 7. **Back decor layer** (every 3rd item, 55% opacity — behind fish for depth) → 8. Equipment (on right wall, vertically centered, with mounting plate + filter bubbles) → 9. Fish (FISH_BASE_SCALES applied) → 10. Movement-type sprites (crawl/glass/snake) → 10.5. **Front decor layer** (remaining items, full opacity — in front of fish for depth) →
 11. Food particles → 12. Bubbles → 13. Ambient particles → 14. Dirt overlay (seeded cells + edge film, **above substrate only**, visible when cleanliness < 95%) →
 15. Laser dot → 16. Float text → 17. Fish bubble (stats pills, earning info, traits, sell button — clamped to widget bounds) → 18. HUD (pixel art icons, fades during cleaning with hud-muted class) →
 19. Tool dock → 20. Toast → 21. Menu (flat 7-button grid: Feed/Clean/Play/Store/Inventory/Tanks/Help, no sub-menus) → 22. Panels
@@ -407,7 +408,7 @@ Test patterns:
 
 > Full testing strategy: AQUARIUM_SPEC.md §26
 
-### E2E Tests (Playwright — 223 tests)
+### E2E Tests (Playwright — 260+ tests)
 
 | File | Count | Coverage |
 |---|---|---|
@@ -415,12 +416,13 @@ Test patterns:
 | `games-advanced.spec.ts` | 57 | Pixel icons, store purchasing, tank nav, state persistence, sell flows |
 | `games-features.spec.ts` | 50 | Zero-fish, half-space, movement types, fish info, cleaning, floating plants |
 | `games-design.spec.ts` | 56 | Fish sizes, layered decor, territorial, trim/move, full-grown, FAB animation |
+| `games-v2.spec.ts` | 40+ | v2 visual overhaul: sunken ship, blue-eye half-space, store icons, equipment + filter bubbles, spider wood, panel close → menu, debug tools, treasure chest |
 
 Page object: `tests/pages/GamesPage.ts`
 
 ```bash
 # Run all aquarium E2E tests
-npx playwright test tests/e2e/games.spec.ts tests/e2e/games-advanced.spec.ts tests/e2e/games-features.spec.ts tests/e2e/games-design.spec.ts
+npx playwright test tests/e2e/games.spec.ts tests/e2e/games-advanced.spec.ts tests/e2e/games-features.spec.ts tests/e2e/games-design.spec.ts tests/e2e/games-v2.spec.ts
 ```
 
 ### Sandbox Mocks
@@ -486,7 +488,7 @@ This creates emergent behavior: fish naturally spread out to avoid territorial z
 
 > Full details: AQUARIUM_SPEC.md §19.3
 
-Fish use `FISH_BASE_SCALES` to create visual size hierarchy from tiny (0.65, schooling) to very large (2.8, moray). Each sprite has a distinctive shape. Scale multiplier amplifies dimension differences.
+Fish use `FISH_BASE_SCALES` to create visual size hierarchy from tiny (0.65, schooling) to very large (3.0, moray). Each sprite has a distinctive shape with enlarged dimensions for better recognition (goldfish 14×10, discus 20×16, moray 32×3). Scale multiplier amplifies dimension differences.
 
 ## Layered Decoration Rendering
 

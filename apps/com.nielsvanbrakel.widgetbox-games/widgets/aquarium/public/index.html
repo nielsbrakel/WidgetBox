@@ -96,6 +96,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a1628;font-family:
 .menu-btn:hover{background:rgba(40,80,140,.7);transform:scale(1.03)}
 .menu-btn .menu-icon{font-size:20px}
 .menu-btn[data-action="help"]{grid-column:span 3;padding:8px 10px;flex-direction:row;justify-content:center;gap:6px;opacity:.7}
+.menu-btn[data-action="help"] .menu-icon{font-size:0;width:24px;height:24px;flex-shrink:0}
+.menu-btn[data-action="help"] .menu-icon img{width:16px!important;height:16px!important}
 
 /* ═══════ TOOL DOCK ═══════ */
 #toolDock{position:absolute;bottom:0;left:0;right:0;background:rgba(10,22,40,.92);border-top:1px solid rgba(100,160,220,.25);z-index:42;padding:8px 12px;display:flex;align-items:center;gap:8px;transform:translateY(100%);transition:transform .25s;border-radius:12px 12px 0 0}
@@ -296,8 +298,8 @@ const FISH_SPRITES = {
   // ── FRESH TANK ──
   // Guppy: tiny body with large colorful fan-shaped tail (12×7)
   guppy: { w:12, h:7, data:['000020000000','002134200000','021345530000','213355533000','021345530000','002134200000','000020000000'] },
-  // Goldfish: compact round body with flowing tail, prominent eye (12×8)
-  goldfish: { w:12, h:8, data:['000022000000','000213100000','002134510000','021345510000','221335510000','021345100000','002133100000','000221000000'] },
+  // Goldfish: round body with distinctive flowing double-tail, big eye, deeper shape (14×10)
+  goldfish: { w:14, h:10, data:['00000220000000','00002133000000','00021334500000','00213345510000','02213455510000','22133555100000','02213345100000','00213331100000','00022110000000','00002200000000'] },
   // Snail: rounded spiral shell, soft body underneath, delicate antennae (10×8)
   snail: { w:10, h:8, data:['0000433000','0004344300','0043443400','0434434000','0333330000','0411040100','4100001040','0100000100'] },
 
@@ -306,20 +308,20 @@ const FISH_SPRITES = {
   neon_tetra: { w:10, h:5, data:['0016650000','1666655100','1663355200','1163310200','0012200000'] },
   // Blue-Eye: small, big reflective eye accent (10×6)
   blue_eye: { w:10, h:6, data:['0011100000','0115351000','1153551000','1153351000','0113310000','0011200000'] },
-  // Moon Fish: tall disc body, crescent shape (14×12)
-  moon_fish: { w:14, h:12, data:['00000110000000','00001131000000','00011331000000','00113351000000','01113351100000','11133551100000','11133551100000','01113351100000','00113351000000','00011331000000','00001131000000','00000110000000'] },
-  // Discus: large round disc, vertical band pattern, red eye (18×14)
-  discus: { w:18, h:14, data:['000000011000000000','000000113100000000','000001136100000000','000011363100000000','000113636100000000','001136361100000000','011136636110000000','011136636110000000','001136361100000000','000113636100000000','000011363100000000','000001136100000000','000000113100000000','000000011000000000'] },
-  // Pleco: long flat body, wide head, sucker mouth, spot pattern (20×7)
-  pleco: { w:20, h:7, data:['00000000000000000000','00011141111141110000','00113434514131411000','01111145111111411110','00113434514131411000','00011141111141110000','00011000110000000000'] },
-  // Gourami: oval with elegant long trailing ventral feeler fins (14×11)
-  gourami: { w:14, h:11, data:['00002200000000','00021131000000','00211335100000','02211335100000','22113351100000','22113311000000','00211310000000','00021100000000','00001010000000','00000100000000','00000010000000'] },
+  // Moon Fish: tall disc, more pronounced crescent shape with dorsal/anal fins (16×14)
+  moon_fish: { w:16, h:14, data:['0000001100000000','0000011310000000','0000013310000000','0000113351000000','0001133551000000','0011335551100000','0113355551100000','0113355551100000','0011335551100000','0001133551000000','0000113351000000','0000013310000000','0000011310000000','0000001100000000'] },
+  // Discus: large perfect disc, bold vertical color bands, visible red eye (20×16)
+  discus: { w:20, h:16, data:['00000000110000000000','00000001631000000000','00000016363100000000','00000163636310000000','00001636363610000000','00016363636310000000','00163636363610000000','01636365636310000000','01636365636310000000','00163636363610000000','00016363636310000000','00001636363610000000','00000163636310000000','00000016363100000000','00000001631000000000','00000000110000000000'] },
+  // Pleco: flat armored body, wide head with prominent sucker mouth, dorsal fin sail (22×8)
+  pleco: { w:22, h:8, data:['0000000030000000000000','0000011141111141110000','0001134345141314110000','0011111145111111411100','4411134345141314110044','0001111141111141110000','0000011100110000000000','0000001000010000000000'] },
+  // Gourami: oval body, distinctive trailing ventral feeler threads, forked "whiskers" (16×12)
+  gourami: { w:16, h:12, data:['0000022000000000','0000211310000000','0002113351000000','0022113351100000','2221133551100000','2211335511000000','0022113310000000','0002211100000000','0000101000000000','0000010100000000','0000001000000000','0000000010000000'] },
 
   // ── SALTWATER TANK ──
-  // Clownfish: vivid orange with 3 white bands, rounded body (14×9)
+  // Clownfish: vivid orange with 3 distinct white bands, rounded body (14×9)
   clownfish: { w:14, h:9, data:['00001100000000','00016161000000','01161636100000','16163161600000','16163116160000','16163161600000','01161636100000','00016161000000','00001100000000'] },
-  // Blue Tang: larger oval, yellow tail accent, palette blue body (18×12)
-  blue_tang: { w:18, h:12, data:['000000022000000000','000000211300000000','000002113310000000','000021133510000000','000211336310000000','002113366311000000','002113366311000000','000211336310000000','000021133510000000','000002113310000000','000000211300000000','000000022000000000'] },
+  // Blue Tang: oval Dory-like body, vivid blue with yellow tail fin, black marking (20×14)
+  blue_tang: { w:20, h:14, data:['00000000220000000000','00000002113000000000','00000021133100000000','00000211335100000000','00002113363100000000','00021133666310000000','00211336666311000000','00211336666311000000','00021133666310000000','00002113363100000000','00000211335100000000','00000021133100000000','00000002113000000000','00000000220000000000'] },
   // Green Chromis: small oval, solid green-blue, schooling (8×6)
   green_chromis: { w:8, h:6, data:['01113000','11335100','11335510','11335510','01131000','00120000'] },
   // Firefish: elongated, tall first dorsal fin, fiery gradient (16×9)
@@ -328,8 +330,8 @@ const FISH_SPRITES = {
   royal_gramma: { w:14, h:9, data:['00002200000000','00064131000000','00641335100000','06641336100000','66613661100000','06641336100000','00641135000000','00064130000000','00002200000000'] },
   // Banggai Cardinalfish: vertical black-white stripes, elongated fins (12×9)
   banggai_cardinal: { w:12, h:9, data:['000320000000','002161100000','021645610000','216456100000','216456100000','021645610000','002161100000','000220000000','000020000000'] },
-  // Moray Eel: LONG thin serpentine body, spotted pattern, visible jaw (28×4)
-  moray_eel: { w:28, h:4, data:['0000000000000000000000000000','0000111111111111111111100000','0005133413341334133413310000','0000111111111111111111100000'] },
+  // Moray Eel: LONGER thinner serpentine body, clear spotted pattern, open jaw at head (32×3)
+  moray_eel: { w:32, h:3, data:['00000000000000000000000000000000','00001111111111111111111111435000','00000111111111111111111111100000'] },
   // Cleaner Shrimp: long antennae, segmented translucent body, red-white (14×8)
   cleaner_shrimp: { w:14, h:8, data:['50000550000050','00001133000000','00013345100000','00113351000000','00013350000000','00011330000000','00100101000000','01000010100000'] },
 };
@@ -340,12 +342,12 @@ const FISH_PALETTES = {
   snail:      { 1:'#D4B896', 2:'#B89878', 3:'#8B6B4A', 4:'#A08060', 5:'#111' },
   neon_tetra: { 1:'#C0C8D0', 2:'#FF3333', 3:'#FF5050', 4:'#333', 5:'#111', 6:'#3388FF' },
   blue_eye:   { 1:'#88CCEE', 2:'#5599CC', 3:'#AADDFF', 4:'#336688', 5:'#2266FF' },
-  moon_fish:  { 1:'#CCE0CC', 2:'#88BB88', 3:'#E8FFE8', 4:'#668866', 5:'#111' },
-  discus:     { 1:'#FF6644', 2:'#DD4422', 3:'#FF8866', 4:'#CC3311', 5:'#111', 6:'#FF4422' },
+  moon_fish:  { 1:'#C8D8C8', 2:'#88BB88', 3:'#E0FFE0', 4:'#668866', 5:'#111' },
+  discus:     { 1:'#FF5533', 2:'#DD3311', 3:'#FF7755', 4:'#CC2200', 5:'#CC0000', 6:'#FF4422' },
   pleco:      { 1:'#665544', 2:'#554433', 3:'#887766', 4:'#443322', 5:'#111' },
   gourami:    { 1:'#5599CC', 2:'#3377AA', 3:'#88CCEE', 4:'#224466', 5:'#111' },
   clownfish:  { 1:'#FF6600', 2:'#FF4400', 3:'#FF8833', 4:'#CC4400', 5:'#111', 6:'#FFFFFF' },
-  blue_tang:  { 1:'#3355BB', 2:'#FFDD33', 3:'#5577DD', 4:'#223399', 5:'#111', 6:'#FFDD33' },
+  blue_tang:  { 1:'#2244AA', 2:'#FFDD33', 3:'#4466CC', 4:'#112288', 5:'#111', 6:'#FFDD33' },
   green_chromis: { 1:'#55BB77', 2:'#339955', 3:'#88EEBB', 4:'#227744', 5:'#111' },
   firefish:   { 1:'#FF4444', 2:'#FFAA33', 3:'#FFCC44', 4:'#CC2222', 5:'#111' },
   royal_gramma: { 1:'#8833CC', 2:'#7722BB', 3:'#AA55EE', 4:'#5511AA', 5:'#111', 6:'#FFDD33' },
@@ -356,7 +358,7 @@ const FISH_PALETTES = {
 
 const DECOR_COLORS = {
   hornwort:'#44AA44', vallisneria:'#3B9944', anubias:'#2D7A2D', moss_ball:'#339933',
-  rock_pile:'#888888', driftwood:'#8B6B4A', treasure_chest:'#AA7733',
+  rock_pile:'#888888', driftwood:'#8B6B4A', treasure_chest:'#AA7733', sunken_ship:'#5A3A1A',
   java_fern:'#338833', amazon_sword:'#228822', cryptocoryne:'#557744', ludwigia:'#AA5533',
   floating_plants:'#55BB55', mossy_log:'#6B4B2A', hollow_stump:'#5A3A1A',
   anemone:'#FF6688', live_rock:'#999999', brain_coral:'#DD8844',
@@ -370,7 +372,7 @@ const FISH_BASE_SCALES = {
   guppy: 0.85, goldfish: 1.3, snail: 1.0,
   neon_tetra: 0.65, blue_eye: 0.8, moon_fish: 1.7, discus: 2.0, pleco: 1.8, gourami: 1.5,
   clownfish: 1.3, blue_tang: 1.8, green_chromis: 0.65, firefish: 1.2,
-  royal_gramma: 1.2, banggai_cardinal: 0.85, moray_eel: 2.8, cleaner_shrimp: 0.9,
+  royal_gramma: 1.2, banggai_cardinal: 0.85, moray_eel: 3.0, cleaner_shrimp: 0.9,
 };
 
 // ═══════ PIXEL ICON SYSTEM ═══════
@@ -1060,81 +1062,147 @@ function drawDecorItem(d, def, color, x, baseSize, subY, biomeKey, isBack) {
       ctx.fill();
       ctx.globalAlpha = isBack ? 0.55 : 1;
     } else if (d.decorId.includes('wood') || d.decorId === 'mossy_log' || d.decorId === 'hollow_stump') {
-      // Driftwood/logs: natural gnarled shape with bark texture and branches
+      // Spider wood / Driftwood: tall reaching mid-tank, branching tentacles, layered for fish swimming through
       const rng = seededRng(Math.round(d.x * 10000) + 33);
-      const woodH = dh * 2.2;
+      const isMossy = d.decorId === 'mossy_log';
+      const isHollow = d.decorId === 'hollow_stump';
+      // Reaches from substrate up to middle of tank (50% water height)
+      const waterH = subY;
+      const woodH = waterH * 0.55; // reaches mid-tank
       const woodTop = subY - woodH;
-      // Main trunk — thick tapering shape
-      const trunkW = dw * 0.14;
-      ctx.fillStyle = color;
+      const trunkW = dw * 0.2; // wider trunk for spider wood
+
+      // Trunk base — natural root flare at substrate
+      ctx.fillStyle = shadeColor(color, -8);
       ctx.beginPath();
-      ctx.moveTo(x - trunkW, subY - 2);
-      ctx.quadraticCurveTo(x - trunkW * 1.8, subY - woodH * 0.5, x - trunkW * 0.6, woodTop + woodH * 0.12);
-      ctx.quadraticCurveTo(x, woodTop - 3, x + trunkW * 0.5, woodTop + woodH * 0.1);
-      ctx.quadraticCurveTo(x + trunkW * 1.5, subY - woodH * 0.4, x + trunkW, subY);
+      ctx.moveTo(x - trunkW * 1.5, subY);
+      ctx.quadraticCurveTo(x - trunkW * 1.2, subY - 4, x - trunkW, subY - 6);
+      ctx.lineTo(x - trunkW * 0.8, subY);
       ctx.closePath();
       ctx.fill();
-      // Bark texture — horizontal grain lines
-      ctx.strokeStyle = shadeColor(color, -18);
-      ctx.lineWidth = 0.5;
-      ctx.globalAlpha = isBack ? 0.2 : 0.45;
-      for (let g = 0; g < 7; g++) {
-        const gy = subY - woodH * 0.08 - g * woodH * 0.13 + rng() * 4;
-        const gxOff = (rng() - 0.5) * 4;
+      ctx.beginPath();
+      ctx.moveTo(x + trunkW * 1.5, subY);
+      ctx.quadraticCurveTo(x + trunkW * 1.2, subY - 5, x + trunkW, subY - 6);
+      ctx.lineTo(x + trunkW * 0.8, subY);
+      ctx.closePath();
+      ctx.fill();
+
+      // Main trunk — thick gnarled shape tapering upward
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.moveTo(x - trunkW, subY - 4);
+      ctx.quadraticCurveTo(x - trunkW * 1.6 + rng() * 4, subY - woodH * 0.4, x - trunkW * 0.5, woodTop + woodH * 0.15);
+      ctx.quadraticCurveTo(x - trunkW * 0.1, woodTop - 2, x + trunkW * 0.3, woodTop + woodH * 0.12);
+      ctx.quadraticCurveTo(x + trunkW * 1.3 + rng() * 3, subY - woodH * 0.35, x + trunkW * 0.8, subY - 4);
+      ctx.closePath();
+      ctx.fill();
+
+      // Bark texture — deep grain with knots
+      ctx.strokeStyle = shadeColor(color, -22);
+      ctx.lineWidth = 0.6;
+      ctx.globalAlpha = isBack ? 0.2 : 0.5;
+      for (let g = 0; g < 10; g++) {
+        const gy = subY - woodH * 0.06 - g * woodH * 0.09 + rng() * 3;
+        const gxOff = (rng() - 0.5) * 3;
         ctx.beginPath();
-        ctx.moveTo(x - trunkW * 0.8 + gxOff, gy);
-        ctx.quadraticCurveTo(x + gxOff, gy - 1.5 + rng()*3, x + trunkW * 0.8 + gxOff, gy + rng()*2);
+        ctx.moveTo(x - trunkW * 0.7 + gxOff, gy);
+        ctx.quadraticCurveTo(x + gxOff + (rng()-0.5)*5, gy - 1 + rng()*2, x + trunkW * 0.6 + gxOff, gy + rng()*2);
         ctx.stroke();
       }
-      // Knots in bark
-      ctx.fillStyle = shadeColor(color, -22);
-      ctx.globalAlpha = isBack ? 0.2 : 0.35;
-      for (let k = 0; k < 2; k++) {
-        const kx = x + (rng() - 0.5) * trunkW * 0.8;
-        const ky = subY - woodH * 0.2 - rng() * woodH * 0.5;
+      // Knots
+      ctx.fillStyle = shadeColor(color, -25);
+      ctx.globalAlpha = isBack ? 0.2 : 0.4;
+      for (let k = 0; k < 3; k++) {
+        const kx = x + (rng() - 0.5) * trunkW;
+        const ky = subY - woodH * 0.15 - rng() * woodH * 0.55;
         ctx.beginPath();
-        ctx.ellipse(kx, ky, 2 + rng(), 1.5 + rng(), rng() * 0.5, 0, Math.PI * 2);
+        ctx.ellipse(kx, ky, 2.5 + rng() * 1.5, 1.8 + rng(), rng() * 0.4, 0, Math.PI * 2);
         ctx.fill();
       }
       ctx.globalAlpha = isBack ? 0.55 : 1;
-      // Branch extending right — natural curve
-      ctx.strokeStyle = shadeColor(color, 5);
-      ctx.lineWidth = 2.5 + rng();
-      ctx.lineCap = 'round';
-      ctx.beginPath();
-      ctx.moveTo(x + trunkW * 0.3, subY - woodH * 0.55);
-      ctx.quadraticCurveTo(x + dw * 0.35, subY - woodH * 0.7, x + dw * 0.6, subY - woodH * 0.58);
-      ctx.stroke();
-      // Thinner sub-branch
-      ctx.lineWidth = 1.2;
-      ctx.beginPath();
-      ctx.moveTo(x + dw * 0.45, subY - woodH * 0.65);
-      ctx.lineTo(x + dw * 0.55, subY - woodH * 0.72);
-      ctx.stroke();
-      // Branch extending left
-      ctx.lineWidth = 2 + rng();
-      ctx.beginPath();
-      ctx.moveTo(x - trunkW * 0.4, subY - woodH * 0.35);
-      ctx.quadraticCurveTo(x - dw * 0.35, subY - woodH * 0.48, x - dw * 0.5, subY - woodH * 0.38);
-      ctx.stroke();
-      // Highlight edge on left side (light source)
-      ctx.fillStyle = shadeColor(color, 22);
-      ctx.globalAlpha = isBack ? 0.1 : 0.2;
-      ctx.fillRect(x - trunkW * 0.9, subY - woodH * 0.8, 1.2, woodH * 0.6);
+
+      // Spider-wood branches — multiple thin tentacle-like extensions reaching outward
+      const branchColor = shadeColor(color, 8);
+      const branches = [
+        // Right branches (upper)
+        { sx: 0.3, sy: 0.55, ex: 0.75, ey: 0.7, w: 3, sub: true },
+        { sx: 0.2, sy: 0.65, ex: 0.85, ey: 0.5, w: 2.5, sub: true },
+        { sx: 0.15, sy: 0.45, ex: 0.6, ey: 0.35, w: 2, sub: false },
+        // Left branches
+        { sx: -0.2, sy: 0.5, ex: -0.7, ey: 0.6, w: 2.8, sub: true },
+        { sx: -0.15, sy: 0.7, ex: -0.65, ey: 0.45, w: 2, sub: true },
+        { sx: -0.1, sy: 0.38, ex: -0.55, ey: 0.25, w: 1.8, sub: false },
+        // Upward thin twigs
+        { sx: 0.05, sy: 0.85, ex: 0.2, ey: 0.95, w: 1.5, sub: false },
+        { sx: -0.05, sy: 0.8, ex: -0.18, ey: 0.92, w: 1.2, sub: false },
+      ];
+      for (const br of branches) {
+        const bsx = x + trunkW * br.sx;
+        const bsy = subY - woodH * br.sy;
+        const bex = x + dw * br.ex;
+        const bey = subY - woodH * br.ey;
+        const cpx = (bsx + bex) / 2 + (rng() - 0.5) * 15;
+        const cpy = (bsy + bey) / 2 + (rng() - 0.5) * 10;
+        ctx.strokeStyle = branchColor;
+        ctx.lineWidth = br.w + rng() * 0.5;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(bsx, bsy);
+        ctx.quadraticCurveTo(cpx, cpy, bex, bey);
+        ctx.stroke();
+        // Taper: thinner tip extension
+        ctx.lineWidth = br.w * 0.4;
+        ctx.strokeStyle = shadeColor(color, 12);
+        const tipX = bex + (bex - bsx) * 0.15;
+        const tipY = bey + (bey - bsy) * 0.1;
+        ctx.beginPath();
+        ctx.moveTo(bex, bey);
+        ctx.lineTo(tipX, tipY);
+        ctx.stroke();
+        // Sub-branches (thin twigs)
+        if (br.sub) {
+          const midX = (bsx + bex) / 2 + (rng() - 0.5) * 5;
+          const midY = (bsy + bey) / 2;
+          ctx.lineWidth = 1 + rng() * 0.5;
+          ctx.strokeStyle = shadeColor(color, 10);
+          for (let s = 0; s < 2; s++) {
+            const subEx = midX + (rng() - 0.5) * dw * 0.3;
+            const subEy = midY - rng() * woodH * 0.15;
+            ctx.beginPath();
+            ctx.moveTo(midX, midY);
+            ctx.lineTo(subEx, subEy);
+            ctx.stroke();
+          }
+        }
+      }
+
+      // Light highlight on trunk left edge
+      ctx.fillStyle = shadeColor(color, 25);
+      ctx.globalAlpha = isBack ? 0.08 : 0.15;
+      ctx.fillRect(x - trunkW * 0.85, subY - woodH * 0.85, 1.5, woodH * 0.7);
       ctx.globalAlpha = isBack ? 0.55 : 1;
-      // Moss coating on top
-      if (d.decorId === 'mossy_log') {
+
+      // Moss patches for mossy_log variant
+      if (isMossy) {
         const mossRng = seededRng(Math.round(d.x * 10000) + 88);
         ctx.fillStyle = '#3a8a3a';
-        ctx.globalAlpha = isBack ? 0.35 : 0.65;
-        for (let m = 0; m < 8; m++) {
-          const mx = x - dw*0.3 + mossRng() * dw * 0.6;
-          const my = dy - 2 + mossRng() * 6;
+        ctx.globalAlpha = isBack ? 0.3 : 0.6;
+        for (let m = 0; m < 12; m++) {
+          const mx = x + (mossRng() - 0.5) * dw * 0.8;
+          const my = subY - woodH * 0.2 - mossRng() * woodH * 0.5;
           ctx.beginPath();
-          ctx.arc(mx, my, 2 + mossRng()*3, 0, Math.PI*2);
+          ctx.arc(mx, my, 2 + mossRng() * 3.5, 0, Math.PI * 2);
           ctx.fill();
         }
         ctx.globalAlpha = isBack ? 0.55 : 1;
+      }
+
+      // Hollow stump interior opening
+      if (isHollow) {
+        ctx.fillStyle = 'rgba(5,10,20,.6)';
+        ctx.beginPath();
+        ctx.ellipse(x, subY - woodH * 0.2, trunkW * 0.6, woodH * 0.12, 0, 0, Math.PI * 2);
+        ctx.fill();
       }
     } else if (d.decorId === 'moss_ball') {
       // Moss ball: perfectly round, fuzzy green ball
@@ -1173,8 +1241,172 @@ function drawDecorItem(d, def, color, x, baseSize, subY, biomeKey, isBack) {
       ctx.ellipse(x - radius * 0.25, cy - radius * 0.3, radius * 0.3, radius * 0.2, -0.3, 0, Math.PI * 2);
       ctx.fill();
       ctx.globalAlpha = isBack ? 0.55 : 1;
+    } else if (d.decorId === 'treasure_chest') {
+      // Treasure Chest: wooden chest with metal bands, partially open lid, gold glint, periodic bubbles
+      const cw = dw * 1.4;
+      const ch = dh * 1.0;
+      const cy = subY - ch;
+      const rng = seededRng(Math.round(d.x * 10000) + 200);
+      // Shadow
+      ctx.fillStyle = 'rgba(0,0,0,.15)';
+      ctx.beginPath();
+      ctx.ellipse(x + 2, subY + 1, cw * 0.48, 4, 0, 0, Math.PI * 2);
+      ctx.fill();
+      // Main body — rectangular with slightly rounded edges
+      ctx.fillStyle = '#8B6B3A';
+      ctx.beginPath();
+      ctx.roundRect(x - cw/2, cy + ch * 0.35, cw, ch * 0.65, 3);
+      ctx.fill();
+      // Darker wood grain lines
+      ctx.strokeStyle = '#6B4B1A';
+      ctx.lineWidth = 0.6;
+      ctx.globalAlpha = isBack ? 0.2 : 0.4;
+      for (let g = 0; g < 4; g++) {
+        const gy = cy + ch * 0.45 + g * ch * 0.14;
+        ctx.beginPath();
+        ctx.moveTo(x - cw * 0.42, gy);
+        ctx.lineTo(x + cw * 0.42, gy + (rng() - 0.5) * 2);
+        ctx.stroke();
+      }
+      ctx.globalAlpha = isBack ? 0.55 : 1;
+      // Metal bands (gold-ish)
+      ctx.fillStyle = '#C8A040';
+      ctx.fillRect(x - cw/2 + 2, cy + ch * 0.35, cw - 4, 3);
+      ctx.fillRect(x - cw/2 + 2, cy + ch * 0.65, cw - 4, 3);
+      // Metal lock plate
+      ctx.fillStyle = '#D4AA44';
+      ctx.fillRect(x - 4, cy + ch * 0.43, 8, 10);
+      ctx.fillStyle = '#222';
+      ctx.beginPath();
+      ctx.arc(x, cy + ch * 0.50, 2, 0, Math.PI * 2);
+      ctx.fill();
+      // Lid — slightly open at an angle, showing gold inside
+      const lidH = ch * 0.35;
+      const lidOpen = Math.sin(Date.now() / 3000 + d.x * 5) * 0.08 + 0.15; // gentle breathing open
+      ctx.fillStyle = '#7B5B2A';
+      ctx.beginPath();
+      ctx.moveTo(x - cw/2, cy + ch * 0.35);
+      ctx.lineTo(x - cw/2 + 2, cy + lidH * (1 - lidOpen));
+      ctx.quadraticCurveTo(x, cy + lidH * (0.85 - lidOpen), x + cw/2 - 2, cy + lidH * (1 - lidOpen));
+      ctx.lineTo(x + cw/2, cy + ch * 0.35);
+      ctx.closePath();
+      ctx.fill();
+      // Gold glint inside gap
+      ctx.fillStyle = '#FFD700';
+      ctx.globalAlpha = isBack ? 0.2 : (0.3 + Math.sin(Date.now() / 1500 + d.x * 8) * 0.15);
+      ctx.beginPath();
+      ctx.ellipse(x, cy + ch * 0.34, cw * 0.25, 3, 0, Math.PI, 0);
+      ctx.fill();
+      ctx.globalAlpha = isBack ? 0.55 : 1;
+      // Lid metal band
+      ctx.fillStyle = '#C8A040';
+      ctx.fillRect(x - cw/2 + 3, cy + lidH * (1 - lidOpen), cw - 6, 2);
+      // Highlight on lid
+      ctx.fillStyle = 'rgba(255,255,255,.12)';
+      ctx.beginPath();
+      ctx.ellipse(x - cw * 0.1, cy + lidH * (0.9 - lidOpen), cw * 0.2, lidH * 0.1, -0.2, 0, Math.PI * 2);
+      ctx.fill();
+      // Periodic treasure bubbles
+      if (!isBack) {
+        const now = Date.now();
+        const bubbleCycle = (now / 4000 + d.x * 3) % 1;
+        if (bubbleCycle < 0.15) {
+          const bubCount = 2 + Math.floor(rng() * 2);
+          for (let b = 0; b < bubCount; b++) {
+            const bx = x + (rng() - 0.5) * cw * 0.3;
+            const by = cy + ch * 0.3 - bubbleCycle * 30;
+            const br = 1 + rng() * 1.5;
+            ctx.strokeStyle = 'rgba(180,220,255,.4)';
+            ctx.lineWidth = 0.5;
+            ctx.beginPath();
+            ctx.arc(bx, by, br, 0, Math.PI * 2);
+            ctx.stroke();
+          }
+        }
+      }
+    } else if (d.decorId === 'sunken_ship') {
+      // Sunken Ship: tilted wooden vessel half-buried in substrate, weathered, with algae
+      const sw = dw * 2.8;
+      const sh = dh * 2.5;
+      const rng = seededRng(Math.round(d.x * 10000) + 250);
+      // Shadow
+      ctx.fillStyle = 'rgba(0,0,0,.12)';
+      ctx.beginPath();
+      ctx.ellipse(x + 3, subY + 2, sw * 0.4, 5, 0.1, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.save();
+      ctx.translate(x, subY);
+      ctx.rotate(-0.12); // slight tilt
+      // Hull — curved boat shape, partially buried
+      ctx.fillStyle = '#5A3A1A';
+      ctx.beginPath();
+      ctx.moveTo(-sw * 0.45, 0);
+      ctx.quadraticCurveTo(-sw * 0.5, -sh * 0.3, -sw * 0.35, -sh * 0.45);
+      ctx.lineTo(sw * 0.15, -sh * 0.45);
+      ctx.quadraticCurveTo(sw * 0.4, -sh * 0.35, sw * 0.45, -sh * 0.1);
+      ctx.lineTo(sw * 0.42, 0);
+      ctx.closePath();
+      ctx.fill();
+      // Hull planks
+      ctx.strokeStyle = '#3A2010';
+      ctx.lineWidth = 0.6;
+      ctx.globalAlpha = isBack ? 0.2 : 0.4;
+      for (let p = 0; p < 5; p++) {
+        const py = -sh * 0.08 - p * sh * 0.08;
+        ctx.beginPath();
+        ctx.moveTo(-sw * 0.42, py);
+        ctx.lineTo(sw * 0.38, py + (rng() - 0.5) * 2);
+        ctx.stroke();
+      }
+      ctx.globalAlpha = isBack ? 0.55 : 1;
+      // Broken mast
+      ctx.strokeStyle = '#5A3A1A';
+      ctx.lineWidth = 3;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(-sw * 0.05, -sh * 0.45);
+      ctx.lineTo(-sw * 0.08, -sh * 0.85);
+      ctx.stroke();
+      // Broken mast top (jagged)
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(-sw * 0.08, -sh * 0.85);
+      ctx.lineTo(-sw * 0.06, -sh * 0.88);
+      ctx.stroke();
+      // Tattered sail remnant
+      ctx.fillStyle = 'rgba(180,170,150,.25)';
+      ctx.beginPath();
+      ctx.moveTo(-sw * 0.07, -sh * 0.82);
+      ctx.quadraticCurveTo(-sw * 0.02, -sh * 0.7 + Math.sin(Date.now() / 2500) * 3, sw * 0.05, -sh * 0.65);
+      ctx.lineTo(-sw * 0.07, -sh * 0.65);
+      ctx.closePath();
+      ctx.fill();
+      // Porthole windows
+      ctx.fillStyle = 'rgba(5,15,30,.6)';
+      for (let w = 0; w < 3; w++) {
+        const wx = -sw * 0.25 + w * sw * 0.15;
+        const wy = -sh * 0.22;
+        ctx.beginPath();
+        ctx.arc(wx, wy, 3, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#7A5A3A';
+        ctx.lineWidth = 0.8;
+        ctx.stroke();
+      }
+      // Algae/moss on hull
+      ctx.fillStyle = '#3A7A3A';
+      ctx.globalAlpha = isBack ? 0.2 : 0.4;
+      for (let m = 0; m < 6; m++) {
+        const mx = -sw * 0.3 + rng() * sw * 0.6;
+        const my = -sh * 0.1 - rng() * sh * 0.3;
+        ctx.beginPath();
+        ctx.arc(mx, my, 2 + rng() * 3, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = isBack ? 0.55 : 1;
+      ctx.restore();
     } else {
-      // Generic (treasure_chest, etc.) — rounder, more prominent
+      // Generic fallback — rounder, more prominent
       ctx.fillStyle = color;
       ctx.beginPath();
       ctx.moveTo(x - dw/2, subY);
@@ -1198,19 +1430,36 @@ function drawDecorItem(d, def, color, x, baseSize, subY, biomeKey, isBack) {
 
 function renderEquipment(toolsOwned) {
   if (!toolsOwned || !tankCat) return;
-  let eqX = W - 10;
+  const biome = BIOMES[activeTankId] || BIOMES.fresh;
+  const subY = H * (1 - biome.subH);
+  // Position equipment on the right wall, vertically centered in the water column
+  let eqX = W - 6;
+  const waterTop = 8;
+  const waterMid = (waterTop + subY) / 2;
   const iconKeys = { heater:'heater', filter_tropical:'filter', filter_salt:'filter', skimmer:'skimmer', uv_sterilizer:'uv' };
 
-  for (const [toolId, level] of Object.entries(toolsOwned)) {
-    if (level <= 0) continue;
+  let eqIdx = 0;
+  const eqEntries = Object.entries(toolsOwned).filter(([, l]) => l > 0);
+  const totalHeight = eqEntries.length * 30;
+  let eqY = Math.max(waterTop + 10, waterMid - totalHeight / 2);
+
+  for (const [toolId, level] of eqEntries) {
     const iKey = iconKeys[toolId] || 'filter';
     const ic = ICON_DATA[iKey];
     if (!ic) continue;
 
-    const eqScale = Math.max(2, PX_SCALE - 1);
+    const eqScale = Math.max(2, PX_SCALE);
     const eqW = ic.w * eqScale;
     const eqH = ic.h * eqScale;
-    const eqY = 15;
+
+    // Semi-transparent mounting plate behind the icon
+    ctx.fillStyle = 'rgba(20,40,60,.35)';
+    ctx.beginPath();
+    const plateX = eqX - eqW - 3;
+    const plateW = eqW + 6;
+    const plateH = eqH + 8;
+    ctx.roundRect(plateX, eqY - 2, plateW, plateH, 3);
+    ctx.fill();
 
     // Draw equipment pixel art on right wall
     for (let y = 0; y < ic.h; y++) {
@@ -1218,7 +1467,7 @@ function renderEquipment(toolsOwned) {
         const ch = ic.d[y][x];
         if (ch === '0') continue;
         ctx.fillStyle = ic.pal[ch] || '#888';
-        ctx.globalAlpha = 0.85;
+        ctx.globalAlpha = 0.9;
         ctx.fillRect(eqX - eqW + x * eqScale, eqY + y * eqScale, eqScale, eqScale);
       }
     }
@@ -1228,11 +1477,31 @@ function renderEquipment(toolsOwned) {
     if (level > 1) {
       for (let i = 0; i < Math.min(level, 5); i++) {
         ctx.fillStyle = '#ffd866';
-        ctx.fillRect(eqX - eqW / 2 - (level * 2) + i * 4, eqY + eqH + 3, 2, 2);
+        ctx.fillRect(eqX - eqW / 2 - (level * 2) + i * 4, eqY + eqH + 2, 2, 2);
       }
     }
 
-    eqX -= eqW + 6;
+    // Filter bubble emission
+    if (toolId.includes('filter')) {
+      const now = Date.now();
+      if (!renderEquipment._filterBubbleTimer) renderEquipment._filterBubbleTimer = 0;
+      if (now - renderEquipment._filterBubbleTimer > 300) {
+        renderEquipment._filterBubbleTimer = now;
+        for (let b = 0; b < level; b++) {
+          bubbles.push({
+            x: (eqX - eqW / 2) / W + (Math.random() - 0.5) * 0.03,
+            y: eqY / H,
+            r: 1.5 + Math.random() * 2,
+            speed: 0.03 + Math.random() * 0.02,
+            wobble: Math.random() * Math.PI * 2,
+            life: 1,
+          });
+        }
+      }
+    }
+
+    eqY += eqH + 12;
+    eqIdx++;
   }
 }
 
@@ -2311,8 +2580,9 @@ function populateStore() {
     for (const item of items) {
       const locked = !item.canBuy;
       const reqText = item.reqInfo?.length ? `<div class="s-desc" style="color:#e8a040;opacity:.8">⚠️ ${item.reqInfo.join(', ')}</div>` : '';
+      const fishColor = FISH_PALETTES[item.id]?.[1] || '#4488cc';
       html += `<div class="s-item ${locked && item.blockReason !== 'Not enough coins' ? 'locked' : ''}">
-        <div class="s-icon">${iconImg('fish', 20)}</div>
+        <div class="s-icon" style="color:${fishColor}">●</div>
         <div class="s-info">
           <div class="s-name">${item.name}</div>
           <div class="s-desc">◆${item.spaceCost} space · ${item.baseCoinPerHour}/hr${item.ownedCount > 0 ? ' · ×' + item.ownedCount + ' owned' : ''}</div>
@@ -2327,7 +2597,7 @@ function populateStore() {
     html += '<div class="panel-section-title">Food</div>';
     for (const item of items) {
       html += `<div class="s-item">
-        <div class="s-icon">${iconImg('food', 20)}</div>
+        <div class="s-icon" style="color:#c8a060">●</div>
         <div class="s-info">
           <div class="s-name">${item.name}</div>
           <div class="s-desc">+${item.hungerRestore} hunger · Stock: ×${item.currentStock}</div>
@@ -2354,8 +2624,9 @@ function populateStore() {
   } else if (storeTab === 'tools') {
     html += '<div class="panel-section-title">Equipment</div>';
     for (const item of items) {
+      const toolIcon = {heater:'heater',filter_tropical:'filter',filter_salt:'filter',skimmer:'skimmer',uv_sterilizer:'uv'}[item.id] || 'wrench';
       html += `<div class="s-item">
-        <div class="s-icon">${iconImg('wrench', 20)}</div>
+        <div class="s-icon">${iconImg(toolIcon, 20)}</div>
         <div class="s-info">
           <div class="s-name">${item.name}</div>
           <div class="s-desc">Level ${item.currentLevel}/${item.maxLevel}${item.maxed ? ' (Max)' : ''}</div>
@@ -2614,12 +2885,14 @@ function setupInput() {
 
 
 
-  // Panel close buttons
+  // Panel close buttons — closing a panel re-opens the menu
   document.querySelectorAll('[data-close]').forEach(btn => {
     btn.onclick = () => {
       const panelId = btn.dataset.close;
       $(panelId)?.classList.remove('visible');
       if (activePanel === panelId) activePanel = null;
+      // Re-open menu overlay so user can pick another action
+      if (!menuOpen) toggleMenu();
     };
   });
 

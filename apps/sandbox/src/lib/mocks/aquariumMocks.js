@@ -76,13 +76,14 @@ const CATALOG = {
                     rock_pile: { name: 'Rock Pile', price: 25, placement: 'bottom' },
                     driftwood: { name: 'Driftwood', price: 35, placement: 'mid' },
                     treasure_chest: { name: 'Treasure Chest', price: 50, placement: 'bottom' },
+                    sunken_ship: { name: 'Sunken Ship', price: 75, placement: 'bottom', maxPerTank: 1 },
                 },
                 tools: {},
             },
             store: { sections: [
                 { id: 'fish', order: ['guppy', 'goldfish', 'snail'] },
                 { id: 'food', order: ['basic_flakes', 'pellets', 'algae_wafer'] },
-                { id: 'decor', order: ['hornwort', 'vallisneria', 'anubias', 'moss_ball', 'rock_pile', 'driftwood', 'treasure_chest'] },
+                { id: 'decor', order: ['hornwort', 'vallisneria', 'anubias', 'moss_ball', 'rock_pile', 'driftwood', 'treasure_chest', 'sunken_ship'] },
                 { id: 'tools', order: [] },
             ] },
         },
@@ -95,7 +96,7 @@ const CATALOG = {
             content: {
                 fish: {
                     neon_tetra: { name: 'Neon Tetra', basePrice: 25, baseCoinPerHour: 3.2, hungerRate: 0.8, spaceCost: 0.5, diet: { accepts: ['tropical_flakes', 'bloodworms'] }, requirements: { tools: [...TROPICAL_TOOL_REQS] }, preferences: { zonePreference: 'middle', schooling: true }, visuals: { spriteKey: 'neon_tetra' } },
-                    blue_eye: { name: 'Blue-Eye', basePrice: 30, baseCoinPerHour: 3.5, hungerRate: 0.9, spaceCost: 1, diet: { accepts: ['tropical_flakes', 'pellets'] }, requirements: { tools: [...TROPICAL_TOOL_REQS] }, preferences: { zonePreference: 'top' }, visuals: { spriteKey: 'blue_eye' } },
+                    blue_eye: { name: 'Blue-Eye', basePrice: 30, baseCoinPerHour: 3.5, hungerRate: 0.9, spaceCost: 0.5, diet: { accepts: ['tropical_flakes', 'pellets'] }, requirements: { tools: [...TROPICAL_TOOL_REQS] }, preferences: { zonePreference: 'top' }, visuals: { spriteKey: 'blue_eye' } },
                     moon_fish: { name: 'Moon Fish', basePrice: 40, baseCoinPerHour: 4.5, hungerRate: 1.0, spaceCost: 2, diet: { accepts: ['tropical_flakes', 'pellets', 'bloodworms'] }, requirements: { tools: [...TROPICAL_TOOL_REQS] }, preferences: { zonePreference: 'middle' }, visuals: { spriteKey: 'moon_fish' } },
                     discus: { name: 'Discus', basePrice: 70, baseCoinPerHour: 6.5, hungerRate: 1.1, spaceCost: 4, diet: { accepts: ['tropical_flakes', 'bloodworms'] }, requirements: { tools: [...TROPICAL_TOOL_REQS], plantMass: { minTotal: 3.0, penalty: 25, label: 'Needs plants' } }, preferences: { zonePreference: 'middle' }, visuals: { spriteKey: 'discus' } },
                     pleco: { name: 'Pleco', basePrice: 50, baseCoinPerHour: 1.8, hungerRate: 0.6, spaceCost: 3, diet: { accepts: ['algae_wafer'] }, requirements: { tools: [...TROPICAL_TOOL_REQS] }, preferences: { zonePreference: 'bottom', movementType: 'glass' }, utility: { dirtReduction: 0.10 }, visuals: { spriteKey: 'pleco' } },
@@ -556,7 +557,7 @@ function applyMockFullGrownTank(save, tankId) {
     tank.foodStock = {};
     for (const fid of Object.keys(tc.content.food)) tank.foodStock[fid] = 50;
     tank.toolsOwned = {};
-    for (const tid of Object.keys(tc.content.tools || {})) tank.toolsOwned[tid] = 3;
+    for (const [tid, tDef] of Object.entries(tc.content.tools || {})) tank.toolsOwned[tid] = tDef.maxLevel || 1;
     tank.cleanliness = 100;
     return { applied: `full_grown_${tankId}` };
 }

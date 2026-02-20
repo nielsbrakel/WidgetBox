@@ -548,40 +548,6 @@
     }
   },
   {
-    "id": "spacer",
-    "app": "com.nielsvanbrakel.widgetbox-layout",
-    "name": {
-      "en": "Spacer",
-      "nl": "Ruimte"
-    },
-    "settings": [
-      {
-        "id": "heightMultiplier",
-        "type": "number",
-        "label": {
-          "en": "Height Multiplier",
-          "nl": "Hoogte Vermenigvuldiger"
-        },
-        "hint": {
-          "en": "Higher values add more vertical space between widgets",
-          "nl": "Hogere waarden voegen meer verticale ruimte toe tussen widgets"
-        },
-        "min": 1,
-        "max": 1000,
-        "step": 1,
-        "value": 10
-      }
-    ],
-    "isTransparent": true,
-    "height": 40,
-    "path": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-layout/widgets/spacer/public/index.html",
-    "absolutePath": "/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-layout/widgets/spacer",
-    "locales": {
-      "en": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-layout/locales/en.json",
-      "nl": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-layout/locales/nl.json"
-    }
-  },
-  {
     "id": "timer",
     "app": "com.nielsvanbrakel.widgetbox-utilities",
     "name": {
@@ -759,6 +725,40 @@
     }
   },
   {
+    "id": "spacer",
+    "app": "com.nielsvanbrakel.widgetbox-layout",
+    "name": {
+      "en": "Spacer",
+      "nl": "Ruimte"
+    },
+    "settings": [
+      {
+        "id": "heightMultiplier",
+        "type": "number",
+        "label": {
+          "en": "Height Multiplier",
+          "nl": "Hoogte Vermenigvuldiger"
+        },
+        "hint": {
+          "en": "Higher values add more vertical space between widgets",
+          "nl": "Hogere waarden voegen meer verticale ruimte toe tussen widgets"
+        },
+        "min": 1,
+        "max": 1000,
+        "step": 1,
+        "value": 10
+      }
+    ],
+    "isTransparent": true,
+    "height": 40,
+    "path": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-layout/widgets/spacer/public/index.html",
+    "absolutePath": "/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-layout/widgets/spacer",
+    "locales": {
+      "en": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-layout/locales/en.json",
+      "nl": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-layout/locales/nl.json"
+    }
+  },
+  {
     "id": "aquarium",
     "app": "com.nielsvanbrakel.widgetbox-games",
     "name": {
@@ -783,662 +783,6 @@
     "locales": {
       "en": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-games/locales/en.json",
       "nl": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-games/locales/nl.json"
-    }
-  },
-  {
-    "id": "rainradar",
-    "app": "com.nielsvanbrakel.widgetbox-buienradar",
-    "name": {
-      "en": "Rain Radar",
-      "nl": "Buienradar"
-    },
-    "settings": [
-      {
-        "id": "showAttribution",
-        "type": "checkbox",
-        "label": {
-          "en": "Show Data Attribution",
-          "nl": "Toon Data Bronvermelding"
-        },
-        "value": true,
-        "hint": {
-          "en": "Required for free data usage from Buienradar.",
-          "nl": "Vereist voor gratis gebruik van Buienradar data."
-        }
-      }
-    ],
-    "isTransparent": false,
-    "height": "100%",
-    "path": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-buienradar/widgets/rainradar/public/index.html",
-    "absolutePath": "/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-buienradar/widgets/rainradar",
-    "locales": {
-      "en": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-buienradar/locales/en.json",
-      "nl": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-buienradar/locales/nl.json"
-    }
-  },
-  {
-    "id": "buientabel",
-    "app": "com.nielsvanbrakel.widgetbox-buienradar",
-    "name": {
-      "en": "Precipitation Forecast",
-      "nl": "Neerslagvoorspelling"
-    },
-    "settings": [
-      {
-        "id": "aspectRatio",
-        "type": "dropdown",
-        "label": {
-          "en": "Aspect Ratio",
-          "nl": "Beeldverhouding"
-        },
-        "value": "16:9",
-        "values": [
-          {
-            "id": "1:1",
-            "label": {
-              "en": "Square (1:1)",
-              "nl": "Vierkant (1:1)"
-            }
-          },
-          {
-            "id": "4:3",
-            "label": {
-              "en": "4:3",
-              "nl": "4:3"
-            }
-          },
-          {
-            "id": "16:9",
-            "label": {
-              "en": "16:9 (Default)",
-              "nl": "16:9 (Standaard)"
-            }
-          },
-          {
-            "id": "21:9",
-            "label": {
-              "en": "Ultrawide (21:9)",
-              "nl": "Ultrabreed (21:9)"
-            }
-          },
-          {
-            "id": "3:1",
-            "label": {
-              "en": "Panoramic (3:1)",
-              "nl": "Panoramisch (3:1)"
-            }
-          }
-        ]
-      },
-      {
-        "id": "chartColor",
-        "type": "dropdown",
-        "label": {
-          "en": "Chart Color",
-          "nl": "Grafiek Kleur"
-        },
-        "value": "blue",
-        "values": [
-          {
-            "id": "blue",
-            "label": {
-              "en": "Blue",
-              "nl": "Blauw"
-            }
-          },
-          {
-            "id": "red",
-            "label": {
-              "en": "Red",
-              "nl": "Rood"
-            }
-          },
-          {
-            "id": "green",
-            "label": {
-              "en": "Green",
-              "nl": "Groen"
-            }
-          },
-          {
-            "id": "orange",
-            "label": {
-              "en": "Orange",
-              "nl": "Oranje"
-            }
-          },
-          {
-            "id": "purple",
-            "label": {
-              "en": "Purple",
-              "nl": "Paars"
-            }
-          },
-          {
-            "id": "mono",
-            "label": {
-              "en": "Monochrome",
-              "nl": "Monochroom"
-            }
-          }
-        ]
-      },
-      {
-        "id": "graphStyle",
-        "type": "dropdown",
-        "label": {
-          "en": "Graph Style",
-          "nl": "Grafieken Stijl"
-        },
-        "value": "bars",
-        "values": [
-          {
-            "id": "bars",
-            "label": {
-              "en": "Bars",
-              "nl": "Staven"
-            }
-          },
-          {
-            "id": "line",
-            "label": {
-              "en": "Line",
-              "nl": "Lijn"
-            }
-          },
-          {
-            "id": "smooth",
-            "label": {
-              "en": "Smooth Line",
-              "nl": "Vloeiende Lijn"
-            }
-          }
-        ]
-      },
-      {
-        "id": "lat",
-        "type": "text",
-        "label": {
-          "en": "Latitude",
-          "nl": "Breedtegraad"
-        },
-        "hint": {
-          "en": "Enter the latitude of your location (e.g. 52.1326)",
-          "nl": "Voer de breedtegraad van je locatie in (bijv. 52.1326)"
-        },
-        "value": "52.1326"
-      },
-      {
-        "id": "lon",
-        "type": "text",
-        "label": {
-          "en": "Longitude",
-          "nl": "Lengtegraad"
-        },
-        "hint": {
-          "en": "Enter the longitude of your location (e.g. 5.2913)",
-          "nl": "Voer de lengtegraad van je locatie in (bijv. 5.2913)"
-        },
-        "value": "5.2913"
-      },
-      {
-        "id": "refreshInterval",
-        "type": "dropdown",
-        "label": {
-          "en": "Auto Refresh",
-          "nl": "Automatisch Verversen"
-        },
-        "value": "300",
-        "values": [
-          {
-            "id": "60",
-            "label": {
-              "en": "Every Minute",
-              "nl": "Elke Minuut"
-            }
-          },
-          {
-            "id": "300",
-            "label": {
-              "en": "Every 5 Minutes",
-              "nl": "Elke 5 Minuten"
-            }
-          },
-          {
-            "id": "900",
-            "label": {
-              "en": "Every 15 Minutes",
-              "nl": "Elke 15 Minuten"
-            }
-          },
-          {
-            "id": "1800",
-            "label": {
-              "en": "Every 30 Minutes",
-              "nl": "Elke 30 Minuten"
-            }
-          },
-          {
-            "id": "3600",
-            "label": {
-              "en": "Every Hour",
-              "nl": "Elk Uur"
-            }
-          }
-        ]
-      }
-    ],
-    "isTransparent": false,
-    "height": 250,
-    "path": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-buienradar/widgets/buientabel/public/index.html",
-    "absolutePath": "/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-buienradar/widgets/buientabel",
-    "locales": {
-      "en": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-buienradar/locales/en.json",
-      "nl": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-buienradar/locales/nl.json"
-    }
-  },
-  {
-    "id": "buienradar-station",
-    "app": "com.nielsvanbrakel.widgetbox-buienradar",
-    "name": {
-      "en": "Station Weather",
-      "nl": "Weerstation"
-    },
-    "settings": [
-      {
-        "id": "lat",
-        "type": "text",
-        "label": {
-          "en": "Latitude",
-          "nl": "Breedtegraad"
-        },
-        "value": "52.09"
-      },
-      {
-        "id": "lon",
-        "type": "text",
-        "label": {
-          "en": "Longitude",
-          "nl": "Lengtegraad"
-        },
-        "value": "5.11"
-      },
-      {
-        "id": "stationId",
-        "type": "text",
-        "label": {
-          "en": "Station ID (Optional)",
-          "nl": "Station ID (Optioneel)"
-        },
-        "hint": {
-          "en": "Enter a specific station ID (e.g. 6260) to override auto-selection.",
-          "nl": "Vul een specifiek station ID in (bv. 6260) om autoselectie te overschrijven."
-        },
-        "value": ""
-      },
-      {
-        "id": "showAttribution",
-        "type": "checkbox",
-        "label": {
-          "en": "Show Data Attribution",
-          "nl": "Toon Data Bronvermelding"
-        },
-        "value": true,
-        "hint": {
-          "en": "Required for free data usage from Buienradar.",
-          "nl": "Vereist voor gratis gebruik van Buienradar data."
-        }
-      },
-      {
-        "id": "textAlign",
-        "type": "dropdown",
-        "label": {
-          "en": "Text Alignment",
-          "nl": "Tekst Uitlijning"
-        },
-        "value": "left",
-        "values": [
-          {
-            "id": "left",
-            "label": {
-              "en": "Left",
-              "nl": "Links"
-            }
-          },
-          {
-            "id": "center",
-            "label": {
-              "en": "Center",
-              "nl": "Midden"
-            }
-          },
-          {
-            "id": "right",
-            "label": {
-              "en": "Right",
-              "nl": "Rechts"
-            }
-          }
-        ]
-      },
-      {
-        "id": "style",
-        "type": "dropdown",
-        "label": {
-          "en": "Style",
-          "nl": "Stijl"
-        },
-        "value": "default",
-        "values": [
-          {
-            "id": "default",
-            "label": {
-              "en": "Default",
-              "nl": "Standaard"
-            }
-          },
-          {
-            "id": "compact",
-            "label": {
-              "en": "Compact",
-              "nl": "Compact"
-            }
-          }
-        ]
-      }
-    ],
-    "isTransparent": false,
-    "height": 200,
-    "path": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-buienradar/widgets/buienradar-station/public/index.html",
-    "absolutePath": "/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-buienradar/widgets/buienradar-station",
-    "locales": {
-      "en": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-buienradar/locales/en.json",
-      "nl": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-buienradar/locales/nl.json"
-    }
-  },
-  {
-    "id": "buienradar-graph",
-    "app": "com.nielsvanbrakel.widgetbox-buienradar",
-    "name": {
-      "en": "Rain Graph 2h",
-      "nl": "Neerslaggrafiek (2u)"
-    },
-    "settings": [
-      {
-        "id": "chartColor",
-        "type": "dropdown",
-        "label": {
-          "en": "Chart Color",
-          "nl": "Grafiek Kleur"
-        },
-        "value": "blue",
-        "values": [
-          {
-            "id": "blue",
-            "label": {
-              "en": "Blue",
-              "nl": "Blauw"
-            }
-          },
-          {
-            "id": "red",
-            "label": {
-              "en": "Red",
-              "nl": "Rood"
-            }
-          },
-          {
-            "id": "green",
-            "label": {
-              "en": "Green",
-              "nl": "Groen"
-            }
-          },
-          {
-            "id": "orange",
-            "label": {
-              "en": "Orange",
-              "nl": "Oranje"
-            }
-          },
-          {
-            "id": "purple",
-            "label": {
-              "en": "Purple",
-              "nl": "Paars"
-            }
-          },
-          {
-            "id": "mono",
-            "label": {
-              "en": "Monochrome",
-              "nl": "Monochroom"
-            }
-          }
-        ]
-      },
-      {
-        "id": "graphStyle",
-        "type": "dropdown",
-        "label": {
-          "en": "Graph Style",
-          "nl": "Grafieken Stijl"
-        },
-        "value": "bars",
-        "values": [
-          {
-            "id": "bars",
-            "label": {
-              "en": "Bars",
-              "nl": "Staven"
-            }
-          },
-          {
-            "id": "line",
-            "label": {
-              "en": "Line",
-              "nl": "Lijn"
-            }
-          },
-          {
-            "id": "smooth",
-            "label": {
-              "en": "Smooth Line",
-              "nl": "Vloeiende Lijn"
-            }
-          }
-        ]
-      },
-      {
-        "id": "lat",
-        "type": "text",
-        "label": {
-          "en": "Latitude",
-          "nl": "Breedtegraad"
-        },
-        "value": "52.1326"
-      },
-      {
-        "id": "lon",
-        "type": "text",
-        "label": {
-          "en": "Longitude",
-          "nl": "Lengtegraad"
-        },
-        "value": "5.2913"
-      },
-      {
-        "id": "refreshInterval",
-        "type": "dropdown",
-        "label": {
-          "en": "Auto Refresh",
-          "nl": "Automatisch Verversen"
-        },
-        "value": "300",
-        "values": [
-          {
-            "id": "60",
-            "label": {
-              "en": "Every Minute",
-              "nl": "Elke Minuut"
-            }
-          },
-          {
-            "id": "300",
-            "label": {
-              "en": "Every 5 Minutes",
-              "nl": "Elke 5 Minuten"
-            }
-          },
-          {
-            "id": "900",
-            "label": {
-              "en": "Every 15 Minutes",
-              "nl": "Elke 15 Minuten"
-            }
-          },
-          {
-            "id": "1800",
-            "label": {
-              "en": "Every 30 Minutes",
-              "nl": "Elke 30 Minuten"
-            }
-          },
-          {
-            "id": "3600",
-            "label": {
-              "en": "Every Hour",
-              "nl": "Elk Uur"
-            }
-          }
-        ]
-      },
-      {
-        "id": "limitLight",
-        "type": "number",
-        "label": {
-          "en": "Limit Light Rain (mm/h)",
-          "nl": "Grens Lichte Regen (mm/u)"
-        },
-        "value": 0.5,
-        "hint": {
-          "en": "Threshold for the 'LIGHT' reference line.",
-          "nl": "Drempelwaarde voor de 'LICHT' referentielijn."
-        }
-      },
-      {
-        "id": "limitModerate",
-        "type": "number",
-        "label": {
-          "en": "Limit Moderate Rain (mm/h)",
-          "nl": "Grens Matige Regen (mm/u)"
-        },
-        "value": 1,
-        "hint": {
-          "en": "Threshold for the 'MODERATE' reference line.",
-          "nl": "Drempelwaarde voor de 'MATIG' referentielijn."
-        }
-      },
-      {
-        "id": "limitHeavy",
-        "type": "number",
-        "label": {
-          "en": "Limit Heavy Rain (mm/h)",
-          "nl": "Grens Zware Regen (mm/u)"
-        },
-        "value": 2.5,
-        "hint": {
-          "en": "Threshold for the 'HEAVY' reference line.",
-          "nl": "Drempelwaarde voor de 'ZWAAR' referentielijn."
-        }
-      },
-      {
-        "id": "showAttribution",
-        "type": "checkbox",
-        "label": {
-          "en": "Show Data Attribution",
-          "nl": "Toon Data Bronvermelding"
-        },
-        "value": true,
-        "hint": {
-          "en": "Required for free data usage from Buienradar.",
-          "nl": "Vereist voor gratis gebruik van Buienradar data."
-        }
-      }
-    ],
-    "isTransparent": true,
-    "height": 200,
-    "path": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-buienradar/widgets/buienradar-graph/public/index.html",
-    "absolutePath": "/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-buienradar/widgets/buienradar-graph",
-    "locales": {
-      "en": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-buienradar/locales/en.json",
-      "nl": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-buienradar/locales/nl.json"
-    }
-  },
-  {
-    "id": "buienradar-forecast",
-    "app": "com.nielsvanbrakel.widgetbox-buienradar",
-    "name": {
-      "en": "5 Days Forecast",
-      "nl": "5-Daagse Verwachting"
-    },
-    "settings": [
-      {
-        "id": "lat",
-        "type": "text",
-        "label": {
-          "en": "Latitude",
-          "nl": "Breedtegraad"
-        },
-        "value": "52.1"
-      },
-      {
-        "id": "lon",
-        "type": "text",
-        "label": {
-          "en": "Longitude",
-          "nl": "Lengtegraad"
-        },
-        "value": "5.1"
-      },
-      {
-        "id": "showAttribution",
-        "type": "checkbox",
-        "label": {
-          "en": "Show Data Attribution",
-          "nl": "Toon Data Bronvermelding"
-        },
-        "value": true,
-        "hint": {
-          "en": "Required for free data usage from Buienradar.",
-          "nl": "Vereist voor gratis gebruik van Buienradar data."
-        }
-      }
-    ],
-    "isTransparent": true,
-    "height": 200,
-    "path": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-buienradar/widgets/buienradar-forecast/public/index.html",
-    "absolutePath": "/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-buienradar/widgets/buienradar-forecast",
-    "locales": {
-      "en": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-buienradar/locales/en.json",
-      "nl": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-buienradar/locales/nl.json"
-    }
-  },
-  {
-    "id": "buienradar",
-    "app": "com.nielsvanbrakel.widgetbox-buienradar",
-    "name": {
-      "en": "Weather Radar",
-      "nl": "5-Daagse Radar"
-    },
-    "settings": [],
-    "isTransparent": false,
-    "height": 406,
-    "path": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-buienradar/widgets/buienradar/public/index.html",
-    "absolutePath": "/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-buienradar/widgets/buienradar",
-    "locales": {
-      "en": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-buienradar/locales/en.json",
-      "nl": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-buienradar/locales/nl.json"
     }
   },
   {
@@ -2597,6 +1941,662 @@
     "locales": {
       "en": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-clocks/locales/en.json",
       "nl": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-clocks/locales/nl.json"
+    }
+  },
+  {
+    "id": "rainradar",
+    "app": "com.nielsvanbrakel.widgetbox-buienradar",
+    "name": {
+      "en": "Rain Radar",
+      "nl": "Buienradar"
+    },
+    "settings": [
+      {
+        "id": "showAttribution",
+        "type": "checkbox",
+        "label": {
+          "en": "Show Data Attribution",
+          "nl": "Toon Data Bronvermelding"
+        },
+        "value": true,
+        "hint": {
+          "en": "Required for free data usage from Buienradar.",
+          "nl": "Vereist voor gratis gebruik van Buienradar data."
+        }
+      }
+    ],
+    "isTransparent": false,
+    "height": "100%",
+    "path": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-buienradar/widgets/rainradar/public/index.html",
+    "absolutePath": "/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-buienradar/widgets/rainradar",
+    "locales": {
+      "en": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-buienradar/locales/en.json",
+      "nl": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-buienradar/locales/nl.json"
+    }
+  },
+  {
+    "id": "buientabel",
+    "app": "com.nielsvanbrakel.widgetbox-buienradar",
+    "name": {
+      "en": "Precipitation Forecast",
+      "nl": "Neerslagvoorspelling"
+    },
+    "settings": [
+      {
+        "id": "aspectRatio",
+        "type": "dropdown",
+        "label": {
+          "en": "Aspect Ratio",
+          "nl": "Beeldverhouding"
+        },
+        "value": "16:9",
+        "values": [
+          {
+            "id": "1:1",
+            "label": {
+              "en": "Square (1:1)",
+              "nl": "Vierkant (1:1)"
+            }
+          },
+          {
+            "id": "4:3",
+            "label": {
+              "en": "4:3",
+              "nl": "4:3"
+            }
+          },
+          {
+            "id": "16:9",
+            "label": {
+              "en": "16:9 (Default)",
+              "nl": "16:9 (Standaard)"
+            }
+          },
+          {
+            "id": "21:9",
+            "label": {
+              "en": "Ultrawide (21:9)",
+              "nl": "Ultrabreed (21:9)"
+            }
+          },
+          {
+            "id": "3:1",
+            "label": {
+              "en": "Panoramic (3:1)",
+              "nl": "Panoramisch (3:1)"
+            }
+          }
+        ]
+      },
+      {
+        "id": "chartColor",
+        "type": "dropdown",
+        "label": {
+          "en": "Chart Color",
+          "nl": "Grafiek Kleur"
+        },
+        "value": "blue",
+        "values": [
+          {
+            "id": "blue",
+            "label": {
+              "en": "Blue",
+              "nl": "Blauw"
+            }
+          },
+          {
+            "id": "red",
+            "label": {
+              "en": "Red",
+              "nl": "Rood"
+            }
+          },
+          {
+            "id": "green",
+            "label": {
+              "en": "Green",
+              "nl": "Groen"
+            }
+          },
+          {
+            "id": "orange",
+            "label": {
+              "en": "Orange",
+              "nl": "Oranje"
+            }
+          },
+          {
+            "id": "purple",
+            "label": {
+              "en": "Purple",
+              "nl": "Paars"
+            }
+          },
+          {
+            "id": "mono",
+            "label": {
+              "en": "Monochrome",
+              "nl": "Monochroom"
+            }
+          }
+        ]
+      },
+      {
+        "id": "graphStyle",
+        "type": "dropdown",
+        "label": {
+          "en": "Graph Style",
+          "nl": "Grafieken Stijl"
+        },
+        "value": "bars",
+        "values": [
+          {
+            "id": "bars",
+            "label": {
+              "en": "Bars",
+              "nl": "Staven"
+            }
+          },
+          {
+            "id": "line",
+            "label": {
+              "en": "Line",
+              "nl": "Lijn"
+            }
+          },
+          {
+            "id": "smooth",
+            "label": {
+              "en": "Smooth Line",
+              "nl": "Vloeiende Lijn"
+            }
+          }
+        ]
+      },
+      {
+        "id": "lat",
+        "type": "text",
+        "label": {
+          "en": "Latitude",
+          "nl": "Breedtegraad"
+        },
+        "hint": {
+          "en": "Enter the latitude of your location (e.g. 52.1326)",
+          "nl": "Voer de breedtegraad van je locatie in (bijv. 52.1326)"
+        },
+        "value": "52.1326"
+      },
+      {
+        "id": "lon",
+        "type": "text",
+        "label": {
+          "en": "Longitude",
+          "nl": "Lengtegraad"
+        },
+        "hint": {
+          "en": "Enter the longitude of your location (e.g. 5.2913)",
+          "nl": "Voer de lengtegraad van je locatie in (bijv. 5.2913)"
+        },
+        "value": "5.2913"
+      },
+      {
+        "id": "refreshInterval",
+        "type": "dropdown",
+        "label": {
+          "en": "Auto Refresh",
+          "nl": "Automatisch Verversen"
+        },
+        "value": "300",
+        "values": [
+          {
+            "id": "60",
+            "label": {
+              "en": "Every Minute",
+              "nl": "Elke Minuut"
+            }
+          },
+          {
+            "id": "300",
+            "label": {
+              "en": "Every 5 Minutes",
+              "nl": "Elke 5 Minuten"
+            }
+          },
+          {
+            "id": "900",
+            "label": {
+              "en": "Every 15 Minutes",
+              "nl": "Elke 15 Minuten"
+            }
+          },
+          {
+            "id": "1800",
+            "label": {
+              "en": "Every 30 Minutes",
+              "nl": "Elke 30 Minuten"
+            }
+          },
+          {
+            "id": "3600",
+            "label": {
+              "en": "Every Hour",
+              "nl": "Elk Uur"
+            }
+          }
+        ]
+      }
+    ],
+    "isTransparent": false,
+    "height": 250,
+    "path": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-buienradar/widgets/buientabel/public/index.html",
+    "absolutePath": "/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-buienradar/widgets/buientabel",
+    "locales": {
+      "en": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-buienradar/locales/en.json",
+      "nl": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-buienradar/locales/nl.json"
+    }
+  },
+  {
+    "id": "buienradar-station",
+    "app": "com.nielsvanbrakel.widgetbox-buienradar",
+    "name": {
+      "en": "Station Weather",
+      "nl": "Weerstation"
+    },
+    "settings": [
+      {
+        "id": "lat",
+        "type": "text",
+        "label": {
+          "en": "Latitude",
+          "nl": "Breedtegraad"
+        },
+        "value": "52.09"
+      },
+      {
+        "id": "lon",
+        "type": "text",
+        "label": {
+          "en": "Longitude",
+          "nl": "Lengtegraad"
+        },
+        "value": "5.11"
+      },
+      {
+        "id": "stationId",
+        "type": "text",
+        "label": {
+          "en": "Station ID (Optional)",
+          "nl": "Station ID (Optioneel)"
+        },
+        "hint": {
+          "en": "Enter a specific station ID (e.g. 6260) to override auto-selection.",
+          "nl": "Vul een specifiek station ID in (bv. 6260) om autoselectie te overschrijven."
+        },
+        "value": ""
+      },
+      {
+        "id": "showAttribution",
+        "type": "checkbox",
+        "label": {
+          "en": "Show Data Attribution",
+          "nl": "Toon Data Bronvermelding"
+        },
+        "value": true,
+        "hint": {
+          "en": "Required for free data usage from Buienradar.",
+          "nl": "Vereist voor gratis gebruik van Buienradar data."
+        }
+      },
+      {
+        "id": "textAlign",
+        "type": "dropdown",
+        "label": {
+          "en": "Text Alignment",
+          "nl": "Tekst Uitlijning"
+        },
+        "value": "left",
+        "values": [
+          {
+            "id": "left",
+            "label": {
+              "en": "Left",
+              "nl": "Links"
+            }
+          },
+          {
+            "id": "center",
+            "label": {
+              "en": "Center",
+              "nl": "Midden"
+            }
+          },
+          {
+            "id": "right",
+            "label": {
+              "en": "Right",
+              "nl": "Rechts"
+            }
+          }
+        ]
+      },
+      {
+        "id": "style",
+        "type": "dropdown",
+        "label": {
+          "en": "Style",
+          "nl": "Stijl"
+        },
+        "value": "default",
+        "values": [
+          {
+            "id": "default",
+            "label": {
+              "en": "Default",
+              "nl": "Standaard"
+            }
+          },
+          {
+            "id": "compact",
+            "label": {
+              "en": "Compact",
+              "nl": "Compact"
+            }
+          }
+        ]
+      }
+    ],
+    "isTransparent": false,
+    "height": 200,
+    "path": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-buienradar/widgets/buienradar-station/public/index.html",
+    "absolutePath": "/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-buienradar/widgets/buienradar-station",
+    "locales": {
+      "en": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-buienradar/locales/en.json",
+      "nl": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-buienradar/locales/nl.json"
+    }
+  },
+  {
+    "id": "buienradar-graph",
+    "app": "com.nielsvanbrakel.widgetbox-buienradar",
+    "name": {
+      "en": "Rain Graph 2h",
+      "nl": "Neerslaggrafiek (2u)"
+    },
+    "settings": [
+      {
+        "id": "chartColor",
+        "type": "dropdown",
+        "label": {
+          "en": "Chart Color",
+          "nl": "Grafiek Kleur"
+        },
+        "value": "blue",
+        "values": [
+          {
+            "id": "blue",
+            "label": {
+              "en": "Blue",
+              "nl": "Blauw"
+            }
+          },
+          {
+            "id": "red",
+            "label": {
+              "en": "Red",
+              "nl": "Rood"
+            }
+          },
+          {
+            "id": "green",
+            "label": {
+              "en": "Green",
+              "nl": "Groen"
+            }
+          },
+          {
+            "id": "orange",
+            "label": {
+              "en": "Orange",
+              "nl": "Oranje"
+            }
+          },
+          {
+            "id": "purple",
+            "label": {
+              "en": "Purple",
+              "nl": "Paars"
+            }
+          },
+          {
+            "id": "mono",
+            "label": {
+              "en": "Monochrome",
+              "nl": "Monochroom"
+            }
+          }
+        ]
+      },
+      {
+        "id": "graphStyle",
+        "type": "dropdown",
+        "label": {
+          "en": "Graph Style",
+          "nl": "Grafieken Stijl"
+        },
+        "value": "bars",
+        "values": [
+          {
+            "id": "bars",
+            "label": {
+              "en": "Bars",
+              "nl": "Staven"
+            }
+          },
+          {
+            "id": "line",
+            "label": {
+              "en": "Line",
+              "nl": "Lijn"
+            }
+          },
+          {
+            "id": "smooth",
+            "label": {
+              "en": "Smooth Line",
+              "nl": "Vloeiende Lijn"
+            }
+          }
+        ]
+      },
+      {
+        "id": "lat",
+        "type": "text",
+        "label": {
+          "en": "Latitude",
+          "nl": "Breedtegraad"
+        },
+        "value": "52.1326"
+      },
+      {
+        "id": "lon",
+        "type": "text",
+        "label": {
+          "en": "Longitude",
+          "nl": "Lengtegraad"
+        },
+        "value": "5.2913"
+      },
+      {
+        "id": "refreshInterval",
+        "type": "dropdown",
+        "label": {
+          "en": "Auto Refresh",
+          "nl": "Automatisch Verversen"
+        },
+        "value": "300",
+        "values": [
+          {
+            "id": "60",
+            "label": {
+              "en": "Every Minute",
+              "nl": "Elke Minuut"
+            }
+          },
+          {
+            "id": "300",
+            "label": {
+              "en": "Every 5 Minutes",
+              "nl": "Elke 5 Minuten"
+            }
+          },
+          {
+            "id": "900",
+            "label": {
+              "en": "Every 15 Minutes",
+              "nl": "Elke 15 Minuten"
+            }
+          },
+          {
+            "id": "1800",
+            "label": {
+              "en": "Every 30 Minutes",
+              "nl": "Elke 30 Minuten"
+            }
+          },
+          {
+            "id": "3600",
+            "label": {
+              "en": "Every Hour",
+              "nl": "Elk Uur"
+            }
+          }
+        ]
+      },
+      {
+        "id": "limitLight",
+        "type": "number",
+        "label": {
+          "en": "Limit Light Rain (mm/h)",
+          "nl": "Grens Lichte Regen (mm/u)"
+        },
+        "value": 0.5,
+        "hint": {
+          "en": "Threshold for the 'LIGHT' reference line.",
+          "nl": "Drempelwaarde voor de 'LICHT' referentielijn."
+        }
+      },
+      {
+        "id": "limitModerate",
+        "type": "number",
+        "label": {
+          "en": "Limit Moderate Rain (mm/h)",
+          "nl": "Grens Matige Regen (mm/u)"
+        },
+        "value": 1,
+        "hint": {
+          "en": "Threshold for the 'MODERATE' reference line.",
+          "nl": "Drempelwaarde voor de 'MATIG' referentielijn."
+        }
+      },
+      {
+        "id": "limitHeavy",
+        "type": "number",
+        "label": {
+          "en": "Limit Heavy Rain (mm/h)",
+          "nl": "Grens Zware Regen (mm/u)"
+        },
+        "value": 2.5,
+        "hint": {
+          "en": "Threshold for the 'HEAVY' reference line.",
+          "nl": "Drempelwaarde voor de 'ZWAAR' referentielijn."
+        }
+      },
+      {
+        "id": "showAttribution",
+        "type": "checkbox",
+        "label": {
+          "en": "Show Data Attribution",
+          "nl": "Toon Data Bronvermelding"
+        },
+        "value": true,
+        "hint": {
+          "en": "Required for free data usage from Buienradar.",
+          "nl": "Vereist voor gratis gebruik van Buienradar data."
+        }
+      }
+    ],
+    "isTransparent": true,
+    "height": 200,
+    "path": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-buienradar/widgets/buienradar-graph/public/index.html",
+    "absolutePath": "/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-buienradar/widgets/buienradar-graph",
+    "locales": {
+      "en": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-buienradar/locales/en.json",
+      "nl": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-buienradar/locales/nl.json"
+    }
+  },
+  {
+    "id": "buienradar-forecast",
+    "app": "com.nielsvanbrakel.widgetbox-buienradar",
+    "name": {
+      "en": "5 Days Forecast",
+      "nl": "5-Daagse Verwachting"
+    },
+    "settings": [
+      {
+        "id": "lat",
+        "type": "text",
+        "label": {
+          "en": "Latitude",
+          "nl": "Breedtegraad"
+        },
+        "value": "52.1"
+      },
+      {
+        "id": "lon",
+        "type": "text",
+        "label": {
+          "en": "Longitude",
+          "nl": "Lengtegraad"
+        },
+        "value": "5.1"
+      },
+      {
+        "id": "showAttribution",
+        "type": "checkbox",
+        "label": {
+          "en": "Show Data Attribution",
+          "nl": "Toon Data Bronvermelding"
+        },
+        "value": true,
+        "hint": {
+          "en": "Required for free data usage from Buienradar.",
+          "nl": "Vereist voor gratis gebruik van Buienradar data."
+        }
+      }
+    ],
+    "isTransparent": true,
+    "height": 200,
+    "path": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-buienradar/widgets/buienradar-forecast/public/index.html",
+    "absolutePath": "/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-buienradar/widgets/buienradar-forecast",
+    "locales": {
+      "en": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-buienradar/locales/en.json",
+      "nl": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-buienradar/locales/nl.json"
+    }
+  },
+  {
+    "id": "buienradar",
+    "app": "com.nielsvanbrakel.widgetbox-buienradar",
+    "name": {
+      "en": "Weather Radar",
+      "nl": "5-Daagse Radar"
+    },
+    "settings": [],
+    "isTransparent": false,
+    "height": 406,
+    "path": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-buienradar/widgets/buienradar/public/index.html",
+    "absolutePath": "/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-buienradar/widgets/buienradar",
+    "locales": {
+      "en": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-buienradar/locales/en.json",
+      "nl": "/@fs/Users/nielsvanbrakel/Repos/WidgetBox/apps/com.nielsvanbrakel.widgetbox-buienradar/locales/nl.json"
     }
   }
 ]

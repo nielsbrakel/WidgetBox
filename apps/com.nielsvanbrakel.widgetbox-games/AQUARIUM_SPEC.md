@@ -487,7 +487,7 @@ The game currently ships with three tank biomes. The system is designed to suppo
 
 **Fish:** Guppy, Goldfish, Snail (utility, eats algae)
 **Food:** Basic Flakes, Pellets, Algae Wafer
-**Decor:** Hornwort (plant, grows), Moss Ball, Rock Pile, Driftwood, Treasure Chest (bubbles)
+**Decor:** Hornwort (plant, grows), Moss Ball, Rock Pile, Driftwood (spider wood), Treasure Chest (animated lid, bubbles), Sunken Ship
 **Tools:** None required
 
 ### 7.2 Tropical Planted Tank
@@ -655,19 +655,19 @@ Each species has a display scale multiplier applied during rendering so fish app
 | `shrimp` | 0.7 | 10×5 | Tiny crawl |
 | `snail` | 0.75 | 10×8 | Tiny crawl |
 | `guppy` | 0.85 | 10×6 | Small |
-| `blue_eye` | 0.85 | 10×6 | Small |
+| `blue_eye` | 0.85 | 10×6 | Small (half-space 0.5) |
 | `banggai_cardinal` | 0.85 | 10×8 | Small schooling |
 | `firefish` | 1.1 | 12×6 | Medium |
 | `royal_gramma` | 1.1 | 12×6 | Medium |
 | `clownfish` | 1.2 | 12×8 | Medium |
 | `cleaner_shrimp` | 1.0 | 14×4 | Medium crawl |
-| `gourami` | 1.3 | 14×10 | Medium-large |
-| `goldfish` | 1.3 | 12×8 | Large |
-| `moon_fish` | 1.7 | 14×12 | Large (tall) |
-| `pleco` | 1.8 | 16×8 | Large (flat) |
-| `blue_tang` | 1.8 | 18×12 | Large |
-| `discus` | 2.0 | 16×14 | Very large (disc) |
-| `moray_eel` | 2.8 | 28×4 | Huge (serpentine) |
+| `gourami` | 1.3 | 16×12 | Medium-large |
+| `goldfish` | 1.3 | 14×10 | Large |
+| `moon_fish` | 1.7 | 16×14 | Large (tall) |
+| `pleco` | 1.8 | 22×8 | Large (flat) |
+| `blue_tang` | 1.8 | 20×14 | Large |
+| `discus` | 2.0 | 20×16 | Very large (disc) |
+| `moray_eel` | 3.0 | 32×3 | Huge (serpentine) |
 
 **Design philosophy:** Fish should be immediately recognizable at a glance. Tiny schooling fish (neon tetras, green chromis) are deliberately small so schools of 10+ look natural. Large fish (discus, moray eel) dominate the visual space. The combination of unique sprite shapes plus scale multipliers creates dramatic size differentiation.
 
@@ -1178,7 +1178,7 @@ The tank fills the **entire** 4:3 viewport. No desk, no frame, no border. The aq
 | 5. Substrate | 3 | 120 varied pebbles (multi-size, multi-shade) with 2-line highlight at substrate top + depth fog above |
 | 6. Rock clusters | 4 | Foreground rock formations (if biome has them) |
 | 7. **Back decor layer** | 5 | Every 3rd decor item rendered at 55% opacity (behind fish for depth) |
-| 8. Equipment | 6 | Filter, heater, skimmer, UV sterilizer rendered as pixel art sprites from ICON_DATA with level indicator dots |
+| 8. Equipment | 6 | Filter, heater, skimmer, UV sterilizer rendered as pixel art sprites on right wall, vertically centered in water column, with semi-transparent mounting plate and level indicator dots. Filter emits bubbles every 300ms proportional to level. |
 | 9. Fish sprites | 7 | All fish, pixel-rendered with species data and FISH_BASE_SCALES |
 | 10. Movement-type sprites | 8 | Crawl (snail/shrimp on substrate), glass (pleco on walls, vertical), snake (moray undulation) |
 | 10.5. **Front decor layer** | 8.5 | Remaining decor items at full opacity (in front of fish for depth) |
@@ -1235,9 +1235,9 @@ All UI icons (HUD, menu, store, panels) use a unified pixel art icon system inst
 - **Wiggle:** Tapped fish stop and oscillate in place for 2 seconds
 - Bubbles rise with sine-wave wobble
 - Plants sway with subtle sine-based offset
-- Equipment has rendered pixel art sprites from ICON_DATA with level indicator dots
+- Equipment is rendered on the right wall of the tank, vertically centered in the water column, with a semi-transparent mounting plate behind each icon. Filter equipment emits bubbles every 300ms, with bubble count proportional to filter level.
 - **Layered decor rendering:** Decor is split into back (every 3rd item, 55% opacity) and front (remaining items, full opacity) layers. Fish swim between these layers, creating a natural depth effect. `renderDecorBack()` runs before fish, `renderDecorFront()` runs after fish in the game loop.
-- Decor rendering is highly detailed: floating plants have 4-6 lily pads with leaf veins and 7 dangling roots with varied widths and sub-branching (35% chance); plants have 2-3 stems with 6-11 leaves along quadratic Bézier curves at 2.5× height; rocks have 5-7 irregular polygon shapes with crack lines (moss on live_rock); coral/anemone items have 5-8 animated swaying branches with sub-branches (anemone scaleMult 3.5); caves render as dark arches with interior shading and rim highlights; driftwood shows gnarled profiles with bark grain texture (7 horizontal lines), bark knots, thinner sub-branches, and highlight edge
+- Decor rendering is highly detailed: floating plants have 4-6 lily pads with leaf veins and 7 dangling roots with varied widths and sub-branching (35% chance); plants have 2-3 stems with 6-11 leaves along quadratic Bézier curves at 2.5× height; rocks have 5-7 irregular polygon shapes with crack lines (moss on live_rock); coral/anemone items have 5-8 animated swaying branches with sub-branches (anemone scaleMult 3.5); caves render as dark arches with interior shading and rim highlights; driftwood renders as spider wood with root flare at substrate base, wide trunk (20% of baseSize) reaching 55% of water height, 8 branching arms with sub-branches and taper tips, and deep bark grain texture (10 grain lines + 3 knots); treasure chest has wooden body with planks, metal bands, gold lock plate, breathing lid animation, gold glint inside, and periodic bubble emission; sunken ship renders as tilted hull with planks, broken mast, tattered sail, porthole windows, and algae patches
 - Pleco rotates when attached to glass walls
 - Food particles set anim.tx/ty to current position after fish consume to prevent snapping
 
@@ -1268,6 +1268,16 @@ Full-screen overlays with header (title + close button) and scrollable body:
 - **Inventory** — List of fish with details
 - **Tanks** — Tank switching and unlocking
 - **Help** — Game manual
+
+**Panel close behavior:** Closing any panel (store, inventory, tanks, help) via the close button automatically re-opens the menu overlay, so the user doesn't get stranded with no visible UI.
+
+### 20.4 Store Icons
+
+Store item icons use a consistent style per tab:
+- **Fish tab:** Colored circle (`●`) using the species' secondary palette color (`FISH_PALETTES[id][1]`)
+- **Food tab:** Colored circle (`●`) in warm brown (`#c8a060`)
+- **Decor tab:** Colored circle (`●`) using `DECOR_COLORS[id]`
+- **Tools tab:** Species-specific pixel art icon per tool type (heater → `heater`, filter → `filter`, skimmer → `skimmer`, UV → `uv`)
 
 ---
 
@@ -1762,7 +1772,7 @@ Core systems must have unit tests in a `test/unit/` directory:
 
 ### 26.2 E2E Tests (Playwright)
 
-Four test files in `tests/e2e/`, 223 tests total:
+Five test files in `tests/e2e/`, 260+ tests total:
 
 | File | Count | Coverage |
 |---|---|---|
@@ -1770,6 +1780,7 @@ Four test files in `tests/e2e/`, 223 tests total:
 | `games-advanced.spec.ts` | 57 | Pixel icons, store purchasing + persistence, tank navigation, scenario state persistence, decor/fish sell, equipment upgrades, dirty tank visuals, panel close behavior |
 | `games-features.spec.ts` | 50 | Zero-fish tanks, half-space schooling, movement types, fish info panel (stats/earning/sell/weak/traits), cleaning, floating plants, scenario switching, rendering stability |
 | `games-design.spec.ts` | 56 | Fish size differentiation, layered decor depth, territorial behavior, plant trim/move/sell, 10-second stability, full-grown scenarios, FAB animation state |
+| `games-v2.spec.ts` | 40+ | v2 visual overhaul: sunken ship decor, blue-eye half-space, store icon consistency, equipment rendering + filter bubbles, spider wood rendering, panel close → menu reopen, debug tool levels, treasure chest animation |
 
 Page object: `tests/pages/GamesPage.ts` — provides helpers for menu, panels, tool modes, wipe gestures, scenario selection, and coin/tier reading.
 
@@ -1812,8 +1823,9 @@ All scenarios are defined in `apps/sandbox/src/lib/scenarios.js` and generated b
 | `anubias` | Anubias | 22 | bottom | 0.01/hr, min 0.4, max 1.5 (broad round leaves) |
 | `moss_ball` | Moss Ball | 15 | bottom | No (renders as sphere with radial gradient) |
 | `rock_pile` | Rock Pile | 25 | bottom | No |
-| `driftwood` | Driftwood | 35 | mid | No |
-| `treasure_chest` | Treasure Chest | 50 | bottom | No (animated bubbles) |
+| `driftwood` | Driftwood | 35 | mid | No (spider wood style: root flare, wide trunk, 8 branching arms) |
+| `treasure_chest` | Treasure Chest | 50 | bottom | No (animated breathing lid, gold glint, periodic bubbles) |
+| `sunken_ship` | Sunken Ship | 75 | bottom | No (tilted hull, broken mast, tattered sail, portholes). Max 1 per tank |
 
 ### Tropical Planted Tank Content
 
@@ -1821,7 +1833,7 @@ All scenarios are defined in `apps/sandbox/src/lib/scenarios.js` and generated b
 | ID | Display Name | Price | Coins/hr | Space | Accepts | Requirements |
 |---|---|---|---|---|---|---|
 | `neon_tetra` | Neon Tetra | 25 | 3.2 | **0.5** | `tropical_flakes`, `bloodworms` | Schooling, half-space |
-| `blue_eye` | Blue-Eye | 30 | 3.5 | 1 | `tropical_flakes`, `pellets` | — |
+| `blue_eye` | Blue-Eye | 30 | 3.5 | **0.5** | `tropical_flakes`, `pellets` | Half-space (schooling-sized) |
 | `moon_fish` | Moon Fish | 40 | 4.5 | 2 | `tropical_flakes`, `pellets`, `bloodworms` | — |
 | `discus` | Discus | 70 | 6.0 | 4 | `tropical_flakes`, `bloodworms` | Plant mass ≥ 3.0 (-25 penalty) |
 | `pleco` | Pleco | 50 | 1.5 | 3 | `algae_wafer` | Utility: reduces dirt 10%, glass movement |

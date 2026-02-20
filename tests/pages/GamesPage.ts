@@ -101,12 +101,18 @@ export class GamesPage extends SandboxPage {
     }
 
     async openMenu() {
-        await this.fab.click();
+        const isVisible = await this.menuOverlay.evaluate(el => el.classList.contains('visible'));
+        if (!isVisible) {
+            await this.fab.click();
+        }
         await expect(this.menuOverlay).toHaveClass(/visible/);
     }
 
     async closeMenu() {
-        await this.fab.click();
+        const isVisible = await this.menuOverlay.evaluate(el => el.classList.contains('visible'));
+        if (isVisible) {
+            await this.fab.click();
+        }
         await expect(this.menuOverlay).not.toHaveClass(/visible/);
     }
 
