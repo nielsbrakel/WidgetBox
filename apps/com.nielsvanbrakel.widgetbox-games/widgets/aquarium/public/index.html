@@ -6,7 +6,7 @@
 <style>
 /* ═══════ BASE ═══════ */
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{width:100%;height:100%;overflow:hidden;background:#0a1628;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#e0e8f0;-webkit-tap-highlight-color:transparent;user-select:none}
+html,body{width:100%;height:100%;overflow:hidden;background:#0a1628;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#e0e8f0;-webkit-tap-highlight-color:transparent;user-select:none;touch-action:none}
 #widgetContainer{position:relative;width:100%;height:100%;overflow:hidden}
 #loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#0a1628;z-index:100;font-size:14px;color:#6090c0;transition:opacity .3s}
 #loading.hidden{opacity:0;pointer-events:none}
@@ -17,10 +17,11 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a1628;font-family:
 #dirtCanvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:12}
 
 /* ═══════ HUD ═══════ */
-.coin-display{position:absolute;top:8px;left:10px;display:flex;align-items:center;gap:4px;background:rgba(0,0,0,.45);border-radius:12px;padding:3px 10px 3px 6px;font-size:13px;font-weight:600;z-index:30;cursor:pointer}
+.coin-display{position:absolute;top:8px;left:10px;display:flex;align-items:center;gap:4px;background:rgba(0,0,0,.45);border-radius:12px;padding:3px 10px 3px 6px;font-size:13px;font-weight:600;z-index:30;cursor:pointer;transition:opacity .2s}
 #coinIcon{font-size:14px}
 #coinCount{color:#ffd866}
-#hudRight{position:absolute;top:8px;right:10px;display:flex;flex-direction:column;gap:4px;z-index:30}
+#hudRight{position:absolute;top:8px;right:10px;display:flex;flex-direction:column;gap:4px;z-index:30;transition:opacity .2s}
+.hud-muted .coin-display,.hud-muted #hudRight{pointer-events:none;opacity:.3}
 .hud-bar{display:flex;align-items:center;gap:4px;background:rgba(0,0,0,.45);border-radius:8px;padding:3px 8px;font-size:10px;cursor:pointer;min-width:80px}
 .hud-bar-label{width:10px;text-align:center}
 .hud-bar-track{flex:1;height:5px;background:rgba(255,255,255,.12);border-radius:3px;overflow:hidden}
@@ -28,7 +29,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a1628;font-family:
 .hud-bar-val{font-size:9px;opacity:.7;min-width:22px;text-align:right}
 
 /* ═══════ HUD TOOLTIP ═══════ */
-#hudTooltip{position:absolute;top:38px;right:10px;background:rgba(10,22,40,.92);border:1px solid rgba(100,160,220,.3);border-radius:10px;padding:8px 12px;z-index:31;opacity:0;pointer-events:none;transform:translateY(-4px);transition:opacity .2s,transform .2s;max-width:200px;font-size:11px}
+#hudTooltip{position:absolute;background:rgba(10,22,40,.92);border:1px solid rgba(100,160,220,.3);border-radius:10px;padding:8px 12px;z-index:31;opacity:0;pointer-events:none;transform:translateY(-4px);transition:opacity .2s,transform .2s;max-width:200px;font-size:11px}
 #hudTooltip.visible{opacity:1;pointer-events:auto;transform:translateY(0)}
 #hudTooltipTitle{font-weight:600;margin-bottom:3px;font-size:12px}
 #hudTooltipBody{opacity:.75;line-height:1.4}
@@ -48,7 +49,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a1628;font-family:
 .fb-btn{padding:3px 10px;border-radius:5px;border:none;font-size:10px;font-weight:600;cursor:pointer}
 .fb-sell{background:rgba(180,60,60,.5);color:#ffa0a0}
 .fb-sell:hover{background:rgba(200,70,70,.6)}
-#fbStage{}
 
 /* ═══════ DECOR CARD ═══════ */
 #decorCard{position:absolute;background:rgba(10,22,40,.94);border:1px solid rgba(100,160,220,.3);border-radius:10px;padding:10px 14px;z-index:22;opacity:0;pointer-events:none;transition:opacity .2s;font-size:11px;min-width:140px}
@@ -62,6 +62,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a1628;font-family:
 .dc-trim:disabled{opacity:.4;cursor:default}
 .dc-sell{background:rgba(180,60,60,.5);color:#ffa0a0}
 .dc-sell:hover{background:rgba(200,70,70,.6)}
+.dc-move{background:rgba(80,120,200,.5);color:#a0c8ff}
+.dc-move:hover{background:rgba(90,140,220,.6)}
 
 /* ═══════ TANK NAV ═══════ */
 #tankNav{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:8px;background:rgba(0,0,0,.5);border-radius:16px;padding:3px 10px;z-index:40;font-size:11px}
@@ -70,22 +72,30 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a1628;font-family:
 #tankNav button:hover{opacity:1}
 #tnLabel{font-weight:500;min-width:80px;text-align:center}
 
-/* ═══════ BOTTOM BAR ═══════ */
-#bottomBar{position:absolute;bottom:0;left:0;right:0;height:0;z-index:40}
 
 /* ═══════ FAB ═══════ */
 #fab{position:absolute;bottom:12px;right:12px;width:44px;height:44px;border-radius:50%;background:rgba(40,80,140,.85);border:2px solid rgba(100,160,220,.5);color:#e0e8f0;font-size:20px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:65;transition:transform .2s,background .2s;box-shadow:0 2px 8px rgba(0,0,0,.4)}
 #fab:hover{background:rgba(50,100,170,.9);transform:scale(1.05)}
-#fab.active{background:rgba(60,120,200,.9);transform:rotate(45deg)}
+#fab.active{background:rgba(60,120,200,.9)}
+#fab .fab-line{display:block;width:18px;height:2px;background:#e0e8f0;border-radius:1px;position:absolute;transition:transform .25s,opacity .25s}
+#fab .fab-line:nth-child(1){transform:translateY(-5px)}
+#fab .fab-line:nth-child(2){transform:translateY(0)}
+#fab .fab-line:nth-child(3){transform:translateY(5px)}
+#fab.active .fab-line:nth-child(1){transform:rotate(45deg)}
+#fab.active .fab-line:nth-child(2){opacity:0;transform:scaleX(0)}
+#fab.active .fab-line:nth-child(3){transform:rotate(-45deg)}
 
 /* ═══════ MENU OVERLAY ═══════ */
 #menuOverlay{position:absolute;inset:0;background:rgba(5,12,25,.82);z-index:60;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
 #menuOverlay.visible{opacity:1;pointer-events:auto}
-#menuGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:280px}
-.menu-btn{display:flex;flex-direction:column;align-items:center;gap:4px;background:rgba(30,60,100,.6);border:1px solid rgba(100,160,220,.25);border-radius:12px;padding:14px 10px;color:#e0e8f0;font-size:11px;font-weight:500;cursor:pointer;transition:background .15s,transform .15s;min-width:75px}
+#menuContent{display:flex;flex-direction:column;align-items:center;gap:8px;max-width:280px;width:100%;padding:0 16px}
+.menu-page{width:100%}
+.menu-title{font-size:13px;font-weight:600;text-align:center;margin-bottom:8px;opacity:.7}
+.menu-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.menu-btn{display:flex;flex-direction:column;align-items:center;gap:4px;background:rgba(30,60,100,.6);border:1px solid rgba(100,160,220,.25);border-radius:12px;padding:12px 8px;color:#e0e8f0;font-size:11px;font-weight:500;cursor:pointer;transition:background .15s,transform .15s;min-width:0}
 .menu-btn:hover{background:rgba(40,80,140,.7);transform:scale(1.03)}
-.menu-btn .menu-icon{font-size:22px}
-.menu-btn.locked{opacity:.4;pointer-events:none}
+.menu-btn .menu-icon{font-size:20px}
+.menu-btn[data-action="help"]{grid-column:span 3;padding:8px 10px;flex-direction:row;justify-content:center;gap:6px;opacity:.7}
 
 /* ═══════ TOOL DOCK ═══════ */
 #toolDock{position:absolute;bottom:0;left:0;right:0;background:rgba(10,22,40,.92);border-top:1px solid rgba(100,160,220,.25);z-index:42;padding:8px 12px;display:flex;align-items:center;gap:8px;transform:translateY(100%);transition:transform .25s;border-radius:12px 12px 0 0}
@@ -204,24 +214,27 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a1628;font-family:
       <button id="tnNext" class="tn-btn" data-icon="arrow_r"></button>
     </div>
 
-    <!-- Bottom bar -->
-    <div id="bottomBar"></div>
   </div>
 
   <!-- FAB -->
-  <button id="fab" data-icon="menu"></button>
+  <button id="fab"><span class="fab-line"></span><span class="fab-line"></span><span class="fab-line"></span></button>
 
   <!-- Menu overlay -->
   <div id="menuOverlay">
-    <div id="menuGrid">
-      <button class="menu-btn" data-action="feed"><span class="menu-icon" data-icon="fish"></span>Feed</button>
-      <button class="menu-btn" data-action="clean"><span class="menu-icon" data-icon="broom"></span>Clean</button>
-      <button class="menu-btn" data-action="laser"><span class="menu-icon" data-icon="laser"></span>Play</button>
-      <button class="menu-btn" data-action="store"><span class="menu-icon" data-icon="store"></span>Store</button>
-      <button class="menu-btn" data-action="upgrades"><span class="menu-icon" data-icon="wrench"></span>Tools</button>
-      <button class="menu-btn" data-action="inventory"><span class="menu-icon" data-icon="clipboard"></span>Fish</button>
-      <button class="menu-btn" data-action="tanks"><span class="menu-icon" data-icon="house"></span>Tanks</button>
-      <button class="menu-btn" data-action="help"><span class="menu-icon" data-icon="help"></span>Help</button>
+    <div id="menuContent">
+      <!-- Single flat menu -->
+      <div id="menuMain" class="menu-page">
+        <div class="menu-title">Menu</div>
+        <div id="menuGrid" class="menu-grid-3">
+          <button class="menu-btn" data-action="feed"><span class="menu-icon" data-icon="fish"></span>Feed</button>
+          <button class="menu-btn" data-action="clean"><span class="menu-icon" data-icon="broom"></span>Clean</button>
+          <button class="menu-btn" data-action="laser"><span class="menu-icon" data-icon="laser"></span>Play</button>
+          <button class="menu-btn" data-action="store"><span class="menu-icon" data-icon="store"></span>Store</button>
+          <button class="menu-btn" data-action="inventory"><span class="menu-icon" data-icon="clipboard"></span>Inventory</button>
+          <button class="menu-btn" data-action="tanks"><span class="menu-icon" data-icon="house"></span>Tanks</button>
+          <button class="menu-btn" data-action="help"><span class="menu-icon" data-icon="help"></span>Help</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -235,10 +248,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a1628;font-family:
   <div id="storePanel" class="panel">
     <div class="panel-header"><span>Store</span><span id="storeCap"></span><button data-close="storePanel">✕</button></div>
     <div id="storeList" class="panel-body"></div>
-  </div>
-  <div id="upgradesPanel" class="panel">
-    <div class="panel-header"><span>Tools &amp; Equipment</span><button data-close="upgradesPanel">✕</button></div>
-    <div id="upgradesList" class="panel-body"></div>
   </div>
   <div id="inventoryPanel" class="panel">
     <div class="panel-header"><span>Fish &amp; Supplies</span><button data-close="inventoryPanel">✕</button></div>
@@ -270,7 +279,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a1628;font-family:
 const TANK_TIER_MAP = { fresh: '1', tropical: '2', salt: '3' };
 const BIOMES = {
   fresh: {
-    bg: ['#5aad90','#1e4838'], wall: '#1a3830', substrate: '#9a8060',
+    bg: ['#48b8d0','#1a6878'], wall: '#145858', substrate: '#c8a868',
     subH: 0.16, bubbleRate: 0.08, label: 'Fresh Starter',
   },
   tropical: {
@@ -285,48 +294,48 @@ const BIOMES = {
 
 const FISH_SPRITES = {
   // ── FRESH TANK ──
-  // Guppy: tiny, fan-shaped tail, rounded body (12×7 → 10×6 small)
-  guppy: { w:10, h:6, data:['0022200000','0213350000','2133551000','2133510000','0213300000','0022000000'] },
-  // Goldfish: plump oval body, flowing double tail, bigger (16×10)
-  goldfish: { w:16, h:10, data:['0000022000000000','0000213100000000','0002133510000000','0221345510000000','2213455110002200','2213355100002200','2213351000000000','0021331000000000','0002211000000000','0000220000000000'] },
-  // Snail: spiral shell on back, stubby body, antennae (10×8)
-  snail: { w:10, h:8, data:['0000433000','0004344300','0043434300','0043443000','0033330000','0411104100','4100010040','0100001000'] },
+  // Guppy: tiny body with large colorful fan-shaped tail (12×7)
+  guppy: { w:12, h:7, data:['000020000000','002134200000','021345530000','213355533000','021345530000','002134200000','000020000000'] },
+  // Goldfish: compact round body with flowing tail, prominent eye (12×8)
+  goldfish: { w:12, h:8, data:['000022000000','000213100000','002134510000','021345510000','221335510000','021345100000','002133100000','000221000000'] },
+  // Snail: rounded spiral shell, soft body underneath, delicate antennae (10×8)
+  snail: { w:10, h:8, data:['0000433000','0004344300','0043443400','0434434000','0333330000','0411040100','4100001040','0100000100'] },
 
   // ── TROPICAL TANK ──
-  // Neon Tetra: tiny torpedo, bright blue stripe + red tail (8×4 very small)
-  neon_tetra: { w:8, h:4, data:['01665100','16655100','16331100','01110200'] },
-  // Blue-Eye: small, big eye accent (10×6)
+  // Neon Tetra: tiny torpedo, iridescent blue stripe + red tail (10×5)
+  neon_tetra: { w:10, h:5, data:['0016650000','1666655100','1663355200','1163310200','0012200000'] },
+  // Blue-Eye: small, big reflective eye accent (10×6)
   blue_eye: { w:10, h:6, data:['0011100000','0115351000','1153551000','1153351000','0113310000','0011200000'] },
-  // Moon Fish: tall disc body, crescent shape, distinctive (14×12)
+  // Moon Fish: tall disc body, crescent shape (14×12)
   moon_fish: { w:14, h:12, data:['00000110000000','00001131000000','00011331000000','00113351000000','01113351100000','11133551100000','11133551100000','01113351100000','00113351000000','00011331000000','00001131000000','00000110000000'] },
-  // Discus: large round disc, vertical stripes (16×14)
-  discus: { w:16, h:14, data:['0000001100000000','0000011310000000','0000113610000000','0001136310000000','0011363610000000','0113636310000000','1113663611000000','1113663611000000','0113636310000000','0011363610000000','0001136310000000','0000113610000000','0000011310000000','0000001100000000'] },
-  // Pleco: long flat body, big head, sucker mouth, whiskers (18×7)
-  pleco: { w:18, h:7, data:['000000000000000000','000111111111100000','001133345111110000','011114511111111100','001133345111110000','000111111111100000','000110001100000000'] },
-  // Gourami: oval with long feeler fins trailing below (14×10)
-  gourami: { w:14, h:10, data:['00002200000000','00021131000000','00211335100000','02211335100000','22113351100000','22113311000000','00211310000000','00021100000000','00001020000000','00000010000000'] },
+  // Discus: large round disc, vertical band pattern, red eye (18×14)
+  discus: { w:18, h:14, data:['000000011000000000','000000113100000000','000001136100000000','000011363100000000','000113636100000000','001136361100000000','011136636110000000','011136636110000000','001136361100000000','000113636100000000','000011363100000000','000001136100000000','000000113100000000','000000011000000000'] },
+  // Pleco: long flat body, wide head, sucker mouth, spot pattern (20×7)
+  pleco: { w:20, h:7, data:['00000000000000000000','00011141111141110000','00113434514131411000','01111145111111411110','00113434514131411000','00011141111141110000','00011000110000000000'] },
+  // Gourami: oval with elegant long trailing ventral feeler fins (14×11)
+  gourami: { w:14, h:11, data:['00002200000000','00021131000000','00211335100000','02211335100000','22113351100000','22113311000000','00211310000000','00021100000000','00001010000000','00000100000000','00000010000000'] },
 
   // ── SALTWATER TANK ──
-  // Clownfish: classic orange-white bands, recognizable (14×9)
-  clownfish: { w:14, h:9, data:['00002200000000','00021161000000','00211636100000','02116361600000','22163616100000','02116361600000','00211636100000','00021161000000','00002200000000'] },
-  // Blue Tang: larger oval, yellow tail accent, very blue (18×12)
+  // Clownfish: vivid orange with 3 white bands, rounded body (14×9)
+  clownfish: { w:14, h:9, data:['00001100000000','00016161000000','01161636100000','16163161600000','16163116160000','16163161600000','01161636100000','00016161000000','00001100000000'] },
+  // Blue Tang: larger oval, yellow tail accent, palette blue body (18×12)
   blue_tang: { w:18, h:12, data:['000000022000000000','000000211300000000','000002113310000000','000021133510000000','000211336310000000','002113366311000000','002113366311000000','000211336310000000','000021133510000000','000002113310000000','000000211300000000','000000022000000000'] },
-  // Green Chromis: small oval, solid green, schooling (8×5)
-  green_chromis: { w:8, h:5, data:['01113100','11335100','11335100','01131000','00120000'] },
-  // Firefish: elongated, tall first dorsal fin, gradient body (16×8)
-  firefish: { w:16, h:8, data:['0000003000000000','0000013300000000','0001133351000000','0011333351000000','0113333510000000','0011333100000000','0001133000000000','0000022000000000'] },
-  // Royal Gramma: half purple half yellow, vivid split (14×9)
-  royal_gramma: { w:14, h:9, data:['00002200000000','00064131000000','00641335100000','06641336100000','66113661100000','06641336100000','00641135000000','00064130000000','00002200000000'] },
-  // Banggai Cardinalfish: vertical black-white stripes, long fins (12×8)
-  banggai_cardinal: { w:12, h:8, data:['000220000000','002161100000','021645610000','216456100000','021645610000','002161100000','000220000000','000020000000'] },
-  // Moray Eel: LONG serpentine body, small head, gaping mouth (28×5)
-  moray_eel: { w:28, h:5, data:['0000000000000000000000000000','0000111111111111111111110000','0005133333333333333333331000','0000111111111111111111110000','0000000000000000000000000000'] },
-  // Cleaner Shrimp: long antennae, segmented body, pincers (14×7)
-  cleaner_shrimp: { w:14, h:7, data:['00000550000050','00001133000000','00013345100000','00113351000000','00011330000000','00100101000000','01000010100000'] },
+  // Green Chromis: small oval, solid green-blue, schooling (8×6)
+  green_chromis: { w:8, h:6, data:['01113000','11335100','11335510','11335510','01131000','00120000'] },
+  // Firefish: elongated, tall first dorsal fin, fiery gradient (16×9)
+  firefish: { w:16, h:9, data:['0000004000000000','0000013300000000','0001133351000000','0011333351000000','0113333510000000','0013333510000000','0001133100000000','0000133000000000','0000022000000000'] },
+  // Royal Gramma: half purple half yellow, vivid split color (14×9)
+  royal_gramma: { w:14, h:9, data:['00002200000000','00064131000000','00641335100000','06641336100000','66613661100000','06641336100000','00641135000000','00064130000000','00002200000000'] },
+  // Banggai Cardinalfish: vertical black-white stripes, elongated fins (12×9)
+  banggai_cardinal: { w:12, h:9, data:['000320000000','002161100000','021645610000','216456100000','216456100000','021645610000','002161100000','000220000000','000020000000'] },
+  // Moray Eel: LONG thin serpentine body, spotted pattern, visible jaw (28×4)
+  moray_eel: { w:28, h:4, data:['0000000000000000000000000000','0000111111111111111111100000','0005133413341334133413310000','0000111111111111111111100000'] },
+  // Cleaner Shrimp: long antennae, segmented translucent body, red-white (14×8)
+  cleaner_shrimp: { w:14, h:8, data:['50000550000050','00001133000000','00013345100000','00113351000000','00013350000000','00011330000000','00100101000000','01000010100000'] },
 };
 
 const FISH_PALETTES = {
-  guppy:      { 1:'#FF8844', 2:'#FF5522', 3:'#FFCC88', 4:'#AA4400', 5:'#111' },
+  guppy:      { 1:'#FF8844', 2:'#FF5522', 3:'#FFCC88', 4:'#AA4400', 5:'#FFDD44' },
   goldfish:   { 1:'#FFB833', 2:'#FF9500', 3:'#FFE088', 4:'#CC7700', 5:'#111' },
   snail:      { 1:'#D4B896', 2:'#B89878', 3:'#8B6B4A', 4:'#A08060', 5:'#111' },
   neon_tetra: { 1:'#C0C8D0', 2:'#FF3333', 3:'#FF5050', 4:'#333', 5:'#111', 6:'#3388FF' },
@@ -346,17 +355,19 @@ const FISH_PALETTES = {
 };
 
 const DECOR_COLORS = {
-  hornwort:'#44AA44', moss_ball:'#339933', rock_pile:'#888888', driftwood:'#8B6B4A',
-  treasure_chest:'#AA7733', java_fern:'#338833', amazon_sword:'#228822', floating_plants:'#55BB55',
-  mossy_log:'#6B4B2A', hollow_stump:'#5A3A1A', anemone:'#FF6688', live_rock:'#999999',
-  brain_coral:'#DD8844', staghorn_coral:'#DDAA66', cave:'#444444', sea_fan:'#CC5599',
+  hornwort:'#44AA44', vallisneria:'#3B9944', anubias:'#2D7A2D', moss_ball:'#339933',
+  rock_pile:'#888888', driftwood:'#8B6B4A', treasure_chest:'#AA7733',
+  java_fern:'#338833', amazon_sword:'#228822', cryptocoryne:'#557744', ludwigia:'#AA5533',
+  floating_plants:'#55BB55', mossy_log:'#6B4B2A', hollow_stump:'#5A3A1A',
+  anemone:'#FF6688', live_rock:'#999999', brain_coral:'#DD8844',
+  staghorn_coral:'#DDAA66', cave:'#555555', sea_fan:'#CC5599',
 };
 
 const ZONE_RANGES = { top:[0.08,0.35], middle:[0.25,0.65], bottom:[0.55,0.82], any:[0.15,0.75] };
 
 // Species base display scales — dramatic size differences for realism
 const FISH_BASE_SCALES = {
-  guppy: 0.85, goldfish: 1.6, snail: 1.0,
+  guppy: 0.85, goldfish: 1.3, snail: 1.0,
   neon_tetra: 0.65, blue_eye: 0.8, moon_fish: 1.7, discus: 2.0, pleco: 1.8, gourami: 1.5,
   clownfish: 1.3, blue_tang: 1.8, green_chromis: 0.65, firefish: 1.2,
   royal_gramma: 1.2, banggai_cardinal: 0.85, moray_eel: 2.8, cleaner_shrimp: 0.9,
@@ -448,19 +459,18 @@ let gameState = null;
 let tankCat = null;
 let storeData = null;
 let tanksList = null;
-let globalCat = null;
 let activeTankId = 'fresh';
 
 // Animation state per fish
 let fishAnims = {};
 // Schooling anchors per species
 let schoolAnchors = {};
-// Territorial dash state per fish
-let territorialDash = {}; // { fishId: { targetId, dashTimer, returnTimer } }
+
+// Claimed decor zones for territorial fish (rebuilt every updateFishAnim call)
+let claimedDecorZones = [];
 // Particles
 let bubbles = [];
 let foodParticles = [];
-let floatTexts = [];
 // Sprite cache
 let spriteCache = {};
 // UI state
@@ -471,12 +481,9 @@ let menuOpen = false;
 let storeTab = 'fish';
 // Cleaning state
 let cleanMask = null;
-let cleanSeed = 0;
 let cleanGridW = 64, cleanGridH = 48;
-let cleanDirtyStart = 0;
 // Laser state
 let laserPos = null;
-let laserActive = false;
 let laserStartTime = 0;
 // Tooltip
 let tooltipTimer = null;
@@ -484,7 +491,7 @@ let selectedFishId = null; // only this fish shows level badge
 let selectedFishTimer = null;
 // Decor dragging state
 let draggingDecor = null; // { id, decorId, startX, startY }
-let floatingDriftPhase = 0; // for floating plant gentle drift
+let isDragging = false; // pointer drag state for decor movement
 // Game time
 let lastFrameTime = 0;
 let refreshTimer = null;
@@ -560,7 +567,7 @@ function renderEnvironment(biomeKey) {
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, W, H);
 
-  // Underwater light rays from surface
+  // Underwater light rays from surface — reaching the bottom
   const time = Date.now() / 3000;
   ctx.globalAlpha = 0.03;
   ctx.fillStyle = '#ffffff';
@@ -570,8 +577,8 @@ function renderEnvironment(biomeKey) {
     ctx.beginPath();
     ctx.moveTo(rayX - rayW, 0);
     ctx.lineTo(rayX + rayW, 0);
-    ctx.lineTo(rayX + rayW * 2.5, H * 0.7);
-    ctx.lineTo(rayX - rayW * 1.5, H * 0.7);
+    ctx.lineTo(rayX + rayW * 3, H * 0.95);
+    ctx.lineTo(rayX - rayW * 2, H * 0.95);
     ctx.closePath();
     ctx.fill();
   }
@@ -618,15 +625,41 @@ function renderEnvironment(biomeKey) {
   ctx.fillStyle = 'rgba(255,255,255,.03)';
   ctx.fillRect(0, subY + 1.5, W, 1);
 
-  // Water surface shimmer — more dynamic
-  ctx.globalAlpha = 0.07;
-  ctx.fillStyle = '#ffffff';
-  for (let i = 0; i < 10; i++) {
-    const sx = Math.sin(time * 0.8 + i * 1.2) * 25 + i * (W / 10);
-    const sw = 25 + Math.sin(time * 1.2 + i) * 12;
-    ctx.fillRect(sx, 0, sw, 2.5);
-    ctx.fillRect(sx + 5, 2.5, sw * 0.6, 1);
+  // Water surface — animated wave line with ripples and refraction
+  // Wave line
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  for (let x = 0; x <= W; x += 2) {
+    const y = 5 + Math.sin(x * 0.04 + time * 2.5) * 2.2 + Math.sin(x * 0.08 + time * 1.3) * 1.0;
+    ctx.lineTo(x, y);
   }
+  ctx.lineTo(W, 0);
+  ctx.closePath();
+  // Light refraction above water line
+  ctx.fillStyle = 'rgba(180,220,255,0.12)';
+  ctx.fill();
+
+  // Surface highlight shimmer
+  ctx.globalAlpha = 0.10;
+  ctx.fillStyle = '#ffffff';
+  for (let i = 0; i < 12; i++) {
+    const sx = Math.sin(time * 0.8 + i * 1.2) * 25 + i * (W / 12);
+    const sw = 18 + Math.sin(time * 1.2 + i) * 10;
+    const sy = 1.5 + Math.sin(sx * 0.04 + time * 2.5) * 1.8;
+    ctx.fillRect(sx, sy, sw, 2);
+    ctx.globalAlpha = 0.05;
+    ctx.fillRect(sx + 3, sy + 2, sw * 0.7, 1.5);
+    ctx.globalAlpha = 0.10;
+  }
+  // Subtle blue underside of surface
+  ctx.globalAlpha = 0.04;
+  ctx.fillStyle = '#88ccff';
+  for (let x = 0; x < W; x += 3) {
+    const y = 3 + Math.sin(x * 0.04 + time * 2.5) * 1.8;
+    ctx.fillRect(x, y, 3, 3 + Math.sin(x * 0.1 + time) * 2);
+  }
+  ctx.restore();
   ctx.globalAlpha = 1;
 
   // Depth fog near bottom — subtle dark gradient at bottom
@@ -724,70 +757,136 @@ function drawDecorItem(d, def, color, x, baseSize, subY, biomeKey, isBack) {
       ctx.ellipse(ox - r * 0.2, 2 + driftY + rng() * 4, r * 0.3, r * 0.15, 0, 0, Math.PI * 2);
       ctx.fill();
     }
-    // Roots dangling down into water
+    // Roots dangling down into water — lush with branching
     ctx.globalAlpha = isBack ? 0.15 : 0.25;
     ctx.strokeStyle = shadeColor(color, -30);
     ctx.lineWidth = 1;
     const rootRng = seededRng(Math.round(d.x * 10000) + 42);
-    for (let r = 0; r < 3; r++) {
-      const rx = x + driftX + (rootRng() - 0.5) * baseSize * 0.8;
-      const rootLen = 15 + rootRng() * 25;
+    for (let r = 0; r < 7; r++) {
+      const rx = x + driftX + (rootRng() - 0.5) * baseSize * 1.0;
+      const rootLen = 18 + rootRng() * 35;
+      ctx.lineWidth = 0.6 + rootRng() * 0.8;
       ctx.beginPath();
       ctx.moveTo(rx, 10 + driftY);
-      ctx.quadraticCurveTo(rx + (rootRng()-0.5)*8, 10 + rootLen*0.5, rx + (rootRng()-0.5)*4, 10 + rootLen);
+      const cp1x = rx + (rootRng()-0.5)*10;
+      const cp1y = 10 + rootLen*0.4;
+      const endx = rx + (rootRng()-0.5)*6;
+      const endy = 10 + rootLen;
+      ctx.quadraticCurveTo(cp1x, cp1y, endx, endy);
       ctx.stroke();
+      // Sub-roots branching off
+      if (rootRng() > 0.35) {
+        const brX = cp1x + (rootRng()-0.5)*8;
+        const brY = cp1y + rootRng()*12;
+        ctx.lineWidth = 0.4;
+        ctx.beginPath();
+        ctx.moveTo(cp1x, cp1y);
+        ctx.lineTo(brX, brY);
+        ctx.stroke();
+      }
     }
     ctx.globalAlpha = 1;
     ctx.restore();
   } else if (def.growth) {
     // ── Plants: lush, tall, multi-stem with dense leaves ──
+    // Flow sway from filter equipment
+    const flowStrength = tankCat?._computed?.flow || 0;
+    const flowTime = Date.now() / 2000;
+    const flowSway = flowStrength * Math.sin(flowTime + d.x * 6) * 8;
+
     const ph = baseSize * 2.5; // taller plants
     const baseY = subY;
     const topY = baseY - ph;
     const rng = seededRng(Math.round(d.x * 10000) + 99);
 
+    // Plant type specific rendering
+    const isVallisneria = d.decorId === 'vallisneria';
+    const isAnubias = d.decorId === 'anubias';
+    const isCryptocoryne = d.decorId === 'cryptocoryne';
+    const isLudwigia = d.decorId === 'ludwigia';
+
     // Multiple stems for fullness
-    const stemCount = 2 + Math.floor(rng() * 3);
+    const stemCount = isVallisneria ? (4 + Math.floor(rng() * 3)) : isAnubias ? 2 : (2 + Math.floor(rng() * 3));
     for (let s = 0; s < stemCount; s++) {
       const sx = x + (rng() - 0.5) * baseSize * 0.6;
-      const curveCp = sx + (rng() - 0.5) * 20;
-      const topX = sx + (rng() - 0.5) * 10;
+      const curveCp = sx + (rng() - 0.5) * 20 + flowSway * 0.5;
+      const topX = sx + (rng() - 0.5) * 10 + flowSway;
       const stemTopY = topY + rng() * ph * 0.25;
       // Stem
       ctx.strokeStyle = shadeColor(color, -25);
-      ctx.lineWidth = 2.5;
+      ctx.lineWidth = isVallisneria ? 1.5 : 2.5;
       ctx.beginPath();
       ctx.moveTo(sx, baseY);
       ctx.quadraticCurveTo(curveCp, baseY - ph * 0.5, topX, stemTopY);
       ctx.stroke();
 
       // Dense leaves along stem
-      const leafCount = 6 + Math.floor(rng() * 5);
+      const leafCount = isVallisneria ? (10 + Math.floor(rng() * 4)) :
+                        isAnubias ? (3 + Math.floor(rng() * 2)) :
+                        (6 + Math.floor(rng() * 5));
       for (let i = 0; i < leafCount; i++) {
         const t = (i + 0.3) / leafCount;
-        // Position along the quadratic curve
         const u = t;
         const ly = baseY * (1-u)*(1-u) + (baseY - ph*0.5) * 2*u*(1-u) + stemTopY * u*u;
         const lx = sx * (1-u)*(1-u) + curveCp * 2*u*(1-u) + topX * u*u;
         const dir = (i % 2 === 0 ? 1 : -1) * (0.8 + rng() * 0.4);
-        const leafW = baseSize * (0.35 + rng() * 0.25) * dir;
-        const leafH = baseSize * (0.12 + rng() * 0.08);
         const shade = ((rng() - 0.5) * 30) | 0;
         ctx.fillStyle = shadeColor(color, shade);
         ctx.globalAlpha = isBack ? 0.5 : 0.9;
-        ctx.beginPath();
-        ctx.moveTo(lx, ly);
-        ctx.quadraticCurveTo(lx + leafW * 0.8, ly - leafH * 1.2, lx + leafW * 0.5, ly + leafH * 0.3);
-        ctx.quadraticCurveTo(lx + leafW * 0.2, ly + leafH * 0.8, lx, ly);
-        ctx.fill();
-        // Leaf vein
-        ctx.strokeStyle = shadeColor(color, -12);
-        ctx.lineWidth = 0.4;
-        ctx.globalAlpha = isBack ? 0.2 : 0.35;
-        ctx.beginPath();
-        ctx.moveTo(lx, ly);
-        ctx.lineTo(lx + leafW * 0.45, ly + leafH * 0.1);
-        ctx.stroke();
+
+        if (isVallisneria) {
+          // Long ribbon-like leaves
+          const leafW = baseSize * (0.12 + rng() * 0.08) * dir;
+          const leafH = baseSize * (0.5 + rng() * 0.3);
+          ctx.beginPath();
+          ctx.moveTo(lx, ly);
+          ctx.quadraticCurveTo(lx + leafW * 2 + flowSway * 0.3, ly - leafH * 0.5, lx + leafW + flowSway * 0.5, ly - leafH);
+          ctx.quadraticCurveTo(lx + leafW * 0.5 + flowSway * 0.2, ly - leafH * 0.4, lx, ly);
+          ctx.fill();
+        } else if (isAnubias) {
+          // Broad, round leaves
+          const leafW = baseSize * (0.45 + rng() * 0.2) * dir;
+          const leafH = baseSize * (0.25 + rng() * 0.15);
+          ctx.beginPath();
+          ctx.ellipse(lx + leafW * 0.4, ly - leafH * 0.3, Math.abs(leafW) * 0.5, leafH * 0.5, dir * 0.3, 0, Math.PI * 2);
+          ctx.fill();
+          // Darker vein
+          ctx.strokeStyle = shadeColor(color, -15);
+          ctx.lineWidth = 0.6;
+          ctx.globalAlpha = isBack ? 0.2 : 0.4;
+          ctx.beginPath();
+          ctx.moveTo(lx, ly);
+          ctx.lineTo(lx + leafW * 0.4, ly - leafH * 0.3);
+          ctx.stroke();
+        } else if (isLudwigia) {
+          // Reddish-green leaves, alternating pairs
+          const leafW = baseSize * (0.25 + rng() * 0.15) * dir;
+          const leafH = baseSize * (0.1 + rng() * 0.08);
+          const redTint = t > 0.6 ? 20 : 0; // tops more red
+          ctx.fillStyle = shadeColor(color, shade + redTint);
+          ctx.beginPath();
+          ctx.moveTo(lx, ly);
+          ctx.quadraticCurveTo(lx + leafW * 0.8, ly - leafH * 1.2, lx + leafW * 0.5, ly + leafH * 0.3);
+          ctx.quadraticCurveTo(lx + leafW * 0.2, ly + leafH * 0.8, lx, ly);
+          ctx.fill();
+        } else {
+          // Default leaf shape (java fern, amazon sword, hornwort, cryptocoryne)
+          const leafW = baseSize * (isCryptocoryne ? (0.28 + rng() * 0.18) : (0.35 + rng() * 0.25)) * dir;
+          const leafH = baseSize * (0.12 + rng() * 0.08);
+          ctx.beginPath();
+          ctx.moveTo(lx, ly);
+          ctx.quadraticCurveTo(lx + leafW * 0.8, ly - leafH * 1.2, lx + leafW * 0.5, ly + leafH * 0.3);
+          ctx.quadraticCurveTo(lx + leafW * 0.2, ly + leafH * 0.8, lx, ly);
+          ctx.fill();
+          // Leaf vein
+          ctx.strokeStyle = shadeColor(color, -12);
+          ctx.lineWidth = 0.4;
+          ctx.globalAlpha = isBack ? 0.2 : 0.35;
+          ctx.beginPath();
+          ctx.moveTo(lx, ly);
+          ctx.lineTo(lx + leafW * 0.45, ly + leafH * 0.1);
+          ctx.stroke();
+        }
       }
     }
     ctx.globalAlpha = 1;
@@ -798,123 +897,230 @@ function drawDecorItem(d, def, color, x, baseSize, subY, biomeKey, isBack) {
     const dy = subY - dh;
 
     if (d.decorId.includes('rock') || d.decorId === 'live_rock') {
-      // Rocky pile: 4-5 overlapping boulders with shadows
+      // Rocky pile: 5-7 overlapping irregular boulders with cracks and moss
       const rng = seededRng(Math.round(d.x * 10000) + 55);
-      const rockCount = 4 + Math.floor(rng() * 2);
+      const rockCount = 5 + Math.floor(rng() * 3);
       for (let r = 0; r < rockCount; r++) {
-        const rx = x + (rng() - 0.5) * dw * 0.6;
-        const ry = subY - rng() * dh * 0.9 - 2;
-        const rw = dw * (0.25 + rng() * 0.3);
-        const rh = dh * (0.2 + rng() * 0.25);
+        const rx = x + (rng() - 0.5) * dw * 0.7;
+        const ry = subY - rng() * dh * 0.95 - 2;
+        const rw = dw * (0.22 + rng() * 0.32);
+        const rh = dh * (0.18 + rng() * 0.28);
+        const rot = (rng() - 0.5) * 0.5;
         // Shadow
-        ctx.fillStyle = 'rgba(0,0,0,.12)';
+        ctx.fillStyle = 'rgba(0,0,0,.15)';
         ctx.beginPath();
-        ctx.ellipse(rx + 2, ry + 2, rw/2, rh/2, 0, Math.PI, 0);
+        ctx.ellipse(rx + 2, ry + 3, rw/2 + 1, rh/2 + 1, rot, 0, Math.PI * 2);
         ctx.fill();
-        // Rock body
-        ctx.fillStyle = shadeColor(color, ((rng() - 0.5) * 35) | 0);
+        // Rock body — irregular rounded polygon
+        const rockShade = ((rng() - 0.5) * 35) | 0;
+        ctx.fillStyle = shadeColor(color, rockShade);
         ctx.beginPath();
-        ctx.ellipse(rx, ry, rw/2, rh/2, rng()*0.3, Math.PI, 0);
+        const pts = 6 + Math.floor(rng() * 3);
+        for (let p = 0; p < pts; p++) {
+          const a = (p / pts) * Math.PI * 2 + rot;
+          const rr = (p % 2 === 0 ? 1 : 0.85 + rng() * 0.15);
+          const px = rx + Math.cos(a) * rw/2 * rr;
+          const py = ry + Math.sin(a) * rh/2 * rr;
+          if (p === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+        }
+        ctx.closePath();
         ctx.fill();
-        // Highlight
-        ctx.fillStyle = shadeColor(color, 30);
-        ctx.globalAlpha = isBack ? 0.15 : 0.35;
+        // Highlight crescent on top
+        ctx.fillStyle = shadeColor(color, 30 + (rng() * 15 | 0));
+        ctx.globalAlpha = isBack ? 0.15 : 0.3;
         ctx.beginPath();
-        ctx.ellipse(rx - rw*0.12, ry - rh*0.2, rw*0.2, rh*0.12, 0, Math.PI, 0);
+        ctx.ellipse(rx - rw*0.1, ry - rh*0.22, rw*0.22, rh*0.1, rot, 0, Math.PI * 2);
         ctx.fill();
+        // Crack lines
+        ctx.globalAlpha = isBack ? 0.1 : 0.2;
+        ctx.strokeStyle = shadeColor(color, -30);
+        ctx.lineWidth = 0.4;
+        if (rng() > 0.4) {
+          ctx.beginPath();
+          ctx.moveTo(rx - rw*0.15, ry - rh*0.1);
+          ctx.lineTo(rx + rw*0.1, ry + rh*0.15);
+          ctx.stroke();
+        }
+        ctx.globalAlpha = isBack ? 0.55 : 1;
+      }
+      // Sparse moss/algae on top rocks
+      if (d.decorId === 'live_rock') {
+        ctx.fillStyle = '#4a8a4a';
+        ctx.globalAlpha = isBack ? 0.2 : 0.4;
+        const mRng = seededRng(Math.round(d.x * 10000) + 111);
+        for (let m = 0; m < 5; m++) {
+          const mx = x + (mRng() - 0.5) * dw * 0.5;
+          const my = subY - dh * 0.5 - mRng() * dh * 0.4;
+          ctx.beginPath();
+          ctx.arc(mx, my, 1.5 + mRng() * 2, 0, Math.PI * 2);
+          ctx.fill();
+        }
         ctx.globalAlpha = isBack ? 0.55 : 1;
       }
     } else if (d.decorId.includes('coral') || d.decorId === 'anemone' || d.decorId === 'sea_fan') {
       // Coral/anemone: dense branching, swaying tips
       const rng = seededRng(Math.round(d.x * 10000) + 77);
-      const branches = 5 + Math.floor(rng() * 4);
-      const sway = Math.sin(Date.now() / 2000 + d.x * 5) * 2;
+      const isAnemone = d.decorId === 'anemone';
+      const flowStrength = tankCat?._computed?.flow || 0;
+      // Anemone is much larger for clownfish nesting
+      const scaleMult = isAnemone ? 3.5 : 1.0;
+      const aDw = dw * scaleMult;
+      const aDh = dh * scaleMult;
+      const branches = isAnemone ? (12 + Math.floor(rng() * 5)) : (5 + Math.floor(rng() * 4));
+      const sway = Math.sin(Date.now() / 2000 + d.x * 5) * (2 + flowStrength * 4);
+      // Anemone base/foot
+      if (isAnemone) {
+        ctx.fillStyle = shadeColor(color, -20);
+        ctx.beginPath();
+        ctx.ellipse(x, subY - aDh * 0.08, aDw * 0.25, aDh * 0.08, 0, 0, Math.PI * 2);
+        ctx.fill();
+        // Thick column
+        ctx.fillStyle = shadeColor(color, -15);
+        ctx.fillRect(x - aDw * 0.08, subY - aDh * 0.35, aDw * 0.16, aDh * 0.28);
+      }
       for (let b = 0; b < branches; b++) {
-        const bx = x + (rng() - 0.5) * dw * 0.5;
-        const by1 = subY;
-        const height = dh * (0.5 + rng() * 0.5);
-        const by2 = subY - height;
-        const tipX = bx + (rng() - 0.5) * dw * 0.2 + sway;
+        const bx = x + (rng() - 0.5) * aDw * 0.5;
+        const by1 = isAnemone ? subY - aDh * 0.3 : subY;
+        const height = aDh * (0.4 + rng() * 0.6);
+        const by2 = by1 - height;
+        const tipX = bx + (rng() - 0.5) * aDw * 0.3 + sway;
         ctx.strokeStyle = shadeColor(color, ((rng() - 0.5) * 30) | 0);
-        ctx.lineWidth = 2.5 + rng() * 2;
+        ctx.lineWidth = isAnemone ? (3 + rng() * 2.5) : (2.5 + rng() * 2);
         ctx.lineCap = 'round';
         ctx.beginPath();
         ctx.moveTo(bx, by1);
-        ctx.quadraticCurveTo(bx + (rng()-0.5)*dw*0.3, (by1+by2)/2, tipX, by2);
+        ctx.quadraticCurveTo(bx + (rng()-0.5)*aDw*0.3, (by1+by2)/2, tipX, by2);
         ctx.stroke();
-        // Bulbous tip
+        // Bulbous tip (larger for anemone)
         ctx.fillStyle = shadeColor(color, 25);
         ctx.beginPath();
-        ctx.arc(tipX, by2, 2.5 + rng()*3, 0, Math.PI*2);
+        const tipR = isAnemone ? (3.5 + rng() * 4) : (2.5 + rng() * 3);
+        ctx.arc(tipX, by2, tipR, 0, Math.PI * 2);
         ctx.fill();
-        // Sub-branches for anemone
-        if (d.decorId === 'anemone' && rng() > 0.4) {
-          const subX = tipX + (rng()-0.5)*10 + sway*0.5;
-          const subY2 = by2 - 5 - rng()*10;
+        // Sub-tentacles for anemone
+        if (isAnemone && rng() > 0.3) {
+          const subX = tipX + (rng()-0.5)*12 + sway*0.5;
+          const subY2 = by2 - 5 - rng()*12;
           ctx.strokeStyle = shadeColor(color, 15);
-          ctx.lineWidth = 1.5;
+          ctx.lineWidth = 1.8;
           ctx.beginPath();
           ctx.moveTo(tipX, by2);
           ctx.lineTo(subX, subY2);
           ctx.stroke();
           ctx.fillStyle = shadeColor(color, 35);
           ctx.beginPath();
-          ctx.arc(subX, subY2, 1.5+rng(), 0, Math.PI*2);
+          ctx.arc(subX, subY2, 2 + rng() * 1.5, 0, Math.PI*2);
           ctx.fill();
         }
       }
     } else if (d.decorId === 'cave') {
-      // Cave: large dark arch, moody interior
-      const caveW = dw * 1.3;
-      const caveH = dh * 1.1;
-      // Shadow
-      ctx.fillStyle = 'rgba(0,0,0,.2)';
+      // Cave: large rocky arch that can house a moray eel
+      const caveW = dw * 1.8;
+      const caveH = dh * 1.6;
+      // Shadow beneath
+      ctx.fillStyle = 'rgba(0,0,0,.15)';
       ctx.beginPath();
-      ctx.ellipse(x + 2, subY - caveH*0.3, caveW/2, caveH*0.6, 0, Math.PI, 0);
+      ctx.ellipse(x + 3, subY, caveW/2 + 4, 5, 0, 0, Math.PI * 2);
       ctx.fill();
-      // Outer rock
+      // Outer rock wall
       ctx.fillStyle = shadeColor(color, -10);
       ctx.beginPath();
       ctx.moveTo(x - caveW/2, subY);
-      ctx.quadraticCurveTo(x - caveW/2, subY - caveH, x, subY - caveH - 4);
-      ctx.quadraticCurveTo(x + caveW/2, subY - caveH, x + caveW/2, subY);
+      ctx.quadraticCurveTo(x - caveW/2 - 4, subY - caveH * 0.8, x, subY - caveH);
+      ctx.quadraticCurveTo(x + caveW/2 + 4, subY - caveH * 0.8, x + caveW/2, subY);
       ctx.closePath();
       ctx.fill();
-      // Dark interior opening
-      ctx.fillStyle = 'rgba(5,5,15,.7)';
+      // Rock texture
+      const caveRng = seededRng(Math.round(d.x * 10000) + 123);
+      for (let r = 0; r < 6; r++) {
+        ctx.fillStyle = shadeColor(color, ((caveRng() - 0.5) * 30) | 0);
+        const rx = x + (caveRng() - 0.5) * caveW * 0.7;
+        const ry = subY - caveH * 0.3 - caveRng() * caveH * 0.5;
+        ctx.beginPath();
+        ctx.ellipse(rx, ry, 4 + caveRng() * 6, 3 + caveRng() * 4, caveRng(), 0, Math.PI * 2);
+        ctx.fill();
+      }
+      // Dark interior opening (large enough for moray)
+      ctx.fillStyle = 'rgba(5,5,15,.75)';
       ctx.beginPath();
-      ctx.ellipse(x, subY - caveH*0.25, caveW*0.3, caveH*0.35, 0, Math.PI, 0);
+      ctx.ellipse(x, subY - caveH * 0.22, caveW * 0.32, caveH * 0.35, 0, Math.PI, 0);
       ctx.closePath();
       ctx.fill();
+      // Interior depth gradient
+      const caveGrad = ctx.createRadialGradient(x, subY - caveH * 0.25, 2, x, subY - caveH * 0.25, caveW * 0.3);
+      caveGrad.addColorStop(0, 'rgba(0,0,0,0.5)');
+      caveGrad.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = caveGrad;
+      ctx.fillRect(x - caveW * 0.4, subY - caveH * 0.5, caveW * 0.8, caveH * 0.4);
       // Highlight on top
-      ctx.fillStyle = shadeColor(color, 20);
+      ctx.fillStyle = shadeColor(color, 22);
       ctx.globalAlpha = isBack ? 0.2 : 0.4;
       ctx.beginPath();
-      ctx.ellipse(x - caveW*0.1, subY - caveH*0.7, caveW*0.2, caveH*0.12, -0.2, 0, Math.PI*2);
+      ctx.ellipse(x - caveW*0.08, subY - caveH*0.75, caveW*0.18, caveH*0.08, -0.2, 0, Math.PI*2);
       ctx.fill();
       ctx.globalAlpha = isBack ? 0.55 : 1;
     } else if (d.decorId.includes('wood') || d.decorId === 'mossy_log' || d.decorId === 'hollow_stump') {
-      // Driftwood/logs: gnarled branching shape
+      // Driftwood/logs: natural gnarled shape with bark texture and branches
       const rng = seededRng(Math.round(d.x * 10000) + 33);
+      const woodH = dh * 2.2;
+      const woodTop = subY - woodH;
+      // Main trunk — thick tapering shape
+      const trunkW = dw * 0.14;
       ctx.fillStyle = color;
       ctx.beginPath();
-      ctx.moveTo(x - dw/2, subY - 2);
-      ctx.quadraticCurveTo(x - dw*0.3, dy - 8, x - dw*0.1, dy - 4);
-      ctx.quadraticCurveTo(x + dw*0.2, dy - 12, x + dw*0.4, dy);
-      ctx.quadraticCurveTo(x + dw/2, subY - 6, x + dw/2, subY);
+      ctx.moveTo(x - trunkW, subY - 2);
+      ctx.quadraticCurveTo(x - trunkW * 1.8, subY - woodH * 0.5, x - trunkW * 0.6, woodTop + woodH * 0.12);
+      ctx.quadraticCurveTo(x, woodTop - 3, x + trunkW * 0.5, woodTop + woodH * 0.1);
+      ctx.quadraticCurveTo(x + trunkW * 1.5, subY - woodH * 0.4, x + trunkW, subY);
       ctx.closePath();
       ctx.fill();
-      // Wood grain texture lines
-      ctx.strokeStyle = shadeColor(color, -15);
+      // Bark texture — horizontal grain lines
+      ctx.strokeStyle = shadeColor(color, -18);
       ctx.lineWidth = 0.5;
-      ctx.globalAlpha = isBack ? 0.2 : 0.4;
-      for (let g = 0; g < 4; g++) {
-        const gy = dy + g * dh * 0.2 + rng() * 5;
+      ctx.globalAlpha = isBack ? 0.2 : 0.45;
+      for (let g = 0; g < 7; g++) {
+        const gy = subY - woodH * 0.08 - g * woodH * 0.13 + rng() * 4;
+        const gxOff = (rng() - 0.5) * 4;
         ctx.beginPath();
-        ctx.moveTo(x - dw*0.3, gy);
-        ctx.quadraticCurveTo(x, gy - 2 + rng()*4, x + dw*0.3, gy + rng()*3);
+        ctx.moveTo(x - trunkW * 0.8 + gxOff, gy);
+        ctx.quadraticCurveTo(x + gxOff, gy - 1.5 + rng()*3, x + trunkW * 0.8 + gxOff, gy + rng()*2);
         ctx.stroke();
       }
+      // Knots in bark
+      ctx.fillStyle = shadeColor(color, -22);
+      ctx.globalAlpha = isBack ? 0.2 : 0.35;
+      for (let k = 0; k < 2; k++) {
+        const kx = x + (rng() - 0.5) * trunkW * 0.8;
+        const ky = subY - woodH * 0.2 - rng() * woodH * 0.5;
+        ctx.beginPath();
+        ctx.ellipse(kx, ky, 2 + rng(), 1.5 + rng(), rng() * 0.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = isBack ? 0.55 : 1;
+      // Branch extending right — natural curve
+      ctx.strokeStyle = shadeColor(color, 5);
+      ctx.lineWidth = 2.5 + rng();
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(x + trunkW * 0.3, subY - woodH * 0.55);
+      ctx.quadraticCurveTo(x + dw * 0.35, subY - woodH * 0.7, x + dw * 0.6, subY - woodH * 0.58);
+      ctx.stroke();
+      // Thinner sub-branch
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(x + dw * 0.45, subY - woodH * 0.65);
+      ctx.lineTo(x + dw * 0.55, subY - woodH * 0.72);
+      ctx.stroke();
+      // Branch extending left
+      ctx.lineWidth = 2 + rng();
+      ctx.beginPath();
+      ctx.moveTo(x - trunkW * 0.4, subY - woodH * 0.35);
+      ctx.quadraticCurveTo(x - dw * 0.35, subY - woodH * 0.48, x - dw * 0.5, subY - woodH * 0.38);
+      ctx.stroke();
+      // Highlight edge on left side (light source)
+      ctx.fillStyle = shadeColor(color, 22);
+      ctx.globalAlpha = isBack ? 0.1 : 0.2;
+      ctx.fillRect(x - trunkW * 0.9, subY - woodH * 0.8, 1.2, woodH * 0.6);
       ctx.globalAlpha = isBack ? 0.55 : 1;
       // Moss coating on top
       if (d.decorId === 'mossy_log') {
@@ -930,8 +1136,45 @@ function drawDecorItem(d, def, color, x, baseSize, subY, biomeKey, isBack) {
         }
         ctx.globalAlpha = isBack ? 0.55 : 1;
       }
+    } else if (d.decorId === 'moss_ball') {
+      // Moss ball: perfectly round, fuzzy green ball
+      const radius = baseSize * 0.7;
+      const cy = subY - radius;
+      // Shadow
+      ctx.fillStyle = 'rgba(0,0,0,.1)';
+      ctx.beginPath();
+      ctx.ellipse(x + 2, subY - 1, radius * 0.9, radius * 0.25, 0, 0, Math.PI * 2);
+      ctx.fill();
+      // Main sphere shape with gradient
+      const mbGrad = ctx.createRadialGradient(x - radius * 0.2, cy - radius * 0.2, 0, x, cy, radius);
+      mbGrad.addColorStop(0, shadeColor(color, 25));
+      mbGrad.addColorStop(0.6, color);
+      mbGrad.addColorStop(1, shadeColor(color, -25));
+      ctx.fillStyle = mbGrad;
+      ctx.beginPath();
+      ctx.arc(x, cy, radius, 0, Math.PI * 2);
+      ctx.fill();
+      // Fuzzy moss texture dots
+      const mbRng = seededRng(Math.round(d.x * 10000) + 66);
+      ctx.globalAlpha = isBack ? 0.3 : 0.55;
+      for (let m = 0; m < 20; m++) {
+        const angle = mbRng() * Math.PI * 2;
+        const dist = mbRng() * radius * 0.8;
+        const mx = x + Math.cos(angle) * dist;
+        const my = cy + Math.sin(angle) * dist;
+        ctx.fillStyle = shadeColor(color, ((mbRng() - 0.5) * 35) | 0);
+        ctx.beginPath();
+        ctx.arc(mx, my, 1 + mbRng() * 2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      // Highlight
+      ctx.fillStyle = 'rgba(255,255,255,0.15)';
+      ctx.beginPath();
+      ctx.ellipse(x - radius * 0.25, cy - radius * 0.3, radius * 0.3, radius * 0.2, -0.3, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = isBack ? 0.55 : 1;
     } else {
-      // Generic (treasure_chest, moss_ball, etc.) — rounder, more prominent
+      // Generic (treasure_chest, etc.) — rounder, more prominent
       ctx.fillStyle = color;
       ctx.beginPath();
       ctx.moveTo(x - dw/2, subY);
@@ -1025,7 +1268,7 @@ function updateFishAnim(fish, dt) {
 
   // ── Territorial behavior: find fish near other fish's claimed decor ──
   // Build map of claimed decor positions
-  const claimedDecorZones = []; // { fishId, x, y, radius, speciesId }
+  claimedDecorZones = []; // { fishId, x, y, radius, speciesId }
   const tank = gameState?.tanks?.[activeTankId];
   const decors = tank?.decor || [];
   for (const f of fish) {
@@ -1035,7 +1278,11 @@ function updateFishAnim(fish, dt) {
     // Find the decor this fish claims
     const claimed = decors.find(d => d.decorId === nearDecor);
     if (!claimed) continue;
-    claimedDecorZones.push({ fishId: f.id, x: claimed.x, y: claimed.y * 0.85, radius: 0.12, speciesId: f.speciesId });
+    // Moray and clownfish get tight territory zones
+    const isMoray = f.speciesId === 'moray_eel';
+    const isClownfish = f.speciesId === 'clownfish';
+    const zRadius = isMoray ? 0.05 : isClownfish ? 0.07 : 0.09;
+    claimedDecorZones.push({ fishId: f.id, x: claimed.x, y: claimed.y * 0.85, radius: zRadius, speciesId: f.speciesId, decorId: nearDecor, isMoray, isClownfish });
   }
 
   for (const f of fish) {
@@ -1068,12 +1315,15 @@ function updateFishAnim(fish, dt) {
       fishAnims[f.id] = anim;
     }
 
-    // Handle wiggle state (fish is being held/tapped)
+    // Handle wiggle state — keep wiggling while this fish is selected (bubble open)
     if (anim.wiggle) {
-      anim.wiggleTimer -= dt;
-      anim.phase += dt * 18; // fast wiggle
-      if (anim.wiggleTimer <= 0) anim.wiggle = false;
-      continue; // Don't move while wiggling
+      // Stop wiggle if no longer selected or bubble dismissed
+      if (selectedFishId !== f.id || !$('fishBubble').classList.contains('visible')) {
+        anim.wiggle = false;
+      } else {
+        anim.phase += dt * 18; // fast wiggle
+        continue; // Don't move while wiggling
+      }
     }
 
     const sp = tankCat?.content?.fish?.[f.speciesId];
@@ -1109,7 +1359,7 @@ function updateFishAnim(fish, dt) {
           const oa = fishAnims[of2.id];
           if (!oa) continue;
           const d2 = Math.sqrt((oa.x - myDecor.x)*(oa.x - myDecor.x) + (oa.y - myDecor.y*0.85)*(oa.y - myDecor.y*0.85));
-          if (d2 < 0.14 && d2 < intruderDist) { intruder = of2; intruderDist = d2; }
+          if (d2 < 0.10 && d2 < intruderDist) { intruder = of2; intruderDist = d2; }
         }
         if (intruder) {
           // Dash toward the intruder to chase it away
@@ -1161,8 +1411,18 @@ function updateFishAnim(fish, dt) {
       anim.tx = chaseTarget.x;
       anim.ty = chaseTarget.y;
     } else if (dist < 0.03) {
+      // ── Check if this fish has a tight territory zone (clownfish/moray) ──
+      const myZone = claimedDecorZones.find(z => z.fishId === f.id);
+      if (myZone && (myZone.isMoray || myZone.isClownfish)) {
+        // Stay very close to their decor — tight swimming zone
+        const swimRadius = myZone.isMoray ? 0.04 : 0.06;
+        const angle = Math.random() * Math.PI * 2;
+        const r = Math.random() * swimRadius;
+        anim.tx = Math.max(0.06, Math.min(0.94, myZone.x + Math.cos(angle) * r));
+        anim.ty = Math.max(0.1, Math.min(0.85, myZone.y + Math.sin(angle) * r * 0.7));
+      }
       // ── Movement type: CRAWL (snails, shrimp) ──
-      if (movType === 'crawl') {
+      else if (movType === 'crawl') {
         // Stay on substrate bottom, move very slowly left/right
         anim.tx = 0.06 + Math.random() * 0.88;
         anim.ty = anim.zone[1] || 0.82; // stay at bottom of zone
@@ -1241,6 +1501,8 @@ function renderFish(fish) {
 
   const biome = BIOMES[activeTankId] || BIOMES.fresh;
   const subY = H * (1 - biome.subH);
+  const tank = gameState?.tanks?.[activeTankId];
+  const decors = tank?.decor || [];
 
   for (const f of sorted) {
     const anim = fishAnims[f.id];
@@ -1284,13 +1546,48 @@ function renderFish(fish) {
       ctx.drawImage(cached.right, -drawW / 2, -drawH / 2, drawW, drawH);
       ctx.restore();
     }
-    // Snake movement: sinusoidal body undulation
+    // Snake movement: sinusoidal body undulation + cave hiding
     else if (movType === 'snake') {
       ctx.save();
+      const myDecorZone = claimedDecorZones?.find(z => z.fishId === f.id && z.isMoray);
       ctx.translate(anim.x * W, anim.y * H);
       const undulate = Math.sin(anim.phase * 1.5) * 2;
       ctx.rotate(undulate * Math.PI / 180);
-      ctx.drawImage(img, -drawW / 2, -drawH / 2, drawW, drawH);
+
+      if (myDecorZone) {
+        const caveDecor = decors.find(d => d.decorId === 'cave');
+        if (caveDecor) {
+          const cdx = anim.x - caveDecor.x;
+          const caveDist = Math.abs(cdx);
+          if (caveDist < 0.08) {
+            // Moray is inside cave — clip to show only the head poking out from the dark opening
+            // The cave opening is the dark ellipse at the bottom part of the cave
+            const caveX = caveDecor.x * W - anim.x * W; // relative to moray center
+            const caveBaseY = (subY - anim.y * H);
+            // Only draw the front portion emerging from cave darkness
+            const visiblePortion = Math.max(0.25, 0.25 + caveDist * 8);
+            const headSide = anim.facing > 0 ? 1 : -1;
+            const srcW = Math.floor(img.width * visiblePortion);
+            const dstW = drawW * visiblePortion;
+            // Show the head end emerging
+            if (anim.facing > 0) {
+              // facing right — head is on right, show right portion
+              ctx.drawImage(img, img.width - srcW, 0, srcW, img.height,
+                drawW / 2 - dstW, -drawH / 2, dstW, drawH);
+            } else {
+              // facing left — head is on left, show left portion
+              ctx.drawImage(img, 0, 0, srcW, img.height,
+                -drawW / 2, -drawH / 2, dstW, drawH);
+            }
+          } else {
+            ctx.drawImage(img, -drawW / 2, -drawH / 2, drawW, drawH);
+          }
+        } else {
+          ctx.drawImage(img, -drawW / 2, -drawH / 2, drawW, drawH);
+        }
+      } else {
+        ctx.drawImage(img, -drawW / 2, -drawH / 2, drawW, drawH);
+      }
       ctx.restore();
     }
     // Crawl movement (snails, shrimp): on substrate
@@ -1301,7 +1598,18 @@ function renderFish(fish) {
     }
     // Default swim
     else {
+      // Clownfish near anemone: partially obscured by tentacles (lower opacity)
+      if (f.speciesId === 'clownfish') {
+        const myZone = claimedDecorZones?.find(z => z.fishId === f.id && z.isClownfish);
+        if (myZone) {
+          const distToDecor = Math.sqrt((anim.x - myZone.x) ** 2 + (anim.y - myZone.y) ** 2);
+          if (distToDecor < 0.05) {
+            ctx.globalAlpha = Math.max(0.55, ctx.globalAlpha * (0.6 + distToDecor * 8));
+          }
+        }
+      }
       ctx.drawImage(img, px, py, drawW, drawH);
+      ctx.globalAlpha = f.weak ? 0.45 : 1;
     }
 
     if (f.weak) {
@@ -1309,8 +1617,8 @@ function renderFish(fish) {
       ctx.filter = 'none';
     }
 
-    // Level badge — only show for selected (tapped) fish
-    if (f.level > 1 && f.id === selectedFishId) {
+    // Level badge — only show for selected (tapped) fish while bubble is visible
+    if (f.level > 1 && f.id === selectedFishId && $('fishBubble').classList.contains('visible')) {
       const badgeX = (movType === 'crawl') ? anim.x * W + drawW / 2 - 12 : px + drawW - 12;
       const badgeY = (movType === 'crawl') ? subY - drawH * 0.6 - 2 : py - 2;
       ctx.fillStyle = 'rgba(0,0,0,.6)';
@@ -1340,7 +1648,10 @@ function updateFoodParticles(dt) {
       const anim = fishAnims[f.id];
       if (!anim) continue;
       const sp = tankCat?.content?.fish?.[f.speciesId];
-      if (!sp || !sp.diet.accepts.includes(fp.foodId)) continue;
+      if (!sp) continue;
+      // Only eat food the fish accepts AND only when hungry
+      if (!sp.diet.accepts.includes(fp.foodId)) continue;
+      if (f.hunger >= 95) continue; // already full — ignore
       const fdx = fp.x - anim.x * W;
       const fdy = fp.y - anim.y * H;
       if (Math.sqrt(fdx*fdx + fdy*fdy) < 18) {
@@ -1569,7 +1880,7 @@ function updateHUD() {
   const tank = gameState?.tanks?.[activeTankId];
   if (!tank) return;
 
-  $('coinCount').textContent = Math.floor(tank.coins);
+  $('coinCount').textContent = Math.floor(gameState?.coins ?? 0);
 
   const clean = Math.round(tank.cleanliness);
   $('cleanFill').style.width = clean + '%';
@@ -1614,12 +1925,24 @@ function showToast(msg, duration) {
 
 // ═══════ HUD TOOLTIP ═══════
 
-function showHudTooltip(title, body) {
+function showHudTooltip(title, body, anchorEl) {
   $('hudTooltipTitle').textContent = title;
   $('hudTooltipBody').textContent = body;
-  $('hudTooltip').classList.add('visible');
+  const tip = $('hudTooltip');
+  if (anchorEl) {
+    const r = anchorEl.getBoundingClientRect();
+    const wr = $('widgetContainer').getBoundingClientRect();
+    tip.style.top = (r.bottom - wr.top + 4) + 'px';
+    tip.style.left = (r.left - wr.left) + 'px';
+    tip.style.right = '';
+  } else {
+    tip.style.top = '38px';
+    tip.style.right = '10px';
+    tip.style.left = '';
+  }
+  tip.classList.add('visible');
   clearTimeout(tooltipTimer);
-  tooltipTimer = setTimeout(() => $('hudTooltip').classList.remove('visible'), 4000);
+  tooltipTimer = setTimeout(() => tip.classList.remove('visible'), 4000);
 }
 
 // ═══════ FISH BUBBLE ═══════
@@ -1658,11 +1981,24 @@ function showFishBubble(f, px, py) {
 
   $('fbDetail').innerHTML = detailHtml;
   $('fbStage').textContent = '';
-  fb.style.left = Math.min(px, W - 170) + 'px';
-  fb.style.top = Math.max(py - 90, 4) + 'px';
+  // Clamp bubble within widget bounds
+  const fbW = 170, fbH = 120; // approximate bubble size
+  let fbLeft = Math.max(4, Math.min(px - fbW / 2, W - fbW - 4));
+  let fbTop = py - fbH - 10; // prefer above fish
+  if (fbTop < 4) fbTop = py + 20; // flip below if too high
+  if (fbTop + fbH > H - 4) fbTop = H - fbH - 4; // clamp bottom
+  fb.style.left = fbLeft + 'px';
+  fb.style.top = Math.max(4, fbTop) + 'px';
   fb.classList.add('visible');
   clearTimeout(fb._timer);
-  fb._timer = setTimeout(() => fb.classList.remove('visible'), 8000);
+  fb._timer = setTimeout(() => {
+    fb.classList.remove('visible');
+    if (selectedFishId) {
+      const a = fishAnims[selectedFishId];
+      if (a) a.wiggle = false;
+      selectedFishId = null;
+    }
+  }, 8000);
 
   // Bind sell action
   const sellBtn = fb.querySelector('[data-fb-sell]');
@@ -1673,7 +2009,11 @@ function showFishBubble(f, px, py) {
       if (res?.result?.error) { showToast(res.result.error); return; }
       if (res?.result?.sold) { showToast(`Sold for ${res.result.value} coins`); }
       fb.classList.remove('visible');
-      selectedFishId = null;
+      if (selectedFishId) {
+        const a = fishAnims[selectedFishId];
+        if (a) a.wiggle = false;
+        selectedFishId = null;
+      }
       await refreshState();
     };
   }
@@ -1697,6 +2037,9 @@ function showDecorCard(d, px, py) {
     actionsHtml += `<button class="dc-trim" ${atMin ? 'disabled' : ''} data-trim-decor="${d.id}">✂️ Trim</button>`;
   }
   actionsHtml += `<button class="dc-sell" data-sell-decor-card="${d.id}">Sell</button>`;
+  if (dd.placement !== 'top') {
+    actionsHtml += `<button class="dc-move" data-move-decor="${d.id}">↔ Move</button>`;
+  }
   $('dcActions').innerHTML = actionsHtml;
 
   // Bind trim handler
@@ -1729,8 +2072,25 @@ function showDecorCard(d, px, py) {
     };
   }
 
-  dc.style.left = Math.min(px, W - 160) + 'px';
-  dc.style.top = Math.max(py - 50, 4) + 'px';
+  // Bind move handler — enables drag mode for this decor
+  const moveBtn = $('dcActions').querySelector('[data-move-decor]');
+  if (moveBtn) {
+    moveBtn.onclick = () => {
+      dc.classList.remove('visible');
+      draggingDecor = { id: d.id, decorId: d.decorId, offsetX: 0, offsetY: 0 };
+      isDragging = true;
+      showToast('Drag to reposition, then release');
+    };
+  }
+
+  // Clamp decor card within widget bounds
+  const dcW = 160, dcH = 80;
+  let dcLeft = Math.max(4, Math.min(px - dcW / 2, W - dcW - 4));
+  let dcTop = py - dcH - 10;
+  if (dcTop < 4) dcTop = py + 20;
+  if (dcTop + dcH > H - 4) dcTop = H - dcH - 4;
+  dc.style.left = dcLeft + 'px';
+  dc.style.top = Math.max(4, dcTop) + 'px';
   dc.classList.add('visible');
   clearTimeout(dc._timer);
   dc._timer = setTimeout(() => dc.classList.remove('visible'), 8000);
@@ -1742,7 +2102,6 @@ function toggleMenu() {
   menuOpen = !menuOpen;
   $('menuOverlay').classList.toggle('visible', menuOpen);
   $('fab').classList.toggle('active', menuOpen);
-  // Close any active panel when menu toggles
 }
 
 function closeMenu() {
@@ -1758,7 +2117,6 @@ function handleMenuAction(action) {
     case 'clean': enterCleanMode(); break;
     case 'laser': enterLaserMode(); break;
     case 'store': openPanel('storePanel'); break;
-    case 'upgrades': openPanel('upgradesPanel'); break;
     case 'inventory': openPanel('inventoryPanel'); break;
     case 'tanks': openPanel('tanksPanel'); break;
     case 'help': openPanel('helpPanel'); break;
@@ -1774,6 +2132,7 @@ function exitToolMode() {
   laserPos = null;
   cleanMask = null;
   selectedFoodId = null;
+  $('widgetContainer').classList.remove('hud-muted');
   renderDirtOverlay();
 }
 
@@ -1822,6 +2181,7 @@ async function enterCleanMode() {
   }
   exitToolMode();
   activeMode = 'clean';
+  $('widgetContainer').classList.add('hud-muted');
 
   const res = await API.doAction('start_clean');
   const r = res?.result;
@@ -1916,7 +2276,6 @@ function closeAllPanels() {
 function populatePanel(panelId) {
   switch (panelId) {
     case 'storePanel': populateStore(); break;
-    case 'upgradesPanel': populateUpgrades(); break;
     case 'inventoryPanel': populateInventory(); break;
     case 'tanksPanel': populateTanks(); break;
     case 'helpPanel': populateHelp(); break;
@@ -2054,69 +2413,6 @@ function populateStore() {
   });
 }
 
-function populateUpgrades() {
-  const list = $('upgradesList');
-  const tank = gameState?.tanks?.[activeTankId];
-  if (!tank || !tankCat) { list.innerHTML = '<div style="opacity:.5">No tools available for this tank.</div>'; return; }
-
-  let html = '<div class="panel-section-title">Equipment</div>';
-  const tools = tankCat.content?.tools || {};
-  const toolEntries = Object.entries(tools);
-
-  if (toolEntries.length === 0) {
-    html += '<div style="opacity:.5;padding:10px">No equipment available for this tank.</div>';
-  }
-
-  for (const [toolId, toolDef] of toolEntries) {
-    const level = tank.toolsOwned?.[toolId] || 0;
-    const maxed = level >= toolDef.maxLevel;
-    const nextPrice = maxed ? null : toolDef.prices[level];
-    const canBuy = !maxed && tank.coins >= (nextPrice || Infinity);
-
-    html += `<div class="s-item">
-      <div class="s-icon">${iconImg('wrench', 20)}</div>
-      <div class="s-info">
-        <div class="s-name">${toolDef.name}</div>
-        <div class="s-desc">Level ${level}/${toolDef.maxLevel}${maxed ? ' — Fully upgraded' : ''}</div>
-      </div>
-      <button class="buy-btn primary" ${!canBuy ? 'disabled' : ''} data-upgrade-tool="${toolId}">
-        ${maxed ? 'Max' : nextPrice + ' ' + iconImg('coin', 12)}
-      </button>
-    </div>`;
-  }
-
-  // Show utility fish
-  const utilFish = (tank.fish || []).filter(f => {
-    const sp = tankCat.content?.fish?.[f.speciesId];
-    return sp?.utility;
-  });
-  if (utilFish.length > 0) {
-    html += '<div class="panel-section-title">Utility Creatures</div>';
-    for (const f of utilFish) {
-      const sp = tankCat.content?.fish?.[f.speciesId];
-      html += `<div class="s-item">
-        <div class="s-icon">${iconImg('wrench', 18)}</div>
-        <div class="s-info">
-          <div class="s-name">${sp.name}</div>
-          <div class="s-desc">Reduces dirt by ${Math.round((sp.utility.dirtReduction||0)*100)}%</div>
-        </div>
-      </div>`;
-    }
-  }
-
-  list.innerHTML = html;
-
-  list.querySelectorAll('[data-upgrade-tool]').forEach(btn => {
-    btn.onclick = async () => {
-      const res = await API.doAction('buy_tool', { toolId: btn.dataset.upgradeTool });
-      if (res?.result?.error) { showToast(res.result.error); return; }
-      if (res?.result?.bought) showToast('Tool upgraded!');
-      await refreshState();
-      populateUpgrades();
-    };
-  });
-}
-
 function populateInventory() {
   const list = $('inventoryList');
   const tank = gameState?.tanks?.[activeTankId];
@@ -2209,7 +2505,7 @@ function populateTanks() {
       <div class="s-icon">${t.unlocked ? iconImg('fish', 18) : iconImg('lock', 18)}</div>
       <div class="s-info">
         <div class="s-name">${t.name}${isCurrent ? ' — Current' : ''}</div>
-        <div class="s-desc">${t.unlocked ? `${t.fishCount} fish · ${t.usedSpace}/${t.spaceCapacity} space · ${t.coins} coins` : t.unlockLabel}</div>
+        <div class="s-desc">${t.unlocked ? `${t.fishCount} fish · ${t.usedSpace}/${t.spaceCapacity} space` : t.unlockLabel}</div>
       </div>
       ${!isCurrent && t.unlocked ?
         `<button class="buy-btn primary" data-switch-tank="${t.tankId}">Switch</button>` :
@@ -2311,10 +2607,12 @@ function setupInput() {
   // FAB
   $('fab').onclick = toggleMenu;
 
-  // Menu buttons
-  document.querySelectorAll('.menu-btn').forEach(btn => {
+  // Menu action buttons
+  document.querySelectorAll('.menu-btn[data-action]').forEach(btn => {
     btn.onclick = () => handleMenuAction(btn.dataset.action);
   });
+
+
 
   // Panel close buttons
   document.querySelectorAll('[data-close]').forEach(btn => {
@@ -2337,19 +2635,19 @@ function setupInput() {
   };
 
   // HUD tooltips
-  $('coinDisplay').onclick = () => {
+  $('coinDisplay').onclick = (e) => {
     const tank = gameState?.tanks?.[activeTankId];
     const lifetime = gameState?.lifetime?.coinsEarned || 0;
-    showHudTooltip('Coins', `Current: ${Math.floor(tank?.coins||0)}\nLifetime: ${Math.floor(lifetime)}`);
+    showHudTooltip('Coins', `Current: ${Math.floor(gameState?.coins||0)}\nLifetime: ${Math.floor(lifetime)}`, $('coinDisplay'));
   };
-  $('cleanBar').onclick = () => {
+  $('cleanBar').onclick = (e) => {
     const tank = gameState?.tanks?.[activeTankId];
-    showHudTooltip('Cleanliness', `${Math.round(tank?.cleanliness||0)}%\nKeep above 60% for happy fish!`);
+    showHudTooltip('Cleanliness', `${Math.round(tank?.cleanliness||0)}%\nKeep above 60% for happy fish!`, $('cleanBar'));
   };
-  $('hungerBar').onclick = () => {
+  $('hungerBar').onclick = (e) => {
     const fish = gameState?.tanks?.[activeTankId]?.fish || [];
     const avg = fish.length > 0 ? Math.round(fish.reduce((s,f) => s + f.hunger, 0)/fish.length) : 100;
-    showHudTooltip('Hunger', `Average: ${avg}%\nFeed fish when below 70%!`);
+    showHudTooltip('Hunger', `Average: ${avg}%\nFeed fish when below 70%!`, $('hungerBar'));
   };
 
   // Tank nav
@@ -2358,8 +2656,6 @@ function setupInput() {
 
   // Canvas interactions
   const canvasEl = canvas;
-  let isDragging = false;
-  let lastDragPos = null;
 
   function getCanvasPos(e) {
     const rect = canvasEl.getBoundingClientRect();
@@ -2381,7 +2677,6 @@ function setupInput() {
     if (e.touches) e.preventDefault();
     const pos = getCanvasPos(e);
     isDragging = true;
-    lastDragPos = pos;
 
     if (activeMode === 'clean') {
       wipeCells(pos.x, pos.y, 3);
@@ -2391,14 +2686,9 @@ function setupInput() {
     } else if (activeMode === 'feed') {
       dropFood(pos.x, pos.y);
     } else {
-      // Normal mode: check decor drag first, then fish tap
-      const hitDecor = hitTestDecor(pos.x, pos.y);
-      if (hitDecor && !hitDecor._isFloating) {
-        draggingDecor = { id: hitDecor.id, decorId: hitDecor.decorId, offsetX: 0, offsetY: 0 };
-      } else {
-        draggingDecor = null;
-        checkFishTap(pos.x, pos.y);
-      }
+      // Normal mode: tap fish or decor to show info
+      draggingDecor = null;
+      checkFishTap(pos.x, pos.y);
     }
   }
 
@@ -2423,7 +2713,6 @@ function setupInput() {
         }
       }
     }
-    lastDragPos = pos;
   }
 
   function onPointerUp(e) {
@@ -2489,7 +2778,6 @@ function checkFishTap(px, py) {
       // Trigger wiggle animation
       if (anim) {
         anim.wiggle = true;
-        anim.wiggleTimer = 2.0; // wiggle for 2 seconds
       }
       showFishBubble(f, fx, effectiveY);
       return;
@@ -2517,38 +2805,14 @@ function checkFishTap(px, py) {
       return;
     }
   }
-  // No fish/decor tapped — dismiss popups
+  // No fish/decor tapped — dismiss popups and stop wiggle
   $('fishBubble').classList.remove('visible');
   $('decorCard').classList.remove('visible');
-}
-
-function hitTestDecor(px, py) {
-  const tank = gameState?.tanks?.[activeTankId];
-  const decors = tank?.decor || [];
-  const biome = BIOMES[activeTankId] || BIOMES.fresh;
-  const subY = H * (1 - biome.subH);
-  for (const d of decors) {
-    const dd = tankCat?.content?.decor?.[d.decorId];
-    if (!dd) continue;
-    const dx = d.x * W;
-    const baseSize = Math.max(12, (d.size || 1) * PX_SCALE * 8);
-    let hitW, hitH, hitX, hitY;
-    if (dd.placement === 'top') {
-      hitW = baseSize * 2; hitH = 16; hitX = dx; hitY = 6;
-      // Mark floating plants
-      d._isFloating = true;
-    } else if (dd.growth) {
-      hitW = baseSize * 1.5; hitH = baseSize * 4; hitX = dx; hitY = subY - hitH;
-      d._isFloating = false;
-    } else {
-      hitW = baseSize * 2.8; hitH = baseSize * 1.8; hitX = dx; hitY = subY - baseSize * 0.9;
-      d._isFloating = false;
-    }
-    if (Math.abs(px - hitX) < hitW / 2 && py > hitY - 4 && py < hitY + hitH + 4) {
-      return d;
-    }
+  if (selectedFishId) {
+    const oldAnim = fishAnims[selectedFishId];
+    if (oldAnim) oldAnim.wiggle = false;
+    selectedFishId = null;
   }
-  return null;
 }
 
 async function switchTankNav(dir) {
@@ -2582,7 +2846,6 @@ function applyState(res) {
   tankCat = res.tankCatalog;
   storeData = res.store;
   tanksList = res.tanksList;
-  globalCat = res.global;
 
   // Prune anims for fish no longer present
   const fishIds = new Set((gameState?.tanks?.[activeTankId]?.fish || []).map(f => f.id));

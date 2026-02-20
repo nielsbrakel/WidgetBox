@@ -37,6 +37,9 @@ export const SCENARIOS = {
         'territorial-showcase': { label: 'Territorial Fish Behavior',  type: 'mock', group: 'Design Overhaul' },
         'lush-planted':         { label: 'Lush Planted Tank (Depth)',  type: 'mock', group: 'Design Overhaul' },
         'size-showcase':        { label: 'Fish Size Showcase',         type: 'mock', group: 'Design Overhaul' },
+        'full-grown-fresh':     { label: 'Full Grown Fresh Tank',      type: 'mock', group: 'Full Grown' },
+        'full-grown-tropical':  { label: 'Full Grown Tropical Tank',   type: 'mock', group: 'Full Grown' },
+        'full-grown-salt':      { label: 'Full Grown Salt Tank',       type: 'mock', group: 'Full Grown' },
     }
 };
 

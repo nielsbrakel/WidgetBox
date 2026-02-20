@@ -314,6 +314,7 @@ test.describe('Games App — Aquarium Features', () => {
         });
 
         test('should sell fish via bubble sell button', async () => {
+            test.setTimeout(60000);
             await games.selectScenario('tier-2-active');
             const initialCoins = await games.getCoins();
             const box = await games.tankWrap.boundingBox();

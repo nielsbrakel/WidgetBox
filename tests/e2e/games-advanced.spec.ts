@@ -32,12 +32,12 @@ test.describe('Games App — Aquarium Advanced', () => {
             await games.openMenu();
             const menuIcons = games.menuGrid.locator('.menu-icon img');
             const count = await menuIcons.count();
-            expect(count).toBe(8); // All 8 menu buttons should have icon images
+            expect(count).toBe(7); // Flat menu has 7 buttons (Feed, Clean, Play, Store, Inventory, Tanks, Help)
         });
 
-        test('should render pixel icon in FAB button', async () => {
-            const fabIcon = games.fab.locator('img');
-            await expect(fabIcon).toBeAttached();
+        test('should render hamburger lines in FAB button', async () => {
+            const fabLines = games.fab.locator('.fab-line');
+            await expect(fabLines).toHaveCount(3);
         });
 
         test('should render pixel icons in HUD bars', async () => {
@@ -371,41 +371,35 @@ test.describe('Games App — Aquarium Advanced', () => {
         });
     });
 
-    // ── Equipment/Tools Panel ────────────────────────────────────────────
+    // ── Equipment/Tools (via Store) ──────────────────────────────────
 
-    test.describe('Equipment Panel', () => {
-        test('should show tools in upgrades panel', async () => {
-            await games.openUpgrades();
-            await expect(games.upgradesList).toContainText('Equipment');
+    test.describe('Equipment (Store Tools Tab)', () => {
+        test('should show tools tab in store panel', async () => {
+            await games.openStore();
+            await expect(games.storeList).toBeVisible();
         });
 
-        test('should show pixel icon images in upgrades panel', async () => {
+        test('should show pixel icon images in store panel', async () => {
             await games.selectScenario('tier-2-active');
-            await games.openUpgrades();
-            const icons = games.upgradesList.locator('.s-icon img');
+            await games.openStore();
+            const icons = games.storeList.locator('.s-icon img');
             const count = await icons.count();
             expect(count).toBeGreaterThan(0);
         });
 
-        test('should upgrade tool in rich scenario', async () => {
-            await games.selectScenario('rich');
-            await games.openUpgrades();
-
-            const upgradeBtn = games.upgradesList.locator('[data-upgrade-tool]').first();
-            if (await upgradeBtn.count() > 0 && await upgradeBtn.isEnabled()) {
-                await upgradeBtn.click();
-                await games.page.waitForTimeout(800);
-                await expect(games.toast).toContainText('Tool upgraded');
-            }
+        test('should show tools tab with tool items', async () => {
+            await games.selectScenario('tier-2-active');
+            await games.openStore();
+            await games.switchStoreTab('tools');
+            await expect(games.storeList).toContainText('Heater');
         });
 
-        test('should show utility creatures when pleco is owned', async () => {
+        test('should show utility creatures section in store', async () => {
             await games.selectScenario('tier-2-active');
-            await games.openUpgrades();
-            // If the scenario has utility fish (snails/pleco), they show in upgrades
-            const utilSection = games.upgradesList.locator('.panel-section-title');
-            const count = await utilSection.count();
-            // At least the Equipment section title should be there
+            await games.openStore();
+            // The store shows fish including utility creatures
+            const fishItems = games.storeList.locator('.s-item');
+            const count = await fishItems.count();
             expect(count).toBeGreaterThanOrEqual(1);
         });
     });
@@ -615,10 +609,10 @@ test.describe('Games App — Aquarium Advanced', () => {
             await expect(games.storePanel).not.toHaveClass(/visible/);
         });
 
-        test('should close upgrades panel with close button', async () => {
-            await games.openUpgrades();
-            await games.closePanel('upgradesPanel');
-            await expect(games.upgradesPanel).not.toHaveClass(/visible/);
+        test('should close store panel (tools) with close button', async () => {
+            await games.openStore();
+            await games.closePanel('storePanel');
+            await expect(games.storePanel).not.toHaveClass(/visible/);
         });
 
         test('should close inventory panel with close button', async () => {

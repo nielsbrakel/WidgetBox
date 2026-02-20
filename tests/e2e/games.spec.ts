@@ -46,13 +46,13 @@ test.describe('Games App — Aquarium Widget', () => {
             await expect(games.menuOverlay).not.toHaveClass(/visible/);
         });
 
-        test('should show all 8 menu buttons', async () => {
+        test('should show all menu buttons in flat layout', async () => {
             await games.openMenu();
             const buttons = games.menuGrid.locator('.menu-btn');
-            await expect(buttons).toHaveCount(8);
+            await expect(buttons).toHaveCount(7);
         });
 
-        test('should have laser button available at tier 1', async () => {
+        test('should have laser button directly visible in menu', async () => {
             await games.openMenu();
             await expect(games.menuBtn('laser')).toBeVisible();
         });
@@ -98,12 +98,12 @@ test.describe('Games App — Aquarium Widget', () => {
         });
     });
 
-    // ── Upgrades Panel ───────────────────────────────────────────────────
+    // ── Tools (via Store) ──────────────────────────────────────────────
 
-    test.describe('Upgrades', () => {
-        test('should open upgrades panel', async () => {
-            await games.openUpgrades();
-            await expect(games.upgradesPanel).toHaveClass(/visible/);
+    test.describe('Tools', () => {
+        test('should open store panel with tools tab available', async () => {
+            await games.openStore();
+            await expect(games.storePanel).toHaveClass(/visible/);
         });
     });
 
@@ -330,16 +330,17 @@ test.describe('Games App — Aquarium Widget', () => {
             expect(coins).toBeGreaterThanOrEqual(1000);
         });
 
-        test('should show utility fish in tier 2 upgrades', async () => {
+        test('should show fish in tier 2 store', async () => {
             await games.selectScenario('tier-2-active');
-            await games.openUpgrades();
-            await expect(games.upgradesList).toContainText('Pleco');
+            await games.openStore();
+            await expect(games.storeList).toContainText('Pleco');
         });
 
-        test('should show equipment upgrades at tier 2', async () => {
+        test('should show tools tab at tier 2', async () => {
             await games.selectScenario('tier-2-active');
-            await games.openUpgrades();
-            await expect(games.upgradesList).toContainText('Equipment');
+            await games.openStore();
+            await games.switchStoreTab('tools');
+            await expect(games.storeList).toContainText('Heater');
         });
 
         test('should load tank-full scenario with full capacity', async () => {

@@ -48,6 +48,7 @@ export class GamesPage extends SandboxPage {
     get fab() { return this.iframe.locator('#fab'); }
     get menuOverlay() { return this.iframe.locator('#menuOverlay'); }
     get menuGrid() { return this.iframe.locator('#menuGrid'); }
+    get menuMain() { return this.iframe.locator('#menuMain'); }
     menuBtn(action: string) { return this.iframe.locator(`.menu-btn[data-action="${action}"]`); }
 
     // ── Panels ───────────────────────────────────────────────────────────
@@ -117,8 +118,8 @@ export class GamesPage extends SandboxPage {
 
     async openUpgrades() {
         await this.openMenu();
-        await this.menuBtn('upgrades').click();
-        await expect(this.upgradesPanel).toHaveClass(/visible/);
+        await this.menuBtn('store').click();
+        await expect(this.storePanel).toHaveClass(/visible/);
     }
 
     async openHelp() {

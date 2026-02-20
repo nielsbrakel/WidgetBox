@@ -421,4 +421,102 @@ test.describe('Games App — Aquarium Design Overhaul', () => {
             await expect(games.coinDisplay).toBeVisible();
         });
     });
+
+    // ══════════════════════════════════════════════════════════════════════
+    // ── Full-Grown Scenarios ─────────────────────────────────────────────
+    // ══════════════════════════════════════════════════════════════════════
+
+    test.describe('Full-Grown Scenarios', () => {
+        test('should load full-grown-fresh with max-level fish', async () => {
+            await games.selectScenario('full-grown-fresh');
+            await expect(games.canvas).toBeVisible();
+            await games.openInventory();
+            // Full-grown fresh has max-capacity fish
+            const fishItems = games.inventoryList.locator('[data-sell-fish]');
+            expect(await fishItems.count()).toBeGreaterThan(0);
+            // Fish should be high level
+            await expect(games.inventoryList).toContainText('Lv.');
+        });
+
+        test('should load full-grown-tropical with high coin balance', async () => {
+            await games.selectScenario('full-grown-tropical');
+            await expect(games.canvas).toBeVisible();
+            const tier = await games.getTankTier();
+            expect(tier).toBe('2');
+            const coins = await games.getCoins();
+            expect(coins).toBeGreaterThanOrEqual(1000);
+        });
+
+        test('should load full-grown-salt with all tools', async () => {
+            await games.selectScenario('full-grown-salt');
+            await expect(games.canvas).toBeVisible();
+            const tier = await games.getTankTier();
+            expect(tier).toBe('3');
+            await games.openStore();
+            await games.switchStoreTab('tools');
+            // Salt has filter, skimmer, UV sterilizer — all should be owned at high level
+            await expect(games.storeList).toContainText('Filter');
+            await expect(games.storeList).toContainText('UV Sterilizer');
+        });
+
+        test('should render full-grown-fresh for 5s without errors', async () => {
+            await games.selectScenario('full-grown-fresh');
+            await games.page.waitForTimeout(5000);
+            await expect(games.canvas).toBeVisible();
+            await expect(games.coinDisplay).toBeVisible();
+        });
+
+        test('should render full-grown-tropical for 5s without errors', async () => {
+            await games.selectScenario('full-grown-tropical');
+            await games.page.waitForTimeout(5000);
+            await expect(games.canvas).toBeVisible();
+            await expect(games.coinDisplay).toBeVisible();
+        });
+
+        test('should render full-grown-salt for 5s without errors', async () => {
+            await games.selectScenario('full-grown-salt');
+            await games.page.waitForTimeout(5000);
+            await expect(games.canvas).toBeVisible();
+            await expect(games.coinDisplay).toBeVisible();
+        });
+
+        test('should show max-grown decor in full-grown-fresh inventory', async () => {
+            await games.selectScenario('full-grown-fresh');
+            await games.openInventory();
+            const decorItems = games.inventoryList.locator('[data-sell-decor]');
+            expect(await decorItems.count()).toBeGreaterThan(0);
+            await expect(games.inventoryList).toContainText('Decoration');
+        });
+
+        test('should show store in full-grown scenario with owned fish', async () => {
+            await games.selectScenario('full-grown-salt');
+            await games.openStore();
+            // Should show fish as purchasable or owned
+            const items = games.storeList.locator('.s-item');
+            expect(await items.count()).toBeGreaterThan(0);
+        });
+    });
+
+    // ══════════════════════════════════════════════════════════════════════
+    // ── FAB Animation State ──────────────────────────────────────────────
+    // ══════════════════════════════════════════════════════════════════════
+
+    test.describe('FAB Animation', () => {
+        test('should add active class to FAB when menu opens', async () => {
+            await games.openMenu();
+            await expect(games.fab).toHaveClass(/active/);
+        });
+
+        test('should remove active class from FAB when menu closes', async () => {
+            await games.openMenu();
+            await expect(games.fab).toHaveClass(/active/);
+            await games.closeMenu();
+            await expect(games.fab).not.toHaveClass(/active/);
+        });
+
+        test('should have three fab-line spans for hamburger icon', async () => {
+            const lines = games.fab.locator('.fab-line');
+            expect(await lines.count()).toBe(3);
+        });
+    });
 });

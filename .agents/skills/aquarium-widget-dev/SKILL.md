@@ -14,11 +14,10 @@ This skill provides comprehensive domain knowledge for developing the Aquarium w
 - Working on the cleaning, feeding, or play tool modes
 - Adding new fish species, decor items, foods, or tools to the catalog
 - Adding new tank biomes to the system
-- Debugging save/load, migration, or catalog reconciliation issues
+- Debugging save/load or catalog reconciliation issues
 - Writing unit tests (Vitest) or E2E tests (Playwright) for game systems
 - Modifying the renderer or visual layers
 - Updating the sandbox mock scenarios
-- Fixing backwards compatibility or save migration problems
 
 ## Project Layout
 
@@ -28,7 +27,7 @@ apps/com.nielsvanbrakel.widgetbox-games/
 ├── app.json                        # Generated from .homeycompose/app.json
 ├── .homeycompose/app.json          # Source of truth for app metadata
 ├── package.json                    # Scripts: homey:run, homey:install, homey:build
-├── AQUARIUM_SPEC.md             # Full game specification (v1.3.0)
+├── AQUARIUM_SPEC.md             # Full game specification
 ├── locales/
 │   ├── en.json                     # English translations
 │   └── nl.json                     # Dutch translations
@@ -84,10 +83,11 @@ Query parameter: `widgetId` (from `Homey.getWidgetInstanceId()`)
 
 ```typescript
 type Save = {
-  version: number;                    // save schema version
+  version: number;                    // save schema version (currently 1)
   widgetInstanceId: string;
   activeTankId: TankId;
   tanks: Record<TankId, TankSave>;
+  coins: number;                      // GLOBAL currency (shared across all tanks)
   lifetime: { coinsEarned: number };
   meta: { createdAt: number; lastSavedAt: number; lastCatalogVersion?: string };
 };
@@ -98,7 +98,7 @@ type TankId = "fresh" | "tropical" | "salt";
 type TankSave = {
   id: string;
   unlocked: boolean;
-  coins: number;                      // PER-TANK currency
+  // Coins are global (save.coins)
   cleanliness: number;                // 0..100
   lastSeenAt: number;
   foodStock: Record<string, number>;  // PER-TANK food
@@ -208,11 +208,11 @@ The game currently ships with three biomes, designed with room for future expans
 
 | Tank | ID | Unlock | Capacity | Key Content |
 |---|---|---|---|---|
-| Fresh Starter | `fresh` | Free | 8 | Guppy, Goldfish, Snail, Hornwort, Treasure Chest |
-| Tropical Planted | `tropical` | 500 lifetime coins | 14 | Neon Tetra, Discus, Gourami, Heater/Filter required |
-| Saltwater Reef | `salt` | 2000 lifetime + Heater | 20 | Clownfish, Blue Tang, Chromis, Firefish, Gramma, Banggai, Moray Eel, Cleaner Shrimp. Filter/Skimmer/UV Sterilizer required |
+| Fresh Starter | `fresh` | Free | 8 | Guppy, Goldfish, Snail, Hornwort, Vallisneria, Anubias, Treasure Chest |
+| Tropical Planted | `tropical` | 1500 lifetime coins | 14 | Neon Tetra, Discus, Gourami, Cryptocoryne, Ludwigia, Heater/Filter required |
+| Saltwater Reef | `salt` | 5000 lifetime + Heater | 20 | Clownfish, Blue Tang, Chromis, Firefish, Gramma, Banggai, Moray Eel, Cleaner Shrimp. Filter/Skimmer/UV Sterilizer required |
 
-Each tank has **independent** coins, food stock, cleanliness, fish, and decor.
+Each tank has **independent** food stock, cleanliness, fish, and decor. **Coins are global** (shared across all tanks).
 
 ### Saltwater Tools — Negative Impact
 
@@ -281,14 +281,14 @@ The most complex tool. Key rules:
 
 1. Red dot follows pointer
 2. Fish chase with species-specific patterns
-3. Reward: 50 coins + XP, on 6-hour cooldown
+3. Reward: 25 coins + 5 XP per fish, on 6-hour cooldown
 
 ## Economy
 
 ### Currency Sources
 - Fish passive coins (happiness × level × lifeStage, per hour)
-- Cleaning rewards (proportional to dirt removed)
-- Play rewards (small, on cooldown)
+- Cleaning rewards (coinsPer100Dirt = 5, proportional to dirt removed)
+- Play rewards (25 coins + 5 XP per fish, 6-hour cooldown)
 
 ### Price Growth
 ```
@@ -303,11 +303,11 @@ fishPrice = basePrice × growthFactor ^ ownedCountOfSpecies
 
 ## Rendering Layers (Bottom to Top)
 
-1. Water gradient (3-stop, biome-specific) → 2. Glass frame (animated shimmer + reflections) → 3. Back silhouettes → 3.5. Light rays (7 animated) → 4. Caustic light (12 animated ellipses) → 5. Substrate (120 varied pebbles + 2-line highlight + depth fog) →
+1. Water gradient (3-stop, biome-specific) → 2. Glass frame (animated shimmer + reflections) → 3. Back silhouettes → 3.5. Light rays (7 animated, 95% tank height) → 3.6. Animated water surface (sine wave at y=5, amplitude 2.2+1.0, shimmer) → 4. Caustic light (12 animated ellipses) → 5. Substrate (120 varied pebbles + 2-line highlight + depth fog) →
 6. Rock clusters → 7. **Back decor layer** (every 3rd item, 55% opacity — behind fish for depth) → 8. Equipment (pixel art sprites from ICON_DATA + level dots) → 9. Fish (FISH_BASE_SCALES applied) → 10. Movement-type sprites (crawl/glass/snake) → 10.5. **Front decor layer** (remaining items, full opacity — in front of fish for depth) →
 11. Food particles → 12. Bubbles → 13. Ambient particles → 14. Dirt overlay (seeded cells + edge film, **above substrate only**, visible when cleanliness < 95%) →
-15. Laser dot → 16. Float text → 17. Fish bubble (stats pills, earning info, traits, sell button) → 18. HUD (pixel art icons) →
-19. Tool dock → 20. Toast → 21. Menu (pixel art icons) → 22. Panels
+15. Laser dot → 16. Float text → 17. Fish bubble (stats pills, earning info, traits, sell button — clamped to widget bounds) → 18. HUD (pixel art icons, fades during cleaning with hud-muted class) →
+19. Tool dock → 20. Toast → 21. Menu (flat 7-button grid: Feed/Clean/Play/Store/Inventory/Tanks/Help, no sub-menus) → 22. Panels
 
 Fish pixel art uses palette indices (0=transparent, 1=body, 2=tail/fin, 3=highlight, 4=dark/eye) mapped to species colors at draw time.
 
@@ -320,12 +320,19 @@ All UI icons use a unified pixel art system (`ICON_DATA`) instead of emoji:
 - `initPixelIcons()` scans `[data-icon]` elements and replaces with pixel art
 - Available icons: coin, broom, food, fish, store, wrench, clipboard, house, help, laser, close, menu, lock, arrow_l, arrow_r, plant, decor, heater, filter, skimmer, uv
 
+### FAB Button
+
+The FAB uses 3 `<span class="fab-line">` elements that animate via CSS transforms:
+- Default: 3 horizontal lines (hamburger)
+- `.open` state: top rotates 45°, middle fades out, bottom rotates -45° (X shape)
+- Pure CSS animation, no image assets
+
 ## Backwards Compatibility
 
-### Migration Pipeline
+### Reconciliation Pipeline
 
 ```
-load → migrateSave(save) → reconcileSaveWithCatalog(save, catalog) → simulate → persist
+load → reconcileSaveWithCatalog(save, catalog) → simulate → persist
 ```
 
 ### Reconciliation Steps
@@ -353,7 +360,7 @@ Organize both `api.js` and `index.html` into clearly separated logical sections 
 - SIMULATION ENGINE — idle catch-up logic
 - ECONOMY — price calculations, validation
 - ACTION HANDLERS — POST action dispatch
-- MIGRATION & RECONCILIATION
+- RECONCILIATION
 - HELPERS — utility functions
 
 ### Pure Functions First
@@ -396,55 +403,41 @@ Test patterns:
 - Batch canvas draw calls, minimize DOM updates
 - Keep late-game saves under 5KB JSON
 
-## Testing Requirements
+## Testing
 
-### Unit Tests (Vitest)
+> Full testing strategy: AQUARIUM_SPEC.md §26
 
-Required test files and what they cover:
+### E2E Tests (Playwright — 223 tests)
 
-| Test Area | Must Verify |
-|---|---|
-| Simulation | Hunger decay, dirt accumulation, weak state, coin generation, 168h cap |
-| Economy | Price curves, buy validation (space/coins/caps), sell returns |
-| Migration | Save version upgrades, missing fields, null handling |
-| Reconciliation | Alias mapping, unknown IDs, size/level clamping, new tank slot creation |
-| Plant growth | Growth over time, min/max bounds, trim reducing size |
-| Floating spread | Determinism (same seed = same result), max clusters cap |
-| Cleaning mask | Deterministic generation, wipe algorithm, proportional rewards |
+| File | Count | Coverage |
+|---|---|---|
+| `games.spec.ts` | 60 | Core: widget load, HUD, menu, panels, tool modes, scenarios |
+| `games-advanced.spec.ts` | 57 | Pixel icons, store purchasing, tank nav, state persistence, sell flows |
+| `games-features.spec.ts` | 50 | Zero-fish, half-space, movement types, fish info, cleaning, floating plants |
+| `games-design.spec.ts` | 56 | Fish sizes, layered decor, territorial, trim/move, full-grown, FAB animation |
 
-### E2E Tests (Playwright)
+Page object: `tests/pages/GamesPage.ts`
 
-Four test files:
-- `tests/e2e/games.spec.ts` (60 tests) — Core smoke tests: widget loads, HUD, menu, panels, tool modes, scenarios
-- `tests/e2e/games-advanced.spec.ts` (57 tests) — Advanced: pixel icons, store purchasing, tank nav, scenario persistence, decor/fish sell, equipment upgrades, dirty tank visuals
-- `tests/e2e/games-features.spec.ts` (50 tests) — v1.2 features: zero-fish tanks, half-space schooling, movement types, fish info panel, cleaning improvements, floating plants, new scenarios, visual rendering, inventory sell flow
-- `tests/e2e/games-design.spec.ts` (45 tests) — v1.3 design overhaul: fish size differentiation, layered decor rendering, territorial fish behavior, plant trim & move, visual rendering stability, decor store integration, tank navigation, long-running stability
-
-Page object at `tests/pages/GamesPage.ts`.
-
-Must verify: widget loads, HUD visible, menu works, panels render, tool modes activate, fish tappable, store functional, pixel icons render, scenario state persists across actions.
+```bash
+# Run all aquarium E2E tests
+npx playwright test tests/e2e/games.spec.ts tests/e2e/games-advanced.spec.ts tests/e2e/games-features.spec.ts tests/e2e/games-design.spec.ts
+```
 
 ### Sandbox Mocks
 
-Located at `apps/sandbox/src/lib/mocks/aquariumMocks.js`. Contains:
-- `createScenarioState(scenarioId)` — 19 full state generators (default, tier-2-ready, tier-2-active, tier-3-endgame, neglected-48h, low-food, dirty-near-threshold, dirty-big-tank, rich, tank-full, tier-3-crowded, multi-tank-decorated, empty-tank, movement-showcase, schooling-showcase, floating-decor, territorial-showcase, lush-planted, size-showcase)
-- `applyDebugScenario(save, scenario)` — 12 mutation actions
+`apps/sandbox/src/lib/mocks/aquariumMocks.js`:
+- `createScenarioState(scenarioId)` — 22 state generators
+- `applyDebugScenario(save, scenario)` — 12 mutations + 3 full-grown scenarios
 - `handleAquariumApi()` — Main handler with `_lastScenarioId` tracking
-- `resetAquariumScenario(scenarioId)` — Skips reset when same scenario already loaded (prevents React useEffect double-fire)
+- Mock storage key: `mock_aquarium_state_v1`
 
-**Critical pattern:** POST requests always use `loadPersistedState()` to avoid recreating state on every action. Only GET requests with changed scenarioId trigger `createScenarioState()`.
+**Critical:** POST requests use `loadPersistedState()` to avoid recreating state on every action. Only GET with changed scenarioId triggers `createScenarioState()`.
 
 ## Widget Platform Constraints
 
-| Constraint | Implementation |
-|---|---|
-| Aspect ratio | `"height": "75%"` in widget.compose.json → 4:3 |
-| No build step | Single `index.html` with inline CSS/JS |
-| State storage | `homey.settings.get/set()` keyed by widget instance ID |
-| API routes | Defined in `widget.compose.json.api`, implemented in `api.js` |
-| Styling | Homey CSS variables `--homey-*` and classes `.homey-*` for native look |
-| Instance ID | `Homey.getWidgetInstanceId()` — async, may return a Promise |
-| Height | Pick ONE method: `widget.compose.json` percentage OR runtime `Homey.setHeight()`. Never both. |
+> Full details: AQUARIUM_SPEC.md §2
+
+Key constraints: single `index.html` (no build step), `Homey.getWidgetInstanceId()` → async, `homey.settings.get/set()` for persistence, `"height": "75%"` for 4:3 ratio (never also call `Homey.setHeight()`), Homey CSS variables `--homey-*` for native look.
 
 ## Fish Movement System
 
@@ -462,26 +455,27 @@ Fish have species-dependent movement controlled by `movementType` in catalog pre
 
 **Zero-fish tanks:** Selling the last fish is allowed. Tanks can be empty and still render normally.
 
-**Fish interaction:** Tap → wiggle in place (2s) → info bubble with stats pills, earning info, traits, sell button → auto-dismiss after 8s.
+**Fish interaction:** Tap → wiggle persists while bubble is open → info bubble with stats pills, earning info, traits, sell button → auto-dismiss after 8s.
 
-**Decor interaction:** Drag-to-move non-floating decor in normal mode. Floating plants drift autonomously with sinusoidal animation. Tap decor to open Decor Card popup (name, size, actions: Trim/Move/Sell).
+**Decor interaction:** Tap to open Decor Card popup (name, size, actions: Trim/Move/Sell). Move button activates drag mode for repositioning. Floating plants drift autonomously with sinusoidal animation.
 
 ## Territorial Fish Behavior
 
-Fish with `nearDecor` preference defend their claimed decor zone:
+Fish with `nearDecor` preference defend their claimed decor zone with tight swim radius:
 
 | Species | Claims | Behavior |
 |---|---|---|
-| `clownfish` | `anemone` | Anemone defense |
-| `moray_eel` | `cave` | Cave lurking, dashes at intruders |
+| `clownfish` | `anemone` | Anemone defense, reduced opacity when nesting (simulates hiding in tentacles) |
+| `moray_eel` | `cave` | Cave lurking, partially hidden (front 40% visible via canvas clipping), dashes at intruders |
 | `firefish` | `brain_coral` | Coral territory |
 | `royal_gramma` | `cave` | Cave entrance defense |
 
 **Implementation:**
 1. Each frame builds `claimedDecorZones` — map of decor positions to owner fish
-2. Owner fish "claims" a zone radius around their preferred decor (decorSize × 0.15 normalized)
-3. Trespassers entering a claimed zone get `dashSpeed = 3.0` (flee)
+2. Owner fish "claims" a zone radius around their preferred decor (territorial zone: moray 0.05, clownfish 0.07, default 0.09)
+3. Trespassers entering a claimed zone (detection radius 0.10) get `dashSpeed = 3.0` (flee)
 4. Owners dash toward trespassers with `dashSpeed = 2.5`
+5. Swim radius: moray 0.04, clownfish 0.06 (tight orbits around claimed decor)
 5. `dashSpeed` decays: `dashSpeed *= (1 - dt * 2)` — burst-then-slow
 6. Speed integration: `baseSpd *= (1 + dashSpeed)`
 7. Same-species fish are not chased
@@ -490,39 +484,19 @@ This creates emergent behavior: fish naturally spread out to avoid territorial z
 
 ## Fish Size Design
 
-Fish sprites use dramatically different dimensions and FISH_BASE_SCALES to create visual size hierarchy:
+> Full details: AQUARIUM_SPEC.md §19.3
 
-| Category | Scale Range | Sprite Size | Species |
-|---|---|---|---|
-| Tiny | 0.65-0.75 | 8×4 to 8×6 | Neon Tetra, Green Chromis, Snail, Shrimp |
-| Small | 0.85 | 10×6 to 10×8 | Guppy, Blue-Eye, Banggai Cardinal |
-| Medium | 1.0-1.2 | 12×6 to 14×4 | Firefish, Royal Gramma, Clownfish, Cleaner Shrimp |
-| Large | 1.3-1.8 | 14×10 to 18×12 | Gourami, Goldfish, Moon Fish, Pleco, Blue Tang |
-| Very Large | 2.0-2.8 | 16×14 to 28×5 | Discus, Moray Eel |
-
-**Design principles:**
-- Tiny schooling fish (0.65 scale) look natural in groups of 10+
-- Large fish (1.8+ scale) visually dominate the tank
-- Each sprite has a distinctive shape: moon fish is tall/round, moray is long/thin, discus is disc-shaped
-- Scale multiplier amplifies the sprite dimension differences
+Fish use `FISH_BASE_SCALES` to create visual size hierarchy from tiny (0.65, schooling) to very large (2.8, moray). Each sprite has a distinctive shape. Scale multiplier amplifies dimension differences.
 
 ## Layered Decoration Rendering
 
-Decorations are split into two render layers for depth:
+> Full details: AQUARIUM_SPEC.md §19
 
-1. **`renderDecorBack(decors, biomeKey)`** — Every 3rd decor item rendered at 55% opacity **before fish** (fish swim in front)
-2. **`renderDecorFront(decors, biomeKey)`** — Remaining decor items at full opacity **after fish** (fish swim behind)
-3. **`drawDecorItem(d, def, color, x, baseSize, subY, biomeKey, isBack)`** — Shared rendering with `isBack` controlling opacity
+Decorations split into two render layers for depth. **Game loop order:** environment → decorBack → equipment → fish → decorFront → food → bubbles → laser → dirt.
 
-**Game loop order:** environment → decorBack → equipment → fish → decorFront → food → bubbles → laser → dirt
-
-**Enhanced decor rendering:**
-- Floating plants: 4-6 lily pads with leaf veins, dangling roots
-- Plants: 2-3 stems with 6-11 leaves on quadratic Bézier curves, 2.5× height
-- Rocks: 4-5 boulders with drop shadows
-- Coral/Anemone: 5-8 animated swaying branches with sub-branches
-- Cave: Dark arch with interior shading and rim highlights
-- Driftwood: Gnarled shape with wood grain texture and moss patches
+- `renderDecorBack()` — Every 3rd decor at 55% opacity (behind fish)
+- `renderDecorFront()` — Remaining decor at full opacity (in front of fish)
+- `drawDecorItem()` — Shared rendering, `isBack` controls opacity
 
 ## Common Patterns
 

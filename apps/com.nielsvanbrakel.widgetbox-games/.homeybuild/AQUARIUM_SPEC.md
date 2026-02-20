@@ -2,6 +2,10 @@
 
 **App:** `com.nielsvanbrakel.widgetbox-games` (Homey WidgetBox)
 **Widget:** `aquarium`
+**Spec version:** 1.4.0
+**Last updated:** 2026-02-19
+
+> See [docs/changelog/](docs/changelog/) for a history of spec changes between versions.
 
 ---
 
@@ -29,11 +33,11 @@
 20. [HUD & Menu System](#20-hud--menu-system)
 21. [Help System](#21-help-system)
 22. [Debug & Development](#22-debug--development)
-23. [Backwards Compatibility & Reconciliation](#23-backwards-compatibility--reconciliation)
+23. [Backwards Compatibility & Migration](#23-backwards-compatibility--migration)
 24. [Game Lifecycle Events](#24-game-lifecycle-events)
 25. [Code Maintenance & Quality](#25-code-maintenance--quality)
-26. [Testing Strategy](#26-testing-strategy)
-[Appendix A: Catalog Content Reference](#appendix-a-catalog-content-reference)
+26. [Implementation Backlog](#26-implementation-backlog)
+27. [Testing Strategy](#27-testing-strategy)
 
 ---
 
@@ -46,24 +50,9 @@ The Aquarium widget is a cozy idle game embedded as a Homey Pro dashboard widget
 - Full decor placement system with x/y positioning and growth mechanics
 - Happiness system with visible penalty breakdowns (required decor, tools)
 - Deterministic cleaning with wipe-mask grid
-- State persisted server-side per widget instance
 - Modular catalog with versioning and ID aliasing for long-running saves
+- State persisted server-side per widget instance
 - Coins are **global** (shared across all tanks); food stock is per-tank
-
-### Reading Guide
-
-| You want to... | Read |
-|---|---|
-| Understand constraints and architecture | §2–§4 |
-| Work on save/load or data model | §5, §23 |
-| Add new fish, decor, food, tools, or tanks | §6, Appendix A |
-| Work on game mechanics | §8–§12 (fish, happiness, decor, plants) |
-| Work on tool modes | §13–§16 (overview, cleaning, feeding, laser) |
-| Work on economy or store | §17–§18 |
-| Work on rendering or visuals | §19 |
-| Work on UI (HUD, menu, panels) | §20–§21 |
-| Write tests or add scenarios | §22, §26 |
-| Understand code standards | §25 |
 
 ---
 
@@ -107,7 +96,7 @@ All game logic lives in `api.js`. The client (`index.html`) is a **dumb renderer
 4. **Progression** — Exponential-ish saving curve for unlocks without becoming grindy.
 5. **Modular & expandable** — New fish, decor, tools, tanks, and biomes can be added without breaking existing saves. The system is designed for future content expansion.
 6. **Server-authoritative** — All mutations happen in `api.js`. Client never directly modifies state.
-7. **Test-driven core** — Simulation, economy, and cleaning must have unit tests.
+7. **Test-driven core** — Simulation, economy, migration, and cleaning must have unit tests.
 
 ---
 
@@ -172,7 +161,7 @@ type Save = {
   activeTankId: TankId;
   tanks: Record<TankId, TankSave>;
 
-  coins: number;                      // GLOBAL currency (shared across all tanks)
+  coins: number;                      // GLOBAL currency (shared across all tanks, since v1.4.0)
 
   lifetime: {
     coinsEarned: number;              // total coins ever earned across all tanks
@@ -192,6 +181,7 @@ type TankSave = {
   id: TankId;
   unlocked: boolean;
 
+  // NOTE: coins moved to Save.coins (global) in v1.4.0 / save version 2
   cleanliness: number;                // 0..100
   lastSeenAt: number;                 // timestamp for idle simulation
 
@@ -481,9 +471,8 @@ The game currently ships with three tank biomes. The system is designed to suppo
 | **ID** | `fresh` |
 | **Unlock** | Free (starting tank) |
 | **Space capacity** | 8 |
-| **Substrate** | Bright sand (`#c8a868`) |
-| **Water tint** | Bright teal `#48b8d0` / `#1a6878` |
-| **Wall** | `#145858` |
+| **Substrate** | Gravel (muted earth tones) |
+| **Water tint** | Light blue-green `#a8d8c8` |
 
 **Fish:** Guppy, Goldfish, Snail (utility, eats algae)
 **Food:** Basic Flakes, Pellets, Algae Wafer
@@ -495,7 +484,7 @@ The game currently ships with three tank biomes. The system is designed to suppo
 | Property | Value |
 |---|---|
 | **ID** | `tropical` |
-| **Unlock** | 1500 lifetime coins |
+| **Unlock** | 500 lifetime coins |
 | **Space capacity** | 14 |
 | **Substrate** | Fine gravel (warm tones) |
 | **Water tint** | Vibrant teal `#40b8d0` |
@@ -510,7 +499,7 @@ The game currently ships with three tank biomes. The system is designed to suppo
 | Property | Value |
 |---|---|
 | **ID** | `salt` |
-| **Unlock** | 5000 lifetime coins + own Heater in tropical |
+| **Unlock** | 2000 lifetime coins + own Heater in tropical |
 | **Space capacity** | 20 |
 | **Substrate** | White sand |
 | **Water tint** | Deep blue `#1a4a7a` |
@@ -631,9 +620,7 @@ Fish with a `nearDecor` preference in their catalog entry will claim a zone arou
 | `royal_gramma` | `cave` | Defends cave entrance |
 
 **Zone mechanics:**
-- Territorial zone radius: moray 0.05, clownfish 0.07, default 0.09 (proportional to decor size)
-- Swim radius: moray 0.04, clownfish 0.06 (tight orbits around claimed decor)
-- Intruder detection radius: 0.10
+- Zone radius is proportional to decor base size (decorSize × 0.15 normalized)
 - Multiple fish can claim different decor items simultaneously
 - Non-territorial fish will flee when they wander into claimed zones
 - Fish that are the same species as the owner are not chased
@@ -651,9 +638,9 @@ Each species has a display scale multiplier applied during rendering so fish app
 | Species | Scale | Sprite | Category |
 |---|---|---|---|
 | `neon_tetra` | 0.65 | 8×4 | Tiny schooling |
-| `green_chromis` | 0.65 | 8×6 | Tiny schooling |
+| `green_chromis` | 0.65 | 8×5 | Tiny schooling |
 | `shrimp` | 0.7 | 10×5 | Tiny crawl |
-| `snail` | 0.75 | 10×8 | Tiny crawl |
+| `snail` | 0.75 | 8×6 | Tiny crawl |
 | `guppy` | 0.85 | 10×6 | Small |
 | `blue_eye` | 0.85 | 10×6 | Small |
 | `banggai_cardinal` | 0.85 | 10×8 | Small schooling |
@@ -662,12 +649,12 @@ Each species has a display scale multiplier applied during rendering so fish app
 | `clownfish` | 1.2 | 12×8 | Medium |
 | `cleaner_shrimp` | 1.0 | 14×4 | Medium crawl |
 | `gourami` | 1.3 | 14×10 | Medium-large |
-| `goldfish` | 1.3 | 12×8 | Large |
+| `goldfish` | 1.6 | 16×10 | Large |
 | `moon_fish` | 1.7 | 14×12 | Large (tall) |
 | `pleco` | 1.8 | 16×8 | Large (flat) |
 | `blue_tang` | 1.8 | 18×12 | Large |
 | `discus` | 2.0 | 16×14 | Very large (disc) |
-| `moray_eel` | 2.8 | 28×4 | Huge (serpentine) |
+| `moray_eel` | 2.8 | 28×5 | Huge (serpentine) |
 
 **Design philosophy:** Fish should be immediately recognizable at a glance. Tiny schooling fish (neon tetras, green chromis) are deliberately small so schools of 10+ look natural. Large fish (discus, moray eel) dominate the visual space. The combination of unique sprite shapes plus scale multipliers creates dramatic size differentiation.
 
@@ -1042,9 +1029,9 @@ This keeps feeding simple: each fish has a list of foods it eats. Drop any accep
 
 - **Cooldown:** 6 hours between rewards
 - **On cooldown expiry + active play session (> 5 seconds):**
-  - Coins: 25 (modest)
-  - XP: 5 per fish in tank
-- Show toast: "+25 coins! Fish had fun!"
+  - Coins: 50 (modest)
+  - XP: 10 per fish in tank
+- Show toast: "+50 coins! Fish had fun!"
 - If on cooldown, still show the play mode (visual fun) but no reward toast
 
 ### 16.3 Implementation
@@ -1060,8 +1047,6 @@ laserReward:
     return { reward: null }
 ```
 
-**Economy constants:** `LASER_REWARD_COINS = 25`, `LASER_REWARD_XP = 5`
-
 ---
 
 ## 17. Store & Economy
@@ -1071,8 +1056,8 @@ laserReward:
 | Source | Amount | Frequency |
 |---|---|---|
 | Fish passive coins | `baseCoinPerHour × happinessMod × levelBonus × lifeStage` | Per hour (idle) |
-| Cleaning reward | `improvement × coinsPer100Dirt` (coinsPer100Dirt = 5) | Per clean session |
-| Play reward | 25 coins | Per 6-hour cooldown |
+| Cleaning reward | `improvement × coinsPer100Dirt` | Per clean session |
+| Play reward | 50 coins | Per 6-hour cooldown |
 
 ### 17.2 Price Growth
 
@@ -1134,8 +1119,8 @@ Store panel shows sections in catalog-defined order:
 | Tank | Requirement | Display |
 |---|---|---|
 | Fresh | Free | "Your starter tank" |
-| Tropical | 1500 lifetime coins | "Earn 1500 coins to unlock" |
-| Salt | 5000 lifetime coins + own Heater in Tropical | "Earn 5000 coins and own a Heater" |
+| Tropical | 500 lifetime coins | "Earn 500 coins to unlock" |
+| Salt | 2000 lifetime coins + own Heater in Tropical | "Earn 2000 coins and own a Heater" |
 
 ### 18.2 In-Store Preview
 
@@ -1173,7 +1158,6 @@ The tank fills the **entire** 4:3 viewport. No desk, no frame, no border. The aq
 | 2. Glass frame | 0.5 | Beveled glass border with highlights, animated shimmer, inner reflection strips, and top reflection bar |
 | 3. Back silhouettes | 1 | Distant plant/rock shapes (biome theme) |
 | 3.5. Light rays | 1.5 | 7 underwater light rays from surface, animated slow drift |
-| 3.6. Animated water surface | 1.6 | Sine wave line at y=5 with amplitude 2.2 + secondary 1.0, shimmer effect above wave |
 | 4. Caustic light | 2 | 12 animated dappled elliptical caustic patterns |
 | 5. Substrate | 3 | 120 varied pebbles (multi-size, multi-shade) with 2-line highlight at substrate top + depth fog above |
 | 6. Rock clusters | 4 | Foreground rock formations (if biome has them) |
@@ -1192,7 +1176,7 @@ The tank fills the **entire** 4:3 viewport. No desk, no frame, no border. The aq
 | 18. HUD | 30 | Coins, bars, tooltip — all icons rendered as pixel art |
 | 19. Tool dock / Tank nav | 40 | Bottom bar controls |
 | 20. Toast | 50 | Notification popups |
-| 21. Menu overlay | 60 | FAB menu flat 7-button grid with pixel art icons |
+| 21. Menu overlay | 60 | FAB menu grid with pixel art icons |
 | 22. Panels | 70 | Store, Inventory, Help, etc. |
 
 ### 19.3 Pixel Art System
@@ -1237,7 +1221,7 @@ All UI icons (HUD, menu, store, panels) use a unified pixel art icon system inst
 - Plants sway with subtle sine-based offset
 - Equipment has rendered pixel art sprites from ICON_DATA with level indicator dots
 - **Layered decor rendering:** Decor is split into back (every 3rd item, 55% opacity) and front (remaining items, full opacity) layers. Fish swim between these layers, creating a natural depth effect. `renderDecorBack()` runs before fish, `renderDecorFront()` runs after fish in the game loop.
-- Decor rendering is highly detailed: floating plants have 4-6 lily pads with leaf veins and 7 dangling roots with varied widths and sub-branching (35% chance); plants have 2-3 stems with 6-11 leaves along quadratic Bézier curves at 2.5× height; rocks have 5-7 irregular polygon shapes with crack lines (moss on live_rock); coral/anemone items have 5-8 animated swaying branches with sub-branches (anemone scaleMult 3.5); caves render as dark arches with interior shading and rim highlights; driftwood shows gnarled profiles with bark grain texture (7 horizontal lines), bark knots, thinner sub-branches, and highlight edge
+- Decor rendering is highly detailed: floating plants have 4-6 lily pads with leaf veins and dangling roots; plants have 2-3 stems with 6-11 leaves along quadratic Bézier curves at 2.5× height; rocks have 4-5 boulders with drop shadows; coral/anemone items have 5-8 animated swaying branches with sub-branches; caves render as dark arches with interior shading and rim highlights; driftwood shows gnarled profiles with wood grain texture and moss patches
 - Pleco rotates when attached to glass walls
 - Food particles set anim.tx/ty to current position after fish consume to prevent snapping
 
@@ -1253,18 +1237,17 @@ All UI icons (HUD, menu, store, panels) use a unified pixel art icon system inst
 
 ### 20.2 FAB Menu
 
-- **Bottom right:** Floating action button with animated hamburger-to-X icon (3 CSS `<span>` lines that morph via CSS transforms on `.open`)
-- **Opens:** Flat 7-button grid (3-column layout):
-  - Row 1: Feed, Clean, Play
-  - Row 2: Store, Inventory, Tanks
-  - Row 3: Help (spans full width, reduced opacity)
-- No sub-menus — all actions accessible in one tap from the main menu
-- Each button uses pixel art icons from ICON_DATA
+- **Bottom right:** Floating action button (hamburger icon)
+- **Opens:** 3×3 grid of menu items:
+  - Feed, Clean, Play
+  - Store, Upgrades, Inventory
+  - Tanks, Help, (Debug — dev only)
 
 ### 20.3 Panels
 
 Full-screen overlays with header (title + close button) and scrollable body:
-- **Store** — Buy fish, food, decor, tools (includes Tools tab for equipment upgrades)
+- **Store** — Buy fish, food, decor, tools
+- **Upgrades** — Equipment upgrades
 - **Inventory** — List of fish with details
 - **Tanks** — Tank switching and unlocking
 - **Help** — Game manual
@@ -1369,9 +1352,6 @@ Available when `debug_mode` setting is enabled:
 | `tank-full` | Fresh tank at 8/8 space (6 fish) |
 | `tier-3-crowded` | Saltwater at 18/20 space (10 fish) |
 | `multi-tank-decorated` | All 3 tanks unlocked with fish, decor, and tools |
-| `full-grown-fresh` | Fresh tank at max capacity, all fish level 10, 30 days old, all decor at maxSize, tools level 3, 50k coins |
-| `full-grown-tropical` | Tropical tank fully stocked with max-level adult fish and max-grown decor |
-| `full-grown-salt` | Saltwater tank fully stocked with max-level adult fish, full decor, all tools level 3 |
 
 ### 22.2 Sandbox Mock Integration
 
@@ -1379,41 +1359,65 @@ The sandbox app (`apps/sandbox/`) must have updated mocks:
 
 - `aquariumMocks.js` contains both `applyDebugScenario()` (action-based) and `createScenarioState()` (state generators)
 - `MockHomey.js` routes widget API calls to mock handlers and passes `scenarioId`
-- Mock state persists in localStorage via `STORAGE_KEY = 'mock_aquarium_state_v1'`
+- Mock state persists in localStorage via `STORAGE_KEY = 'mock_aquarium_state_v2'`
 - **State persistence fix:** `resetAquariumScenario(scenarioId)` skips reset when the same scenario is already loaded, preventing React `useEffect` double-fire from clearing state mid-session
 - `_lastScenarioId` tracking ensures scenario state is only recreated on GET when the scenario actually changes
 - POST requests always use persisted state to avoid resetting on every action
 
 ### 22.3 Playwright E2E Tests
 
-Four test files cover the aquarium widget (223 tests total). See §26.2 for the summary table.
+Two test files cover the aquarium widget:
 
 **`tests/e2e/games.spec.ts`** (60 tests) — Core functionality:
-- Widget loads, HUD, menu (7-button flat grid), all panels, tool modes
-- Store (with Tools tab), inventory, tanks, help panels
-- Feed/clean/laser modes, debug scenarios, HUD tooltips, space capacity
+- Widget loads without errors
+- HUD elements are visible
+- Menu opens/closes
+- Panels render content
+- Tool modes activate correctly
+- Store, inventory, tanks, upgrades, help panels
+- Feed mode, clean mode, laser mode
+- Debug scenario loading and state persistence
 
-**`tests/e2e/games-advanced.spec.ts`** (57 tests) — Advanced flows:
-- Pixel icon system, store purchasing + persistence, tank navigation
-- Scenario state persistence, decor/fish sell flows, equipment upgrades
-- Dirty tank visuals, fish info display, store tabs, panel close behavior
-
-**`tests/e2e/games-features.spec.ts`** (50 tests) — Feature validation:
-- Zero-fish tanks, half-space schooling, movement types
-- Fish info panel (stats, earning, sell, weak, traits, auto-dismiss)
-- Cleaning improvements, floating plants, scenario switching, rendering stability
-
-**`tests/e2e/games-design.spec.ts`** (56 tests) — Design & rendering validation:
-- Fish size differentiation, layered decor depth, territorial behavior
-- Plant trim/move/sell, 10-second stability, full-grown scenarios, FAB animation
+**`tests/e2e/games-advanced.spec.ts`** (57 tests) — Visual overhaul & advanced flows:
+- Pixel icon system rendering (HUD, menu, FAB, bars, tank nav)
+- Store purchasing flow (buy fish/food/decor/tools, coin updates, persistence)
+- Tank navigation (multi-tank switching via nav buttons and tanks panel)
+- Debug scenario state persistence (purchases persist, scenario switching resets)
+- Decor system (inventory display, sell buttons, sell flow, growth info)
+- Inventory details (food stock, fish stats, pixel icons, sell fish)
+- Equipment panel (tools display, pixel icons, upgrades, utility creatures)
+- Laser mode activation and dismissal
+- Dirty tank visual rendering
+- Fish info display without emoji
+- Store tab navigation
+- Panel close behavior
 
 ---
 
-## 23. Backwards Compatibility & Reconciliation
+## 23. Backwards Compatibility & Migration
 
-### 23.1 Catalog Reconciliation
+### 23.1 Migration Framework
 
-On every load:
+```javascript
+function migrateSave(save) {
+  // Each version bump adds a migration step
+  // Example: version 1 → version 2
+  if (save.version < CURRENT_VERSION) {
+    return applyMigrations(save);
+  }
+  return save;
+}
+```
+
+**Migration rules:**
+- Each save schema version has a migration function to the next version
+- Migrations are chained: v1 → v2 → v3, never skip
+- Unknown fields are preserved (forward compatibility)
+- Missing fields get sensible defaults
+
+### 23.2 Catalog Reconciliation
+
+On every load, after migration:
 
 ```javascript
 function reconcileSaveWithCatalog(save, catalog) {
@@ -1459,7 +1463,7 @@ function reconcileSaveWithCatalog(save, catalog) {
 }
 ```
 
-### 23.2 Rules for Future Updates
+### 23.3 Rules for Future Updates
 
 1. **Never rename IDs without aliases.** Add the old→new mapping in `catalog.aliases`.
 2. **Keep simulation rules stable.** Change only catalog balance numbers where possible.
@@ -1483,7 +1487,7 @@ This section documents every event in the game's lifecycle — from first load t
 4. Call GET /api → server:
    a. Load save from homey.settings (keyed by widgetId)
    b. If no save exists → createInitialState()
-   c. If save exists → reconcileSaveWithCatalog(save, catalog)
+   c. If save exists → migrateSave(save) → reconcileSaveWithCatalog(save, catalog)
    d. Run simulate(save) to catch up idle time
    e. Persist updated save
    f. Return { state, catalog snapshot, simResult }
@@ -1638,7 +1642,7 @@ The server file is large by necessity (single file, no build step). Organize it 
 // ═══════════════════════════════════════════
 
 // ═══════════════════════════════════════════
-//  RECONCILIATION
+//  MIGRATION & RECONCILIATION
 // ═══════════════════════════════════════════
 
 // ═══════════════════════════════════════════
@@ -1711,7 +1715,22 @@ function calculateHappiness(fishId) {
 2. Updated sandbox mocks if the data model changes
 3. E2E smoke test for any new UI element or interaction
 
-See §26 for comprehensive test strategy details.
+**Test organization:**
+```
+test/
+  unit/
+    simulation.test.js    # hunger, dirt, weak, coins, growth
+    economy.test.js       # prices, buy validation, sell returns
+    migration.test.js     # save version upgrades
+    reconciliation.test.js # alias mapping, unknown IDs, clamping
+    cleaning.test.js      # mask generation, wipe algorithm
+```
+
+**Test patterns:**
+- Use descriptive test names: `"fish enters weak state when hunger <= 10 for 2+ hours"`
+- Test boundary values: 0, max, just-above-threshold, just-below-threshold
+- Test time-dependent logic with explicit timestamps (don't use `Date.now()` in tests)
+- Test determinism: same inputs MUST produce same outputs (especially RNG-seeded systems)
 
 ### 25.7 Code Review Checklist
 
@@ -1740,49 +1759,210 @@ Before merging any game logic change:
 
 ---
 
-## 26. Testing Strategy
+## 26. Implementation Backlog
 
-### 26.1 Unit Tests (Vitest)
+### EPIC 1 — Widget Foundation
 
-Core systems must have unit tests in a `test/unit/` directory:
-
-| Test File | Must Verify |
-|---|---|
-| `simulation.test.js` | Hunger decay, dirt accumulation (with/without filters/snails), weak state entry/exit, coin generation at various happiness levels, 168h cap, auto-feeder cycles |
-| `economy.test.js` | Fish price growth curve, buy validation (space/coins/caps/requirements), sell returns |
-| `reconciliation.test.js` | Alias mapping, unknown IDs → legacy, size/level clamping, new tank slot creation |
-| `cleaning.test.js` | Deterministic mask generation, wipe algorithm, proportional rewards, auto-complete at epsilon |
-| `plant_growth.test.js` | Growth respects min/max, floating spread determinism, trim reduces size |
-
-**Test patterns:**
-- Descriptive names: `"fish enters weak state when hunger <= 10 for 2+ hours"`
-- Boundary values: 0, max, just-above, just-below threshold
-- Explicit timestamps (no `Date.now()` in tests)
-- Determinism: same inputs MUST produce same outputs (especially RNG-seeded systems)
-
-### 26.2 E2E Tests (Playwright)
-
-Four test files in `tests/e2e/`, 223 tests total:
-
-| File | Count | Coverage |
+| # | Task | Acceptance Criteria |
 |---|---|---|
-| `games.spec.ts` | 60 | Widget loading, HUD, menu, all panels, tool modes, scenarios, HUD tooltips, space capacity |
-| `games-advanced.spec.ts` | 57 | Pixel icons, store purchasing + persistence, tank navigation, scenario state persistence, decor/fish sell, equipment upgrades, dirty tank visuals, panel close behavior |
-| `games-features.spec.ts` | 50 | Zero-fish tanks, half-space schooling, movement types, fish info panel (stats/earning/sell/weak/traits), cleaning, floating plants, scenario switching, rendering stability |
-| `games-design.spec.ts` | 56 | Fish size differentiation, layered decor depth, territorial behavior, plant trim/move/sell, 10-second stability, full-grown scenarios, FAB animation state |
+| 1.1 | Set `height: "75%"` in `widget.compose.json` | 4:3 aspect ratio, no layout shifts |
+| 1.2 | Implement widget API endpoints | GET returns state+catalog, POST handles actions |
+| 1.3 | Add Homey CSS variable usage | Text, menus, tooltips use `--homey-*` vars |
+| 1.4 | Widget instance ID persistence | State persisted per `getWidgetInstanceId()` |
 
-Page object: `tests/pages/GamesPage.ts` — provides helpers for menu, panels, tool modes, wipe gestures, scenario selection, and coin/tier reading.
+### EPIC 2 — Persistence & Backwards Compatibility
 
-### 26.3 Sandbox Scenarios
+| # | Task | Acceptance Criteria |
+|---|---|---|
+| 2.1 | Save schema + storage | Schema persists correctly |
+| 2.2 | Migration framework `migrateSave()` | Version-chained migrations work |
+| 2.3 | Catalog reconciliation `reconcileSaveWithCatalog()` | Aliases mapped, unknowns handled, values clamped |
+| 2.4 | Unit tests for migration + reconciliation | All edge cases covered |
 
-All scenarios are defined in `apps/sandbox/src/lib/scenarios.js` and generated by `createScenarioState()` in `aquariumMocks.js`. See §22.1 for the full scenario list.
+### EPIC 3 — Rendering & Layout
 
-**Key scenario groups:**
-- **Progression:** default → tier-2-ready → tier-2-active → tier-3-endgame
-- **Problem states:** dirty-near-threshold, dirty-big-tank, neglected-48h, low-food
-- **Feature showcases:** empty-tank, movement-showcase, schooling-showcase, floating-decor
-- **Design showcases:** territorial-showcase, lush-planted, size-showcase
-- **Full-grown:** full-grown-fresh, full-grown-tropical, full-grown-salt
+| # | Task | Acceptance Criteria |
+|---|---|---|
+| 3.1 | Full-bleed tank renderer (all layers) | 21-layer stack renders correctly |
+| 3.2 | Biome-specific water gradients + substrates | Distinct visual theme per biome |
+| 3.3 | Input system (tap fish, tap decor, drag modes) | All interactions route correctly |
+| 3.4 | HUD + FAB menu + tooltip system | All elements functional |
+
+### EPIC 4 — Simulation Engine (TDD)
+
+| # | Task | Acceptance Criteria |
+|---|---|---|
+| 4.1 | `simulate()` core (hunger, cleanliness, weak) | Correct idle catch-up for 0–168h |
+| 4.2 | Happiness calculation + breakdown | Matches spec formula, returns breakdown |
+| 4.3 | Coin accrual with happiness modifiers | Correct rates per fish per hour |
+| 4.4 | Unit tests for all simulation functions | Edge cases: 0h, 168h cap, boundary values |
+
+### EPIC 5 — Decor Placement, Growth, Trimming (TDD)
+
+| # | Task | Acceptance Criteria |
+|---|---|---|
+| 5.1 | Place/move/resize decor + persistence | Saved positions survive reload |
+| 5.2 | Plant growth simulation | Growth stops at max, doesn't exceed bounds |
+| 5.3 | Floating plant spread (deterministic seed) | Same day = same spread result |
+| 5.4 | Trim action | Reduces size by step, disabled at min |
+| 5.5 | Unit tests for growth + spread + trim | Determinism verified, bounds checked |
+
+### EPIC 6 — Store & Economy (TDD)
+
+| # | Task | Acceptance Criteria |
+|---|---|---|
+| 6.1 | Store UI with locked/greyed items | Clear block reasons shown |
+| 6.2 | Purchase validation (capacity, caps, requirements) | All constraints enforced |
+| 6.3 | Price growth logic | Prices increase correctly per species |
+| 6.4 | Sell logic | Returns correct percentages |
+| 6.5 | Unit tests for all economy functions | Price curves, edge cases |
+
+### EPIC 7 — Tool Modes (TDD)
+
+| # | Task | Acceptance Criteria |
+|---|---|---|
+| 7.1 | Clean mode (wipe mask) | Deterministic mask, proportional rewards, auto-complete |
+| 7.2 | Feed mode (particles + targeting) | Particles sink, fish target accepted foods |
+| 7.3 | Play mode (laser) | Fish follow, cooldown rewards work |
+| 7.4 | Unit tests for clean mask, feed, play | Mask stability, reward proportionality |
+
+### EPIC 8 — Content (Biomes)
+
+| # | Task | Acceptance Criteria |
+|---|---|---|
+| 8.1 | Fresh Starter catalog | All species, food, decor, visuals |
+| 8.2 | Tropical Planted catalog | Heater/filter gating, discus/gourami requirements |
+| 8.3 | Saltwater Reef catalog | Skimmer/UV gating, schooling fish, anemone/cave |
+| 8.4 | Tank switching UI + unlock rules | Switch works, requirements shown |
+
+### EPIC 9 — Help & Debug
+
+| # | Task | Acceptance Criteria |
+|---|---|---|
+| 9.1 | Help screen with all chapters | Readable, covers all mechanics |
+| 9.2 | Debug scenarios + dev toggle | All scenarios work, hidden in prod |
+
+---
+
+## 27. Testing Strategy
+
+### 27.1 Unit Tests (Vitest)
+
+Core systems must have unit tests. These live alongside the game code or in a test directory.
+
+**Simulation tests:**
+- Hunger decay over various time periods
+- Cleanliness decay with/without filter/snails
+- Weak state entry/exit conditions
+- Coin generation at various happiness levels
+- 168h cap enforcement
+- Auto-feeder cycles
+
+**Economy tests:**
+- Fish price growth curve
+- Buy validation (space, coins, caps, requirements)
+- Sell return calculations
+- Food capacity with silo upgrades
+
+**Migration tests:**
+- Save version upgrades (chained)
+- Edge cases: missing fields, extra fields, null values
+
+**Reconciliation tests:**
+- Alias mapping (old ID → new ID)
+- Unknown IDs become legacy
+- Size clamping to new bounds
+- Tool level clamping to new maxLevel
+- New tanks in catalog create default tank slots
+
+**Plant growth tests:**
+- Growth over time respects min/max
+- Floating plant spread determinism (same seed = same result)
+- Trim reduces size correctly
+
+**Cleaning tests:**
+- Mask generation is deterministic for same inputs
+- Wipe removes correct cells
+- Reward proportional to dirt removed
+- Auto-complete triggers at epsilon threshold
+
+### 27.2 E2E Tests (Playwright)
+
+Four test files in `tests/e2e/`:
+
+**`games.spec.ts`** (60 tests) — Core smoke tests:
+- Widget loads in 4:3 aspect ratio
+- HUD shows coins, cleanliness, hunger
+- Menu FAB opens/closes
+- All panels render
+- Tool modes activate and show dock
+- Fish are visible and tappable
+- Store shows items with prices
+- Tank switching works
+- All 12 debug scenarios load correctly
+
+**`games-advanced.spec.ts`** (57 tests) — Advanced validation:
+- Pixel icon system in HUD, menu, FAB, bars, tank nav
+- Store purchasing (fish, food, decor, tools) with coin verification
+- Tank navigation via nav buttons and tanks panel
+- Scenario state persistence across actions
+- Decor sell flow with coin tracking
+- Fish sell flow with list update verification
+- Equipment upgrades in rich scenario
+- Dirty tank visual and cleanliness bar colors
+- Fish info display without emoji text
+
+**`games-features.spec.ts`** (50 tests) — v1.2 feature validation:
+- Zero-fish tank: empty-tank scenario, sell last fish, buy first fish, empty inventory
+- Half-space schooling: 0.5 space cost in store, schooling showcase with 10+ tetras, capacity display
+- Movement types: movement-showcase scenario, crawl/glass traits in bubble, rendering without errors
+- Fish info panel: stats pills, earning info, sell button, weak warning, trait labels, auto-dismiss
+- Cleaning improvements: consistent dirt pattern, wiping works, saltwater cleaning
+- Floating plants: floating-decor scenario, inventory display, rendering without errors
+- New scenarios: empty-tank, movement-showcase, schooling-showcase, floating-decor
+- Visual rendering: no JS errors across all scenarios, proper dimensions, tier verification
+- Inventory sell flow: sell all fish, coin updates, sell last fish to empty
+
+**`games-design.spec.ts`** (45 tests) — v1.3 design overhaul validation:
+- Fish size differentiation: tiny schooling fish visible, large fish (discus/moray) visually dominant, all 18 species render at correct scales, size-showcase scenario loads all sizes
+- Layered decoration rendering: lush-planted scenario renders, back/front decor layers create depth, large plants fill visual space, multiple decor types coexist
+- Territorial fish behavior: territorial-showcase loads, clownfish/moray/firefish/royal_gramma listed in store, canvas renders continuously without errors during territorial interactions
+- Plant trim & move: decor card popup on tap, trim button present for growable plants, move interaction via drag, sell decor flow with coin update
+- Visual rendering stability: all design scenarios render without JS errors, proper 4:3 dimensions, 10-second sustained rendering tests for territorial, size, and lush-planted scenarios
+- Decor store integration: anemone/cave/brain_coral purchasable, decor appears in inventory after purchase
+- Tank navigation: navigate between tanks in multi-tank scenarios, verify biome-specific content loads
+
+### 27.3 Sandbox Scenarios
+
+Updated scenarios in `apps/sandbox/src/lib/scenarios.js`:
+
+**Progression group:**
+- Fresh start (new player)
+- Mid-game (tropical unlocked, some fish)
+- Late-game (all tanks, multiple species)
+
+**Problem states:**
+- Dirty tank (cleanliness: 5)
+- Hungry fish (all hunger < 20)
+- All fish weak
+- Missing requirements (clownfish without anemone)
+
+**Features:**
+- Max plants (all at max growth)
+- Full tank (at space capacity)
+- Clean mode active (dirty mask visible)
+- Feed mode active (food particles dropping)
+
+**New Features (v1.2):**
+- Empty tank (zero fish, decor present)
+- Movement showcase (all movement types: normal, crawl, glass, snake, schooling)
+- Schooling showcase (10 neon tetras + pleco + moon fish, demonstrates leader-following)
+- Floating decor (multiple floating plants with drift animation)
+
+**Design Overhaul (v1.3):**
+- Territorial showcase (10 salt fish defending anemone, cave, and brain coral zones)
+- Lush planted (dense tropical tank with 8 decor items — oversized plants, floating plants, mossy log, hollow stump)
+- Size showcase (all fish sizes from tiny chromis to huge moray in salt + tetras to discus in tropical)
 
 ---
 
@@ -1885,6 +2065,48 @@ All scenarios are defined in `apps/sandbox/src/lib/scenarios.js` and generated b
 | `staghorn_coral` | Staghorn Coral | 55 | any | No |
 | `cave` | Cave | 100 | bottom | No. Max 1 per tank |
 | `sea_fan` | Sea Fan | 40 | any | No (sways) |
+
+---
+
+## v1.4.0 — Economy & UX Overhaul
+
+### Economy
+- **Global coins**: Coins are now shared across all tanks (save.coins). Save version bumped to 2 with migration.
+- **Starting coins**: 50 at save level.
+- **Reduced cleaning reward**: coinsPer100Dirt reduced from 30 to 10 (3x less).
+- **Fish rebalancing**: 9 species adjusted for space cost, price, and coin rate.
+
+### New Content
+- **4 new plant species**: Vallisneria, Anubias (fresh tank); Cryptocoryne, Ludwigia (tropical tank).
+- Each plant species has unique visual rendering.
+
+### Visual Improvements
+- Light rays extend to 95% tank depth (was 70%).
+- Animated water surface with natural sine wave motion.
+- Filter equipment generates flow parameter (0.3/0.6 at level 1/2) that causes plant sway.
+- Improved fish sprites for better realism.
+- Moss ball renders as realistic sphere with radial gradient.
+- Anemone 2.5x larger with base/foot and more tentacles (12-17) for clownfish nesting.
+- Cave enlarged 1.8x wider, 1.6x taller with rock texture for moray housing.
+- Driftwood 2.2x taller with branching arms.
+
+### Fish Behavior
+- Territorial fish stay close to their decor (tight swim radius).
+- Moray partially hidden in cave (front 40% visible via canvas clipping).
+- Clownfish opacity reduction when nesting in anemone.
+- Fish wiggle persists while info bubble is open (was 2-second timer).
+
+### UI/UX
+- Menu restructured into sub-categories: Actions (Feed/Clean/Play), Manage (Store/Tools/Fish/Tanks), Help.
+- Back button in sub-menus.
+- Popover menus (fish bubble, decor card) clamp to widget bounds (no overflow).
+- HUD fades during cleaning mode to avoid blocking wipe (hud-muted class).
+- Plant interaction: tap to show card (trim/sell/move), dedicated Move button for repositioning.
+
+### Technical
+- Save version: 1 → 2 (migration moves tank.coins to save.coins).
+- Mock storage key: v2 → v3.
+- E2E tests and page objects updated for sub-menu navigation.
 
 ---
 
