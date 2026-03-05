@@ -1,7 +1,7 @@
 {
   "_comment": "This file is generated. Please edit .homeycompose/app.json instead.",
   "id": "com.nielsvanbrakel.widgetbox-windy",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "compatibility": ">=12.3.0",
   "sdk": 3,
   "platforms": [
@@ -18,7 +18,7 @@
   "category": [
     "tools"
   ],
-  "brandColor": "#4A90A4",
+  "brandColor": "#a70500",
   "permissions": [],
   "images": {
     "small": "/assets/images/small.png",
@@ -142,7 +142,7 @@
             "en": "Enter the latitude of your location (e.g. 52.22)",
             "nl": "Voer de breedtegraad van je locatie in (bijv. 52.22)"
           },
-          "value": "52.22"
+          "value": ""
         },
         {
           "id": "level",
@@ -187,7 +187,7 @@
             "en": "Enter the longitude of your location (e.g. 6.01)",
             "nl": "Voer de lengtegraad van je locatie in (bijv. 6.01)"
           },
-          "value": "6.01"
+          "value": ""
         },
         {
           "id": "marker",

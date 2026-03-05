@@ -14,9 +14,9 @@ test.describe('Windy Widget', () => {
     test('should load with default settings', async () => {
         await windy.verifyLoaded();
 
-        // Check default URL parameters
-        await windy.verifySrcContains('lat=52.22');
-        await windy.verifySrcContains('lon=6.01');
+        // Check default URL parameters (lat/lon defaults are empty)
+        await windy.verifySrcContains('lat=');
+        await windy.verifySrcContains('lon=');
         await windy.verifySrcContains('zoom=5');
         await windy.verifySrcContains('overlay=wind');
     });
