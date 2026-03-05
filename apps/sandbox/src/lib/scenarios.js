@@ -48,6 +48,8 @@ export const SCENARIOS = {
         'full-grown-fresh':     { label: 'Full Grown Fresh Tank',      type: 'mock', group: 'Full Grown' },
         'full-grown-tropical':  { label: 'Full Grown Tropical Tank',   type: 'mock', group: 'Full Grown' },
         'full-grown-salt':      { label: 'Full Grown Salt Tank',       type: 'mock', group: 'Full Grown' },
+        'depth-row-showcase':   { label: '3-Row Depth Showcase',       type: 'mock', group: 'v3 Visual' },
+        'hiding-showcase':      { label: 'Fish Hiding Behavior',       type: 'mock', group: 'v3 Visual' },
     }
 };
 

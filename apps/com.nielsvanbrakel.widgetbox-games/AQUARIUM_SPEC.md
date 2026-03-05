@@ -224,6 +224,7 @@ type DecorSave = {
 
   x: number;                          // normalized 0..1
   y: number;                          // normalized 0..1
+  depthRow: 0 | 1 | 2;               // depth layer: 0=back, 1=mid (default), 2=front
   size: number;                       // 0.5..2.0 (current size, affected by growth)
 
   placedAt: number;                   // timestamp
@@ -598,8 +599,10 @@ Fish have species-dependent movement patterns. The `movementType` field in catal
 | `hide` | Stays mostly behind/inside cave or large decor |
 
 **Special behaviors:**
-- Clownfish gravitates toward nearest Anemone decor
-- Moray Eel uses `snake` movement — serpentine body undulation, stays in bottom zone near Cave
+- Clownfish gravitates toward nearest Anemone decor — when very close, partially disappears into tentacles (body clipping + opacity reduction down to 0.25)
+- Moray Eel uses `snake` movement — serpentine body undulation, stays in bottom zone near Cave; when near any shelter or cover decor (`SHELTER_DECORS`: cave, hollow_stump, mossy_log, driftwood; `HIDING_COVER_DECORS`: plants, anemone, sea_fan, staghorn_coral), clips to show only head emerging (20-100% visible depending on distance)
+- Royal Gramma and Firefish fade behind their host decor when very close (opacity reduction)
+- Any fish swimming through dense plant foliage gets subtle transparency (0.7 opacity)
 - Discus swims near plant clusters
 - Gourami patrols the top zone near floating plants
 - Pleco uses `glass` movement — targets glass walls (x=0.04 or x=0.96) with 12% chance of switching sides; rendered rotated vertically (head up) when attached to glass
@@ -646,28 +649,27 @@ Fish with a `nearDecor` preference in their catalog entry will claim a zone arou
 
 **Species Base Scales (`FISH_BASE_SCALES`):**
 
-Each species has a display scale multiplier applied during rendering so fish appear at species-appropriate sizes. Sprite dimensions vary dramatically (8×4 for tiny schooling fish to 28×5 for moray eel) and scales amplify this further:
+Each species has a display scale multiplier applied during rendering so fish appear at species-appropriate sizes. Sprite dimensions vary dramatically (10×7 for tiny schooling fish to 36×4 for moray eel) and scales amplify this further. All sprites were redesigned with anatomically detailed side-view profiles:
 
 | Species | Scale | Sprite | Category |
 |---|---|---|---|
-| `neon_tetra` | 0.65 | 8×4 | Tiny schooling |
-| `green_chromis` | 0.65 | 8×6 | Tiny schooling |
-| `shrimp` | 0.7 | 10×5 | Tiny crawl |
-| `snail` | 0.75 | 10×8 | Tiny crawl |
-| `guppy` | 0.85 | 10×6 | Small |
-| `blue_eye` | 0.85 | 10×6 | Small (half-space 0.5) |
-| `banggai_cardinal` | 0.85 | 10×8 | Small schooling |
-| `firefish` | 1.1 | 12×6 | Medium |
-| `royal_gramma` | 1.1 | 12×6 | Medium |
-| `clownfish` | 1.2 | 12×8 | Medium |
-| `cleaner_shrimp` | 1.0 | 14×4 | Medium crawl |
-| `gourami` | 1.3 | 16×12 | Medium-large |
-| `goldfish` | 1.3 | 14×10 | Large |
-| `moon_fish` | 1.7 | 16×14 | Large (tall) |
-| `pleco` | 1.8 | 22×8 | Large (flat) |
-| `blue_tang` | 1.8 | 20×14 | Large |
-| `discus` | 2.0 | 20×16 | Very large (disc) |
-| `moray_eel` | 3.0 | 32×3 | Huge (serpentine) |
+| `neon_tetra` | 0.65 | 12×6 | Tiny schooling — torpedo body, iridescent stripe |
+| `green_chromis` | 0.65 | 10×7 | Tiny schooling — iridescent green-blue |
+| `cleaner_shrimp` | 0.7 | 16×9 | Tiny crawl — swept antennae, walking legs |
+| `snail` | 0.75 | 12×9 | Tiny crawl — spiral shell, eye stalks |
+| `guppy` | 0.85 | 14×8 | Small — streamlined body, fan tail |
+| `blue_eye` | 0.75 | 12×7 | Small — oversized reflective eye |
+| `banggai_cardinal` | 0.85 | 14×10 | Small schooling — bold stripes, tassels |
+| `firefish` | 1.1 | 18×10 | Medium — tall dorsal spine, fire gradient |
+| `royal_gramma` | 1.1 | 16×10 | Medium — bicolor purple/yellow split |
+| `clownfish` | 1.2 | 16×10 | Medium — 3 white bands with black edges |
+| `gourami` | 1.4 | 18×14 | Medium-large — trailing pelvic feelers |
+| `goldfish` | 1.2 | 16×12 | Large — flowing double-lobed tail |
+| `moon_fish` | 1.6 | 18×16 | Large (tall) — elongated dorsal/anal fins |
+| `pleco` | 1.7 | 24×9 | Large (flat) — bony scute plates, barbels |
+| `blue_tang` | 1.7 | 22×15 | Large — Dory-like, yellow tail |
+| `discus` | 1.8 | 22×18 | Very large — near-perfect disc, vertical banding |
+| `moray_eel` | 3.0 | 36×4 | Huge — sinuous, mottled, visible jaw |
 
 **Design philosophy:** Fish should be immediately recognizable at a glance. Tiny schooling fish (neon tetras, green chromis) are deliberately small so schools of 10+ look natural. Large fish (discus, moray eel) dominate the visual space. The combination of unique sprite shapes plus scale multipliers creates dramatic size differentiation.
 
@@ -786,7 +788,10 @@ Once conditions are met for 1 tick (next simulation), `weak` becomes `false` and
 Decor items are placed in the tank with:
 - `x`: normalized 0..1 (left to right)
 - `y`: normalized 0..1 (top to bottom)
+- `depthRow`: 0, 1, or 2 — depth layer (0=back, 1=mid default, 2=front)
 - `size`: 0.5..2.0 (scalar multiplier on base sprite)
+
+The `depthRow` field controls which depth layer the decor renders in. Old saves without `depthRow` default to 1 (mid) via `(d.depthRow ?? 1)`. The `buy_decor` and `move_decor` actions accept `depthRow` in their payload.
 
 ### 11.2 Placement Zones
 
@@ -1169,19 +1174,20 @@ The tank fills the **entire** 4:3 viewport. No desk, no frame, no border. The aq
 
 | Layer | Z-Index | Description |
 |---|---|---|
-| 1. Water gradient | 0 | Biome-specific 3-stop gradient: light top, mid-tone center, darkened bottom (uses `shadeColor` helper) |
+| 1. Water gradient | 0 | Biome-specific 4-stop gradient with volumetric depth |
 | 2. Glass frame | 0.5 | Beveled glass border with highlights, animated shimmer, inner reflection strips, and top reflection bar |
-| 3. Back silhouettes | 1 | Distant plant/rock shapes (biome theme) |
-| 3.5. Light rays | 1.5 | 7 underwater light rays from surface, animated slow drift |
+| 3. Back wall ambient | 1 | Left/right edge darkening gradient for 3D depth feel |
+| 3.5. Volumetric god rays | 1.5 | 8 underwater light rays from surface with per-ray alpha variation |
 | 3.6. Animated water surface | 1.6 | Sine wave line at y=5 with amplitude 2.2 + secondary 1.0, shimmer effect above wave |
-| 4. Caustic light | 2 | 12 animated dappled elliptical caustic patterns |
-| 5. Substrate | 3 | 120 varied pebbles (multi-size, multi-shade) with 2-line highlight at substrate top + depth fog above |
+| 4. Caustic light | 2 | 14 animated dappled elliptical caustic patterns (subtler alpha) |
+| 5. Sand ripples | 2.5 | 5 undulating light/dark bands over substrate for texture |
+| 5.5. Substrate | 3 | 150 varied pebbles (multi-size, multi-shade) with depth fog above |
 | 6. Rock clusters | 4 | Foreground rock formations (if biome has them) |
-| 7. **Back decor layer** | 5 | Every 3rd decor item rendered at 55% opacity (behind fish for depth) |
+| 7. **Back decor layer (row 0)** | 5 | Decor items with `depthRow: 0` — opacity 0.50, scale 0.82, yShift -4 |
 | 8. Equipment | 6 | Filter, heater, skimmer, UV sterilizer rendered as pixel art sprites on right wall, vertically centered in water column, with semi-transparent mounting plate and level indicator dots. Filter emits bubbles every 300ms proportional to level. |
-| 9. Fish sprites | 7 | All fish, pixel-rendered with species data and FISH_BASE_SCALES |
-| 10. Movement-type sprites | 8 | Crawl (snail/shrimp on substrate), glass (pleco on walls, vertical), snake (moray undulation) |
-| 10.5. **Front decor layer** | 8.5 | Remaining decor items at full opacity (in front of fish for depth) |
+| 9. **Mid decor layer (row 1)** | 6.5 | Decor items with `depthRow: 1` (default) — opacity 0.85, scale 1.00 |
+| 10. Fish sprites | 7 | All fish, pixel-rendered with species data and FISH_BASE_SCALES |
+| 10.5. **Front decor layer (row 2)** | 8.5 | Decor items with `depthRow: 2` — opacity 1.00, scale 1.12, yShift +3 |
 | 11. Food particles | 9 | Active food dropping/sinking |
 | 12. Bubbles | 10 | Ambient rising bubbles |
 | 13. Ambient particles | 11 | Floating dust motes |
@@ -1197,22 +1203,25 @@ The tank fills the **entire** 4:3 viewport. No desk, no frame, no border. The aq
 
 ### 19.3 Pixel Art System
 
-Fish are rendered as pixel art sprites with palette swapping:
+Fish are rendered as pixel art sprites with extended palette swapping:
 
 ```
 Palette indices:
   0 = transparent
-  1 = body color
-  2 = tail/fin color
-  3 = highlight/accent
-  4 = dark detail / eye
+  1 = body base color
+  2 = secondary / fin color
+  3 = highlight / accent stripe
+  4 = dark detail / eye / markings
+  5 = tertiary (lateral line, banding, spots)
+  6 = contrast detail (eye ring, band edges)
+  7 = brightest highlight (eye reflection, fin tips)
 ```
 
-Each fish species has a `px` array (2D grid of palette indices) and a `color` map. The renderer maps indices to actual colors at draw time, allowing easy palette variations.
+Each fish species has a `px` array (2D grid of palette indices) and a `color` map. The renderer maps indices to actual colors at draw time. Sprites use anatomically accurate side-view profiles with realistic proportions. The expanded 7-index palette allows for lateral lines, eye reflections, fin gradients, and species-specific markings.
 
 ### 19.3.1 Pixel Icon System (ICON_DATA)
 
-All UI icons (HUD, menu, store, panels) use a unified pixel art icon system instead of emoji. The `ICON_DATA` dictionary maps icon names to 8×8 pixel grids with palette entries. Icons are rendered to canvas and cached as data URIs.
+All UI icons (HUD, menu, store, panels) use a unified pixel art icon system instead of emoji. The `ICON_DATA` dictionary maps icon names to 5×5–9×9 pixel grids with up to 7 palette entries. Icons are rendered to canvas and cached as data URIs. Key icons (coin, fish, store, laser) use larger grids (9×9) with richer gradients for more visual detail.
 
 **Available icons:** `coin`, `broom`, `food`, `fish`, `store`, `wrench`, `clipboard`, `house`, `help`, `laser`, `close`, `menu`, `lock`, `arrow_l`, `arrow_r`, `plant`, `decor`, `heater`, `filter`, `skimmer`, `uv`
 
@@ -1236,7 +1245,8 @@ All UI icons (HUD, menu, store, panels) use a unified pixel art icon system inst
 - Bubbles rise with sine-wave wobble
 - Plants sway with subtle sine-based offset
 - Equipment is rendered on the right wall of the tank, vertically centered in the water column, with a semi-transparent mounting plate behind each icon. Filter equipment emits bubbles every 300ms, with bubble count proportional to filter level.
-- **Layered decor rendering:** Decor is split into back (every 3rd item, 55% opacity) and front (remaining items, full opacity) layers. Fish swim between these layers, creating a natural depth effect. `renderDecorBack()` runs before fish, `renderDecorFront()` runs after fish in the game loop.
+- **3-Row Depth Layer System:** Decor items have a `depthRow` field (0=back, 1=mid, 2=front, default 1). Each row has distinct visual properties configured in `DEPTH_ROW_CONFIG`: row 0 (opacity 0.50, scale 0.82, yShift -4), row 1 (opacity 0.85, scale 1.00), row 2 (opacity 1.00, scale 1.12, yShift +3). `renderDecorRow(decors, biomeKey, row)` renders each layer. Render order: back row → equipment → mid row → fish → front row, creating a convincing 3D depth parallax effect.
+- **Host-plant hiding:** Fish with `nearDecor` preferences can visually hide in their host decor. Moray eels clip to show only head portion when near any shelter or plant decor (`SHELTER_DECORS`, `HIDING_COVER_DECORS`). Clownfish partially disappear into anemone tentacles with body clipping and opacity reduction. Other territorial fish (royal_gramma, firefish) fade behind their host decor. Any fish swimming through dense plant foliage gets subtle transparency.
 - Decor rendering is highly detailed: floating plants have 4-6 lily pads with leaf veins and 7 dangling roots with varied widths and sub-branching (35% chance); plants have 2-3 stems with 6-11 leaves along quadratic Bézier curves at 2.5× height; rocks have 5-7 irregular polygon shapes with crack lines (moss on live_rock); coral/anemone items have 5-8 animated swaying branches with sub-branches (anemone scaleMult 3.5); caves render as dark arches with interior shading and rim highlights; driftwood renders as spider wood with root flare at substrate base, wide trunk (20% of baseSize) reaching 55% of water height, 8 branching arms with sub-branches and taper tips, and deep bark grain texture (10 grain lines + 3 knots); treasure chest has wooden body with planks, metal bands, gold lock plate, breathing lid animation, gold glint inside, and periodic bubble emission; sunken ship renders as tilted hull with planks, broken mast, tattered sail, porthole windows, and algae patches
 - Pleco rotates when attached to glass walls
 - Food particles set anim.tx/ty to current position after fish consume to prevent snapping

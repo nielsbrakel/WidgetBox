@@ -4,7 +4,7 @@
 
 Embeds the powerful Windy.com visualization map.
 
-> **⚠️ iOS Notice:** This widget does not work on iOS dashboards due to a limitation of the Homey app. It does work on Android and web devices.
+> **iOS Notice:** This widget does not work on iOS dashboards due to a limitation of the Homey app. It does work on Android and web devices.
 
 ## Features
 *   **Layers**: View Wind, Temperature, Rain, Clouds, or Pressure.

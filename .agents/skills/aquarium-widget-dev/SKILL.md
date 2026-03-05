@@ -48,7 +48,8 @@ tests/e2e/games.spec.ts                        # Playwright E2E tests (60 tests)
 tests/e2e/games-advanced.spec.ts               # Advanced E2E tests (57 tests)
 tests/e2e/games-features.spec.ts               # v1.2 feature E2E tests (50 tests)
 tests/e2e/games-design.spec.ts                 # v1.3 design overhaul E2E tests (56 tests)
-tests/e2e/games-v2.spec.ts                     # v2 visual overhaul E2E tests (40+ tests)
+tests/e2e/games-v2.spec.ts                     # v2 visual overhaul E2E tests (45 tests)
+tests/e2e/games-v3.spec.ts                     # v3 visual redesign E2E tests (47 tests)
 tests/pages/GamesPage.ts                       # Page object for E2E
 ```
 
@@ -117,7 +118,7 @@ type FishSave = {
 
 type DecorSave = {
   id: string; decorId: string;
-  x: number; y: number; size: number;
+  x: number; y: number; depthRow: 0 | 1 | 2; size: number;
   placedAt: number; state?: { lastSpreadAt?: number };
 };
 ```
@@ -304,17 +305,19 @@ fishPrice = basePrice × growthFactor ^ ownedCountOfSpecies
 
 ## Rendering Layers (Bottom to Top)
 
-1. Water gradient (3-stop, biome-specific) → 2. Glass frame (animated shimmer + reflections) → 3. Back silhouettes → 3.5. Light rays (7 animated, 95% tank height) → 3.6. Animated water surface (sine wave at y=5, amplitude 2.2+1.0, shimmer) → 4. Caustic light (12 animated ellipses) → 5. Substrate (120 varied pebbles + 2-line highlight + depth fog) →
-6. Rock clusters → 7. **Back decor layer** (every 3rd item, 55% opacity — behind fish for depth) → 8. Equipment (on right wall, vertically centered, with mounting plate + filter bubbles) → 9. Fish (FISH_BASE_SCALES applied) → 10. Movement-type sprites (crawl/glass/snake) → 10.5. **Front decor layer** (remaining items, full opacity — in front of fish for depth) →
+1. Water gradient (4-stop, biome-specific, volumetric) → 2. Glass frame (animated shimmer + reflections) → 3. Back wall ambient (left/right edge darkening) → 3.5. Volumetric god rays (8 animated, per-ray alpha variation) → 3.6. Animated water surface (sine wave at y=5, amplitude 2.2+1.0, shimmer) → 4. Caustic light (14 animated ellipses, subtler alpha) → 5. Sand ripples (5 undulating bands) → 5.5. Substrate (150 varied pebbles + depth fog) →
+6. Rock clusters → 7. **Back decor layer (row 0)** (opacity 0.50, scale 0.82, yShift -4) → 8. Equipment (on right wall, vertically centered, with mounting plate + filter bubbles) → 9. **Mid decor layer (row 1)** (default, opacity 0.85, scale 1.00) → 10. Fish (FISH_BASE_SCALES applied) → 10.5. **Front decor layer (row 2)** (opacity 1.00, scale 1.12, yShift +3) →
 11. Food particles → 12. Bubbles → 13. Ambient particles → 14. Dirt overlay (seeded cells + edge film, **above substrate only**, visible when cleanliness < 95%) →
 15. Laser dot → 16. Float text → 17. Fish bubble (stats pills, earning info, traits, sell button — clamped to widget bounds) → 18. HUD (pixel art icons, fades during cleaning with hud-muted class) →
 19. Tool dock → 20. Toast → 21. Menu (flat 7-button grid: Feed/Clean/Play/Store/Inventory/Tanks/Help, no sub-menus) → 22. Panels
 
-Fish pixel art uses palette indices (0=transparent, 1=body, 2=tail/fin, 3=highlight, 4=dark/eye) mapped to species colors at draw time.
+Fish pixel art uses extended palette indices (0=transparent, 1-7=body/fin/highlight/detail/lateral/contrast/bright) mapped to species colors at draw time. All 17 species have anatomically accurate side-view sprites.
 
 ### Pixel Icon System
 
 All UI icons use a unified pixel art system (`ICON_DATA`) instead of emoji:
+- Icons range from 5×5 to 9×9 pixel grids with up to 7 palette entries
+- Key icons (coin, fish, store, laser) use larger 9×9 grids with richer gradients
 - `renderPixelIcon(name, size)` renders to canvas, returns data URI
 - `iconCache` prevents recomputation
 - `iconImg(name, size)` returns `<img>` HTML string for panel templates
@@ -408,27 +411,28 @@ Test patterns:
 
 > Full testing strategy: AQUARIUM_SPEC.md §26
 
-### E2E Tests (Playwright — 260+ tests)
+### E2E Tests (Playwright — 310+ tests)
 
 | File | Count | Coverage |
 |---|---|---|
 | `games.spec.ts` | 60 | Core: widget load, HUD, menu, panels, tool modes, scenarios |
 | `games-advanced.spec.ts` | 57 | Pixel icons, store purchasing, tank nav, state persistence, sell flows |
-| `games-features.spec.ts` | 50 | Zero-fish, half-space, movement types, fish info, cleaning, floating plants |
-| `games-design.spec.ts` | 56 | Fish sizes, layered decor, territorial, trim/move, full-grown, FAB animation |
-| `games-v2.spec.ts` | 40+ | v2 visual overhaul: sunken ship, blue-eye half-space, store icons, equipment + filter bubbles, spider wood, panel close → menu, debug tools, treasure chest |
+| `games-features.spec.ts` | 63 | Zero-fish, half-space, movement types, fish info, cleaning, floating plants |
+| `games-design.spec.ts` | 40 | Fish sizes, layered decor, territorial, trim/move, full-grown, FAB animation |
+| `games-v2.spec.ts` | 45 | v2 visual overhaul: sunken ship, blue-eye half-space, store icons, equipment + filter bubbles, spider wood, panel close → menu, debug tools, treasure chest |
+| `games-v3.spec.ts` | 47 | v3 visual redesign: 3-row depth system, depthRow buy/move, backward compat, fish hiding, redesigned sprites, enhanced environment, pixel icons, stress tests |
 
 Page object: `tests/pages/GamesPage.ts`
 
 ```bash
 # Run all aquarium E2E tests
-npx playwright test tests/e2e/games.spec.ts tests/e2e/games-advanced.spec.ts tests/e2e/games-features.spec.ts tests/e2e/games-design.spec.ts tests/e2e/games-v2.spec.ts
+npx playwright test tests/e2e/games.spec.ts tests/e2e/games-advanced.spec.ts tests/e2e/games-features.spec.ts tests/e2e/games-design.spec.ts tests/e2e/games-v2.spec.ts tests/e2e/games-v3.spec.ts
 ```
 
 ### Sandbox Mocks
 
 `apps/sandbox/src/lib/mocks/aquariumMocks.js`:
-- `createScenarioState(scenarioId)` — 22 state generators
+- `createScenarioState(scenarioId)` — 24 state generators
 - `applyDebugScenario(save, scenario)` — 12 mutations + 3 full-grown scenarios
 - `handleAquariumApi()` — Main handler with `_lastScenarioId` tracking
 - Mock storage key: `mock_aquarium_state_v1`
@@ -467,10 +471,15 @@ Fish with `nearDecor` preference defend their claimed decor zone with tight swim
 
 | Species | Claims | Behavior |
 |---|---|---|
-| `clownfish` | `anemone` | Anemone defense, reduced opacity when nesting (simulates hiding in tentacles) |
-| `moray_eel` | `cave` | Cave lurking, partially hidden (front 40% visible via canvas clipping), dashes at intruders |
-| `firefish` | `brain_coral` | Coral territory |
-| `royal_gramma` | `cave` | Cave entrance defense |
+| `clownfish` | `anemone` | Anemone defense, body clipping + opacity reduction when nesting (disappears into tentacles, 25-100% visible) |
+| `moray_eel` | `cave` | Hides in any shelter or cover decor (cave, plants, driftwood etc.), head-only visible (20-100%), dashes at intruders |
+| `firefish` | `brain_coral` | Coral territory, fades behind host decor when close |
+| `royal_gramma` | `cave` | Cave entrance defense, fades behind host decor when close |
+
+**Cover decor sets:**
+- `SHELTER_DECORS`: cave, hollow_stump, mossy_log, driftwood — structural hiding
+- `HIDING_COVER_DECORS`: hornwort, vallisneria, anubias, java_fern, amazon_sword, cryptocoryne, ludwigia, anemone, sea_fan, staghorn_coral — plant/coral cover
+- Any fish swimming through dense plant foliage gets subtle transparency (0.7 opacity)
 
 **Implementation:**
 1. Each frame builds `claimedDecorZones` — map of decor positions to owner fish
@@ -488,17 +497,24 @@ This creates emergent behavior: fish naturally spread out to avoid territorial z
 
 > Full details: AQUARIUM_SPEC.md §19.3
 
-Fish use `FISH_BASE_SCALES` to create visual size hierarchy from tiny (0.65, schooling) to very large (3.0, moray). Each sprite has a distinctive shape with enlarged dimensions for better recognition (goldfish 14×10, discus 20×16, moray 32×3). Scale multiplier amplifies dimension differences.
+Fish use `FISH_BASE_SCALES` to create visual size hierarchy from tiny (0.65, schooling) to very large (3.0, moray). All 17 species have anatomically detailed side-view sprites with enlarged dimensions for realistic profiles (guppy 14×8, goldfish 16×12, discus 22×18, moray 36×4). Extended 7-index palettes support lateral lines, eye reflections, fin gradients, and species-specific markings.
 
-## Layered Decoration Rendering
+## 3-Row Depth Layer System
 
-> Full details: AQUARIUM_SPEC.md §19
+> Full details: AQUARIUM_SPEC.md §19.2
 
-Decorations split into two render layers for depth. **Game loop order:** environment → decorBack → equipment → fish → decorFront → food → bubbles → laser → dirt.
+Decorations use a 3-row depth system for convincing 3D parallax. Each decor instance has a `depthRow` field (0, 1, or 2, default 1).
 
-- `renderDecorBack()` — Every 3rd decor at 55% opacity (behind fish)
-- `renderDecorFront()` — Remaining decor at full opacity (in front of fish)
-- `drawDecorItem()` — Shared rendering, `isBack` controls opacity
+**`DEPTH_ROW_CONFIG`:**
+| Row | Opacity | Scale | Y Shift | Description |
+|---|---|---|---|---|
+| 0 (back) | 0.50 | 0.82 | -4 | Behind fish, smaller &amp; faded |
+| 1 (mid) | 0.85 | 1.00 | 0 | Default, between equipment and fish |
+| 2 (front) | 1.00 | 1.12 | +3 | In front of fish, larger &amp; vivid |
+
+**Game loop order:** environment → back decor (row 0) → equipment → mid decor (row 1) → fish → front decor (row 2) → food → bubbles → laser → dirt.
+
+**`renderDecorRow(decors, biomeKey, row)`** replaces the old `renderDecorBack()` / `renderDecorFront()` split. Old saves without `depthRow` default to row 1 via `(d.depthRow ?? 1)`.
 
 ## Common Patterns
 

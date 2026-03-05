@@ -993,6 +993,61 @@ function createScenarioState(scenarioId) {
             applyMockFullGrownTank(s, 'salt');
             return s;
         }
+        case 'depth-row-showcase': {
+            // 3-row depth system with decor on each row (back=0, mid=1, front=2)
+            const s = createInitialState();
+            s.tanks.fresh.unlocked = true;
+            s.tanks.tropical.unlocked = true;
+            s.activeTankId = 'tropical';
+            s.coins = 5000;
+            s.tanks.tropical.toolsOwned = { heater: 1, filter_tropical: 1 };
+            s.tanks.tropical.foodStock = { tropical_flakes: 15, pellets: 5 };
+            s.tanks.tropical.fish = [
+                createFishInstance('discus', { hunger: 85, level: 2 }),
+                createFishInstance('neon_tetra', { hunger: 80 }),
+                createFishInstance('neon_tetra', { hunger: 75 }),
+                createFishInstance('gourami', { hunger: 80 }),
+            ];
+            s.tanks.tropical.decor = [
+                createDecorInstance('java_fern', 0.15, 0.8, 0),          // back row
+                createDecorInstance('amazon_sword', 0.4, 0.8, 0),        // back row
+                createDecorInstance('mossy_log', 0.5, 0.85, 1),          // mid row
+                createDecorInstance('hollow_stump', 0.8, 0.85, 1),       // mid row
+                createDecorInstance('cryptocoryne', 0.25, 0.8, 2),       // front row
+                createDecorInstance('ludwigia', 0.65, 0.8, 2),            // front row
+                createDecorInstance('floating_plants', 0.5, 0.1),        // default mid
+            ];
+            s.lifetime.coinsEarned = 3000;
+            return s;
+        }
+        case 'hiding-showcase': {
+            // Moray + clownfish + plants for hiding behavior testing
+            const s = createInitialState();
+            s.tanks.fresh.unlocked = true;
+            s.tanks.tropical.unlocked = true;
+            s.tanks.salt.unlocked = true;
+            s.activeTankId = 'salt';
+            s.coins = 5000;
+            s.tanks.salt.toolsOwned = { filter_salt: 2, skimmer: 1, uv_sterilizer: 1 };
+            s.tanks.salt.foodStock = { marine_pellets: 20, reef_flakes: 20, frozen_brine: 10 };
+            s.tanks.salt.fish = [
+                createFishInstance('clownfish', { hunger: 85 }),
+                createFishInstance('moray_eel', { hunger: 80 }),
+                createFishInstance('royal_gramma', { hunger: 70 }),
+                createFishInstance('firefish', { hunger: 75 }),
+                createFishInstance('green_chromis', { hunger: 60 }),
+                createFishInstance('green_chromis', { hunger: 55 }),
+            ];
+            s.tanks.salt.decor = [
+                createDecorInstance('anemone', 0.25, 0.7),
+                createDecorInstance('cave', 0.75, 0.85),
+                createDecorInstance('brain_coral', 0.5, 0.75),
+                createDecorInstance('sea_fan', 0.4, 0.8),
+                createDecorInstance('staghorn_coral', 0.6, 0.8),
+            ];
+            s.lifetime.coinsEarned = 5000;
+            return s;
+        }
         default:
             return null;
     }
