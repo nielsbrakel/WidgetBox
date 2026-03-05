@@ -17,6 +17,14 @@ export const SCENARIOS = {
         'real': { label: 'Real Data (Live)', type: 'real' },
         'error': { label: 'API Error', type: 'error' }
     },
+    'youtube': {
+        'default': { label: 'Normal (Default)', type: 'mock' },
+        'ios': { label: 'Simulate iOS', type: 'mock' },
+    },
+    'windy': {
+        'default': { label: 'Normal (Default)', type: 'mock' },
+        'ios': { label: 'Simulate iOS', type: 'mock' },
+    },
     'aquarium': {
         'default':              { label: 'Fresh Start',                type: 'mock', group: 'Progression' },
         'tier-2-ready':         { label: 'Tropical Ready',             type: 'mock', group: 'Progression' },

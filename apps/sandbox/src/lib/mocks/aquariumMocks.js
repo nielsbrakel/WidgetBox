@@ -191,8 +191,8 @@ function createFishInstance(speciesId, overrides) {
     };
 }
 
-function createDecorInstance(decorId, x, y, overrides) {
-    return { id: generateId(), decorId, x: x ?? (0.2 + Math.random() * 0.6), y: y ?? 0.85, size: 1.0, placedAt: Date.now(), state: {}, ...(overrides || {}) };
+function createDecorInstance(decorId, x, y, depthRow, overrides) {
+    return { id: generateId(), decorId, x: x ?? (0.2 + Math.random() * 0.6), y: y ?? 0.85, depthRow: Math.max(0, Math.min(2, depthRow ?? 1)), size: 1.0, placedAt: Date.now(), state: {}, ...(overrides || {}) };
 }
 
 function createInitialState() {
@@ -474,10 +474,10 @@ function handleAction(save, type, payload) {
             return { reward: null, cooldownRemaining: LASER_COOLDOWN_MS - (now - last) };
         }
         case 'buy_food': { const food = tankCat.content.food[payload.foodId]; if (!food) return { error: 'Unknown food' }; const qty = Math.max(1, payload.quantity || 5); const cost = food.price * qty; if (save.coins < cost) return { error: 'Not enough coins' }; save.coins -= cost; tank.foodStock[payload.foodId] = (tank.foodStock[payload.foodId] || 0) + qty; return { bought: true, foodId: payload.foodId, quantity: qty, newStock: tank.foodStock[payload.foodId] }; }
-        case 'buy_decor': { const dd = tankCat.content.decor[payload.decorId]; if (!dd) return { error: 'Unknown decor' }; if (dd.maxPerTank && tank.decor.filter(d => d.decorId === payload.decorId).length >= dd.maxPerTank) return { error: 'Max reached' }; if (save.coins < dd.price) return { error: 'Not enough coins' }; save.coins -= dd.price; const d = createDecorInstance(payload.decorId); if (dd.growth) d.size = dd.growth.minSize; tank.decor.push(d); return { bought: true, decor: d }; }
+        case 'buy_decor': { const dd = tankCat.content.decor[payload.decorId]; if (!dd) return { error: 'Unknown decor' }; if (dd.maxPerTank && tank.decor.filter(d => d.decorId === payload.decorId).length >= dd.maxPerTank) return { error: 'Max reached' }; if (save.coins < dd.price) return { error: 'Not enough coins' }; save.coins -= dd.price; const d = createDecorInstance(payload.decorId, undefined, undefined, payload.depthRow); if (dd.growth) d.size = dd.growth.minSize; tank.decor.push(d); return { bought: true, decor: d }; }
         case 'sell_decor': { const idx = tank.decor.findIndex(d => d.id === payload.decorInstanceId); if (idx === -1) return { error: 'Decor not found' }; const d = tank.decor[idx]; const v = getDecorSellReturn(d.decorId, tankCat); save.coins += v; tank.decor.splice(idx, 1); return { sold: true, value: v }; }
         case 'buy_tool': { const tl = tankCat.content.tools[payload.toolId]; if (!tl) return { error: 'Unknown tool' }; const cl = tank.toolsOwned[payload.toolId] || 0; if (cl >= tl.maxLevel) return { error: 'Max level' }; const p = tl.prices[cl]; if (save.coins < p) return { error: 'Not enough coins' }; save.coins -= p; tank.toolsOwned[payload.toolId] = cl + 1; return { bought: true, toolId: payload.toolId, level: cl + 1 }; }
-        case 'move_decor': { const d = tank.decor.find(d => d.id === payload.decorInstanceId); if (!d) return { error: 'Decor not found' }; d.x = clamp(payload.x ?? d.x, 0, 1); d.y = clamp(payload.y ?? d.y, 0, 1); return { moved: true }; }
+        case 'move_decor': { const d = tank.decor.find(d => d.id === payload.decorInstanceId); if (!d) return { error: 'Decor not found' }; d.x = clamp(payload.x ?? d.x, 0, 1); d.y = clamp(payload.y ?? d.y, 0, 1); if (payload.depthRow !== undefined) d.depthRow = Math.max(0, Math.min(2, payload.depthRow)); return { moved: true }; }
         case 'trim_plant': { const d = tank.decor.find(d => d.id === payload.decorInstanceId); if (!d) return { error: 'Decor not found' }; const dd = tankCat.content.decor[d.decorId]; if (!dd?.growth) return { error: 'Not growable' }; d.size = clamp(d.size - 0.25, dd.growth.minSize, dd.growth.maxSize); return { trimmed: true, newSize: d.size }; }
         case 'reset_state': { const fresh = createInitialState(); Object.assign(save, fresh); return { reset: true }; }
         case 'debug_scenario': return applyDebugScenario(save, payload.scenario);
@@ -920,10 +920,10 @@ function createScenarioState(scenarioId) {
                 createFishInstance('pleco', { hunger: 85 }),
             ]; // 3+0.5*4+2+2 = 9/14
             s.tanks.tropical.decor = [
-                createDecorInstance('java_fern', 0.15, 0.8, { size: 2.5 }),
-                createDecorInstance('amazon_sword', 0.35, 0.8, { size: 3.0 }),
-                createDecorInstance('java_fern', 0.55, 0.8, { size: 2.0 }),
-                createDecorInstance('amazon_sword', 0.75, 0.8, { size: 2.8 }),
+                createDecorInstance('java_fern', 0.15, 0.8, undefined, { size: 2.5 }),
+                createDecorInstance('amazon_sword', 0.35, 0.8, undefined, { size: 3.0 }),
+                createDecorInstance('java_fern', 0.55, 0.8, undefined, { size: 2.0 }),
+                createDecorInstance('amazon_sword', 0.75, 0.8, undefined, { size: 2.8 }),
                 createDecorInstance('floating_plants', 0.3, 0.1),
                 createDecorInstance('floating_plants', 0.7, 0.1),
                 createDecorInstance('mossy_log', 0.5, 0.85),

@@ -99,3 +99,31 @@ test.describe('Windy Widget', () => {
         await expect(overlay).toHaveCSS('pointer-events', 'none');
     });
 });
+
+test.describe('Windy Widget — iOS', () => {
+    let windy: WindyPage;
+
+    test.beforeEach(async ({ page }) => {
+        windy = new WindyPage(page);
+        await windy.goto();
+        await windy.selectWidget('Windy');
+        // Select iOS scenario and reload
+        await windy.setSettingSelect('Debug Scenarios', { value: 'ios' });
+    });
+
+    test('should show unsupported message on iOS', async () => {
+        await expect(windy.iosMessage).toBeVisible();
+        await expect(windy.iosTitle).toContainText('Windy does not work on iOS dashboards yet');
+    });
+
+    test('should not render Windy iframe on iOS', async () => {
+        await expect(windy.iosMessage).toBeVisible();
+        await expect(windy.embedIframe).toHaveCount(0);
+    });
+
+    test('should mention Homey app limitation on iOS', async () => {
+        const message = windy.iframe.locator('.ios-unsupported-message');
+        await expect(message).toContainText('limitation of the Homey app');
+        await expect(message).toContainText('android or web devices');
+    });
+});

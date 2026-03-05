@@ -43,15 +43,15 @@ function seededRng(seed) {
 //  CONSTANTS
 // ═══════════════════════════════════════════
 
-const CURRENT_SAVE_VERSION = 2;
+const CURRENT_SAVE_VERSION = 1;
 const MAX_LEVEL = 10;
 const XP_BASE = 30;
 const XP_PER_LEVEL_SCALE = 14;
 const LEVEL_COIN_BONUS = 0.12;
 const MAX_IDLE_HOURS = 168; // 7 days cap
 const LASER_COOLDOWN_MS = 6 * 3600000;
-const LASER_REWARD_COINS = 50;
-const LASER_REWARD_XP = 10;
+const LASER_REWARD_COINS = 25;
+const LASER_REWARD_XP = 5;
 const WEAK_HUNGER_THRESHOLD = 10;
 const WEAK_HUNGER_DURATION_MS = 2 * 3600000;
 const WEAK_HEALTH_THRESHOLD = 15;
@@ -94,7 +94,7 @@ const CATALOG = {
       wipeMaskGrid: { w: 64, h: 48 },
     },
     economy: {
-      coinsPer100Dirt: 10,
+      coinsPer100Dirt: 5,
       sellReturnDefault: 0.35,
       fishSellReturn: 0.30,
       priceGrowth: {
@@ -182,6 +182,10 @@ const CATALOG = {
             name: 'Treasure Chest', price: 50, placement: 'bottom',
             visuals: { spriteKey: 'treasure_chest' },
           },
+          sunken_ship: {
+            name: 'Sunken Ship', price: 75, placement: 'bottom', maxPerTank: 1,
+            visuals: { spriteKey: 'sunken_ship' },
+          },
         },
         tools: {},
       },
@@ -189,7 +193,7 @@ const CATALOG = {
         sections: [
           { id: 'fish', order: ['guppy', 'goldfish', 'snail'] },
           { id: 'food', order: ['basic_flakes', 'pellets', 'algae_wafer'] },
-          { id: 'decor', order: ['hornwort', 'vallisneria', 'anubias', 'moss_ball', 'rock_pile', 'driftwood', 'treasure_chest'] },
+          { id: 'decor', order: ['hornwort', 'vallisneria', 'anubias', 'moss_ball', 'rock_pile', 'driftwood', 'treasure_chest', 'sunken_ship'] },
           { id: 'tools', order: [] },
         ],
       },
@@ -199,7 +203,7 @@ const CATALOG = {
     tropical: {
       id: 'tropical',
       name: 'Tropical Planted',
-      unlock: { type: 'lifetimeCoins', value: 500, label: 'Earn 500 lifetime coins' },
+      unlock: { type: 'lifetimeCoins', value: 1500, label: 'Earn 1,500 lifetime coins' },
       capacity: { spaceCapacity: 14 },
       simulation: {
         baseDirtyRatePerHour: 0.5,
@@ -223,7 +227,7 @@ const CATALOG = {
           },
           blue_eye: {
             name: 'Blue-Eye', basePrice: 30, baseCoinPerHour: 3.5,
-            hungerRate: 0.9, spaceCost: 1,
+            hungerRate: 0.9, spaceCost: 0.5,
             diet: { accepts: ['tropical_flakes', 'pellets'] },
             requirements: { tools: [...TROPICAL_TOOL_REQS] },
             preferences: { zonePreference: 'top' },
@@ -340,10 +344,10 @@ const CATALOG = {
       unlock: {
         type: 'compound',
         rules: [
-          { type: 'lifetimeCoins', value: 2000 },
+          { type: 'lifetimeCoins', value: 5000 },
           { type: 'toolOwned', toolId: 'heater', tankId: 'tropical' },
         ],
-        label: 'Earn 2000 lifetime coins and own a Heater',
+        label: 'Earn 5,000 lifetime coins and own a Heater',
       },
       capacity: { spaceCapacity: 20 },
       simulation: {
@@ -571,102 +575,8 @@ function createInitialState(widgetInstanceId) {
 }
 
 // ═══════════════════════════════════════════
-//  MIGRATION & RECONCILIATION
+//  RECONCILIATION — Ensure save matches current catalog
 // ═══════════════════════════════════════════
-
-/**
- * Migrate old save formats to current version.
- * Chained: v0 → v1, never skip.
- */
-function migrateSave(save) {
-  if (!save) return null;
-
-  // Handle saves from the old (test) implementation
-  if (save.version === 3 && save.unlockedTanks) {
-    return migrateFromLegacy(save);
-  }
-
-  // v1 → v2: Move coins from per-tank to global
-  if (save.version < 2) {
-    let totalCoins = 0;
-    for (const tankId of Object.keys(save.tanks || {})) {
-      const tank = save.tanks[tankId];
-      if (tank && typeof tank.coins === 'number') {
-        totalCoins += tank.coins;
-        delete tank.coins;
-      }
-    }
-    save.coins = totalCoins;
-    save.version = 2;
-  }
-
-  return save;
-}
-
-/** Migrate from the old numeric-tank implementation to the new spec format. */
-function migrateFromLegacy(old) {
-  const now = Date.now();
-  const freshTank = createDefaultTank('fresh', true);
-  freshTank.lastSeenAt = old.lastSeenAt || now;
-
-  // Migrate food stock
-  if (old.foodStock) {
-    freshTank.foodStock = {
-      basic_flakes: old.foodStock.flakes || 0,
-      pellets: old.foodStock.pellets || 0,
-    };
-  }
-
-  // Migrate fish from old tank 1 (cold water) into fresh
-  const oldTank = old.tanks && old.tanks[1];
-  if (oldTank && oldTank.fish) {
-    freshTank.fish = oldTank.fish.map(f => {
-      // Map old species to new (goldfish → goldfish, koi → goldfish, guppy → guppy)
-      let speciesId = f.speciesId;
-      if (speciesId === 'koi') speciesId = 'goldfish';
-      if (!CATALOG.tanks.fresh.content.fish[speciesId]) speciesId = 'guppy';
-
-      return {
-        id: f.id || generateId(),
-        speciesId,
-        bornAt: f.bornAt || now,
-        level: f.level || 1,
-        xp: f.xp || 0,
-        hunger: clamp(f.hunger || 80, 0, 100),
-        health: clamp(f.health || 100, 0, 100),
-        weak: !!f.weak,
-        lastFedAt: now,
-        lastPlayedAt: null,
-      };
-    });
-    freshTank.cleanliness = clamp(oldTank.cleanliness || 100, 0, 100);
-  }
-
-  if (freshTank.fish.length === 0) {
-    const starter = createFishInstance('guppy');
-    freshTank.fish = [starter];
-  }
-
-  return {
-    version: CURRENT_SAVE_VERSION,
-    widgetInstanceId: 'default',
-    activeTankId: 'fresh',
-    coins: old.coins || 50,
-    tanks: {
-      fresh: freshTank,
-      tropical: createDefaultTank('tropical', false),
-      salt: createDefaultTank('salt', false),
-    },
-    lifetime: {
-      coinsEarned: old.stats?.coinsEarnedLifetime || 0,
-    },
-    meta: {
-      createdAt: now,
-      lastSavedAt: now,
-      lastCatalogVersion: CATALOG.contentVersion,
-    },
-  };
-}
 
 /**
  * Reconcile save with current catalog:
@@ -678,7 +588,7 @@ function migrateFromLegacy(old) {
 function reconcileSaveWithCatalog(save) {
   const catalog = CATALOG;
 
-  // Ensure global coins field exists (v2 migration safety net)
+  // Ensure global coins field exists
   if (typeof save.coins !== 'number') {
     save.coins = 0;
   }
@@ -1634,9 +1544,100 @@ function applyDebugScenario(save, scenario) {
       Object.assign(save, fresh);
       return { applied: 'fresh_start' };
     }
+    case 'full_grown_fresh': {
+      return applyFullGrownTank(save, 'fresh');
+    }
+    case 'full_grown_tropical': {
+      return applyFullGrownTank(save, 'tropical');
+    }
+    case 'full_grown_salt': {
+      return applyFullGrownTank(save, 'salt');
+    }
     default:
       return { error: `Unknown scenario: ${scenario}` };
   }
+}
+
+/**
+ * Apply a "full grown" scenario to a specific tank:
+ * - Unlock the tank
+ * - Fill to capacity with max-level, full-grown fish (one of each species, then fill with smallest)
+ * - Max-size all plants
+ * - All tools owned at level 3
+ * - Full food stock, high coins
+ * - 100% cleanliness
+ */
+function applyFullGrownTank(save, tankId) {
+  const tankCat = CATALOG.tanks[tankId];
+  if (!tankCat) return { error: `Unknown tank: ${tankId}` };
+  if (!save.tanks[tankId]) {
+    save.tanks[tankId] = { tankId, unlocked: false, fish: [], decor: [], foodStock: {}, toolsOwned: {}, cleanliness: 100 };
+  }
+  const tank = save.tanks[tankId];
+  tank.unlocked = true;
+
+  // Rich player
+  save.coins = 50000;
+  save.lifetimeCoins = 50000;
+  save.xp = 5000;
+  save.activeTankId = tankId;
+
+  // One of each species, all max level
+  tank.fish = [];
+  const speciesIds = Object.keys(tankCat.content.fish);
+  for (const sid of speciesIds) {
+    if (getUsedSpace(tank, tankCat) + tankCat.content.fish[sid].spaceCost > tankCat.capacity.spaceCapacity) break;
+    const f = createFishInstance(sid);
+    f.bornAt = Date.now() - 30 * 24 * 3600 * 1000; // 30 days old — fully grown
+    f.hunger = 85;
+    f.health = 100;
+    f.weak = false;
+    f.fedCount = 500;
+    tank.fish.push(f);
+  }
+  // Fill remaining space with smallest species
+  const smallestSpecies = speciesIds.reduce((best, id) => {
+    const sp = tankCat.content.fish[id];
+    if (!best || sp.spaceCost < tankCat.content.fish[best].spaceCost) return id;
+    return best;
+  }, null);
+  if (smallestSpecies) {
+    while (getUsedSpace(tank, tankCat) + tankCat.content.fish[smallestSpecies].spaceCost <= tankCat.capacity.spaceCapacity) {
+      const f = createFishInstance(smallestSpecies);
+      f.bornAt = Date.now() - 30 * 24 * 3600 * 1000;
+      f.hunger = 85;
+      f.health = 100;
+      f.weak = false;
+      f.fedCount = 500;
+      tank.fish.push(f);
+    }
+  }
+
+  // All decor — one of each, max size, spread across tank
+  tank.decor = [];
+  const decorIds = Object.keys(tankCat.content.decor);
+  for (let i = 0; i < decorIds.length; i++) {
+    const did = decorIds[i];
+    const dd = tankCat.content.decor[did];
+    const d = { decorId: did, x: 0.1 + (i / decorIds.length) * 0.8 };
+    if (dd.growth) d.size = dd.growth.maxSize;
+    tank.decor.push(d);
+  }
+
+  // All food stocked high
+  tank.foodStock = {};
+  for (const fid of Object.keys(tankCat.content.food)) {
+    tank.foodStock[fid] = 50;
+  }
+
+  // All tools at max level
+  tank.toolsOwned = {};
+  for (const [tid, tDef] of Object.entries(tankCat.content.tools || {})) {
+    tank.toolsOwned[tid] = tDef.maxLevel || 1;
+  }
+
+  tank.cleanliness = 100;
+  return { applied: `full_grown_${tankId}` };
 }
 
 // ═══════════════════════════════════════════
@@ -1655,13 +1656,6 @@ module.exports = {
       save = createInitialState(widgetId);
       isNew = true;
     } else {
-      // Migration from old format
-      save = migrateSave(save);
-      if (!save) {
-        save = createInitialState(widgetId);
-        isNew = true;
-      }
-      // Reconcile with current catalog
       reconcileSaveWithCatalog(save);
     }
 
@@ -1679,8 +1673,6 @@ module.exports = {
     if (!save) {
       save = createInitialState(widgetId);
     } else {
-      save = migrateSave(save);
-      if (!save) save = createInitialState(widgetId);
       reconcileSaveWithCatalog(save);
     }
 

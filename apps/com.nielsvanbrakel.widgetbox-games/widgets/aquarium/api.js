@@ -532,12 +532,13 @@ function createFishInstance(speciesId) {
   };
 }
 
-function createDecorInstance(decorId, x, y) {
+function createDecorInstance(decorId, x, y, depthRow) {
   return {
     id: generateId(),
     decorId,
     x: x ?? (0.2 + Math.random() * 0.6),
     y: y ?? 0.85,
+    depthRow: depthRow ?? 1, // 0=back, 1=mid, 2=front (3 depth rows)
     size: 1.0,
     placedAt: Date.now(),
     state: {},
@@ -1380,7 +1381,7 @@ function handleAction(save, type, payload) {
 
     // ── Store: buy decor ─────────────────────────────────────────────
     case 'buy_decor': {
-      const { decorId, x, y } = payload;
+      const { decorId, x, y, depthRow } = payload;
       const decorDef = tankCat.content.decor[decorId];
       if (!decorDef) return { error: 'Unknown decor' };
       if (decorDef.maxPerTank && tank.decor.filter(d => d.decorId === decorId).length >= decorDef.maxPerTank) {
@@ -1389,7 +1390,7 @@ function handleAction(save, type, payload) {
       if (save.coins < decorDef.price) return { error: 'Not enough coins' };
       save.coins -= decorDef.price;
 
-      const decor = createDecorInstance(decorId, x, y);
+      const decor = createDecorInstance(decorId, x, y, depthRow);
       if (decorDef.growth) {
         decor.size = decorDef.growth.minSize;
       }
@@ -1425,11 +1426,12 @@ function handleAction(save, type, payload) {
 
     // ── Decor: move ──────────────────────────────────────────────────
     case 'move_decor': {
-      const { decorInstanceId, x: newX, y: newY } = payload;
+      const { decorInstanceId, x: newX, y: newY, depthRow: newRow } = payload;
       const decor = tank.decor.find(d => d.id === decorInstanceId);
       if (!decor) return { error: 'Decor not found' };
       decor.x = clamp(newX ?? decor.x, 0, 1);
       decor.y = clamp(newY ?? decor.y, 0, 1);
+      if (newRow !== undefined) decor.depthRow = clamp(newRow, 0, 2);
       return { moved: true };
     }
 

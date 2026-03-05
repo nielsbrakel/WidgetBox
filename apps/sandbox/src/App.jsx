@@ -136,6 +136,9 @@ function App() {
 
     win.Homey = mock;
 
+    // Inject iOS simulation flag for debug scenarios
+    win.__SIMULATE_IOS__ = activeScenario === 'ios';
+
     if (typeof win.onHomeyReady === 'function') {
       try {
         win.onHomeyReady(mock);

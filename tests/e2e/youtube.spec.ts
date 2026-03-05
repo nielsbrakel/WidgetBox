@@ -106,3 +106,31 @@ test.describe('YouTube App', () => {
         expect(log).toContain('release');
     });
 });
+
+test.describe('YouTube App — iOS', () => {
+    let tube: YouTubePage;
+
+    test.beforeEach(async ({ page }) => {
+        tube = new YouTubePage(page);
+        await tube.goto();
+        await tube.selectWidget('YouTube');
+        // Select iOS scenario and reload
+        await tube.setSettingSelect('Debug Scenarios', { value: 'ios' });
+    });
+
+    test('should show unsupported message on iOS', async () => {
+        await expect(tube.iosMessage).toBeVisible();
+        await expect(tube.iosTitle).toContainText('YouTube does not work on iOS dashboards yet');
+    });
+
+    test('should not render YouTube iframe on iOS', async () => {
+        await expect(tube.iosMessage).toBeVisible();
+        await expect(tube.widgetIframe).toHaveCount(0);
+    });
+
+    test('should mention Homey app limitation on iOS', async () => {
+        const message = tube.iframe.locator('.ios-unsupported-message');
+        await expect(message).toContainText('limitation of the Homey app');
+        await expect(message).toContainText('android or web devices');
+    });
+});

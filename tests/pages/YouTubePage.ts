@@ -4,6 +4,8 @@ import { SandboxPage } from './SandboxPage';
 export class YouTubePage extends SandboxPage {
     get widgetIframe() { return this.iframe.locator('iframe').first(); }
     get card() { return this.iframe.locator('.homey-card'); }
+    get iosMessage() { return this.iframe.locator('.ios-unsupported'); }
+    get iosTitle() { return this.iframe.locator('.ios-unsupported-title'); }
 
     async verifyLoaded() {
         await expect(this.widgetIframe).toBeVisible();

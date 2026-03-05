@@ -295,65 +295,65 @@ const BIOMES = {
 };
 
 const FISH_SPRITES = {
-  // ── FRESH TANK ──
-  // Guppy: tiny body with large colorful fan-shaped tail (12×7)
-  guppy: { w:12, h:7, data:['000020000000','002134200000','021345530000','213355533000','021345530000','002134200000','000020000000'] },
-  // Goldfish: round body with distinctive flowing double-tail, big eye, deeper shape (14×10)
-  goldfish: { w:14, h:10, data:['00000220000000','00002133000000','00021334500000','00213345510000','02213455510000','22133555100000','02213345100000','00213331100000','00022110000000','00002200000000'] },
-  // Snail: rounded spiral shell, soft body underneath, delicate antennae (10×8)
-  snail: { w:10, h:8, data:['0000433000','0004344300','0043443400','0434434000','0333330000','0411040100','4100001040','0100000100'] },
+  // ── FRESH TANK ── realistic side-view anatomy
+  // Guppy: streamlined body, large fan-shaped caudal fin, dorsal fin, visible eye (14×8)
+  guppy: { w:14, h:8, data:['00000220000000','00002134420000','00021345542000','00213355543200','52133555543000','00213345542000','00002134420000','00000220000000'] },
+  // Goldfish: deep rounded body, flowing double-lobed tail, prominent dorsal, lateral line, large eye (16×12)
+  goldfish: { w:16, h:12, data:['0000002200000000','0000021332000000','0000213345200000','0001133455420000','0021334555420000','2221345555320000','2213355555200000','0021345554200000','0002134543200000','0000213332000000','0000022320000000','0000002200000000'] },
+  // Snail: realistic spiral shell with growth lines, soft muscular foot, eye stalks (12×9)
+  snail: { w:12, h:9, data:['000004330000','000043444300','004344434400','043443434400','434343340000','033333300000','041100401000','410000010400','010000001000'] },
 
   // ── TROPICAL TANK ──
-  // Neon Tetra: tiny torpedo, iridescent blue stripe + red tail (10×5)
-  neon_tetra: { w:10, h:5, data:['0016650000','1666655100','1663355200','1163310200','0012200000'] },
-  // Blue-Eye: small, big reflective eye accent (10×6)
-  blue_eye: { w:10, h:6, data:['0011100000','0115351000','1153551000','1153351000','0113310000','0011200000'] },
-  // Moon Fish: tall disc, more pronounced crescent shape with dorsal/anal fins (16×14)
-  moon_fish: { w:16, h:14, data:['0000001100000000','0000011310000000','0000013310000000','0000113351000000','0001133551000000','0011335551100000','0113355551100000','0113355551100000','0011335551100000','0001133551000000','0000113351000000','0000013310000000','0000011310000000','0000001100000000'] },
-  // Discus: large perfect disc, bold vertical color bands, visible red eye (20×16)
-  discus: { w:20, h:16, data:['00000000110000000000','00000001631000000000','00000016363100000000','00000163636310000000','00001636363610000000','00016363636310000000','00163636363610000000','01636365636310000000','01636365636310000000','00163636363610000000','00016363636310000000','00001636363610000000','00000163636310000000','00000016363100000000','00000001631000000000','00000000110000000000'] },
-  // Pleco: flat armored body, wide head with prominent sucker mouth, dorsal fin sail (22×8)
-  pleco: { w:22, h:8, data:['0000000030000000000000','0000011141111141110000','0001134345141314110000','0011111145111111411100','4411134345141314110044','0001111141111141110000','0000011100110000000000','0000001000010000000000'] },
-  // Gourami: oval body, distinctive trailing ventral feeler threads, forked "whiskers" (16×12)
-  gourami: { w:16, h:12, data:['0000022000000000','0000211310000000','0002113351000000','0022113351100000','2221133551100000','2211335511000000','0022113310000000','0002211100000000','0000101000000000','0000010100000000','0000001000000000','0000000010000000'] },
+  // Neon Tetra: torpedo shape, iridescent blue lateral stripe, vivid red posterior, forked tail (12×6)
+  neon_tetra: { w:12, h:6, data:['001166500000','166666551000','166633552200','116633512200','001633100000','000122000000'] },
+  // Blue-Eye: delicate small body, oversized reflective blue eye, translucent fins (12×7)
+  blue_eye: { w:12, h:7, data:['000111000000','001155310000','011535510000','115355510000','011535310000','001133100000','000112000000'] },
+  // Moon Fish: tall laterally compressed disc, elongated dorsal and anal fins, crescent tail (18×16)
+  moon_fish: { w:18, h:16, data:['000000011000000000','000000113100000000','000001133100000000','000011335100000000','000113355100000000','001133555100000000','011335555100000000','113355555100000000','113355555100000000','011335555100000000','001133555100000000','000113355100000000','000011335100000000','000001133100000000','000000113100000000','000000011000000000'] },
+  // Discus: nearly perfect disc, bold vertical banding, red eye, fine dorsal/ventral fin edge (22×18)
+  discus: { w:22, h:18, data:['0000000001100000000000','0000000016310000000000','0000000163631000000000','0000001636361000000000','0000016363631000000000','0000163636361000000000','0001636363631000000000','0016363656361000000000','0163636565631000000000','0163636565631000000000','0016363656361000000000','0001636363631000000000','0000163636361000000000','0000016363631000000000','0000001636361000000000','0000000163631000000000','0000000016310000000000','0000000001100000000000'] },
+  // Pleco: flat armored catfish, wide sucker head, bony scute plates, sail dorsal, whisker barbels (24×9)
+  pleco: { w:24, h:9, data:['000000003000000000000000','000001114111114111000000','000113434514131411000000','001111114511111141110000','441113434514131411004400','000111114111114111000000','000001110011000000000000','000000100001000000000000','000000010000100000000000'] },
+  // Gourami: oval body, trailing threadlike pelvic fins (feelers), labyrinth fish shape (18×14)
+  gourami: { w:18, h:14, data:['000000220000000000','000002113100000000','000021133510000000','000211335510000000','002211335510000000','222113355510000000','221133551100000000','002211331000000000','000221110000000000','000010100000000000','000001010000000000','000000100000000000','000000010000000000','000000001000000000'] },
 
   // ── SALTWATER TANK ──
-  // Clownfish: vivid orange with 3 distinct white bands, rounded body (14×9)
-  clownfish: { w:14, h:9, data:['00001100000000','00016161000000','01161636100000','16163161600000','16163116160000','16163161600000','01161636100000','00016161000000','00001100000000'] },
-  // Blue Tang: oval Dory-like body, vivid blue with yellow tail fin, black marking (20×14)
-  blue_tang: { w:20, h:14, data:['00000000220000000000','00000002113000000000','00000021133100000000','00000211335100000000','00002113363100000000','00021133666310000000','00211336666311000000','00211336666311000000','00021133666310000000','00002113363100000000','00000211335100000000','00000021133100000000','00000002113000000000','00000000220000000000'] },
-  // Green Chromis: small oval, solid green-blue, schooling (8×6)
-  green_chromis: { w:8, h:6, data:['01113000','11335100','11335510','11335510','01131000','00120000'] },
-  // Firefish: elongated, tall first dorsal fin, fiery gradient (16×9)
-  firefish: { w:16, h:9, data:['0000004000000000','0000013300000000','0001133351000000','0011333351000000','0113333510000000','0013333510000000','0001133100000000','0000133000000000','0000022000000000'] },
-  // Royal Gramma: half purple half yellow, vivid split color (14×9)
-  royal_gramma: { w:14, h:9, data:['00002200000000','00064131000000','00641335100000','06641336100000','66613661100000','06641336100000','00641135000000','00064130000000','00002200000000'] },
-  // Banggai Cardinalfish: vertical black-white stripes, elongated fins (12×9)
-  banggai_cardinal: { w:12, h:9, data:['000320000000','002161100000','021645610000','216456100000','216456100000','021645610000','002161100000','000220000000','000020000000'] },
-  // Moray Eel: LONGER thinner serpentine body, clear spotted pattern, open jaw at head (32×3)
-  moray_eel: { w:32, h:3, data:['00000000000000000000000000000000','00001111111111111111111111435000','00000111111111111111111111100000'] },
-  // Cleaner Shrimp: long antennae, segmented translucent body, red-white (14×8)
-  cleaner_shrimp: { w:14, h:8, data:['50000550000050','00001133000000','00013345100000','00113351000000','00013350000000','00011330000000','00100101000000','01000010100000'] },
+  // Clownfish: vivid orange, 3 white vertical bands with black edges, rounded body (16×10)
+  clownfish: { w:16, h:10, data:['0000011000000000','0001616100000000','0116163610000000','1616316160000000','1616311616000000','1616316160000000','0116163610000000','0001616100000000','0000011000000000','0000002000000000'] },
+  // Blue Tang: oval Dory-like, vivid blue, black palette marking, yellow tail+pectoral (22×15)
+  blue_tang: { w:22, h:15, data:['0000000002200000000000','0000000021130000000000','0000000211331000000000','0000002113351000000000','0000021133531000000000','0000211336631000000000','0002113366631100000000','0021133666631100000000','0021133666631100000000','0002113366631100000000','0000211336631000000000','0000021133531000000000','0000002113351000000000','0000000211330000000000','0000000002200000000000'] },
+  // Green Chromis: small oval, iridescent green-blue scales, schooling fish (10×7)
+  green_chromis: { w:10, h:7, data:['0011300000','0113351000','1133551000','1133551000','0113351000','0011310000','0001200000'] },
+  // Firefish: elongated body, dramatically tall first dorsal spine, fire gradient (18×10)
+  firefish: { w:18, h:10, data:['000000400000000000','000001330000000000','000013335100000000','000113335100000000','001133335100000000','011333351000000000','001333351000000000','000113310000000000','000013300000000000','000002200000000000'] },
+  // Royal Gramma: bicolor split — vivid purple anterior, bright yellow posterior (16×10)
+  royal_gramma: { w:16, h:10, data:['0000022000000000','0000641310000000','0006413351000000','0064413361000000','6664136611000000','0664413361000000','0006413351000000','0000641310000000','0000022000000000','0000002000000000'] },
+  // Banggai Cardinalfish: bold black/white vertical stripes, elongated dorsal/ventral fin tassels (14×10)
+  banggai_cardinal: { w:14, h:10, data:['00003200000000','00021616100000','00216456100000','02164561000000','21645610000000','21645610000000','02164561000000','00216456100000','00021616100000','00002200000000'] },
+  // Moray Eel: long sinuous serpentine body, mottled pattern, visible jaw, recessed eye (36×4)
+  moray_eel: { w:36, h:4, data:['000000000000000000000000000000000000','000011111111111111111111111114350000','000011213121312131213121312111300000','000000111111111111111111111111000000'] },
+  // Cleaner Shrimp: long swept-back antennae, segmented translucent body, walking legs (16×9)
+  cleaner_shrimp: { w:16, h:9, data:['5000005500000050','0000011330000000','0001334510000000','0011335100000000','0001335000000000','0001133000000000','0010010100000000','0100001010000000','1000000101000000'] },
 };
 
 const FISH_PALETTES = {
-  guppy:      { 1:'#FF8844', 2:'#FF5522', 3:'#FFCC88', 4:'#AA4400', 5:'#FFDD44' },
-  goldfish:   { 1:'#FFB833', 2:'#FF9500', 3:'#FFE088', 4:'#CC7700', 5:'#111' },
-  snail:      { 1:'#D4B896', 2:'#B89878', 3:'#8B6B4A', 4:'#A08060', 5:'#111' },
-  neon_tetra: { 1:'#C0C8D0', 2:'#FF3333', 3:'#FF5050', 4:'#333', 5:'#111', 6:'#3388FF' },
-  blue_eye:   { 1:'#88CCEE', 2:'#5599CC', 3:'#AADDFF', 4:'#336688', 5:'#2266FF' },
-  moon_fish:  { 1:'#C8D8C8', 2:'#88BB88', 3:'#E0FFE0', 4:'#668866', 5:'#111' },
-  discus:     { 1:'#FF5533', 2:'#DD3311', 3:'#FF7755', 4:'#CC2200', 5:'#CC0000', 6:'#FF4422' },
-  pleco:      { 1:'#665544', 2:'#554433', 3:'#887766', 4:'#443322', 5:'#111' },
-  gourami:    { 1:'#5599CC', 2:'#3377AA', 3:'#88CCEE', 4:'#224466', 5:'#111' },
-  clownfish:  { 1:'#FF6600', 2:'#FF4400', 3:'#FF8833', 4:'#CC4400', 5:'#111', 6:'#FFFFFF' },
-  blue_tang:  { 1:'#2244AA', 2:'#FFDD33', 3:'#4466CC', 4:'#112288', 5:'#111', 6:'#FFDD33' },
-  green_chromis: { 1:'#55BB77', 2:'#339955', 3:'#88EEBB', 4:'#227744', 5:'#111' },
-  firefish:   { 1:'#FF4444', 2:'#FFAA33', 3:'#FFCC44', 4:'#CC2222', 5:'#111' },
-  royal_gramma: { 1:'#8833CC', 2:'#7722BB', 3:'#AA55EE', 4:'#5511AA', 5:'#111', 6:'#FFDD33' },
-  banggai_cardinal: { 1:'#CCCCCC', 2:'#AAAAAA', 3:'#EEEEEE', 4:'#555', 5:'#111', 6:'#222' },
-  moray_eel:  { 1:'#667744', 2:'#556633', 3:'#8B9966', 4:'#445522', 5:'#FFDD33' },
-  cleaner_shrimp: { 1:'#EE4444', 2:'#CC2222', 3:'#FFFFFF', 4:'#AA0000', 5:'#FFFFFF' },
+  guppy:      { 1:'#E87840', 2:'#D05818', 3:'#F0A868', 4:'#983808', 5:'#FFD044' },
+  goldfish:   { 1:'#F0A830', 2:'#E08800', 3:'#F8D080', 4:'#B86800', 5:'#181818' },
+  snail:      { 1:'#C8A880', 2:'#A88868', 3:'#786040', 4:'#907050', 5:'#181818' },
+  neon_tetra: { 1:'#B0B8C8', 2:'#E83030', 3:'#F04848', 4:'#303030', 5:'#181818', 6:'#2878E8' },
+  blue_eye:   { 1:'#78B8D8', 2:'#4888B8', 3:'#98C8E8', 4:'#285878', 5:'#1858E0' },
+  moon_fish:  { 1:'#B8C8B0', 2:'#78A878', 3:'#D0E8D0', 4:'#587858', 5:'#181818' },
+  discus:     { 1:'#E84828', 2:'#C82808', 3:'#F06848', 4:'#B01800', 5:'#A80000', 6:'#E83818' },
+  pleco:      { 1:'#584838', 2:'#483828', 3:'#786858', 4:'#382818', 5:'#181818' },
+  gourami:    { 1:'#4888B8', 2:'#286898', 3:'#78B8D8', 4:'#183858', 5:'#181818' },
+  clownfish:  { 1:'#F05800', 2:'#D83800', 3:'#F87828', 4:'#B03800', 5:'#181818', 6:'#F8F8F8' },
+  blue_tang:  { 1:'#1838A0', 2:'#F0D028', 3:'#3858B8', 4:'#081878', 5:'#181818', 6:'#F0D028' },
+  green_chromis: { 1:'#48A868', 2:'#288848', 3:'#78D8A8', 4:'#186838', 5:'#181818' },
+  firefish:   { 1:'#E83838', 2:'#F09828', 3:'#F0B838', 4:'#B81818', 5:'#181818' },
+  royal_gramma: { 1:'#7828B8', 2:'#6818A8', 3:'#9848D8', 4:'#480898', 5:'#181818', 6:'#F0D028' },
+  banggai_cardinal: { 1:'#B8B8B8', 2:'#989898', 3:'#D8D8D8', 4:'#484848', 5:'#181818', 6:'#202020' },
+  moray_eel:  { 1:'#586838', 2:'#485828', 3:'#788858', 4:'#384818', 5:'#F0D028' },
+  cleaner_shrimp: { 1:'#D83838', 2:'#B81818', 3:'#F8F8F8', 4:'#980000', 5:'#F0F0F0' },
 };
 
 const DECOR_COLORS = {
@@ -369,10 +369,10 @@ const ZONE_RANGES = { top:[0.08,0.35], middle:[0.25,0.65], bottom:[0.55,0.82], a
 
 // Species base display scales — dramatic size differences for realism
 const FISH_BASE_SCALES = {
-  guppy: 0.85, goldfish: 1.3, snail: 1.0,
-  neon_tetra: 0.65, blue_eye: 0.8, moon_fish: 1.7, discus: 2.0, pleco: 1.8, gourami: 1.5,
-  clownfish: 1.3, blue_tang: 1.8, green_chromis: 0.65, firefish: 1.2,
-  royal_gramma: 1.2, banggai_cardinal: 0.85, moray_eel: 3.0, cleaner_shrimp: 0.9,
+  guppy: 0.85, goldfish: 1.2, snail: 1.0,
+  neon_tetra: 0.65, blue_eye: 0.75, moon_fish: 1.6, discus: 1.8, pleco: 1.7, gourami: 1.4,
+  clownfish: 1.2, blue_tang: 1.7, green_chromis: 0.65, firefish: 1.1,
+  royal_gramma: 1.1, banggai_cardinal: 0.85, moray_eel: 3.0, cleaner_shrimp: 0.9,
 };
 
 // ═══════ PIXEL ICON SYSTEM ═══════
@@ -561,170 +561,203 @@ function renderSprite(sp, palette, scale, flip) {
 function renderEnvironment(biomeKey) {
   const b = BIOMES[biomeKey] || BIOMES.fresh;
 
-  // Water gradient — deeper color transition
+  // Water gradient — deeper color transition with realistic depth darkening
   const grad = ctx.createLinearGradient(0, 0, 0, H);
   grad.addColorStop(0, b.bg[0]);
-  grad.addColorStop(0.5, b.bg[1]);
-  grad.addColorStop(1, shadeColor(b.bg[1], -15));
+  grad.addColorStop(0.4, b.bg[1]);
+  grad.addColorStop(0.7, shadeColor(b.bg[1], -10));
+  grad.addColorStop(1, shadeColor(b.bg[1], -20));
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, W, H);
 
-  // Underwater light rays from surface — reaching the bottom
+  // Underwater light rays from surface — volumetric god rays
   const time = Date.now() / 3000;
-  ctx.globalAlpha = 0.03;
   ctx.fillStyle = '#ffffff';
-  for (let i = 0; i < 7; i++) {
-    const rayX = ((time * 12 + i * 65) % (W + 60)) - 30;
-    const rayW = 8 + Math.sin(time + i) * 4;
+  for (let i = 0; i < 8; i++) {
+    const rayX = ((time * 10 + i * 55) % (W + 80)) - 40;
+    const rayW = 6 + Math.sin(time * 0.7 + i) * 3;
+    const rayAlpha = 0.02 + Math.sin(time * 0.5 + i * 1.3) * 0.01;
+    ctx.globalAlpha = rayAlpha;
     ctx.beginPath();
     ctx.moveTo(rayX - rayW, 0);
     ctx.lineTo(rayX + rayW, 0);
-    ctx.lineTo(rayX + rayW * 3, H * 0.95);
-    ctx.lineTo(rayX - rayW * 2, H * 0.95);
+    ctx.lineTo(rayX + rayW * 4, H * 0.9);
+    ctx.lineTo(rayX - rayW * 3, H * 0.9);
     ctx.closePath();
     ctx.fill();
   }
 
-  // Caustic light patterns — animated dappled light
-  ctx.globalAlpha = 0.025;
-  for (let i = 0; i < 12; i++) {
-    const cx = Math.sin(time * 0.4 + i * 2.1) * W * 0.4 + W * 0.5;
-    const cy = Math.cos(time * 0.3 + i * 1.7) * H * 0.2 + H * 0.25;
-    const r = 15 + Math.sin(time * 0.8 + i) * 8;
+  // Caustic light patterns — animated dappled light on substrate/walls
+  ctx.globalAlpha = 0.02;
+  ctx.fillStyle = '#ffffff';
+  for (let i = 0; i < 14; i++) {
+    const cx = Math.sin(time * 0.35 + i * 2.1) * W * 0.45 + W * 0.5;
+    const cy = Math.cos(time * 0.25 + i * 1.7) * H * 0.25 + H * 0.3;
+    const r = 12 + Math.sin(time * 0.6 + i) * 7;
     ctx.beginPath();
-    ctx.ellipse(cx, cy, r, r * 0.6, time * 0.1 + i, 0, Math.PI * 2);
+    ctx.ellipse(cx, cy, r, r * 0.55, time * 0.08 + i, 0, Math.PI * 2);
     ctx.fill();
   }
   ctx.globalAlpha = 1;
 
-  // Substrate — multi-layer for depth
+  // Substrate — multi-layer with sand ripple texture for depth
   const subY = H * (1 - b.subH);
   // Dark substrate base
-  ctx.fillStyle = shadeColor(b.substrate, -20);
+  ctx.fillStyle = shadeColor(b.substrate, -22);
   ctx.fillRect(0, subY, W, H - subY);
-  // Lighter top layer
+  // Top gradient layer
   const subGrad = ctx.createLinearGradient(0, subY, 0, H);
   subGrad.addColorStop(0, b.substrate);
-  subGrad.addColorStop(0.3, shadeColor(b.substrate, -10));
-  subGrad.addColorStop(1, shadeColor(b.substrate, -25));
+  subGrad.addColorStop(0.25, shadeColor(b.substrate, -8));
+  subGrad.addColorStop(1, shadeColor(b.substrate, -28));
   ctx.fillStyle = subGrad;
   ctx.fillRect(0, subY, W, H - subY);
 
-  // Substrate pebble texture — varied sizes and colors
+  // Sand ripple pattern — undulating light/dark bands for realism
+  ctx.globalAlpha = 0.06;
+  for (let r = 0; r < 5; r++) {
+    const ripY = subY + 4 + r * ((H - subY) / 5);
+    ctx.beginPath();
+    ctx.moveTo(0, ripY);
+    for (let rx = 0; rx <= W; rx += 3) {
+      const ry = ripY + Math.sin(rx * 0.03 + r * 1.5 + time * 0.15) * 2;
+      ctx.lineTo(rx, ry);
+    }
+    ctx.lineTo(W, ripY + 3);
+    ctx.lineTo(0, ripY + 3);
+    ctx.closePath();
+    ctx.fillStyle = r % 2 === 0 ? 'rgba(255,255,255,.06)' : 'rgba(0,0,0,.04)';
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+
+  // Substrate pebble/grain texture — varied sizes and natural colors
   const rng = seededRng(42);
-  for (let i = 0; i < 120; i++) {
+  for (let i = 0; i < 150; i++) {
     const gx = rng() * W;
     const gy = subY + 2 + rng() * (H - subY - 4);
-    const shade = ((rng() - 0.5) * 40) | 0;
+    const shade = ((rng() - 0.5) * 45) | 0;
     ctx.fillStyle = shadeColor(b.substrate, shade);
-    const pw = 1 + rng() * 3.5;
-    const ph = 0.8 + rng() * 1.5;
+    const pw = 1 + rng() * 3;
+    const ph = 0.6 + rng() * 1.2;
     ctx.fillRect(gx, gy, pw, ph);
   }
-  // Substrate highlight line — softer
-  ctx.fillStyle = 'rgba(255,255,255,.08)';
+  // Substrate highlight line at water/sand boundary
+  ctx.fillStyle = 'rgba(255,255,255,.09)';
   ctx.fillRect(0, subY, W, 1.5);
   ctx.fillStyle = 'rgba(255,255,255,.03)';
   ctx.fillRect(0, subY + 1.5, W, 1);
 
-  // Water surface — animated wave line with ripples and refraction
-  // Wave line
+  // Water surface — animated wave with realistic light refraction
   ctx.save();
   ctx.beginPath();
   ctx.moveTo(0, 0);
   for (let x = 0; x <= W; x += 2) {
-    const y = 5 + Math.sin(x * 0.04 + time * 2.5) * 2.2 + Math.sin(x * 0.08 + time * 1.3) * 1.0;
+    const y = 4.5 + Math.sin(x * 0.035 + time * 2.2) * 2 + Math.sin(x * 0.07 + time * 1.1) * 0.9;
     ctx.lineTo(x, y);
   }
   ctx.lineTo(W, 0);
   ctx.closePath();
-  // Light refraction above water line
-  ctx.fillStyle = 'rgba(180,220,255,0.12)';
+  ctx.fillStyle = 'rgba(180,220,255,0.1)';
   ctx.fill();
 
-  // Surface highlight shimmer
-  ctx.globalAlpha = 0.10;
+  // Surface highlight shimmer — moving bright spots
+  ctx.globalAlpha = 0.08;
   ctx.fillStyle = '#ffffff';
-  for (let i = 0; i < 12; i++) {
-    const sx = Math.sin(time * 0.8 + i * 1.2) * 25 + i * (W / 12);
-    const sw = 18 + Math.sin(time * 1.2 + i) * 10;
-    const sy = 1.5 + Math.sin(sx * 0.04 + time * 2.5) * 1.8;
-    ctx.fillRect(sx, sy, sw, 2);
-    ctx.globalAlpha = 0.05;
-    ctx.fillRect(sx + 3, sy + 2, sw * 0.7, 1.5);
-    ctx.globalAlpha = 0.10;
+  for (let i = 0; i < 14; i++) {
+    const sx = Math.sin(time * 0.7 + i * 1.1) * 22 + i * (W / 14);
+    const sw = 15 + Math.sin(time * 1.1 + i) * 9;
+    const sy = 1.2 + Math.sin(sx * 0.035 + time * 2.2) * 1.6;
+    ctx.fillRect(sx, sy, sw, 1.8);
+    ctx.globalAlpha = 0.04;
+    ctx.fillRect(sx + 2, sy + 1.8, sw * 0.7, 1.2);
+    ctx.globalAlpha = 0.08;
   }
-  // Subtle blue underside of surface
-  ctx.globalAlpha = 0.04;
+  // Subtle underside of surface in blue
+  ctx.globalAlpha = 0.03;
   ctx.fillStyle = '#88ccff';
   for (let x = 0; x < W; x += 3) {
-    const y = 3 + Math.sin(x * 0.04 + time * 2.5) * 1.8;
-    ctx.fillRect(x, y, 3, 3 + Math.sin(x * 0.1 + time) * 2);
+    const y = 2.5 + Math.sin(x * 0.035 + time * 2.2) * 1.6;
+    ctx.fillRect(x, y, 3, 2.5 + Math.sin(x * 0.08 + time) * 1.5);
   }
   ctx.restore();
   ctx.globalAlpha = 1;
 
-  // Depth fog near bottom — subtle dark gradient at bottom
-  const fogGrad = ctx.createLinearGradient(0, subY - 20, 0, subY);
+  // Depth fog near substrate — haze for depth illusion
+  const fogGrad = ctx.createLinearGradient(0, subY - 25, 0, subY);
   fogGrad.addColorStop(0, 'rgba(0,0,0,0)');
-  fogGrad.addColorStop(1, 'rgba(0,0,0,.06)');
+  fogGrad.addColorStop(1, 'rgba(0,0,0,.05)');
   ctx.fillStyle = fogGrad;
-  ctx.fillRect(0, subY - 20, W, 20);
+  ctx.fillRect(0, subY - 25, W, 25);
+
+  // Back wall ambient gradient — subtle darkening at edges for depth
+  const wallL = ctx.createLinearGradient(0, 0, 20, 0);
+  wallL.addColorStop(0, 'rgba(0,0,0,.04)');
+  wallL.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = wallL;
+  ctx.fillRect(0, 0, 20, subY);
+  const wallR = ctx.createLinearGradient(W - 20, 0, W, 0);
+  wallR.addColorStop(0, 'rgba(0,0,0,0)');
+  wallR.addColorStop(1, 'rgba(0,0,0,.04)');
+  ctx.fillStyle = wallR;
+  ctx.fillRect(W - 20, 0, 20, subY);
 
   // Glass frame — subtle edge borders with inner reflection
-  ctx.strokeStyle = 'rgba(150,200,255,.06)';
+  ctx.strokeStyle = 'rgba(150,200,255,.05)';
   ctx.lineWidth = 2;
   ctx.strokeRect(1, 1, W - 2, H - 2);
-  // Inner glass reflection strips — animated subtle shimmer
-  const reflAlpha = 0.02 + Math.sin(time * 0.5) * 0.01;
+  // Inner glass reflection strips
+  const reflAlpha = 0.015 + Math.sin(time * 0.4) * 0.008;
   ctx.fillStyle = `rgba(150,200,255,${reflAlpha})`;
-  ctx.fillRect(0, 0, 4, H);
-  ctx.fillRect(W - 4, 0, 4, H);
-  // Top reflection
-  ctx.fillStyle = 'rgba(200,230,255,.04)';
-  ctx.fillRect(0, 0, W, 3);
+  ctx.fillRect(0, 0, 3, H);
+  ctx.fillRect(W - 3, 0, 3, H);
+  // Top glass reflection
+  ctx.fillStyle = 'rgba(200,230,255,.03)';
+  ctx.fillRect(0, 0, W, 2.5);
 }
 
-// ═══════ RENDERING — DECOR (Layered: back decor → fish → front decor) ═══════
+// ═══════ RENDERING — DECOR (3-row depth: back → mid → front for 3D feel) ═══════
 
-// Draw BACK layer decor (fish swim in front of these)
-function renderDecorBack(decors, biomeKey) {
+// Depth row constants: 0=back (behind fish), 1=mid (interleaved), 2=front (in front)
+const DEPTH_ROW_CONFIG = {
+  0: { opacity: 0.50, scale: 0.82, yShift: -4, blur: true },   // back row: smaller, faded
+  1: { opacity: 0.85, scale: 1.00, yShift: 0, blur: false },   // mid row: normal
+  2: { opacity: 1.00, scale: 1.12, yShift: 3, blur: false },   // front row: larger, full
+};
+
+// Decor IDs that act as plant/cover for fish hiding behavior
+const HIDING_COVER_DECORS = new Set([
+  'hornwort', 'vallisneria', 'anubias', 'java_fern', 'amazon_sword',
+  'cryptocoryne', 'ludwigia', 'anemone', 'sea_fan', 'staghorn_coral',
+]);
+// Decor IDs that act as structural shelter (cave-like)
+const SHELTER_DECORS = new Set(['cave', 'hollow_stump', 'mossy_log', 'driftwood']);
+
+function getDecorsByRow(decors, row) {
+  if (!decors) return [];
+  return decors.filter(d => (d.depthRow ?? 1) === row);
+}
+
+// Draw a specific depth row of decorations
+function renderDecorRow(decors, biomeKey, row) {
   if (!decors || !tankCat) return;
   const biome = BIOMES[biomeKey] || BIOMES.fresh;
   const subY = H * (1 - biome.subH);
-  // Back layer: large plants, corals — rendered at 60% opacity for depth
-  for (const d of decors) {
+  const cfg = DEPTH_ROW_CONFIG[row] || DEPTH_ROW_CONFIG[1];
+  const rowDecors = getDecorsByRow(decors, row);
+
+  for (const d of rowDecors) {
     const def = tankCat.content?.decor?.[d.decorId];
     if (!def) continue;
-    if (def.placement === 'top') continue; // floating always in front
     const color = DECOR_COLORS[d.decorId] || '#888';
     const x = d.x * W;
-    const baseSize = Math.max(16, (d.size || 1) * PX_SCALE * 10);
-    // Only render roughly half the decor in the back (based on index)
-    const idx = decors.indexOf(d);
-    if (idx % 3 !== 0) continue; // every 3rd decor drawn behind fish
-    ctx.globalAlpha = 0.55; // faded depth effect
-    drawDecorItem(d, def, color, x, baseSize, subY, biomeKey, true);
+    const baseSize = Math.max(16, (d.size || 1) * PX_SCALE * 10) * cfg.scale;
+    ctx.globalAlpha = cfg.opacity;
+    drawDecorItem(d, def, color, x, baseSize, subY + cfg.yShift, biomeKey, row === 0);
     ctx.globalAlpha = 1;
   }
 }
 
-// Draw FRONT layer decor (in front of fish)
-function renderDecorFront(decors, biomeKey) {
-  if (!decors || !tankCat) return;
-  const biome = BIOMES[biomeKey] || BIOMES.fresh;
-  const subY = H * (1 - biome.subH);
-  for (const d of decors) {
-    const def = tankCat.content?.decor?.[d.decorId];
-    if (!def) continue;
-    const color = DECOR_COLORS[d.decorId] || '#888';
-    const x = d.x * W;
-    const baseSize = Math.max(16, (d.size || 1) * PX_SCALE * 10);
-    const idx = decors.indexOf(d);
-    if (idx % 3 === 0) continue; // skip back-layer items
-    drawDecorItem(d, def, color, x, baseSize, subY, biomeKey, false);
-  }
-}
 
 function drawDecorItem(d, def, color, x, baseSize, subY, biomeKey, isBack) {
   if (def.placement === 'top') {
@@ -1815,7 +1848,7 @@ function renderFish(fish) {
       ctx.drawImage(cached.right, -drawW / 2, -drawH / 2, drawW, drawH);
       ctx.restore();
     }
-    // Snake movement: sinusoidal body undulation + cave hiding
+    // Snake movement: sinusoidal body undulation + shelter/plant hiding
     else if (movType === 'snake') {
       ctx.save();
       const myDecorZone = claimedDecorZones?.find(z => z.fishId === f.id && z.isMoray);
@@ -1823,40 +1856,36 @@ function renderFish(fish) {
       const undulate = Math.sin(anim.phase * 1.5) * 2;
       ctx.rotate(undulate * Math.PI / 180);
 
+      let drawn = false;
       if (myDecorZone) {
-        const caveDecor = decors.find(d => d.decorId === 'cave');
-        if (caveDecor) {
-          const cdx = anim.x - caveDecor.x;
-          const caveDist = Math.abs(cdx);
-          if (caveDist < 0.08) {
-            // Moray is inside cave — clip to show only the head poking out from the dark opening
-            // The cave opening is the dark ellipse at the bottom part of the cave
-            const caveX = caveDecor.x * W - anim.x * W; // relative to moray center
-            const caveBaseY = (subY - anim.y * H);
-            // Only draw the front portion emerging from cave darkness
-            const visiblePortion = Math.max(0.25, 0.25 + caveDist * 8);
-            const headSide = anim.facing > 0 ? 1 : -1;
-            const srcW = Math.floor(img.width * visiblePortion);
-            const dstW = drawW * visiblePortion;
-            // Show the head end emerging
-            if (anim.facing > 0) {
-              // facing right — head is on right, show right portion
-              ctx.drawImage(img, img.width - srcW, 0, srcW, img.height,
-                drawW / 2 - dstW, -drawH / 2, dstW, drawH);
-            } else {
-              // facing left — head is on left, show left portion
-              ctx.drawImage(img, 0, 0, srcW, img.height,
-                -drawW / 2, -drawH / 2, dstW, drawH);
-            }
-          } else {
-            ctx.drawImage(img, -drawW / 2, -drawH / 2, drawW, drawH);
-          }
-        } else {
-          ctx.drawImage(img, -drawW / 2, -drawH / 2, drawW, drawH);
+        // Find the nearest shelter decor OR dense plant the moray can hide in
+        let hideDecor = null;
+        let hideDist = Infinity;
+        for (const d of decors) {
+          if (!SHELTER_DECORS.has(d.decorId) && !HIDING_COVER_DECORS.has(d.decorId)) continue;
+          const ddx = Math.abs(anim.x - d.x);
+          if (ddx < hideDist) { hideDist = ddx; hideDecor = d; }
         }
-      } else {
-        ctx.drawImage(img, -drawW / 2, -drawH / 2, drawW, drawH);
+        if (hideDecor && hideDist < 0.08) {
+          const isShelter = SHELTER_DECORS.has(hideDecor.decorId);
+          // Moray is inside cover — clip to show only the head poking out
+          const visiblePortion = Math.max(0.20, 0.20 + hideDist * 9);
+          const srcW = Math.floor(img.width * visiblePortion);
+          const dstW = drawW * visiblePortion;
+          // Reduce opacity for plant cover (more translucent feel through foliage)
+          if (!isShelter) ctx.globalAlpha = Math.max(0.4, (f.weak ? 0.3 : 0.7) * (0.5 + hideDist * 6));
+          if (anim.facing > 0) {
+            ctx.drawImage(img, img.width - srcW, 0, srcW, img.height,
+              drawW / 2 - dstW, -drawH / 2, dstW, drawH);
+          } else {
+            ctx.drawImage(img, 0, 0, srcW, img.height,
+              -drawW / 2, -drawH / 2, dstW, drawH);
+          }
+          if (!isShelter) ctx.globalAlpha = f.weak ? 0.45 : 1;
+          drawn = true;
+        }
       }
+      if (!drawn) ctx.drawImage(img, -drawW / 2, -drawH / 2, drawW, drawH);
       ctx.restore();
     }
     // Crawl movement (snails, shrimp): on substrate
@@ -1865,15 +1894,52 @@ function renderFish(fish) {
       const crawlY = subY - drawH * 0.6;
       ctx.drawImage(img, anim.x * W - drawW / 2, crawlY, drawW, drawH);
     }
-    // Default swim
+    // Default swim — with host-decor hiding for clownfish, royal_gramma, firefish, etc.
     else {
-      // Clownfish near anemone: partially obscured by tentacles (lower opacity)
-      if (f.speciesId === 'clownfish') {
-        const myZone = claimedDecorZones?.find(z => z.fishId === f.id && z.isClownfish);
-        if (myZone) {
-          const distToDecor = Math.sqrt((anim.x - myZone.x) ** 2 + (anim.y - myZone.y) ** 2);
-          if (distToDecor < 0.05) {
-            ctx.globalAlpha = Math.max(0.55, ctx.globalAlpha * (0.6 + distToDecor * 8));
+      const myZone = claimedDecorZones?.find(z => z.fishId === f.id);
+      let hideApplied = false;
+
+      if (myZone) {
+        const distToDecor = Math.sqrt((anim.x - myZone.x) ** 2 + (anim.y - myZone.y) ** 2);
+
+        if (myZone.isClownfish) {
+          // Clownfish disappears into anemone tentacles when very close
+          if (distToDecor < 0.06) {
+            const hideAmount = 1 - (distToDecor / 0.06); // 0 at edge, 1 at center
+            ctx.globalAlpha = Math.max(0.25, (f.weak ? 0.2 : 1.0) * (0.3 + distToDecor * 12));
+            // Clip body: only show portion emerging from anemone
+            const clipPortion = Math.max(0.35, 0.35 + distToDecor * 10);
+            const srcW = Math.floor(img.width * clipPortion);
+            const dstW = drawW * clipPortion;
+            if (anim.facing > 0) {
+              ctx.drawImage(img, img.width - srcW, 0, srcW, img.height,
+                px + drawW - dstW, py, dstW, drawH);
+            } else {
+              ctx.drawImage(img, 0, 0, srcW, img.height,
+                px, py, dstW, drawH);
+            }
+            ctx.globalAlpha = f.weak ? 0.45 : 1;
+            hideApplied = true;
+          }
+        } else if (distToDecor < 0.05) {
+          // Other territorial fish (royal_gramma, firefish): fade behind their host decor
+          const hostDecor = decors.find(d => d.decorId === myZone.decorId);
+          if (hostDecor && (SHELTER_DECORS.has(hostDecor.decorId) || HIDING_COVER_DECORS.has(hostDecor.decorId))) {
+            ctx.globalAlpha = Math.max(0.35, (f.weak ? 0.25 : 1.0) * (0.4 + distToDecor * 12));
+            hideApplied = true; // still draw normally but faded
+          }
+        }
+      }
+      if (!hideApplied) {
+        // Check if any plant/cover decor overlaps this fish position (generic plant hiding)
+        for (const d of decors) {
+          if (!HIDING_COVER_DECORS.has(d.decorId)) continue;
+          const ddx = Math.abs(anim.x - d.x);
+          const ddy = Math.abs(anim.y - d.y * 0.85);
+          if (ddx < 0.04 && ddy < 0.08) {
+            // Fish is inside plant foliage — subtle transparency
+            ctx.globalAlpha = Math.max(0.5, (f.weak ? 0.3 : 1.0) * 0.7);
+            break;
           }
         }
       }
@@ -3148,13 +3214,14 @@ function gameLoop(timestamp) {
   updateFoodParticles(dt);
   updateBubbles(dt, activeTankId);
 
-  // Render (layered: back decor → equipment → fish → front decor → particles)
+  // Render (3-row depth: back decor → equipment → mid decor → fish → front decor → particles)
   ctx.clearRect(0, 0, W, H);
   renderEnvironment(activeTankId);
-  renderDecorBack(tank?.decor, activeTankId);
+  renderDecorRow(tank?.decor, activeTankId, 0);   // back row (behind everything)
   renderEquipment(tank?.toolsOwned);
+  renderDecorRow(tank?.decor, activeTankId, 1);   // mid row (behind fish)
   renderFish(fish);
-  renderDecorFront(tank?.decor, activeTankId);
+  renderDecorRow(tank?.decor, activeTankId, 2);   // front row (in front of fish)
   renderFoodParticles();
   renderBubbles();
   renderLaser();
