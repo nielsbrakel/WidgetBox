@@ -1,0 +1,43 @@
+<svg width="900" height="300" viewBox="0 0 900 300" xmlns="http://www.w3.org/2000/svg">
+
+  <defs>
+    <!-- gradient for the box -->
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff7a18"/>
+      <stop offset="25%" stop-color="#ff3cac"/>
+      <stop offset="50%" stop-color="#784ba0"/>
+      <stop offset="75%" stop-color="#2b86c5"/>
+      <stop offset="100%" stop-color="#42e695"/>
+    </linearGradient>
+
+    <!-- mask for transparent shapes -->
+    <mask id="cutouts">
+      <rect width="300" height="300" fill="white"/>
+
+      <!-- circle -->
+      <circle cx="105" cy="105" r="38" fill="black"/>
+
+      <!-- square -->
+      <rect x="155" y="67" width="76" height="76" rx="16" fill="black"/>
+
+      <!-- triangle -->
+      <polygon points="105,155 65,230 145,230" fill="black"/>
+
+      <!-- diamond -->
+      <polygon points="190,155 230,195 190,235 150,195" fill="black"/>
+    </mask>
+  </defs>
+
+  <!-- gradient icon -->
+  <rect x="0" y="0" width="300" height="300" rx="70"
+        fill="url(#grad)" mask="url(#cutouts)"/>
+
+  <!-- text -->
+  <text x="340" y="180"
+        font-family="Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif"
+        font-size="96"
+        fill="#2b2b2b">
+    WidgetBox
+  </text>
+
+</svg>

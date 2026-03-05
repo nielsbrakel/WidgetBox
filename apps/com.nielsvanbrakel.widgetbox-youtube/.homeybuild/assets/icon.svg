@@ -1,4 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
-  <rect x="62" y="192" width="900" height="640" rx="180" fill="#FF0000"/>
-  <polygon points="412,332 412,692 712,512" fill="white"/>
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <mask id="cutouts">
+      <!-- everything visible -->
+      <rect width="512" height="512" fill="white"/>
+      
+      <!-- shapes become transparent -->
+      <circle cx="180" cy="180" r="62" fill="black"/>
+      <rect x="270" y="118" width="124" height="124" rx="24" fill="black"/>
+      <polygon points="180,268 115,394 245,394" fill="black"/>
+      <polygon points="332,266 398,332 332,398 266,332" fill="black"/>
+    </mask>
+  </defs>
+
+  <!-- black rounded square with transparent cut-outs -->
+  <rect x="16" y="16" width="480" height="480" rx="96" fill="black" mask="url(#cutouts)"/>
 </svg>

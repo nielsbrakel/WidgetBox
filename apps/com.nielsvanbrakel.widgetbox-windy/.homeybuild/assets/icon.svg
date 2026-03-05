@@ -1,6 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
-  <!-- Wind swoosh lines representing the Windy logo -->
-  <path d="M160 340 C280 340 340 240 480 240 C620 240 660 340 820 280" stroke="#C03020" stroke-width="64" fill="none" stroke-linecap="round"/>
-  <path d="M120 520 C280 520 380 420 540 420 C700 420 740 520 900 460" stroke="#E84233" stroke-width="64" fill="none" stroke-linecap="round"/>
-  <path d="M160 700 C320 700 400 600 560 600 C720 600 760 700 880 640" stroke="#F4675B" stroke-width="64" fill="none" stroke-linecap="round"/>
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <mask id="cutouts">
+      <!-- everything visible -->
+      <rect width="512" height="512" fill="white"/>
+      
+      <!-- shapes become transparent -->
+      <circle cx="180" cy="180" r="62" fill="black"/>
+      <rect x="270" y="118" width="124" height="124" rx="24" fill="black"/>
+      <polygon points="180,268 115,394 245,394" fill="black"/>
+      <polygon points="332,266 398,332 332,398 266,332" fill="black"/>
+    </mask>
+  </defs>
+
+  <!-- black rounded square with transparent cut-outs -->
+  <rect x="16" y="16" width="480" height="480" rx="96" fill="black" mask="url(#cutouts)"/>
 </svg>
