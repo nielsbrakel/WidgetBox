@@ -26,9 +26,16 @@
   },
   "author": {
     "name": "Niels van Brakel",
-    "email": "niels@nielsvanbrakel.com"
+    "email": "info@nielsvanbrakel.com"
   },
   "brandColor": "#9E9E9E",
+  "bugs": {
+    "url": "https://github.com/nielsbrakel/WidgetBox/issues"
+  },
+  "source": "https://github.com/nielsbrakel/WidgetBox",
+  "homepage": "https://nielsvanbrakel.com",
+  "support": "mailto:info@nielsvanbrakel.com",
+  "homeyCommunityTopicId": 152111,
   "widgets": {
     "spacer": {
       "name": {
