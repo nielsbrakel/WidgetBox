@@ -117,37 +117,6 @@
       content.appendChild(iframe);
     }
 
-    let wakeLock = null;
-
-    async function updateWakeLock() {
-      try {
-        if (currentSettings.preventSleep) {
-          if (!wakeLock) {
-            wakeLock = await navigator.wakeLock.request('screen');
-            console.log('Wake Lock active');
-            wakeLock.addEventListener('release', () => {
-              console.log('Wake Lock released');
-              wakeLock = null;
-            });
-          }
-        } else {
-          if (wakeLock) {
-            await wakeLock.release();
-            wakeLock = null;
-          }
-        }
-      } catch (err) {
-        console.error(`${err.name}, ${err.message}`);
-      }
-    }
-
-    // Re-request wake lock when visibility changes (if it was released by system)
-    document.addEventListener('visibilitychange', async () => {
-      if (wakeLock !== null && document.visibilityState === 'visible') {
-        updateWakeLock();
-      }
-    });
-
     async function onHomeyReady(Homey) {
       currentSettings = Homey.getSettings();
       const heightPercentage = getAspectRatioPercentage(currentSettings.aspectRatio);
@@ -165,7 +134,6 @@
       }
 
       render();
-      updateWakeLock();
 
       Homey.ready({ height: heightPercentage });
 
@@ -175,10 +143,6 @@
         const newHeightPercentage = getAspectRatioPercentage(currentSettings.aspectRatio);
         render();
         Homey.setHeight(newHeightPercentage);
-
-        if (key === 'preventSleep') {
-          updateWakeLock();
-        }
       });
     }
   </script>

@@ -46,7 +46,7 @@ class MockHomey extends SimpleEventEmitter {
 
     ready(options) {
         console.log('[MockHomey] Widget ready', options);
-        if (options?.height && this.onHeightChange) {
+        if (options?.height != null && this.onHeightChange) {
             this.onHeightChange(options.height);
         }
     }

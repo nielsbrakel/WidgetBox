@@ -58,53 +58,6 @@ test.describe('YouTube App', () => {
         // await expect(tube.card).toHaveCSS('aspect-ratio', /(1\.33|4 \/ 3)/);
     });
 
-    test('should toggle wake lock', async () => {
-        // Mock navigator.wakeLock
-        await tube.widgetIframe.evaluate(() => {
-            let releaseFn = async () => { };
-            const sentinel = {
-                release: async () => { await releaseFn(); },
-                get released() { return false; }, // Simplified
-                type: 'screen' as WakeLockType,
-                onrelease: null,
-                addEventListener: () => { },
-                removeEventListener: () => { },
-                dispatchEvent: () => true,
-            };
-
-            (window as any)._wakeLockLog = [] as string[];
-
-            // Mock navigator.wakeLock
-            Object.defineProperty(navigator, 'wakeLock', {
-                value: {
-                    request: async (type: string) => {
-                        (window as any)._wakeLockLog.push(`request:${type}`);
-                        return sentinel;
-                    }
-                },
-                writable: true
-            });
-
-            // Spy on release
-            releaseFn = async () => {
-                (window as any)._wakeLockLog.push('release');
-            };
-        });
-
-        // Enable "Keep Screen On"
-        await tube.setSettingCheckbox('Keep Screen On', true);
-
-        // Check log
-        let log = await tube.widgetIframe.evaluate(() => (window as any)._wakeLockLog);
-        expect(log).toContain('request:screen');
-
-        // Disable "Keep Screen On"
-        await tube.setSettingCheckbox('Keep Screen On', false);
-
-        // Check log again
-        log = await tube.widgetIframe.evaluate(() => (window as any)._wakeLockLog);
-        expect(log).toContain('release');
-    });
 });
 
 test.describe('YouTube App — iOS', () => {

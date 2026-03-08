@@ -21,7 +21,7 @@ Embeds a YouTube video or livestream directly in the dashboard.
 | `mute` | Checkbox | `false` | Start muted. |
 | `controls` | Checkbox | `false` | Show YouTube player controls. |
 | `loop` | Checkbox | `false` | Loop video/playlist. |
-| `preventSleep` | Checkbox | `false` | Keep screen on while widget is active. |
+
 | `start` | Number | `0` | Start time offset (seconds). |
 | `aspectRatio` | Dropdown | `16:9` | 1:1, 4:3, 16:9, 9:16 (Portrait), 21:9, 3:1 (Panoramic). |
 

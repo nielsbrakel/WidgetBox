@@ -1,0 +1,118 @@
+{
+  "name": {
+    "en": "Separator",
+    "nl": "Scheidingslijn"
+  },
+  "description": {
+    "en": "A horizontal line to visually separate widgets",
+    "nl": "Een horizontale lijn om widgets visueel te scheiden"
+  },
+  "height": 24,
+  "transparent": true,
+  "settings": [
+    {
+      "id": "color",
+      "type": "dropdown",
+      "label": {
+        "en": "Color",
+        "nl": "Kleur"
+      },
+      "value": "default",
+      "values": [
+        { "id": "default", "label": { "en": "Default", "nl": "Standaard" } },
+        { "id": "blue", "label": { "en": "Blue", "nl": "Blauw" } },
+        { "id": "green", "label": { "en": "Green", "nl": "Groen" } },
+        { "id": "orange", "label": { "en": "Orange", "nl": "Oranje" } },
+        { "id": "red", "label": { "en": "Red", "nl": "Rood" } },
+        { "id": "purple", "label": { "en": "Purple", "nl": "Paars" } }
+      ]
+    },
+    {
+      "id": "thickness",
+      "type": "dropdown",
+      "label": {
+        "en": "Thickness",
+        "nl": "Dikte"
+      },
+      "value": "1",
+      "values": [
+        {
+          "id": "1",
+          "label": {
+            "en": "1px — Thin",
+            "nl": "1px — Dun"
+          }
+        },
+        {
+          "id": "2",
+          "label": {
+            "en": "2px",
+            "nl": "2px"
+          }
+        },
+        {
+          "id": "3",
+          "label": {
+            "en": "3px",
+            "nl": "3px"
+          }
+        },
+        {
+          "id": "4",
+          "label": {
+            "en": "4px — Thick",
+            "nl": "4px — Dik"
+          }
+        }
+      ]
+    },
+    {
+      "id": "style",
+      "type": "dropdown",
+      "label": {
+        "en": "Style",
+        "nl": "Stijl"
+      },
+      "value": "solid",
+      "values": [
+        {
+          "id": "solid",
+          "label": {
+            "en": "Solid",
+            "nl": "Doorgetrokken"
+          }
+        },
+        {
+          "id": "dashed",
+          "label": {
+            "en": "Dashed",
+            "nl": "Gestreept"
+          }
+        },
+        {
+          "id": "dotted",
+          "label": {
+            "en": "Dotted",
+            "nl": "Gestippeld"
+          }
+        }
+      ]
+    },
+    {
+      "id": "margin",
+      "type": "number",
+      "label": {
+        "en": "Side Margin (pixels)",
+        "nl": "Zijmarge (pixels)"
+      },
+      "hint": {
+        "en": "Horizontal space on each side of the line.",
+        "nl": "Horizontale ruimte aan elke kant van de lijn."
+      },
+      "min": 0,
+      "max": 200,
+      "step": 1,
+      "value": 16
+    }
+  ]
+}

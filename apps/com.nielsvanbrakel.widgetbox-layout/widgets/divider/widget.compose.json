@@ -1,0 +1,30 @@
+{
+  "name": {
+    "en": "Divider",
+    "nl": "Scheiding"
+  },
+  "description": {
+    "en": "Add empty space between widgets",
+    "nl": "Voeg lege ruimte toe tussen widgets"
+  },
+  "height": 32,
+  "transparent": true,
+  "settings": [
+    {
+      "id": "height",
+      "type": "number",
+      "label": {
+        "en": "Height (pixels)",
+        "nl": "Hoogte (pixels)"
+      },
+      "hint": {
+        "en": "Homey uses an 8 pixel grid, so multiples of 8 (8, 16, 24, 32, ...) will align best.",
+        "nl": "Homey gebruikt een raster van 8 pixels, dus veelvouden van 8 (8, 16, 24, 32, ...) passen het beste."
+      },
+      "min": 0,
+      "max": 1000,
+      "step": 1,
+      "value": 32
+    }
+  ]
+}

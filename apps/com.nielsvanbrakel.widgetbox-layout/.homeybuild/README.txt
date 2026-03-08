@@ -2,4 +2,4 @@ WidgetBox adds clean, native-looking widgets to your Homey dashboard. Designed t
 
 WidgetBox Layout provides tools to organize your dashboard structure and spacing.
 
-The Spacer is a simple but useful layout tool. Use it to add vertical breathing room between your other widgets. Adjust the height multiplier to get exactly the spacing you want, creating a clean and organized dashboard layout.
+The Divider is a simple but useful layout tool. Use it to add vertical breathing room between your other widgets. Pick a size from Extra Small to Extra Large to get exactly the spacing you want, creating a clean and organized dashboard layout.

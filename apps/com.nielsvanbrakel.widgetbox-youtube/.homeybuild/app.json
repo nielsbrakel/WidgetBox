@@ -107,6 +107,10 @@
             "en": "Autoplay",
             "nl": "Automatisch Afspelen"
           },
+          "hint": {
+            "en": "While a video is playing, YouTube will prevent the default screen timeout behaviour.",
+            "nl": "Terwijl een video afspeelt, voorkomt YouTube het standaard scherm time-out gedrag."
+          },
           "value": true
         },
         {
@@ -133,19 +137,6 @@
           "label": {
             "en": "Muted",
             "nl": "Gedempt"
-          },
-          "value": false
-        },
-        {
-          "id": "preventSleep",
-          "type": "checkbox",
-          "label": {
-            "en": "Keep Screen On",
-            "nl": "Scherm Aanhouden"
-          },
-          "hint": {
-            "en": "Prevents the device from going to sleep while the widget is active.",
-            "nl": "Voorkomt dat het apparaat in slaapstand gaat terwijl de widget actief is."
           },
           "value": false
         },
