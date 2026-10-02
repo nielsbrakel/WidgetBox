@@ -96,10 +96,15 @@
         this.checkTimezone();
         if (Date.now() - this.lastSync > 30000) this.refreshFromServer();
       });
+      // Rebuilding the backdrop and sprites is costly, so wait until resizing settles.
+      let resizeTimer = null;
       const ro = new ResizeObserver(() => {
-        this.scene.resize();
-        this.scene.sync(this.save, this.now(), this.save.active);
-        if (this.ui.sheet) this.ui.renderSheet();
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+          this.scene.resize();
+          this.scene.sync(this.save, this.now(), this.save.active);
+          if (this.ui.sheet) this.ui.renderSheet();
+        }, 120);
       });
       ro.observe(document.getElementById("app"));
     }
@@ -225,6 +230,17 @@
       }
     }
 
+    // One tap from the welcome-back card gathers every coin in the tank.
+    collectAll() {
+      const scene = this.scene;
+      const target = this.pillTarget();
+      const spots = scene.drops.map((d) => scene.dropPos(d));
+      const r = this.do({ type: "collect", tank: this.save.active });
+      if (!r.ok || !r.result.coins) return;
+      for (const p of spots) scene.coinFly(p.x, p.y, target.x, target.y, 1);
+      this.ui.toast(`+${r.result.coins}`, "gold");
+    }
+
     tick() {
       if (!this.save || document.hidden) return;
       const ev = [];
@@ -292,12 +308,22 @@
 
       const hit = scene.hitTest(x, y);
       if (hit.type === "drop") {
-        const r = this.do({ type: "collect", tank, id: hit.id });
-        if (r.ok) {
-          const target = this.pillTarget();
-          scene.coinFly(hit.x, hit.y, target.x, target.y, r.result.coins);
-          scene.floatText(hit.x, hit.y - 10, `+${r.result.coins}`);
+        // Coins lying close together come along with the one you tap.
+        const reach = scene.W * 0.12;
+        const near = scene.drops.filter((d) => {
+          const p = scene.dropPos(d);
+          return d.id === hit.id || Math.hypot(p.x - hit.x, p.y - hit.y) < reach;
+        });
+        const target = this.pillTarget();
+        let total = 0;
+        for (const d of near) {
+          const p = scene.dropPos(d);
+          const r = this.do({ type: "collect", tank, id: d.id });
+          if (!r.ok) continue;
+          total += r.result.coins;
+          scene.coinFly(p.x, p.y, target.x, target.y, r.result.coins);
         }
+        if (total) scene.floatText(hit.x, hit.y - 10, `+${total}`);
         return;
       }
       // Chores stay tappable while feeding or playing; only open water drops food or a toy.

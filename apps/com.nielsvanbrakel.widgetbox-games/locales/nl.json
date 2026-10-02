@@ -62,7 +62,7 @@
         "noFood": "Dit voer is op. Tik + om meer te kopen.",
         "noEaters": "Geen vis hier eet {food}",
         "feed": "Tik op het water om {food} te strooien",
-        "play": "Tik om het lichtje te verplaatsen. {n} vissen willen spelen",
+        "play": "Tik om het lichtje te verplaatsen · {n} willen spelen",
         "playTired": "Je vissen rusten. Probeer het later nog eens.",
         "place": "Tik op een oplichtende plek",
         "clean": "Tik op algen op het glas en vuil op de bodem om schoon te maken."
@@ -70,7 +70,8 @@
       "chip": {
         "eggs": "Eitjes!",
         "hungry": "{n} hongerig",
-        "full": "Vol"
+        "full": "Vol",
+        "water": "Water {n}%"
       },
       "tut": {
         "collect": "Tik op de munt in het zand om hem te pakken",
@@ -323,7 +324,8 @@
         "eggs": "{n} nieuw legsel eitjes",
         "hungry": "{n} vissen hebben honger",
         "dirty": "{n} plekken moeten schoon",
-        "go": "Aan de slag"
+        "go": "Aan de slag",
+        "collect": "Pak {n} munten"
       },
       "egg": {
         "mystery": "Verrassingsei",
@@ -333,7 +335,19 @@
         "mystery": "Komt uit als een willekeurige vis van {tank}, met drie keer zoveel kans op een zeldzame kleur.",
         "golden": "Komt altijd uit als een zeldzame kleur, bij voorkeur een die nog in je Visboek ontbreekt."
       },
-      "eggBought": "Ei op het zand gelegd. Het komt over 2 uur uit."
+      "eggBought": "Ei op het zand gelegd. Het komt over 2 uur uit.",
+      "tutComplete": "Uitleg klaar!",
+      "tutCompleteSub": "Dagdoelen staan open: tik op de levelring",
+      "biggerTank": "Grotere bak",
+      "streakStart": "Haal alle 3 doelen om een reeks te beginnen",
+      "dock": {
+        "feed": "Voer",
+        "play": "Spelen",
+        "shop": "Winkel",
+        "menu": "Menu"
+      },
+      "noGoals": "Morgen komen er nieuwe doelen",
+      "needMore": "Nog {n} nodig"
     }
   }
 }

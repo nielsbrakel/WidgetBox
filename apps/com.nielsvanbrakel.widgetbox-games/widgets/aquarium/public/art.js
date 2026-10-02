@@ -210,7 +210,8 @@
   function drawRays(ctx, W, H, biomeId, t, light) {
     const b = BIOMES[biomeId];
     const alpha = b.rays * light;
-    if (alpha < 0.01) return;
+    // Dim rays vanish under the night overlay but still cost a full blend pass.
+    if (alpha < 0.01 || light < 0.35) return;
     ctx.save();
     ctx.globalCompositeOperation = "lighter";
     for (let i = 0; i < 5; i++) {
@@ -1592,6 +1593,20 @@
     ctx.translate(head.x, head.y);
     ctx.rotate(ang);
     const jaw = 0.5 + 0.5 * Math.sin(o.phase * 0.35);
+    // Rounded snout so the head doesn't end in a flat cut.
+    ctx.fillStyle = shade(pal.body, 0.08);
+    ctx.beginPath();
+    ctx.ellipse(W * 0.15, 0, W * 1.05, W * 0.78, 0, 0, TAU);
+    ctx.fill();
+    ctx.strokeStyle = rgba(shade(pal.body, -0.5), 0.5);
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    // Gill slit.
+    ctx.strokeStyle = rgba(shade(pal.body, -0.45), 0.7);
+    ctx.lineWidth = Math.max(1, W * 0.12);
+    ctx.beginPath();
+    ctx.arc(-W * 0.85, 0, W * 0.45, -0.9, 0.9);
+    ctx.stroke();
     ctx.fillStyle = "#2a0f12";
     ctx.beginPath();
     ctx.moveTo(W * 0.9, 0);
@@ -2239,16 +2254,17 @@
         ctx.stroke();
         const rnd = prng(41);
         for (let i = 0; i < 10; i++) {
+          const a = Math.PI + rnd() * Math.PI;
+          const px = x + Math.cos(a) * 50 * s * rnd();
+          const py = y - 10 * s + Math.sin(a) * 70 * s * (0.5 + rnd() * 0.5);
+          const pr = (2 + rnd() * 3) * s;
+          // Keep the opening clear so whoever lives inside isn't painted over.
+          const dx = (px - h.x) / (h.rx + pr);
+          const dy = (py - h.y) / (h.ry + pr);
+          if (dx * dx + dy * dy < 1) continue;
           ctx.fillStyle = ["#c86aa0", "#e0905a", "#8a6ad0", "#6ac0a0"][i % 4];
           ctx.beginPath();
-          const a = Math.PI + rnd() * Math.PI;
-          ctx.arc(
-            x + Math.cos(a) * 50 * s * rnd(),
-            y - 10 * s + Math.sin(a) * 70 * s * (0.5 + rnd() * 0.5),
-            (2 + rnd() * 3) * s,
-            0,
-            TAU,
-          );
+          ctx.arc(px, py, pr, 0, TAU);
           ctx.fill();
         }
       },
@@ -2490,11 +2506,7 @@
   DECOR_GLOW.golden_chest = DECOR_GLOW.chest;
 
   // Bounding size used for hit testing and slot previews (in units of s).
-  const DECOR_BOX = {
-    S: { w: 44, h: 40 },
-    M: { w: 60, h: 100 },
-    L: { w: 120, h: 110 },
-  };
+  const DECOR_BOX = { S: { w: 44, h: 40 }, M: { w: 60, h: 100 }, L: { w: 120, h: 110 } };
 
   function drawDecor(ctx, id, x, y, s, t, pass) {
     const d = DECOR[id];
@@ -2567,48 +2579,71 @@
   }
 
   // Algae smear on the front glass: soft green blotch made of overlapping puffs.
+  /*
+   * Algae film stuck on the front glass: a flat, lumpy patch with darker spots and a few
+   * hair-like strands. Each scrub (hp) shrinks and fades it.
+   */
   function drawAlgae(ctx, x, y, r, hp, max, seed, t) {
     const rnd = prng(seed);
-    const k = 0.45 + 0.55 * (hp / max);
+    const k = 0.5 + 0.5 * (hp / max);
+    const R = r * (0.6 + 0.4 * k);
     ctx.save();
-    for (let i = 0; i < 9; i++) {
-      const a = rnd() * TAU;
-      const d = rnd() * r * 0.6;
-      const pr = r * (0.35 + rnd() * 0.45) * k;
-      const g = ctx.createRadialGradient(
-        x + Math.cos(a) * d,
-        y + Math.sin(a) * d,
-        0,
-        x + Math.cos(a) * d,
-        y + Math.sin(a) * d,
-        pr,
-      );
-      g.addColorStop(0, `rgba(70,140,50,${0.55 * k})`);
-      g.addColorStop(1, "rgba(70,140,50,0)");
-      ctx.fillStyle = g;
-      ctx.beginPath();
-      ctx.arc(x + Math.cos(a) * d, y + Math.sin(a) * d, pr, 0, TAU);
-      ctx.fill();
+    // Lumpy outline.
+    const n = 11;
+    const pts = [];
+    for (let i = 0; i < n; i++) {
+      const a = (i / n) * TAU;
+      const d = R * (0.7 + rnd() * 0.35);
+      pts.push([x + Math.cos(a) * d, y + Math.sin(a) * d * 0.85]);
     }
-    ctx.fillStyle = `rgba(150,200,90,${0.5 * k})`;
-    for (let i = 0; i < 10; i++) {
+    ctx.beginPath();
+    for (let i = 0; i < n; i++) {
+      const [x0, y0] = pts[i];
+      const [x1, y1] = pts[(i + 1) % n];
+      if (i === 0) ctx.moveTo((x0 + x1) / 2, (y0 + y1) / 2);
+      else ctx.quadraticCurveTo(x0, y0, (x0 + x1) / 2, (y0 + y1) / 2);
+    }
+    const [fx, fy] = pts[0];
+    const [sx, sy] = pts[1];
+    ctx.quadraticCurveTo(fx, fy, (fx + sx) / 2, (fy + sy) / 2);
+    ctx.fillStyle = `rgba(78,128,46,${0.42 * k})`;
+    ctx.fill();
+    ctx.strokeStyle = `rgba(150,196,90,${0.35 * k})`;
+    ctx.lineWidth = Math.max(1, r * 0.05);
+    ctx.stroke();
+    // Darker colonies inside the film.
+    ctx.fillStyle = `rgba(46,92,30,${0.45 * k})`;
+    for (let i = 0; i < 6; i++) {
       ctx.beginPath();
-      ctx.arc(
-        x + (rnd() - 0.5) * r * 1.2,
-        y + (rnd() - 0.5) * r * 1.2,
-        r * 0.05 + rnd() * r * 0.05,
+      ctx.ellipse(
+        x + (rnd() - 0.5) * R * 1.1,
+        y + (rnd() - 0.5) * R * 0.9,
+        R * (0.1 + rnd() * 0.14),
+        R * (0.08 + rnd() * 0.1),
+        rnd() * TAU,
         0,
         TAU,
       );
       ctx.fill();
     }
-    // A faint pulsing ring hints that it can be tapped.
-    const pulse = (t * 0.6 + seed * 0.001) % 3;
-    if (pulse < 1) {
-      ctx.strokeStyle = `rgba(220,255,200,${0.35 * (1 - pulse)})`;
-      ctx.lineWidth = 1.2;
+    // Strands drifting a little in the current.
+    ctx.strokeStyle = `rgba(110,170,70,${0.4 * k})`;
+    ctx.lineWidth = Math.max(0.8, r * 0.035);
+    ctx.lineCap = "round";
+    for (let i = 0; i < 5; i++) {
+      const a = rnd() * TAU;
+      const bx = x + Math.cos(a) * R * 0.75;
+      const by = y + Math.sin(a) * R * 0.65;
+      const len = R * (0.14 + rnd() * 0.16);
+      const sway = Math.sin(t * 1.2 + i + seed) * len * 0.25;
       ctx.beginPath();
-      ctx.arc(x, y, r * (0.8 + pulse * 0.4), 0, TAU);
+      ctx.moveTo(bx, by);
+      ctx.quadraticCurveTo(
+        bx + Math.cos(a) * len * 0.6 + sway,
+        by + Math.sin(a) * len * 0.6,
+        bx + Math.cos(a) * len + sway * 1.5,
+        by + Math.sin(a) * len + len * 0.2,
+      );
       ctx.stroke();
     }
     ctx.restore();

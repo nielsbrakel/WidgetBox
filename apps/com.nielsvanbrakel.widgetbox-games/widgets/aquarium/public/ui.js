@@ -19,11 +19,13 @@
   const ICONS = {
     coin: `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#e8a91f"/><circle cx="12" cy="11.2" r="9" fill="#ffd85a"/><circle cx="12" cy="11.2" r="5.6" fill="none" stroke="#e8a91f" stroke-width="1.6"/></svg>`,
     pearl: `<svg viewBox="0 0 24 24" aria-hidden="true"><defs><radialGradient id="pg" cx="35%" cy="30%" r="70%"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#b9b0ea"/></radialGradient></defs><circle cx="12" cy="12" r="9.5" fill="url(#pg)"/><circle cx="9" cy="8.5" r="2.2" fill="#fff" opacity=".9"/></svg>`,
+    // A food shaker sprinkling flakes.
     food: S(
-      '<path d="M5 9h14l-1.5 10a2 2 0 0 1-2 1.7h-7a2 2 0 0 1-2-1.7z"/><path d="M8 9V6a4 4 0 0 1 8 0v3"/><circle cx="10" cy="14" r=".6" fill="currentColor"/><circle cx="14" cy="15.5" r=".6" fill="currentColor"/>',
+      '<rect x="7" y="2.5" width="10" height="4" rx="1.2"/><path d="M7.5 6.5h9l-1 9.5a2 2 0 0 1-2 1.8h-3a2 2 0 0 1-2-1.8z"/><circle cx="9" cy="21" r=".9" fill="currentColor"/><circle cx="12.5" cy="20.5" r=".9" fill="currentColor"/><circle cx="15.5" cy="21.5" r=".9" fill="currentColor"/>',
     ),
+    // A wand with a spark: play drops a light toy for the fish to chase.
     play: S(
-      '<circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/>',
+      '<path d="M4 20L14 10"/><path d="M17 3v3M17 12v3M12.5 7.5h3M18.5 7.5h3M14.5 5l1.2 1.2M18.3 8.8l1.2 1.2M14.5 10l1.2-1.2M18.3 6.2l1.2-1.2"/>',
     ),
     shop: S('<path d="M4 8h16l-1 12H5z"/><path d="M9 8a3 3 0 0 1 6 0"/>'),
     menu: S('<path d="M4 7h16M4 12h16M4 17h16"/>'),
@@ -190,6 +192,7 @@
         el.innerHTML = ICONS[el.dataset.icon] || "";
       });
       document.getElementById("app").addEventListener("click", (e) => this.onClick(e));
+      for (const el of document.querySelectorAll("[data-t]")) el.textContent = this.t(el.dataset.t);
     }
 
     t(key, vars) {
@@ -228,9 +231,11 @@
         case "play":
           this.setMode(this.mode === "play" ? "look" : "play");
           break;
-        case "shop":
-          this.openSheet("shop", "fish");
+        case "shop": {
+          const step = C.TUTORIAL[this.game.save.tut];
+          this.openSheet("shop", step?.id === "buy_decor" ? "decor" : "fish");
           break;
+        }
         case "menu":
           this.openSheet("menu");
           break;
@@ -280,6 +285,10 @@
           break;
         case "chip":
           this.chipAction(arg);
+          break;
+        case "collectAll":
+          this.$("modal").hidden = true;
+          this.game.collectAll();
           break;
         case "modalClose":
           this.$("modal").hidden = true;
@@ -383,10 +392,12 @@
       const now = this.game.now();
       this.setNum("coinVal", save.coins);
       this.setNum("pearlVal", save.pearls);
-      this.$("levelVal").textContent = save.level;
+      this.setText("levelVal", save.level);
       const need = E.xpFor(save.level);
       const pct = save.level >= C.RULES.maxLevel ? 1 : Math.min(1, save.xp / need);
-      this.$("levelRing").style.strokeDashoffset = String(97.4 * (1 - pct));
+      const dash = String(97.4 * (1 - pct));
+      const ring = this.$("levelRing");
+      if (ring.style.strokeDashoffset !== dash) ring.style.strokeDashoffset = dash;
       const goalsOpen = save.tut < C.TUTORIAL.length || save.daily.goals.some((g) => !g.done);
       this.$("goalDot").hidden = !goalsOpen;
 
@@ -395,7 +406,8 @@
       if (info.eggsReady) chips.push(["eggs", "good", "egg", this.t("chip.eggs")]);
       if (info.hungry)
         chips.push(["hungry", "warn", "food", this.t("chip.hungry", { n: info.hungry })]);
-      if (info.water < 65) chips.push(["water", "warn", "water", `${Math.round(info.water)}%`]);
+      if (info.water < 65)
+        chips.push(["water", "warn", "water", this.t("chip.water", { n: Math.round(info.water) })]);
       if (info.uncollected >= info.cap && info.cap > 0)
         chips.push(["full", "warn", "coin", this.t("chip.full")]);
       const chipHtml = chips
@@ -419,6 +431,12 @@
         Date.now() - this.lastMode > 25000
       )
         this.setMode("look");
+    }
+
+    setText(id, value) {
+      const el = this.$(id);
+      const text = String(value);
+      if (el.textContent !== text) el.textContent = text;
     }
 
     setNum(id, value) {
@@ -454,9 +472,9 @@
       const save = this.game.save;
       const coach = this.$("coach");
       const scene = this.game.scene;
-      for (const b of document.querySelectorAll(".dock-btn")) b.classList.remove("hint");
+      for (const b of document.querySelectorAll(".dock-btn.hint")) b.classList.remove("hint");
       if (save.tut >= C.TUTORIAL.length || this.sheet || this.mode === "place") {
-        coach.hidden = true;
+        if (!coach.hidden) coach.hidden = true;
         if (!this.pointerTimer || this.pointerTimer._done) scene.setPointer(null);
         return;
       }
@@ -471,7 +489,8 @@
       scene.setPointer(pointer);
       const html = `<b>${save.tut + 1}/${C.TUTORIAL.length}</b> ${esc(text)}`;
       if (coach.innerHTML !== html) coach.innerHTML = html;
-      coach.hidden = this.mode !== "look";
+      const hide = this.mode !== "look";
+      if (coach.hidden !== hide) coach.hidden = hide;
     }
 
     pulseDock(name) {
@@ -556,7 +575,7 @@
           html += `<div class="card-sub">${esc(this.t("eggsHatchIn", { time: this.duration(left) }))}</div>`;
         } else {
           html += `<div class="card-sub">${esc(this.t("eggsFull"))}</div>`;
-          html += `<div class="row"><button type="button" class="btn primary" data-ui="cardAction" data-arg="sellEggs">${esc(this.t("sellFry"))}</button></div>`;
+          html += `<div class="row"><button type="button" class="btn primary" data-ui="cardAction" data-arg="sellEggs">${esc(this.t("sellFry"))}</button><button type="button" class="btn" data-ui="cardAction" data-arg="bigger">${icon("upgrade")}${esc(this.t("biggerTank"))}</button></div>`;
         }
       }
       el.className = card.side;
@@ -568,7 +587,10 @@
       const card = this.card;
       const tank = this.game.save.active;
       if (!card) return;
-      if (action === "sellFish") {
+      if (action === "bigger") {
+        this.hideCard();
+        this.openSheet("shop", "upgrades");
+      } else if (action === "sellFish") {
         if (!this.confirmed(el, `sell:${card.id}`)) return;
         const r = this.game.do({ type: "sellFish", tank, fish: card.id });
         if (r.ok) this.toast(this.t("soldFor", { n: r.result.coins }), "gold");
@@ -760,6 +782,7 @@
       const tank = save.tanks[save.active];
       let info = "";
       let btn = "";
+      let price = null;
       if (tab === "fish" && id.startsWith("egg_")) {
         const kind = id.slice(4);
         const egg = C.EGGS[kind];
@@ -767,6 +790,7 @@
         const full = tank.eggs.length >= C.RULES.maxEggClutches;
         const locked = save.level < egg.level;
         info = `<b>${esc(this.t(`egg.${kind}`))}</b><br><span class="muted">${esc(this.t(`eggInfo.${kind}`, { tank: this.t(`tank.${tank.id}`) }))}</span>`;
+        price = cost;
         btn = `<button type="button" class="btn primary" style="flex:none" data-ui="action" data-arg="buyEgg:${kind}" ${locked || full ? "disabled" : ""}>${locked ? `${icon("lock")}${this.t("levelN", { n: egg.level })}` : full ? esc(this.t("err.eggsFull")) : `${esc(this.t("buy"))} ${icon(cost.pearls ? "pearl" : "coin")}${fmt(cost.pearls || cost.coins)}`}</button>`;
       } else if (tab === "fish") {
         const sp = C.SPECIES[id];
@@ -777,11 +801,13 @@
             ? this.t("likes", { tags: sp.likes.map((t) => this.t(`tag.${t}`)).join(", ") })
             : "";
         info = `<b>${esc(this.speciesName(id))}</b><br><span class="muted">${icon("coin")}${sp.income}/${esc(this.t("hourShort"))} · ${esc(this.t("space", { n: sp.space }))}${likes ? ` · ${esc(likes)}` : ""} · ${esc(this.t("eats", { foods: sp.eats.map((f) => this.t(`food.${f}`)).join("/") }))}${sp.cleans ? ` · ${esc(this.t("trait.cleaner"))}` : ""}</span>`;
+        price = { coins: sp.price };
         btn = `<button type="button" class="btn primary" style="flex:none" data-ui="action" data-arg="buyFish:${id}" ${block && block !== "coins" ? "disabled" : ""}>${block === "level" ? `${icon("lock")}${this.t("levelN", { n: sp.level })}` : block === "space" ? esc(this.t("err.space")) : block === "max" ? esc(this.t("err.max")) : `${esc(this.t("buy"))} ${icon("coin")}${fmt(sp.price)}`}</button>`;
       } else if (tab === "decor") {
         const item = C.DECOR[id];
         const block = E.decorBlock(save, tank, id);
         info = `<b>${esc(this.t(`decor.${id}`))}</b><br><span class="muted">${item.tags.map((t) => esc(this.t(`tag.${t}`))).join(" · ")} · ${esc(this.t(`size.${item.size}`))}${item.bonus ? ` · +${Math.round(item.bonus * 100)}% ${esc(this.t("income"))}` : ""}</span>`;
+        price = item.pearls ? { pearls: item.pearls } : { coins: item.price };
         btn = `<button type="button" class="btn primary" style="flex:none" data-ui="action" data-arg="buyDecor:${id}" ${block && block !== "coins" && block !== "pearls" ? "disabled" : ""}>${block === "level" ? `${icon("lock")}${this.t("levelN", { n: item.level })}` : block === "slot" ? esc(this.t("err.slot")) : `${esc(this.t("buy"))} ${icon(item.pearls ? "pearl" : "coin")}${fmt(item.pearls || item.price)}`}</button>`;
       } else if (tab === "food") {
         const food = C.FOODS[id];
@@ -792,7 +818,21 @@
           .slice(0, 4)
           .map((s) => esc(this.speciesName(s)))
           .join(", ")}</span>`;
+        price = { coins: food.price };
         btn = `<button type="button" class="btn primary" style="flex:none" data-ui="action" data-arg="buyFood:${id}" ${save.level < food.level ? "disabled" : ""}>${save.level < food.level ? `${icon("lock")}${this.t("levelN", { n: food.level })}` : `+${food.pack} ${icon("coin")}${fmt(food.price)}`}</button>`;
+      }
+      // Say how much is missing instead of offering a purchase that can't go through.
+      if (price && !btn.includes("disabled")) {
+        const have = price.pearls ? save.pearls : save.coins;
+        const amount = price.pearls || price.coins;
+        if (have < amount) {
+          btn = btn
+            .replace('class="btn primary"', 'class="btn short"')
+            .replace(
+              /^(<button[^>]*>)[\s\S]*<\/button>$/,
+              `$1${icon(price.pearls ? "pearl" : "coin")}${esc(this.t("needMore", { n: fmt(amount - have) }))}</button>`,
+            );
+        }
       }
       return `<div class="foot-info">${info}</div>${btn}`;
     }
@@ -896,7 +936,10 @@
         body += `<div class="list-row ${g.done ? "done" : ""}"><div class="grow"><div class="title">${esc(this.t(`goal.${g.k}`, { n: fmt(g.n) }))}</div><div class="bar"><i style="width:${Math.round((g.p / g.n) * 100)}%"></i></div><div class="sub">${fmt(g.p)} / ${fmt(g.n)}</div></div>${g.done ? icon("check") : `<span class="price" style="color:var(--gold)">${icon("coin")}${fmt(reward)}</span>`}</div>`;
       }
       const nextDay = (E.localDay(save, now) + 1) * E.DAY + (save.tz || 0) * 60000;
-      foot = `<div class="foot-info">${icon("flame")} <b>${esc(this.t("streak", { n: save.daily.streak }))}</b><br><span class="muted">${esc(this.t("allGoalsReward", { n: C.RULES.goalsBonusPearls }))} · ${esc(this.t("newGoalsIn", { time: this.duration(nextDay - now) }))}</span></div>`;
+      const streak = save.daily.streak
+        ? this.t("streak", { n: save.daily.streak })
+        : this.t("streakStart");
+      foot = `<div class="foot-info">${icon("flame")} <b>${esc(streak)}</b><br><span class="muted">${esc(this.t("allGoalsReward", { n: C.RULES.goalsBonusPearls }))} · ${esc(this.t("newGoalsIn", { time: this.duration(nextDay - now) }))}</span></div>`;
       return { body, foot };
     }
 
@@ -1020,7 +1063,7 @@
       el.style.setProperty("--life", `${life || 2.4}s`);
       el.textContent = msg;
       box.appendChild(el);
-      while (box.children.length > 3) box.firstChild.remove();
+      while (box.children.length > 2) box.firstChild.remove();
       setTimeout(() => el.remove(), (life || 2.4) * 1000 + 450);
     }
 
@@ -1068,7 +1111,11 @@
             );
             break;
           case "tutorial":
-            this.toast(this.t("tutDone", { n: e.coins }), "gold");
+            // Step back to looking so the coach can show the next lesson.
+            if (this.mode === "feed" || this.mode === "play") this.setMode("look");
+            if (this.game.save.tut >= C.TUTORIAL.length)
+              this.banner(this.t("tutComplete"), this.t("tutCompleteSub"));
+            else this.toast(this.t("tutDone", { n: e.coins }), "gold");
             break;
           case "ach":
             this.toast(
@@ -1119,7 +1166,11 @@
       if (away.algae + away.debris)
         lines.push(["water", this.t("away.dirty", { n: away.algae + away.debris })]);
       if (!lines.length) return;
-      modal.innerHTML = `<div class="modal-box"><h2>${esc(this.t("away.title"))}</h2><div class="sub">${esc(this.t("away.sub", { time: this.duration(away.hours * E.HOUR) }))}</div>${lines.map(([ic, text]) => `<div class="modal-line">${icon(ic)}<span>${esc(text)}</span></div>`).join("")}<div class="row"><button type="button" class="btn primary" data-ui="modalClose">${esc(this.t("away.go"))}</button></div></div>`;
+      const coins = save.tanks[save.active].drops.reduce((n, d) => n + d.v, 0);
+      const go = coins
+        ? `<button type="button" class="btn primary" data-ui="collectAll">${icon("coin")}${esc(this.t("away.collect", { n: fmt(coins) }))}</button>`
+        : `<button type="button" class="btn primary" data-ui="modalClose">${esc(this.t("away.go"))}</button>`;
+      modal.innerHTML = `<div class="modal-box"><h2>${esc(this.t("away.title"))}</h2><div class="sub">${esc(this.t("away.sub", { time: this.duration(away.hours * E.HOUR) }))}</div>${lines.map(([ic, text]) => `<div class="modal-line">${icon(ic)}<span>${esc(text)}</span></div>`).join("")}<div class="row">${go}</div></div>`;
       modal.hidden = false;
     }
   }

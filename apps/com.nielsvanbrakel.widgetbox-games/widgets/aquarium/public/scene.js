@@ -106,7 +106,8 @@
     slotPos(i) {
       const slot = C.SLOTS[i];
       const depth = this.H - this.sandY;
-      const y = slot.row === "back" ? this.sandY + depth * 0.18 : this.H - depth * 0.06;
+      // Front items stand a little up the sand so feet, bases and lids stay inside the frame.
+      const y = slot.row === "back" ? this.sandY + depth * 0.18 : this.H - depth * 0.2;
       return { x: slot.x * this.W, y, scale: slot.row === "back" ? this.s * 0.95 : this.s * 1.05 };
     }
 
@@ -754,7 +755,8 @@
       let diff = want - a.heading;
       while (diff > Math.PI) diff -= TAU;
       while (diff < -Math.PI) diff += TAU;
-      a.heading += diff * Math.min(1, dt * 2.5);
+      // Inside the rock there is no room for wide turns: point straight at the next waypoint.
+      a.heading += a.sunk != null ? diff : diff * Math.min(1, dt * 2.5);
       a.x += Math.cos(a.heading) * speed * dt;
       a.y += Math.sin(a.heading) * speed * dt;
       // Once the head is through the hole, keep swimming inside the rock until the whole
@@ -829,6 +831,8 @@
       if (home) {
         const h = home.hole;
         a.state = "enter";
+        // Line up in open water first, so the final approach comes straight into the opening.
+        route.push({ x: h.x - h.rx * 3.4, y: h.y - h.ry * 0.4 });
         route.push({ x: h.x - h.rx * 1.8, y: h.y + h.ry * 0.2 });
         route.push({ x: h.x, y: h.y, hole: true });
         route.push(...this.caveLoop(home));
@@ -841,10 +845,10 @@
       const h = home.hole;
       const s = home.s;
       return [
-        { x: h.x + 46 * s, y: h.y },
-        { x: h.x + 46 * s, y: h.y - 36 * s },
-        { x: h.x - 12 * s, y: h.y - 36 * s },
-        { x: h.x + 46 * s, y: h.y - 36 * s },
+        { x: h.x + 30 * s, y: h.y - 2 * s },
+        { x: h.x + 30 * s, y: h.y - 30 * s },
+        { x: h.x, y: h.y - 34 * s },
+        { x: h.x + 30 * s, y: h.y - 30 * s },
       ];
     }
 
@@ -1033,7 +1037,16 @@
 
     isHomed(a) {
       if (!a.home) return false;
-      if (a.move === "eel") return true;
+      if (a.move === "eel") {
+        // Only clip the eel while part of it is in the cave; out in the open it swims in front.
+        if (a.state === "home" || a.sunk != null) return true;
+        const h = a.home.hole;
+        return (a.pts || []).some((p) => {
+          const dx = (p.x - h.x) / (h.rx * 1.6);
+          const dy = (p.y - h.y) / (h.ry * 1.6);
+          return dx * dx + dy * dy < 1;
+        });
+      }
       if (a.home.kind === "anemone")
         return dist(a.x, a.y, a.home.x, a.home.y + 6 * a.home.s) < 22 * a.home.s;
       return a.state === "hide" || a.hidden > 0;
@@ -1092,17 +1105,6 @@
         A.drawDecor(ctx, d.d, p.x, p.y, p.scale, t, "all");
       });
 
-      for (const d of this.drops) {
-        const p = this.dropPos(d);
-        A.drawCoin(
-          ctx,
-          p.x,
-          p.y,
-          Math.max(6, this.unit * (0.16 + Math.min(0.12, Math.log10(d.v + 1) * 0.04))),
-          t,
-          d.v,
-        );
-      }
       for (const b of this.bubbles) A.drawBubble(ctx, b.x, b.y, b.r);
       ctx.fillStyle = biome.dark ? "rgba(220,230,255,0.45)" : "rgba(255,255,255,0.35)";
       for (const m of this.motes) ctx.fillRect(m.x, m.y, m.r, m.r);
@@ -1141,12 +1143,29 @@
       for (const a of this.algae)
         A.drawAlgae(ctx, a.x * W, a.y * H, this.algaeR(a), a.hp, a.max, E.hash(a.id), t);
 
+      // Coins come after the night and murk overlays: they are what you tap, so they stay bright.
+      for (const d of this.drops) {
+        const p = this.dropPos(d);
+        A.drawCoin(
+          ctx,
+          p.x,
+          p.y,
+          Math.max(6, this.unit * (0.16 + Math.min(0.12, Math.log10(d.v + 1) * 0.04))),
+          t,
+          d.v,
+        );
+      }
+
       // Glass reflection.
-      const gl = ctx.createLinearGradient(0, 0, W * 0.5, H * 0.6);
-      gl.addColorStop(0, "rgba(255,255,255,0.08)");
-      gl.addColorStop(0.5, "rgba(255,255,255,0)");
-      ctx.fillStyle = gl;
-      ctx.fillRect(0, 0, W, H);
+      if (!this.glass || this.glass.W !== W || this.glass.H !== H) {
+        const g = ctx.createLinearGradient(0, 0, W * 0.5, H * 0.6);
+        g.addColorStop(0, "rgba(255,255,255,0.08)");
+        g.addColorStop(0.5, "rgba(255,255,255,0)");
+        this.glass = { W, H, g };
+      }
+      // The sheen fades out halfway down, so only the top-left part needs painting.
+      ctx.fillStyle = this.glass.g;
+      ctx.fillRect(0, 0, W * 0.75, H * 0.9);
 
       if (this.slotHighlight) this.drawSlots(ctx);
       this.drawFx(ctx);

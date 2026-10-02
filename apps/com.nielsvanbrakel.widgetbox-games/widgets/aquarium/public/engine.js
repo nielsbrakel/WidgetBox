@@ -569,7 +569,12 @@
     // server (catching up hours at once) take exactly the same steps and reach the same save.
     const end = Math.floor(now / STEP) * STEP;
     const summary = { hours: 0, coins: 0, algae: 0, debris: 0, eggs: 0, ev };
-    if (end <= start) return summary;
+    if (end <= start) {
+      // No time to catch up, but a fresh load still needs today's goals and earned trophies.
+      ensureDaily(save, ev);
+      checkAchievements(save, ev);
+      return summary;
+    }
     summary.hours = (now - start) / HOUR;
     const from = Math.max(start, end - C.RULES.maxIdleHours * HOUR);
     for (const id of TANK_IDS) {
@@ -708,7 +713,7 @@
    * Report progress on an activity. Drives the tutorial and the daily goals.
    * kind: collect | feed | scrub | vacuum | play | hatch | buyFish | buyDecor | visit
    */
-  function progress(save, kind, amount, now, ev) {
+  function progress(save, kind, amount, _now, ev) {
     if (save.tut < C.TUTORIAL.length) {
       const step = C.TUTORIAL[save.tut];
       const match =
@@ -1107,7 +1112,7 @@
       return {};
     },
 
-    unlockTank(save, p, now, ev) {
+    unlockTank(save, p, _now, ev) {
       if (!TANK_IDS.includes(p.tank)) return "invalid";
       const def = C.TANKS[p.tank];
       const tank = save.tanks[p.tank];

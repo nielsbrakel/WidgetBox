@@ -122,7 +122,10 @@ test.describe("Aquarium widget", () => {
     await aq.open("neglected");
     await expect(aq.modal).toBeVisible();
     await expect(aq.modal).toContainText("3d");
-    await aq.closeWelcome();
+    const coins = await aq.state((g) => g.save.coins);
+    await aq.ui("collectAll").click();
+    await expect(aq.modal).toBeHidden();
+    await expect.poll(() => aq.state((g) => g.save.coins)).toBeGreaterThan(coins);
     await expect.poll(() => aq.state((g) => g.save.tanks.pond.algae.length)).toBeGreaterThan(3);
   });
 

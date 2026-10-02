@@ -111,7 +111,7 @@ export class AquariumPage extends SandboxPage {
   }
 
   async closeWelcome() {
-    if (await this.modal.isVisible()) await this.ui("modalClose").click();
+    if (await this.modal.isVisible()) await this.modal.locator(".btn.primary").first().click();
     await expect(this.modal).toBeHidden();
   }
 

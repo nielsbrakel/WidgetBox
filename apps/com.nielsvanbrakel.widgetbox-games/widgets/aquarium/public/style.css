@@ -12,7 +12,7 @@
   );
   --fs: clamp(11px, 3vw, 14px);
   --fs-small: clamp(10px, 2.5vw, 12px);
-  --btn: clamp(30px, 8.6vw, 44px);
+  --btn: clamp(38px, 9vw, 46px);
   --pad: clamp(6px, 1.8vw, 10px);
   --glass: rgba(6, 26, 40, 0.62);
   --glass-strong: rgba(6, 22, 34, 0.92);
@@ -287,7 +287,8 @@ button {
 #tray {
   position: absolute;
   left: 50%;
-  bottom: var(--pad);
+  /* Sits above the sand line so it never covers coins, eggs or front decor. */
+  bottom: calc(21% + var(--pad));
   transform: translateX(calc(-50% - var(--btn) * 0.5));
   max-width: calc(100% - var(--btn) * 2 - var(--pad) * 3);
   display: flex;
@@ -613,7 +614,7 @@ button {
   position: absolute;
   inset: 0;
   z-index: 20;
-  background: rgba(4, 18, 28, 0.94);
+  background: rgba(4, 18, 28, 0.985);
   display: flex;
   flex-direction: column;
   padding: var(--pad);
@@ -652,8 +653,8 @@ button {
 }
 
 .icon-btn {
-  width: calc(var(--btn) * 0.8);
-  height: calc(var(--btn) * 0.8);
+  width: max(34px, calc(var(--btn) * 0.8));
+  height: max(34px, calc(var(--btn) * 0.8));
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.1);
   display: grid;
@@ -676,7 +677,7 @@ button {
 
 .tab {
   flex: 1;
-  height: calc(var(--btn) * 0.66);
+  height: max(30px, calc(var(--btn) * 0.7));
   border-radius: 9px;
   background: rgba(255, 255, 255, 0.07);
   font-weight: 800;
@@ -735,8 +736,8 @@ button {
 }
 
 .pager .icon-btn {
-  width: calc(var(--btn) * 0.7);
-  height: calc(var(--btn) * 0.7);
+  width: max(34px, calc(var(--btn) * 0.8));
+  height: max(34px, calc(var(--btn) * 0.8));
 }
 
 .pager .icon-btn:disabled {
@@ -1019,7 +1020,15 @@ button {
 
 #app:not(.is-loading) #loading {
   opacity: 0;
+  visibility: hidden;
   pointer-events: none;
+  transition:
+    opacity 0.4s,
+    visibility 0s 0.4s;
+}
+
+#app:not(.is-loading) .spinner {
+  animation: none;
 }
 
 .spinner {
@@ -1057,4 +1066,42 @@ button {
 #app.sheet-open #toasts {
   top: auto;
   bottom: 64px;
+}
+
+/* A banner is the headline: toasts wait underneath instead of piling on top of it. */
+#app:has(#banner:not([hidden])) #toasts {
+  opacity: 0;
+}
+
+/* Dock labels when there is room for them. */
+.dock-btn .lbl {
+  display: none;
+}
+
+@media (min-width: 400px) {
+  .dock-btn {
+    height: calc(var(--btn) * 1.18);
+    grid-template-rows: 1fr auto;
+    padding: 4px 0 3px;
+  }
+
+  .dock-btn .ico {
+    width: 50%;
+    height: auto;
+    aspect-ratio: 1;
+    align-self: end;
+  }
+
+  .dock-btn .lbl {
+    display: block;
+    font-size: 9px;
+    font-weight: 800;
+    line-height: 1;
+    opacity: 0.85;
+  }
+}
+
+.btn.short {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--muted);
 }
