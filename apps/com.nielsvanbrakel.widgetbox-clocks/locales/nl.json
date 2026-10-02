@@ -5,6 +5,17 @@
     "digital-clock": {},
     "flip-clock": {},
     "word-clock-grid": {},
-    "word-clock-sentence": {}
+    "word-clock-sentence": {},
+    "stopwatch": {
+      "addStopwatch": "Stopwatch Toevoegen",
+      "lap": "Ronde",
+      "noLaps": "Geen rondes opgenomen"
+    },
+    "timer": {
+      "hours": "Uren",
+      "minutes": "Minuten",
+      "seconds": "Seconden",
+      "addTimer": "Timer Toevoegen"
+    }
   }
 }

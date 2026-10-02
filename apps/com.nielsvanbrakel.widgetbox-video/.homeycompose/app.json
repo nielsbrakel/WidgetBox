@@ -1,23 +1,22 @@
 {
-  "id": "com.nielsvanbrakel.widgetbox-windy",
-  "version": "1.0.1",
+  "id": "com.nielsvanbrakel.widgetbox-video",
+  "version": "0.1.0",
   "compatibility": ">=12.3.0",
   "sdk": 3,
   "platforms": [
     "local"
   ],
   "name": {
-    "en": "WidgetBox Windy",
-    "nl": "WidgetBox Windy"
+    "en": "WidgetBox Video",
+    "nl": "WidgetBox Video"
   },
   "description": {
-    "en": "Interactive weather maps with wind, rain, and temperature layers",
-    "nl": "Interactieve weerkaarten met wind-, regen- en temperatuurlagen"
+    "en": "Watch videos, livestreams, and playlists right on your dashboard",
+    "nl": "Bekijk video's, livestreams en afspeellijsten direct op je dashboard"
   },
   "category": [
     "tools"
   ],
-  "brandColor": "#a70500",
   "permissions": [],
   "images": {
     "small": "/assets/images/small.png",
@@ -28,6 +27,7 @@
     "name": "Niels van Brakel",
     "email": "info@nielsvanbrakel.com"
   },
+  "brandColor": "#FF0000",
   "bugs": {
     "url": "https://github.com/nielsbrakel/WidgetBox/issues"
   },

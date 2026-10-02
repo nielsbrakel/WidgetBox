@@ -1,6 +1,6 @@
 {
-  "name": "com.nielsvanbrakel.widgetbox-windy",
-  "version": "1.0.1",
+  "name": "com.nielsvanbrakel.widgetbox-video",
+  "version": "0.1.0",
   "private": true,
   "main": "app.js",
   "scripts": {

@@ -188,19 +188,15 @@ importers:
         specifier: ^5.0.3
         version: 5.0.3(@types/node@26.6.3)(jsdom@30.1.1)(vite@8.3.2(@types/node@26.6.3))
 
-  apps/com.nielsvanbrakel.widgetbox-buienradar: {}
-
   apps/com.nielsvanbrakel.widgetbox-clocks: {}
 
   apps/com.nielsvanbrakel.widgetbox-games: {}
 
   apps/com.nielsvanbrakel.widgetbox-layout: {}
 
-  apps/com.nielsvanbrakel.widgetbox-utilities: {}
+  apps/com.nielsvanbrakel.widgetbox-video: {}
 
-  apps/com.nielsvanbrakel.widgetbox-windy: {}
-
-  apps/com.nielsvanbrakel.widgetbox-youtube: {}
+  apps/com.nielsvanbrakel.widgetbox-weather: {}
 
   apps/sandbox:
     dependencies:
