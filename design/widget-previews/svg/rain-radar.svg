@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<?xml-stylesheet href="theme.css" type="text/css" ?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <title>Rain radar widget preview</title>
+  <!-- Square card: radar map with rain cells, location pin and a time slider -->
+  <defs>
+    <clipPath id="map"><rect x="196" y="196" width="632" height="532" rx="36" /></clipPath>
+  </defs>
+  <rect class="card" x="172" y="172" width="680" height="680" rx="64" />
+  <g clip-path="url(#map)">
+    <rect class="ph" x="196" y="196" width="632" height="532" />
+    <path
+      class="land"
+      d="M420 196 C440 260 400 300 430 360 C460 420 420 470 450 530 C480 600 440 660 470 728 L828 728 L828 196 Z"
+    />
+    <path
+      class="accent-soft"
+      d="M300 300 C380 240 520 250 600 300 C690 350 720 440 660 500 C600 560 470 540 390 520 C300 500 230 380 300 300 Z"
+    />
+    <path
+      class="accent-soft"
+      d="M380 340 C440 300 540 310 580 360 C620 410 600 470 540 480 C470 490 400 470 370 430 C340 390 340 370 380 340 Z"
+    />
+    <path
+      class="accent"
+      opacity="0.7"
+      d="M450 370 C490 350 540 365 545 400 C550 435 510 450 475 440 C440 430 420 390 450 370 Z"
+    />
+    <path
+      class="accent-soft"
+      d="M640 580 C690 560 760 580 770 630 C780 680 720 700 680 690 C630 680 600 610 640 580 Z"
+    />
+  </g>
+  <circle class="card-fill" cx="600" cy="560" r="22" />
+  <circle class="ink" cx="600" cy="560" r="12" />
+  <circle class="accent" cx="226" cy="790" r="26" />
+  <path class="on-accent" d="M218 776 L240 790 L218 804 Z" />
+  <rect class="mid" x="276" y="785" width="552" height="10" rx="5" />
+  <rect class="accent" x="276" y="785" width="260" height="10" rx="5" />
+  <circle class="accent" cx="536" cy="790" r="16" />
+</svg>

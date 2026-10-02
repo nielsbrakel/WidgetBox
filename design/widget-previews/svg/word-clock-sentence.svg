@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<?xml-stylesheet href="theme.css" type="text/css" ?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <title>Word clock sentence widget preview</title>
+  <!-- Wide card: a short sentence where the time words are highlighted -->
+  <rect class="card" x="112" y="382" width="800" height="260" rx="64" />
+  <rect class="mid" x="260" y="452" width="110" height="44" rx="22" />
+  <rect class="accent" x="392" y="452" width="230" height="44" rx="22" />
+  <rect class="mid" x="644" y="452" width="120" height="44" rx="22" />
+  <rect class="accent" x="437" y="528" width="150" height="44" rx="22" />
+</svg>

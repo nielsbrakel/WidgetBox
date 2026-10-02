@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<?xml-stylesheet href="theme.css" type="text/css" ?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <title>Analog clock widget preview</title>
+  <!-- Square card with a classic analog face at 10:10 -->
+  <rect class="card" x="202" y="202" width="620" height="620" rx="64" />
+  <circle class="ph" cx="512" cy="512" r="236" />
+  <g class="s-mid" stroke-width="14">
+    <line x1="512" y1="304" x2="512" y2="340" transform="rotate(30 512 512)" />
+    <line x1="512" y1="304" x2="512" y2="340" transform="rotate(60 512 512)" />
+    <line x1="512" y1="304" x2="512" y2="340" transform="rotate(120 512 512)" />
+    <line x1="512" y1="304" x2="512" y2="340" transform="rotate(150 512 512)" />
+    <line x1="512" y1="304" x2="512" y2="340" transform="rotate(210 512 512)" />
+    <line x1="512" y1="304" x2="512" y2="340" transform="rotate(240 512 512)" />
+    <line x1="512" y1="304" x2="512" y2="340" transform="rotate(300 512 512)" />
+    <line x1="512" y1="304" x2="512" y2="340" transform="rotate(330 512 512)" />
+  </g>
+  <g class="s-ink" stroke-width="16">
+    <line x1="512" y1="300" x2="512" y2="356" />
+    <line x1="512" y1="300" x2="512" y2="356" transform="rotate(90 512 512)" />
+    <line x1="512" y1="300" x2="512" y2="356" transform="rotate(180 512 512)" />
+    <line x1="512" y1="300" x2="512" y2="356" transform="rotate(270 512 512)" />
+  </g>
+  <line
+    class="s-ink"
+    x1="512"
+    y1="512"
+    x2="512"
+    y2="392"
+    stroke-width="22"
+    transform="rotate(305 512 512)"
+  />
+  <line
+    class="s-ink"
+    x1="512"
+    y1="512"
+    x2="512"
+    y2="344"
+    stroke-width="16"
+    transform="rotate(60 512 512)"
+  />
+  <line
+    class="s-accent"
+    x1="512"
+    y1="560"
+    x2="512"
+    y2="326"
+    stroke-width="8"
+    transform="rotate(200 512 512)"
+  />
+  <circle class="accent" cx="512" cy="512" r="18" />
+</svg>

@@ -1,0 +1,99 @@
+/*
+ * Shared palette for the widget previews (Homey guideline 1.10).
+ * Light is the default; render.mjs sets data-theme="dark" on the root <svg>.
+ * Opening an SVG directly in a browser also follows the OS colour scheme.
+ */
+:root {
+  --card: #ffffff;
+  --ph: #f1f1f6;
+  --land: #e7e7ef;
+  --mid: #d9d9e3;
+  --ink: #4b4b5a;
+  --on-accent: #ffffff;
+  --accent: #0080ff;
+  --accent-soft: rgba(0, 128, 255, 0.16);
+  --warm: #ffa51f;
+  --shadow-a: rgba(28, 28, 48, 0.1);
+  --shadow-b: rgba(28, 28, 48, 0.06);
+}
+
+:root[data-theme="dark"] {
+  --card: #2b2b2b;
+  --ph: #383838;
+  --land: #404040;
+  --mid: #4c4c4c;
+  --ink: #e2e2e6;
+  --accent-soft: rgba(0, 128, 255, 0.3);
+  --shadow-a: rgba(0, 0, 0, 0.45);
+  --shadow-b: rgba(0, 0, 0, 0.3);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --card: #2b2b2b;
+    --ph: #383838;
+    --land: #404040;
+    --mid: #4c4c4c;
+    --ink: #e2e2e6;
+    --accent-soft: rgba(0, 128, 255, 0.3);
+    --shadow-a: rgba(0, 0, 0, 0.45);
+    --shadow-b: rgba(0, 0, 0, 0.3);
+  }
+}
+
+.card {
+  fill: var(--card);
+  filter: drop-shadow(0 18px 36px var(--shadow-a)) drop-shadow(0 3px 8px var(--shadow-b));
+}
+.card-fill {
+  fill: var(--card);
+}
+.ph {
+  fill: var(--ph);
+}
+.land {
+  fill: var(--land);
+}
+.mid {
+  fill: var(--mid);
+}
+.ink {
+  fill: var(--ink);
+}
+.accent {
+  fill: var(--accent);
+}
+.accent-soft {
+  fill: var(--accent-soft);
+}
+.warm {
+  fill: var(--warm);
+}
+.on-accent {
+  fill: var(--on-accent);
+}
+
+.s-ph,
+.s-mid,
+.s-ink,
+.s-accent,
+.s-card {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.s-ph {
+  stroke: var(--ph);
+}
+.s-mid {
+  stroke: var(--mid);
+}
+.s-ink {
+  stroke: var(--ink);
+}
+.s-accent {
+  stroke: var(--accent);
+}
+.s-card {
+  stroke: var(--card);
+}

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<?xml-stylesheet href="theme.css" type="text/css" ?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <title>Timer widget preview</title>
+  <!-- Wide card: three steppers (hours, minutes, seconds) and a play button -->
+  <rect class="card" x="112" y="322" width="800" height="380" rx="64" />
+  <g class="s-mid" stroke-width="12">
+    <polyline points="222,428 246,404 270,428" />
+    <polyline points="362,428 386,404 410,428" />
+    <polyline points="502,428 526,404 550,428" />
+    <polyline points="222,596 246,620 270,596" />
+    <polyline points="362,596 386,620 410,596" />
+    <polyline points="502,596 526,620 550,596" />
+  </g>
+  <g class="ink">
+    <rect x="204" y="484" width="84" height="56" rx="20" />
+    <rect x="344" y="484" width="84" height="56" rx="20" />
+    <rect x="484" y="484" width="84" height="56" rx="20" />
+  </g>
+  <g class="mid">
+    <circle cx="316" cy="498" r="7" />
+    <circle cx="316" cy="526" r="7" />
+    <circle cx="456" cy="498" r="7" />
+    <circle cx="456" cy="526" r="7" />
+  </g>
+  <circle class="accent" cx="766" cy="512" r="62" />
+  <path class="on-accent" d="M750 482 L792 512 L750 542 Z" />
+</svg>

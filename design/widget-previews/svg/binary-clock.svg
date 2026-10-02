@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<?xml-stylesheet href="theme.css" type="text/css" ?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <title>Binary clock widget preview</title>
+  <!-- Wide card: three rows (hours, minutes, seconds) of binary dots -->
+  <rect class="card" x="112" y="332" width="800" height="360" rx="64" />
+  <g class="ph">
+    <rect x="215" y="400" width="52" height="24" rx="12" />
+    <rect x="215" y="500" width="52" height="24" rx="12" />
+    <rect x="215" y="600" width="52" height="24" rx="12" />
+  </g>
+  <g class="mid">
+    <circle cx="347" cy="412" r="28" />
+    <circle cx="507" cy="412" r="28" />
+    <circle cx="611" cy="412" r="28" />
+    <circle cx="771" cy="412" r="28" />
+    <circle cx="427" cy="512" r="28" />
+    <circle cx="611" cy="512" r="28" />
+    <circle cx="691" cy="512" r="28" />
+    <circle cx="347" cy="612" r="28" />
+    <circle cx="507" cy="612" r="28" />
+    <circle cx="691" cy="612" r="28" />
+    <circle cx="771" cy="612" r="28" />
+  </g>
+  <g class="warm">
+    <circle cx="427" cy="412" r="28" />
+    <circle cx="691" cy="412" r="28" />
+    <circle cx="347" cy="512" r="28" />
+    <circle cx="507" cy="512" r="28" />
+    <circle cx="771" cy="512" r="28" />
+    <circle cx="427" cy="612" r="28" />
+    <circle cx="611" cy="612" r="28" />
+  </g>
+</svg>

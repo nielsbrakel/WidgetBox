@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<?xml-stylesheet href="theme.css" type="text/css" ?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <title>Youtube widget preview</title>
+  <!-- 16:9 card: video frame with a round play button and a progress bar -->
+  <defs>
+    <clipPath id="frame"><rect x="132" y="307" width="760" height="410" rx="44" /></clipPath>
+  </defs>
+  <rect class="card" x="112" y="287" width="800" height="450" rx="64" />
+  <g clip-path="url(#frame)">
+    <rect class="ph" x="132" y="307" width="760" height="410" />
+    <path
+      class="land"
+      d="M132 717 L132 600 C220 540 300 560 380 610 C460 560 560 500 680 580 C760 540 830 560 892 600 L892 717 Z"
+    />
+  </g>
+  <circle class="accent" cx="512" cy="500" r="80" />
+  <path class="on-accent" d="M490 460 L550 500 L490 540 Z" />
+  <rect class="mid" x="172" y="672" width="680" height="10" rx="5" />
+  <rect class="accent" x="172" y="672" width="250" height="10" rx="5" />
+  <circle class="accent" cx="422" cy="677" r="16" />
+</svg>
