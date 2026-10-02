@@ -1,15 +1,11 @@
-# Divider Widget
+# Spacer widget
 
-**Directory**: `widgets/divider`
+**Directory**: `widgets/spacer`
 
-A utility widget used to add vertical spacing between other widgets on a dashboard.
+An invisible widget that adds vertical space between other widgets on a dashboard.
 
-## Features
-*   **Custom Height**: Set any height from 0 to 1000 pixels.
-*   **Transparent**: Invisible on the dashboard.
-
-## Settings (`widget.compose.json`)
+## Settings
 
 | ID | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
-| `height` | Number | `32` | Height in pixels (0-1000). Multiples of 8 align best with Homey's grid. |
+| `height` | Number | `32` | Height in pixels, 8 to 200. Multiples of 8 line up best with Homey's grid. |

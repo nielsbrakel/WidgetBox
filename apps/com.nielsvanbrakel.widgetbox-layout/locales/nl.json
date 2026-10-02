@@ -1,5 +1,7 @@
 {
   "widgets": {
+    "header": {},
+    "separator": {},
     "spacer": {}
   }
 }

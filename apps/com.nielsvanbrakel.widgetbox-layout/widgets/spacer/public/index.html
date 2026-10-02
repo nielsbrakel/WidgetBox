@@ -1,38 +1,46 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
+    html,
     body {
+      margin: 0;
+      height: 100%;
       overflow: hidden;
     }
     </style>
   </head>
 
   <body>
-    <div id="divider"></div>
+    <div id="spacer" aria-hidden="true"></div>
 
     <script type="text/javascript">
-    function getHeightPixels(settings) {
-      const h = parseInt(settings.height, 10);
-      return Number.isFinite(h) ? Math.max(0, h) : 32;
+    const MIN_HEIGHT = 8;
+    const MAX_HEIGHT = 200;
+    const DEFAULT_HEIGHT = 32;
+
+    function getHeight(settings) {
+      const height = Number.parseInt(settings.height, 10);
+      if (!Number.isFinite(height)) return DEFAULT_HEIGHT;
+      return Math.min(MAX_HEIGHT, Math.max(MIN_HEIGHT, height));
     }
 
-    function onHomeyReady(Homey) {
+    window.onHomeyReady = (Homey) => {
       const settings = Homey.getSettings();
-      Homey.ready({ height: getHeightPixels(settings) });
+      let height = getHeight(settings);
+      Homey.ready({ height });
 
       Homey.on("settings.set", (key, value) => {
         settings[key] = value;
-        Homey.setHeight(getHeightPixels(settings));
+        const nextHeight = getHeight(settings);
+        if (nextHeight !== height) {
+          height = nextHeight;
+          Homey.setHeight(height);
+        }
       });
-    }
+    };
     </script>
   </body>
 </html>

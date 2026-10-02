@@ -1,5 +1,14 @@
 {
   "widgets": {
-    "youtube": {}
+    "youtube": {
+      "emptyTitle": "Nog geen video",
+      "emptyMessage": "Voeg een YouTube-link of video-ID toe in de widgetinstellingen.",
+      "invalidTitle": "Link niet herkend",
+      "invalidMessage": "Gebruik een link naar een YouTube-video of -afspeellijst, of een video-ID van 11 tekens.",
+      "iosTitle": "Video is niet beschikbaar op iPhone en iPad",
+      "iosMessage": "De Homey-app kan ingesloten YouTube-video's nog niet afspelen op iOS. Deze widget werkt wel op Android en in het webdashboard.",
+      "play": "Video afspelen",
+      "playerTitle": "YouTube-videospeler"
+    }
   }
 }

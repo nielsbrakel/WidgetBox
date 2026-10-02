@@ -46,6 +46,8 @@ body {
 
 ## Canonical Shared Settings
 
+Dutch (`nl`) labels use sentence case ("Extra klein", "Horizontale uitlijning"), like the rest of the Homey app. English labels keep the Title Case shown below.
+
 ### Size
 
 5-tier size system. Default value depends on the widget.
@@ -57,11 +59,11 @@ body {
   "label": { "en": "Size", "nl": "Grootte" },
   "value": "medium",
   "values": [
-    { "id": "xsmall", "label": { "en": "Extra Small", "nl": "Extra Klein" } },
+    { "id": "xsmall", "label": { "en": "Extra Small", "nl": "Extra klein" } },
     { "id": "small", "label": { "en": "Small", "nl": "Klein" } },
     { "id": "medium", "label": { "en": "Medium", "nl": "Gemiddeld" } },
     { "id": "large", "label": { "en": "Large", "nl": "Groot" } },
-    { "id": "xlarge", "label": { "en": "Extra Large", "nl": "Extra Groot" } }
+    { "id": "xlarge", "label": { "en": "Extra Large", "nl": "Extra groot" } }
   ]
 }
 ```
@@ -91,13 +93,13 @@ const WEIGHT_MAP = { thin: '300', normal: 'normal', bold: 'bold' };
 
 ### Horizontal Alignment
 
-Setting ID is `horizontalAlignment` (NOT `align`). Label is "Horizontal Alignment" / "Horizontale Uitlijning".
+Setting ID is `horizontalAlignment` (NOT `align`). Label is "Horizontal Alignment" / "Horizontale uitlijning".
 
 ```json
 {
   "id": "horizontalAlignment",
   "type": "dropdown",
-  "label": { "en": "Horizontal Alignment", "nl": "Horizontale Uitlijning" },
+  "label": { "en": "Horizontal Alignment", "nl": "Horizontale uitlijning" },
   "value": "center",
   "values": [
     { "id": "left", "label": { "en": "Left", "nl": "Links" } },
@@ -109,7 +111,7 @@ Setting ID is `horizontalAlignment` (NOT `align`). Label is "Horizontal Alignmen
 
 ### Color
 
-6-option color dropdown. Uses hex values mapped in the widget HTML.
+6-option color dropdown. Values map to Homey palette variables with a hex fallback (this is the only color system in WidgetBox; `.agents/skills/widgetbox/SKILL.md` documents the same map).
 
 ```json
 {
@@ -131,14 +133,19 @@ Setting ID is `horizontalAlignment` (NOT `align`). Label is "Horizontal Alignmen
 CSS mapping in widget HTML:
 ```js
 const COLOR_MAP = {
-  default: '',  // Uses --homey-text-color CSS variable
-  blue: '#3B82F6',
-  green: '#22C55E',
-  orange: '#F97316',
-  red: '#EF4444',
-  purple: '#A855F7',
+  default: "", // inherit var(--homey-text-color) from the stylesheet
+  blue: "var(--homey-color-blue-500, #0099ff)",
+  green: "var(--homey-color-green-500, #26c281)",
+  orange: "var(--homey-color-orange-500, #ff9500)",
+  red: "var(--homey-color-red-500, #ff3b30)",
+  purple: "var(--homey-color-purple-500, #a855f7)",
 };
 ```
+
+- Homey's palette has blue, green, orange and red but no purple, so purple always resolves to its fallback. Keep the fallback so it still renders.
+- The fallbacks are the sandbox values of the Homey palette, so the sandbox and a real Homey look the same.
+- `default` depends on what is being colored: text uses `--homey-text-color`; a line or border uses a mono step such as `var(--homey-color-mono-300, #b3b3b3)`. The mono scale flips between light and dark mode, the named colors do not.
+- Never hardcode Tailwind or Material hex values, and never switch colors with `prefers-color-scheme`; Homey sets the `homey-dark-mode` class and updates the variables itself.
 
 ## Files That Must Stay in Sync
 

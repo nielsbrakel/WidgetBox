@@ -1,13 +1,12 @@
 {
   "name": {
-    "en": "Divider",
-    "nl": "Scheiding"
+    "en": "Spacer",
+    "nl": "Ruimte"
   },
   "description": {
-    "en": "Add empty space between widgets",
-    "nl": "Voeg lege ruimte toe tussen widgets"
+    "en": "Invisible empty space between widgets",
+    "nl": "Onzichtbare lege ruimte tussen widgets"
   },
-  "height": 32,
   "transparent": true,
   "settings": [
     {
@@ -18,11 +17,11 @@
         "nl": "Hoogte (pixels)"
       },
       "hint": {
-        "en": "Homey uses an 8 pixel grid, so multiples of 8 (8, 16, 24, 32, ...) will align best.",
-        "nl": "Homey gebruikt een raster van 8 pixels, dus veelvouden van 8 (8, 16, 24, 32, ...) passen het beste."
+        "en": "Height of the empty space, from 8 to 200 pixels. Multiples of 8 (8, 16, 24, 32, ...) line up best with Homey's grid.",
+        "nl": "Hoogte van de lege ruimte, van 8 tot 200 pixels. Veelvouden van 8 (8, 16, 24, 32, ...) sluiten het beste aan op het raster van Homey."
       },
-      "min": 0,
-      "max": 1000,
+      "min": 8,
+      "max": 200,
       "step": 1,
       "value": 32
     }
