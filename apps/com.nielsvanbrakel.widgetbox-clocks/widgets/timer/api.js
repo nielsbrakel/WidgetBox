@@ -1,49 +1,25 @@
-module.exports = {
-  /**
-   * Get the saved state for a timer widget instance
-   */
-  async getState({ homey, query }) {
-    const { widgetId } = query;
+const { createStateApi, invalid, toInt, toTimestampOrNull } = require("../../lib/widgetState");
 
-    if (!widgetId) {
-      throw new Error("Missing widgetId");
-    }
+const MAX_DURATION_MS = (23 * 3600 + 59 * 60 + 59) * 1000;
+const STATUSES = new Set(["idle", "running", "paused"]);
 
-    const key = `timer_${widgetId}`;
-    const state = homey.settings.get(key);
+/**
+ * A countdown: `durationMs` as set by the user, `remainingMs` left at the last start or pause,
+ * `startedAt` (epoch ms, Homey clock) while running, and `status` idle | running | paused.
+ * A running timer whose remaining time has passed is finished; that is derived, not stored.
+ */
+const sanitizeItem = (item) => {
+  if (!STATUSES.has(item.status)) throw invalid("status");
+  const durationMs = toInt(item.durationMs, 0, MAX_DURATION_MS, "durationMs");
+  const startedAt = toTimestampOrNull(item.startedAt, "startedAt");
+  if ((item.status === "running") !== (startedAt !== null)) throw invalid("startedAt");
 
-    return state || null;
-  },
-
-  /**
-   * Save the state for a timer widget instance
-   */
-  async setState({ homey, query, body }) {
-    const { widgetId } = query;
-
-    if (!widgetId) {
-      throw new Error("Missing widgetId");
-    }
-
-    const key = `timer_${widgetId}`;
-    homey.settings.set(key, body);
-
-    return { success: true };
-  },
-
-  /**
-   * Clear the saved state for a timer widget instance
-   */
-  async clearState({ homey, query }) {
-    const { widgetId } = query;
-
-    if (!widgetId) {
-      throw new Error("Missing widgetId");
-    }
-
-    const key = `timer_${widgetId}`;
-    homey.settings.unset(key);
-
-    return { success: true };
-  },
+  return {
+    status: item.status,
+    durationMs,
+    remainingMs: toInt(item.remainingMs, 0, durationMs, "remainingMs"),
+    startedAt,
+  };
 };
+
+module.exports = createStateApi({ prefix: "timer", sanitizeItem });

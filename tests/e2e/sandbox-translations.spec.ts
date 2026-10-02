@@ -1,21 +1,18 @@
 import { expect, test } from "@playwright/test";
-import { UtilitiesPage } from "../pages/UtilitiesPage";
+import { TimersPage } from "../pages/TimersPage";
 
 test.describe("Sandbox Translations", () => {
-  let utils: UtilitiesPage;
+  let ui: TimersPage;
 
   test.beforeEach(async ({ page }) => {
-    utils = new UtilitiesPage(page);
-    await utils.goto();
+    ui = new TimersPage(page);
+    await ui.goto();
   });
 
   test("should translate widget text correctly", async () => {
-    // Select Stopwatch widget
-    await utils.selectWidget("Stopwatch");
+    await ui.selectWidget("Stopwatch");
 
-    // Verify that the "Add Stopwatch" button has the correct translated text
-    // In en.json: "addStopwatch": "Add Stopwatch"
-    // Current behavior (bug): "addStopwatch"
-    await expect(utils.btnAdd).toContainText("Add Stopwatch", { timeout: 5000 });
+    // en.json widgets.stopwatch.addStopwatch, not the raw key
+    await expect(ui.btnAdd).toContainText("Add stopwatch", { timeout: 5000 });
   });
 });

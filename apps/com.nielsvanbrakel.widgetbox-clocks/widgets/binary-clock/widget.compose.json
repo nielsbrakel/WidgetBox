@@ -1,13 +1,12 @@
 {
   "name": {
     "en": "Binary Clock",
-    "nl": "Binaire Klok"
+    "nl": "Binaire klok"
   },
   "description": {
-    "en": "Time displayed in binary format",
-    "nl": "Tijd weergegeven in binair formaat"
+    "en": "Time displayed in binary format.",
+    "nl": "Tijd weergegeven in binaire notatie."
   },
-  "height": 128,
   "transparent": false,
   "settings": [
     {
@@ -15,7 +14,7 @@
       "type": "dropdown",
       "label": {
         "en": "Time Format",
-        "nl": "Tijdformaat"
+        "nl": "Tijdnotatie"
       },
       "value": "24",
       "values": [
@@ -23,14 +22,103 @@
           "id": "24",
           "label": {
             "en": "24-hour",
-            "nl": "24-uur"
+            "nl": "24-uurs"
           }
         },
         {
           "id": "12",
           "label": {
-            "en": "12-hour",
-            "nl": "12-uur"
+            "en": "12-hour (AM/PM)",
+            "nl": "12-uurs (AM/PM)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "showSeconds",
+      "type": "checkbox",
+      "label": {
+        "en": "Show Seconds",
+        "nl": "Seconden tonen"
+      },
+      "value": true
+    },
+    {
+      "id": "showLabels",
+      "type": "checkbox",
+      "label": {
+        "en": "Show Labels",
+        "nl": "Labels tonen"
+      },
+      "value": true
+    },
+    {
+      "id": "orientation",
+      "type": "dropdown",
+      "label": {
+        "en": "Orientation",
+        "nl": "Oriëntatie"
+      },
+      "value": "horizontal",
+      "values": [
+        {
+          "id": "horizontal",
+          "label": {
+            "en": "Horizontal (rows)",
+            "nl": "Horizontaal (rijen)"
+          }
+        },
+        {
+          "id": "vertical",
+          "label": {
+            "en": "Vertical (columns)",
+            "nl": "Verticaal (kolommen)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "size",
+      "type": "dropdown",
+      "label": {
+        "en": "Size",
+        "nl": "Grootte"
+      },
+      "value": "medium",
+      "values": [
+        {
+          "id": "xsmall",
+          "label": {
+            "en": "Extra Small",
+            "nl": "Extra klein"
+          }
+        },
+        {
+          "id": "small",
+          "label": {
+            "en": "Small",
+            "nl": "Klein"
+          }
+        },
+        {
+          "id": "medium",
+          "label": {
+            "en": "Medium",
+            "nl": "Gemiddeld"
+          }
+        },
+        {
+          "id": "large",
+          "label": {
+            "en": "Large",
+            "nl": "Groot"
+          }
+        },
+        {
+          "id": "xlarge",
+          "label": {
+            "en": "Extra Large",
+            "nl": "Extra groot"
           }
         }
       ]
@@ -93,7 +181,7 @@
       "type": "dropdown",
       "label": {
         "en": "Horizontal Alignment",
-        "nl": "Horizontale Uitlijning"
+        "nl": "Horizontale uitlijning"
       },
       "value": "center",
       "values": [
@@ -116,95 +204,6 @@
           "label": {
             "en": "Right",
             "nl": "Rechts"
-          }
-        }
-      ]
-    },
-    {
-      "id": "orientation",
-      "type": "dropdown",
-      "label": {
-        "en": "Orientation",
-        "nl": "Oriëntatie"
-      },
-      "value": "horizontal",
-      "values": [
-        {
-          "id": "vertical",
-          "label": {
-            "en": "Vertical",
-            "nl": "Verticaal"
-          }
-        },
-        {
-          "id": "horizontal",
-          "label": {
-            "en": "Horizontal",
-            "nl": "Horizontaal"
-          }
-        }
-      ]
-    },
-    {
-      "id": "showLabels",
-      "type": "checkbox",
-      "label": {
-        "en": "Show H/M/S Labels",
-        "nl": "Toon U/M/S Labels"
-      },
-      "value": true
-    },
-    {
-      "id": "showSeconds",
-      "type": "checkbox",
-      "label": {
-        "en": "Show Seconds",
-        "nl": "Toon Seconden"
-      },
-      "value": true
-    },
-    {
-      "id": "size",
-      "type": "dropdown",
-      "label": {
-        "en": "Size",
-        "nl": "Grootte"
-      },
-      "value": "medium",
-      "values": [
-        {
-          "id": "xsmall",
-          "label": {
-            "en": "Extra Small",
-            "nl": "Extra Klein"
-          }
-        },
-        {
-          "id": "small",
-          "label": {
-            "en": "Small",
-            "nl": "Klein"
-          }
-        },
-        {
-          "id": "medium",
-          "label": {
-            "en": "Medium",
-            "nl": "Gemiddeld"
-          }
-        },
-        {
-          "id": "large",
-          "label": {
-            "en": "Large",
-            "nl": "Groot"
-          }
-        },
-        {
-          "id": "xlarge",
-          "label": {
-            "en": "Extra Large",
-            "nl": "Extra Groot"
           }
         }
       ]

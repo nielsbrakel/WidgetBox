@@ -1,13 +1,12 @@
 {
   "name": {
     "en": "Digital Clock",
-    "nl": "Digitale Klok"
+    "nl": "Digitale klok"
   },
   "description": {
     "en": "Clean digital clock with date and time.",
     "nl": "Strakke digitale klok met tijd en datum."
   },
-  "height": 64,
   "transparent": false,
   "settings": [
     {
@@ -15,7 +14,7 @@
       "type": "dropdown",
       "label": {
         "en": "Time Format",
-        "nl": "Tijdformaat"
+        "nl": "Tijdnotatie"
       },
       "value": "24",
       "values": [
@@ -23,24 +22,42 @@
           "id": "24",
           "label": {
             "en": "24-hour",
-            "nl": "24-uur"
+            "nl": "24-uurs"
           }
         },
         {
           "id": "12",
           "label": {
             "en": "12-hour (AM/PM)",
-            "nl": "12-uur (AM/PM)"
+            "nl": "12-uurs (AM/PM)"
           }
         }
       ]
+    },
+    {
+      "id": "showSeconds",
+      "type": "checkbox",
+      "label": {
+        "en": "Show Seconds",
+        "nl": "Seconden tonen"
+      },
+      "value": false
+    },
+    {
+      "id": "showDate",
+      "type": "checkbox",
+      "label": {
+        "en": "Show Date",
+        "nl": "Datum tonen"
+      },
+      "value": true
     },
     {
       "id": "dateFormat",
       "type": "dropdown",
       "label": {
         "en": "Date Format",
-        "nl": "Datumformaat"
+        "nl": "Datumnotatie"
       },
       "value": "weekday-short",
       "values": [
@@ -110,6 +127,52 @@
       ]
     },
     {
+      "id": "size",
+      "type": "dropdown",
+      "label": {
+        "en": "Size",
+        "nl": "Grootte"
+      },
+      "value": "medium",
+      "values": [
+        {
+          "id": "xsmall",
+          "label": {
+            "en": "Extra Small",
+            "nl": "Extra klein"
+          }
+        },
+        {
+          "id": "small",
+          "label": {
+            "en": "Small",
+            "nl": "Klein"
+          }
+        },
+        {
+          "id": "medium",
+          "label": {
+            "en": "Medium",
+            "nl": "Gemiddeld"
+          }
+        },
+        {
+          "id": "large",
+          "label": {
+            "en": "Large",
+            "nl": "Groot"
+          }
+        },
+        {
+          "id": "xlarge",
+          "label": {
+            "en": "Extra Large",
+            "nl": "Extra groot"
+          }
+        }
+      ]
+    },
+    {
       "id": "fontWeight",
       "type": "dropdown",
       "label": {
@@ -142,11 +205,64 @@
       ]
     },
     {
+      "id": "color",
+      "type": "dropdown",
+      "label": {
+        "en": "Color",
+        "nl": "Kleur"
+      },
+      "value": "default",
+      "values": [
+        {
+          "id": "default",
+          "label": {
+            "en": "Default",
+            "nl": "Standaard"
+          }
+        },
+        {
+          "id": "blue",
+          "label": {
+            "en": "Blue",
+            "nl": "Blauw"
+          }
+        },
+        {
+          "id": "green",
+          "label": {
+            "en": "Green",
+            "nl": "Groen"
+          }
+        },
+        {
+          "id": "orange",
+          "label": {
+            "en": "Orange",
+            "nl": "Oranje"
+          }
+        },
+        {
+          "id": "red",
+          "label": {
+            "en": "Red",
+            "nl": "Rood"
+          }
+        },
+        {
+          "id": "purple",
+          "label": {
+            "en": "Purple",
+            "nl": "Paars"
+          }
+        }
+      ]
+    },
+    {
       "id": "horizontalAlignment",
       "type": "dropdown",
       "label": {
         "en": "Horizontal Alignment",
-        "nl": "Horizontale Uitlijning"
+        "nl": "Horizontale uitlijning"
       },
       "value": "center",
       "values": [
@@ -169,70 +285,6 @@
           "label": {
             "en": "Right",
             "nl": "Rechts"
-          }
-        }
-      ]
-    },
-    {
-      "id": "showDate",
-      "type": "checkbox",
-      "label": {
-        "en": "Show Date",
-        "nl": "Toon Datum"
-      },
-      "value": true
-    },
-    {
-      "id": "showSeconds",
-      "type": "checkbox",
-      "label": {
-        "en": "Show Seconds",
-        "nl": "Toon Seconden"
-      },
-      "value": false
-    },
-    {
-      "id": "size",
-      "type": "dropdown",
-      "label": {
-        "en": "Size",
-        "nl": "Grootte"
-      },
-      "value": "medium",
-      "values": [
-        {
-          "id": "xsmall",
-          "label": {
-            "en": "Extra Small",
-            "nl": "Extra Klein"
-          }
-        },
-        {
-          "id": "small",
-          "label": {
-            "en": "Small",
-            "nl": "Klein"
-          }
-        },
-        {
-          "id": "medium",
-          "label": {
-            "en": "Medium",
-            "nl": "Gemiddeld"
-          }
-        },
-        {
-          "id": "large",
-          "label": {
-            "en": "Large",
-            "nl": "Groot"
-          }
-        },
-        {
-          "id": "xlarge",
-          "label": {
-            "en": "Extra Large",
-            "nl": "Extra Groot"
           }
         }
       ]

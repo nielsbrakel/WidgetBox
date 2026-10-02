@@ -1,21 +1,102 @@
 {
   "name": {
     "en": "Word Clock Grid",
-    "nl": "Woordenklok (Raster)"
+    "nl": "Woordklok (raster)"
   },
   "description": {
-    "en": "Time displayed as a word matrix with highlighted letters",
-    "nl": "Tijd weergegeven als een woordenraster met gemarkeerde letters"
+    "en": "Time spelled out in a grid of letters.",
+    "nl": "Tijd uitgeschreven in een raster van letters."
   },
-  "height": 500,
   "transparent": false,
   "settings": [
+    {
+      "id": "language",
+      "type": "dropdown",
+      "label": {
+        "en": "Language",
+        "nl": "Taal"
+      },
+      "value": "auto",
+      "hint": {
+        "en": "Language of the words. Automatic follows the language of your Homey.",
+        "nl": "Taal van de woorden. Automatisch volgt de taal van je Homey."
+      },
+      "values": [
+        {
+          "id": "auto",
+          "label": {
+            "en": "Automatic",
+            "nl": "Automatisch"
+          }
+        },
+        {
+          "id": "en",
+          "label": {
+            "en": "English",
+            "nl": "Engels"
+          }
+        },
+        {
+          "id": "nl",
+          "label": {
+            "en": "Dutch",
+            "nl": "Nederlands"
+          }
+        }
+      ]
+    },
+    {
+      "id": "size",
+      "type": "dropdown",
+      "label": {
+        "en": "Size",
+        "nl": "Grootte"
+      },
+      "value": "medium",
+      "values": [
+        {
+          "id": "xsmall",
+          "label": {
+            "en": "Extra Small",
+            "nl": "Extra klein"
+          }
+        },
+        {
+          "id": "small",
+          "label": {
+            "en": "Small",
+            "nl": "Klein"
+          }
+        },
+        {
+          "id": "medium",
+          "label": {
+            "en": "Medium",
+            "nl": "Gemiddeld"
+          }
+        },
+        {
+          "id": "large",
+          "label": {
+            "en": "Large",
+            "nl": "Groot"
+          }
+        },
+        {
+          "id": "xlarge",
+          "label": {
+            "en": "Extra Large",
+            "nl": "Extra groot"
+          }
+        }
+      ]
+    },
     {
       "id": "color",
       "type": "dropdown",
       "label": {
-        "en": "Highlight Color",
-        "nl": "Markeerkleur"
+        "en": "Color",
+        "nl": "Kleur"
       },
       "value": "default",
       "values": [
@@ -61,14 +142,18 @@
             "nl": "Paars"
           }
         }
-      ]
+      ],
+      "hint": {
+        "en": "Color of the words that tell the time.",
+        "nl": "Kleur van de woorden die de tijd aangeven."
+      }
     },
     {
       "id": "horizontalAlignment",
       "type": "dropdown",
       "label": {
         "en": "Horizontal Alignment",
-        "nl": "Horizontale Uitlijning"
+        "nl": "Horizontale uitlijning"
       },
       "value": "center",
       "values": [
@@ -91,52 +176,6 @@
           "label": {
             "en": "Right",
             "nl": "Rechts"
-          }
-        }
-      ]
-    },
-    {
-      "id": "size",
-      "type": "dropdown",
-      "label": {
-        "en": "Size",
-        "nl": "Grootte"
-      },
-      "value": "medium",
-      "values": [
-        {
-          "id": "xsmall",
-          "label": {
-            "en": "Extra Small",
-            "nl": "Extra Klein"
-          }
-        },
-        {
-          "id": "small",
-          "label": {
-            "en": "Small",
-            "nl": "Klein"
-          }
-        },
-        {
-          "id": "medium",
-          "label": {
-            "en": "Medium",
-            "nl": "Gemiddeld"
-          }
-        },
-        {
-          "id": "large",
-          "label": {
-            "en": "Large",
-            "nl": "Groot"
-          }
-        },
-        {
-          "id": "xlarge",
-          "label": {
-            "en": "Extra Large",
-            "nl": "Extra Groot"
           }
         }
       ]

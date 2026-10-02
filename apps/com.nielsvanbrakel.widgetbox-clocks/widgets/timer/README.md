@@ -1,27 +1,31 @@
-# Timer Widget
+# Timer widget
 
-**Directory**: `widgets/timer`
+One or more countdown timers. The duration is set with tap-or-hold stepper buttons (no swiping), and a
+finished timer stays visible (red, pulsing for a minute, counting the overtime) until you tap Done.
+State lives on Homey, so the same widget shows the same timers on every device.
 
-A countdown timer widget with support for multiple concurrent timers.
-
-## Features
-*   **iOS-style Picker**: Custom scrolling value picker for setting Hours, Minutes, and Seconds.
-*   **Visual Feedback**: Progress bar background fills as time elapses.
-*   **Animations**: "Shake" animation when timer completes.
-*   **Multiple Timers**: Support for adding/removing timer instances dynamically.
-
-## Settings (`widget.compose.json`)
+## Settings
 
 | ID | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
-| `initialTimers` | Number | `1` | Number of timers to show on load. |
-| `maxTimers` | Number | `5` | Maximum allowed timers. |
-| `allowAddingTimers` | Checkbox | `true` | Allow user to add new timers. |
-| `defaultHours` | Number | `0` | Default start value (Hours). |
-| `defaultMinutes` | Number | `5` | Default start value (Minutes). |
-| `defaultSeconds` | Number | `0` | Default start value (Seconds). |
+| `defaultHours` / `defaultMinutes` / `defaultSeconds` | Number | `0` / `5` / `0` | Duration for new timers. Idle timers still on the old default follow a change. |
+| `playSound` | Checkbox | `true` | Beep when time is up. Browsers only allow audio after a tap, so it beeps on devices where a timer button was pressed. |
+| `allowAddingTimers` | Checkbox | `true` | Show the add and remove buttons. When off, the count is fixed to `initialTimers`. |
+| `initialTimers` | Number 1-10 | `1` | Timers shown when the widget is first added. |
+| `maxTimers` | Number 1-10 | `3` | The add button is hidden at this count. |
 
-## Development Notes
-*   **Standards**: User Close button adheres to positioning standards.
-*   **Interaction**: The time picker requires touch/mouse event handling for the scroll effect.
-*   **Vibration**: Uses `navigator.vibrate` on supported devices when timer finishes.
+## State and sync
+
+- `api.js` (`GET` / `PUT /state?widgetId=<instance id>`) is built on `lib/widgetState.js` and stores
+  `{ items: [{ id, status, durationMs, remainingMs, startedAt }], updatedAt }` under
+  `timer_<instance id>`. `status` is `idle`, `running` or `paused`; "finished" is derived from a
+  running timer whose remaining time has passed.
+- Remaining time is kept in milliseconds, so pausing, resuming or reloading never gains or loses time.
+- Saves are broadcast as the realtime event `timer:state`; devices also reload state when visible.
+- The alert (vibration where supported, optional beep) fires once per run, only when the timer
+  finished within the last 5 seconds, so waking a tablet later does not replay it.
+
+## Layout
+
+Rows switch to a stacked layout below 360 px; the stepper fits in 170 px. Height follows the content
+via `ResizeObserver` and `Homey.setHeight`. Ticks are aligned to whole seconds and stop while hidden.

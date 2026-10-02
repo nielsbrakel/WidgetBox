@@ -4,68 +4,77 @@
     "nl": "Stopwatch"
   },
   "description": {
-    "en": "Stopwatch with lap timing",
-    "nl": "Stopwatch met rondetijden"
+    "en": "One or more stopwatches with lap times, synced across your devices",
+    "nl": "Een of meer stopwatches met rondetijden, gesynchroniseerd tussen je apparaten"
   },
-  "height": 200,
   "transparent": false,
   "settings": [
     {
-      "id": "allowAddingStopwatches",
+      "id": "showMilliseconds",
       "type": "checkbox",
       "label": {
-        "en": "Allow adding stopwatches",
-        "nl": "Stopwatches toevoegen toestaan"
+        "en": "Show hundredths of a second",
+        "nl": "Honderdsten van een seconde tonen"
       },
       "value": true
-    },
-    {
-      "id": "maxStopwatches",
-      "type": "number",
-      "label": {
-        "en": "Maximum stopwatches",
-        "nl": "Maximaal aantal stopwatches"
-      },
-      "hint": {
-        "en": "Maximum number of stopwatches that can run simultaneously (1-5)",
-        "nl": "Maximaal aantal stopwatches dat tegelijk kan draaien (1-5)"
-      },
-      "min": 1,
-      "max": 10,
-      "value": 3
-    },
-    {
-      "id": "initialStopwatches",
-      "type": "number",
-      "label": {
-        "en": "Number of stopwatches to start with",
-        "nl": "Aantal stopwatches bij starten"
-      },
-      "hint": {
-        "en": "How many stopwatches to show when the widget first loads",
-        "nl": "Hoeveel stopwatches worden getoond wanneer de widget wordt geladen"
-      },
-      "min": 1,
-      "max": 5,
-      "value": 1
     },
     {
       "id": "showLaps",
       "type": "checkbox",
       "label": {
         "en": "Show lap times",
-        "nl": "Toon rondetijden"
+        "nl": "Rondetijden tonen"
       },
       "value": false
     },
     {
-      "id": "showMilliseconds",
+      "id": "allowAddingStopwatches",
       "type": "checkbox",
       "label": {
-        "en": "Show milliseconds",
-        "nl": "Toon milliseconden"
+        "en": "Allow adding and removing stopwatches",
+        "nl": "Stopwatches toevoegen en verwijderen toestaan"
       },
       "value": true
+    },
+    {
+      "id": "initialStopwatches",
+      "type": "number",
+      "label": {
+        "en": "Number of stopwatches",
+        "nl": "Aantal stopwatches"
+      },
+      "hint": {
+        "en": "How many stopwatches to show when the widget is first added (1-10). If adding is not allowed, the widget always shows this many.",
+        "nl": "Hoeveel stopwatches er worden getoond wanneer de widget wordt toegevoegd (1-10). Als toevoegen niet is toegestaan, toont de widget er altijd zoveel."
+      },
+      "min": 1,
+      "max": 10,
+      "value": 1
+    },
+    {
+      "id": "maxStopwatches",
+      "type": "number",
+      "label": {
+        "en": "Maximum number of stopwatches",
+        "nl": "Maximaal aantal stopwatches"
+      },
+      "hint": {
+        "en": "The add button is hidden once this many stopwatches are shown (1-10).",
+        "nl": "De knop om toe te voegen verdwijnt zodra er zoveel stopwatches worden getoond (1-10)."
+      },
+      "min": 1,
+      "max": 10,
+      "value": 3
     }
-  ]
+  ],
+  "api": {
+    "getState": {
+      "method": "GET",
+      "path": "/state"
+    },
+    "setState": {
+      "method": "PUT",
+      "path": "/state"
+    }
+  }
 }

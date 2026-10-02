@@ -1,49 +1,25 @@
-module.exports = {
-  /**
-   * Get the saved state for a stopwatch widget instance
-   */
-  async getState({ homey, query }) {
-    const { widgetId } = query;
+const {
+  DAY_MS,
+  createStateApi,
+  invalid,
+  toInt,
+  toTimestampOrNull,
+} = require("../../lib/widgetState");
 
-    if (!widgetId) {
-      throw new Error("Missing widgetId");
-    }
+const MAX_LAPS = 99;
+const MAX_ELAPSED_MS = 1000 * DAY_MS;
 
-    const key = `stopwatch_${widgetId}`;
-    const state = homey.settings.get(key);
-
-    return state || null;
-  },
-
-  /**
-   * Save the state for a stopwatch widget instance
-   */
-  async setState({ homey, query, body }) {
-    const { widgetId } = query;
-
-    if (!widgetId) {
-      throw new Error("Missing widgetId");
-    }
-
-    const key = `stopwatch_${widgetId}`;
-    homey.settings.set(key, body);
-
-    return { success: true };
-  },
-
-  /**
-   * Clear the saved state for a stopwatch widget instance
-   */
-  async clearState({ homey, query }) {
-    const { widgetId } = query;
-
-    if (!widgetId) {
-      throw new Error("Missing widgetId");
-    }
-
-    const key = `stopwatch_${widgetId}`;
-    homey.settings.unset(key);
-
-    return { success: true };
-  },
+/**
+ * A stopwatch: `elapsedMs` accumulated before the current run, `startedAt` (epoch ms, Homey
+ * clock) while running or null when paused, and `laps` as total elapsed ms at each lap.
+ */
+const sanitizeItem = (item) => {
+  if (!Array.isArray(item.laps) || item.laps.length > MAX_LAPS) throw invalid("laps");
+  return {
+    elapsedMs: toInt(item.elapsedMs, 0, MAX_ELAPSED_MS, "elapsedMs"),
+    startedAt: toTimestampOrNull(item.startedAt, "startedAt"),
+    laps: item.laps.map((lap) => toInt(lap, 0, MAX_ELAPSED_MS, "lap")),
+  };
 };
+
+module.exports = createStateApi({ prefix: "stopwatch", sanitizeItem });
