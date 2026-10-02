@@ -1,9 +1,8 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-
-<head>
-  <meta charset="UTF-8">
-  <style>
+  <head>
+    <meta charset="UTF-8">
+    <style>
     * {
       margin: 0;
       padding: 0;
@@ -13,13 +12,13 @@
     body {
       overflow: hidden;
     }
-  </style>
-</head>
+    </style>
+  </head>
 
-<body>
-  <div id="divider"></div>
+  <body>
+    <div id="divider"></div>
 
-  <script type="text/javascript">
+    <script type="text/javascript">
     function getHeightPixels(settings) {
       const h = parseInt(settings.height, 10);
       return Number.isFinite(h) ? Math.max(0, h) : 32;
@@ -29,12 +28,11 @@
       const settings = Homey.getSettings();
       Homey.ready({ height: getHeightPixels(settings) });
 
-      Homey.on('settings.set', (key, value) => {
+      Homey.on("settings.set", (key, value) => {
         settings[key] = value;
         Homey.setHeight(getHeightPixels(settings));
       });
     }
-  </script>
-</body>
-
+    </script>
+  </body>
 </html>

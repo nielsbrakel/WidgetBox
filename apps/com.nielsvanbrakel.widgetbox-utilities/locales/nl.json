@@ -1,15 +1,15 @@
 {
-    "widgets": {
-        "stopwatch": {
-            "addStopwatch": "Stopwatch Toevoegen",
-            "lap": "Ronde",
-            "noLaps": "Geen rondes opgenomen"
-        },
-        "timer": {
-            "hours": "Uren",
-            "minutes": "Minuten",
-            "seconds": "Seconden",
-            "addTimer": "Timer Toevoegen"
-        }
+  "widgets": {
+    "stopwatch": {
+      "addStopwatch": "Stopwatch Toevoegen",
+      "lap": "Ronde",
+      "noLaps": "Geen rondes opgenomen"
+    },
+    "timer": {
+      "hours": "Uren",
+      "minutes": "Minuten",
+      "seconds": "Seconden",
+      "addTimer": "Timer Toevoegen"
     }
+  }
 }

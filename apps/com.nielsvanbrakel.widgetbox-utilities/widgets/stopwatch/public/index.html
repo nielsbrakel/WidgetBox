@@ -1,7 +1,6 @@
 <html>
-
-<head>
-  <style>
+  <head>
+    <style>
     /* Reset & Base */
     body {
       margin: 0;
@@ -58,10 +57,10 @@
     }
 
     .stopwatch-item.running::before {
-      content: '';
+      content: "";
       position: absolute;
       inset: 0;
-      background: linear-gradient(90deg, rgba(34, 197, 94, 0.10), rgba(34, 197, 94, 0.03));
+      background: linear-gradient(90deg, rgba(34, 197, 94, 0.1), rgba(34, 197, 94, 0.03));
     }
 
     /* Controls & Display */
@@ -216,7 +215,9 @@
       font-weight: 600;
       font-size: 14px;
       box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-      transition: transform 0.1s, box-shadow 0.2s;
+      transition:
+        transform 0.1s,
+        box-shadow 0.2s;
     }
 
     .btn-add:hover {
@@ -289,13 +290,13 @@
       color: var(--homey-text-color);
       opacity: 0.6;
     }
-  </style>
-</head>
+    </style>
+  </head>
 
-<body>
-  <div id="app"></div>
+  <body>
+    <div id="app"></div>
 
-  <script>
+    <script>
     // Config defaults (will be overridden by settings)
     const CONFIG = {
       STOPWATCH_HEIGHT: 120,
@@ -307,7 +308,7 @@
       MAX_STOPWATCHES: 1,
       ALLOW_ADDING: false,
       SHOW_MILLISECONDS: true,
-      SHOW_LAPS: false
+      SHOW_LAPS: false,
     };
 
     // State
@@ -317,7 +318,7 @@
     let tickInterval = null;
     let checkpointInterval = null;
     let settings = {};
-    let restoreReason = 'cold start';
+    let restoreReason = "cold start";
     let lastSaveTimestamp = null;
     let lastSavePayload = null;
 
@@ -326,8 +327,7 @@
 
     // --- Utilities ---
     const $ = (sel, ctx = document) => ctx.querySelector(sel);
-    const pad = n => String(n).padStart(2, '0');
-
+    const pad = (n) => String(n).padStart(2, "0");
 
     const formatTime = (ms, showMs = true) => {
       const totalSeconds = Math.floor(ms / 1000);
@@ -345,7 +345,8 @@
 
     const calcHeight = () => {
       const { STOPWATCH_HEIGHT, GAP, MAX_STOPWATCHES, ALLOW_ADDING } = CONFIG;
-      const total = stopwatches.length * STOPWATCH_HEIGHT + Math.max(0, stopwatches.length - 1) * GAP;
+      const total =
+        stopwatches.length * STOPWATCH_HEIGHT + Math.max(0, stopwatches.length - 1) * GAP;
       const canAdd = ALLOW_ADDING && stopwatches.length < MAX_STOPWATCHES;
       // Button height (36px) + margins (12px top + 12px bottom) = 60px
       const btnHeight = canAdd ? 60 : 0;
@@ -362,16 +363,18 @@
      */
     const buildPersistState = () => {
       return {
-        stopwatches: stopwatches.map(sw => ({
+        stopwatches: stopwatches.map((sw) => ({
           id: sw.id,
           isRunning: sw.isRunning,
           // Accumulated time BEFORE current run session
-          elapsedBeforeLastStart: sw.isRunning ? sw.elapsed : sw.elapsed + (sw.startTime ? Date.now() - sw.startTime : 0),
+          elapsedBeforeLastStart: sw.isRunning
+            ? sw.elapsed
+            : sw.elapsed + (sw.startTime ? Date.now() - sw.startTime : 0),
           // Epoch timestamp when Start was pressed (null if paused)
           lastStartEpochMs: sw.isRunning ? sw.startTime : null,
-          laps: sw.laps
+          laps: sw.laps,
         })),
-        updatedAtEpochMs: Date.now()
+        updatedAtEpochMs: Date.now(),
       };
     };
 
@@ -385,12 +388,10 @@
       lastSavePayload = state;
       lastSaveTimestamp = Date.now();
 
-
-
       try {
-        await Homey.api('PUT', `/state?widgetId=${encodeURIComponent(widgetId)}`, state);
+        await Homey.api("PUT", `/state?widgetId=${encodeURIComponent(widgetId)}`, state);
       } catch (err) {
-        console.error('Failed to save stopwatch state:', err);
+        console.error("Failed to save stopwatch state:", err);
       }
     };
 
@@ -401,10 +402,10 @@
       if (!widgetId) return null;
 
       try {
-        const state = await Homey.api('GET', `/state?widgetId=${encodeURIComponent(widgetId)}`);
+        const state = await Homey.api("GET", `/state?widgetId=${encodeURIComponent(widgetId)}`);
         return state;
       } catch (err) {
-        console.error('Failed to load stopwatch state:', err);
+        console.error("Failed to load stopwatch state:", err);
         return null;
       }
     };
@@ -418,20 +419,20 @@
         return false;
       }
 
-      restoreReason = 'restored from persistence';
+      restoreReason = "restored from persistence";
       const now = Date.now();
 
-      stopwatches = savedState.stopwatches.map(saved => {
+      stopwatches = savedState.stopwatches.map((saved) => {
         if (saved.isRunning && saved.lastStartEpochMs) {
           // Was running - calculate how much time passed since we started
           const timeSinceStart = now - saved.lastStartEpochMs;
           return {
             id: saved.id,
             elapsed: saved.elapsedBeforeLastStart, // Keep original accumulated
-            startTime: saved.lastStartEpochMs,     // Keep original start time!
+            startTime: saved.lastStartEpochMs, // Keep original start time!
             isRunning: true,
             laps: saved.laps || [],
-            isNew: false
+            isNew: false,
           };
         } else {
           // Was paused - just restore the frozen elapsed time
@@ -441,11 +442,10 @@
             startTime: null,
             isRunning: false,
             laps: saved.laps || [],
-            isNew: false
+            isNew: false,
           };
         }
       });
-
 
       return true;
     };
@@ -456,7 +456,7 @@
     const startCheckpoint = () => {
       if (!checkpointInterval) {
         checkpointInterval = setInterval(() => {
-          if (stopwatches.some(sw => sw.isRunning)) {
+          if (stopwatches.some((sw) => sw.isRunning)) {
             saveState();
           }
         }, CONFIG.CHECKPOINT_INTERVAL);
@@ -477,10 +477,10 @@
       startTime: null,
       isRunning: false,
       laps: [],
-      isNew: true
+      isNew: true,
     });
 
-    const getStopwatch = id => stopwatches.find(s => s.id === id);
+    const getStopwatch = (id) => stopwatches.find((s) => s.id === id);
 
     const toggleStopwatch = (id) => {
       const sw = getStopwatch(id);
@@ -511,7 +511,7 @@
         elapsed: 0,
         startTime: null,
         isRunning: false,
-        laps: []
+        laps: [],
       });
 
       render();
@@ -529,7 +529,7 @@
       sw.laps.unshift({
         number: sw.laps.length + 1,
         time: currentTime - lastLapTime,
-        total: currentTime
+        total: currentTime,
       });
 
       render();
@@ -537,7 +537,7 @@
     };
 
     const removeStopwatch = (id) => {
-      stopwatches = stopwatches.filter(s => s.id !== id);
+      stopwatches = stopwatches.filter((s) => s.id !== id);
       render();
       setHeight();
       saveState(); // Save on remove
@@ -576,28 +576,30 @@
       const el = $(`[data-stopwatch="${sw.id}"]`);
       if (!el) return;
 
-      const timeEl = $('.time-display', el);
+      const timeEl = $(".time-display", el);
       if (timeEl) {
         const currentTime = sw.elapsed + (sw.startTime ? Date.now() - sw.startTime : 0);
         timeEl.innerHTML = formatTime(currentTime, CONFIG.SHOW_MILLISECONDS);
       }
     };
 
-
-
     // --- Rendering ---
     const renderLaps = (sw) => {
       if (sw.laps.length === 0) {
-        return `<div class="laps-container"><div class="laps-empty">${__('noLaps')}</div></div>`;
+        return `<div class="laps-container"><div class="laps-empty">${__("noLaps")}</div></div>`;
       }
 
-      const lapsHtml = sw.laps.map(lap => `
+      const lapsHtml = sw.laps
+        .map(
+          (lap) => `
         <div class="lap-item">
-          <span class="lap-number">${__('lap')} ${lap.number}</span>
+          <span class="lap-number">${__("lap")} ${lap.number}</span>
           <span class="lap-diff">+${formatTime(lap.time, CONFIG.SHOW_MILLISECONDS)}</span>
           <span class="lap-time">${formatTime(lap.total, CONFIG.SHOW_MILLISECONDS)}</span>
         </div>
-      `).join('');
+      `,
+        )
+        .join("");
 
       return `<div class="laps-container">${lapsHtml}</div>`;
     };
@@ -609,11 +611,13 @@
 
       if (isNew) sw.isNew = false;
 
-      const classes = ['stopwatch-item', isNew && 'fade-in', isRunning && 'running'].filter(Boolean).join(' ');
+      const classes = ["stopwatch-item", isNew && "fade-in", isRunning && "running"]
+        .filter(Boolean)
+        .join(" ");
 
       // Determine which buttons to show
-      let controlBtn = `<button class="btn-round btn-primary" onclick="toggleStopwatch('${id}')"><div class="icon ${isRunning ? 'icon-pause' : 'icon-play'}"></div></button>`;
-      let secondBtn = '';
+      const controlBtn = `<button class="btn-round btn-primary" onclick="toggleStopwatch('${id}')"><div class="icon ${isRunning ? "icon-pause" : "icon-play"}"></div></button>`;
+      let secondBtn = "";
 
       if (isRunning && CONFIG.SHOW_LAPS) {
         secondBtn = `<button class="btn-round btn-secondary" onclick="lapStopwatch('${id}')"><div class="icon icon-lap"></div></button>`;
@@ -623,25 +627,26 @@
 
       return `
         <div class="${classes}" data-stopwatch="${id}">
-          ${stopwatches.length > 1 ? `<button class="stopwatch-close" onclick="removeStopwatch('${id}')">×</button>` : ''}
+          ${stopwatches.length > 1 ? `<button class="stopwatch-close" onclick="removeStopwatch('${id}')">×</button>` : ""}
           <div class="stopwatch-controls">
             ${controlBtn}
             ${secondBtn}
           </div>
           <div class="stopwatch-display">
             <div class="time-display">${formatTime(currentTime, CONFIG.SHOW_MILLISECONDS)}</div>
-            ${CONFIG.SHOW_LAPS ? renderLaps(sw) : ''}
+            ${CONFIG.SHOW_LAPS ? renderLaps(sw) : ""}
           </div>
         </div>`;
     };
 
     const render = () => {
-      const content = stopwatches.map(renderStopwatch).join('');
+      const content = stopwatches.map(renderStopwatch).join("");
       const canAdd = CONFIG.ALLOW_ADDING && stopwatches.length < CONFIG.MAX_STOPWATCHES;
       const addBtn = canAdd
-        ? `<button class="btn btn-add" onclick="addStopwatch()">+ ${__('addStopwatch')}</button>`
-        : '';
-      $('#app').innerHTML = `<div class="stopwatch-list ${canAdd ? 'has-add-btn' : ''}">${content}</div>${addBtn}`;
+        ? `<button class="btn btn-add" onclick="addStopwatch()">+ ${__("addStopwatch")}</button>`
+        : "";
+      $("#app").innerHTML =
+        `<div class="stopwatch-list ${canAdd ? "has-add-btn" : ""}">${content}</div>${addBtn}`;
     };
 
     // --- Init ---
@@ -652,16 +657,14 @@
       // Get widget instance ID from Homey
       widgetId = Homey.getWidgetInstanceId();
 
-
       // Apply settings to CONFIG
       CONFIG.MAX_STOPWATCHES = settings.maxStopwatches ?? CONFIG.MAX_STOPWATCHES;
       CONFIG.ALLOW_ADDING = settings.allowAddingStopwatches ?? CONFIG.ALLOW_ADDING;
       CONFIG.SHOW_MILLISECONDS = settings.showMilliseconds ?? CONFIG.SHOW_MILLISECONDS;
       CONFIG.SHOW_LAPS = settings.showLaps ?? CONFIG.SHOW_LAPS;
 
-
       // Handle setting changes
-      Homey.on('settings.set', (key, value) => {
+      Homey.on("settings.set", (key, value) => {
         settings[key] = value;
         CONFIG.MAX_STOPWATCHES = settings.maxStopwatches ?? CONFIG.MAX_STOPWATCHES;
         CONFIG.ALLOW_ADDING = settings.allowAddingStopwatches ?? CONFIG.ALLOW_ADDING;
@@ -683,7 +686,7 @@
       }
 
       // If any stopwatch is running, start the tick loop
-      if (stopwatches.some(sw => sw.isRunning)) {
+      if (stopwatches.some((sw) => sw.isRunning)) {
         startTick();
         startCheckpoint();
       }
@@ -691,7 +694,6 @@
       render();
       Homey.ready({ height: calcHeight() });
     };
-  </script>
-</body>
-
+    </script>
+  </body>
 </html>

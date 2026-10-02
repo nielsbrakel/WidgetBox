@@ -1,15 +1,15 @@
 {
-    "widgets": {
-        "stopwatch": {
-            "addStopwatch": "Add Stopwatch",
-            "lap": "Lap",
-            "noLaps": "No laps recorded"
-        },
-        "timer": {
-            "hours": "Hours",
-            "minutes": "Minutes",
-            "seconds": "Seconds",
-            "addTimer": "Add Timer"
-        }
+  "widgets": {
+    "stopwatch": {
+      "addStopwatch": "Add Stopwatch",
+      "lap": "Lap",
+      "noLaps": "No laps recorded"
+    },
+    "timer": {
+      "hours": "Hours",
+      "minutes": "Minutes",
+      "seconds": "Seconds",
+      "addTimer": "Add Timer"
     }
+  }
 }

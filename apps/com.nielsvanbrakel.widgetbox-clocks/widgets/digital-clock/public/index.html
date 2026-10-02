@@ -1,11 +1,10 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="../../_shared/shared-styles.css">
-  <style>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../../_shared/shared-styles.css">
+    <style>
     /* Widget Specific Styles */
     html,
     body {
@@ -43,7 +42,9 @@
       /* Dynamic height */
       background: var(--homey-background-color);
       border-radius: var(--homey-border-radius, 12px);
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
+      box-shadow:
+        0 1px 3px rgba(0, 0, 0, 0.08),
+        0 1px 2px rgba(0, 0, 0, 0.06);
       padding: 16px;
       /* Internal padding for text breathing room */
       box-sizing: border-box;
@@ -81,7 +82,6 @@
     .align-v-bottom {
       justify-content: flex-end;
     }
-
 
     /* Typography Sizes (Applied to Card) */
     .size-xsmall .time {
@@ -195,39 +195,39 @@
       box-shadow: none !important;
       padding: 0 !important;
     }
-  </style>
-</head>
+    </style>
+  </head>
 
-<body>
-  <div class="widget-spacing-wrapper" id="app-container">
-    <div class="widget-card" id="widget-card">
-      <div class="time" id="time"></div>
-      <div class="date" id="date"></div>
+  <body>
+    <div class="widget-spacing-wrapper" id="app-container">
+      <div class="widget-card" id="widget-card">
+        <div class="time" id="time"></div>
+        <div class="date" id="date"></div>
+      </div>
     </div>
-  </div>
 
-  <script>
+    <script>
     let currentSettings = {};
 
     function updateTime() {
       const now = new Date();
-      const timeElement = document.getElementById('time');
-      const dateElement = document.getElementById('date');
+      const timeElement = document.getElementById("time");
+      const dateElement = document.getElementById("date");
 
       // 1. Time Formatting
-      const is24h = currentSettings.clockFormat !== '12';
+      const is24h = currentSettings.clockFormat !== "12";
       let hours = now.getHours();
-      let minutes = now.getMinutes();
-      let seconds = now.getSeconds();
-      let period = '';
+      const minutes = now.getMinutes();
+      const seconds = now.getSeconds();
+      let period = "";
 
       if (!is24h) {
-        period = hours >= 12 ? 'PM' : 'AM';
+        period = hours >= 12 ? "PM" : "AM";
         hours = hours % 12;
         hours = hours ? hours : 12; // the hour '0' should be '12'
       }
 
-      const pad = (num) => num.toString().padStart(2, '0');
+      const pad = (num) => num.toString().padStart(2, "0");
 
       let timeHtml = `${pad(hours)}<span class="colon">:</span>${pad(minutes)}`;
 
@@ -243,84 +243,88 @@
 
       // 2. Date Formatting
       if (currentSettings.showDate) {
-        dateElement.style.display = 'block';
+        dateElement.style.display = "block";
         dateElement.innerText = formatDate(now);
       } else {
-        dateElement.style.display = 'none';
+        dateElement.style.display = "none";
       }
     }
 
     function formatDate(date) {
-      const format = currentSettings.dateFormat || 'weekday-short';
+      const format = currentSettings.dateFormat || "weekday-short";
       const options = {};
 
       switch (format) {
-        case 'dmy':
-          return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
-        case 'mdy':
-          return `${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getDate().toString().padStart(2, '0')}/${date.getFullYear()}`;
-        case 'ymd':
-          return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
-        case 'short':
-          options.month = 'short'; options.day = 'numeric'; options.year = 'numeric';
+        case "dmy":
+          return `${date.getDate().toString().padStart(2, "0")}/${(date.getMonth() + 1).toString().padStart(2, "0")}/${date.getFullYear()}`;
+        case "mdy":
+          return `${(date.getMonth() + 1).toString().padStart(2, "0")}/${date.getDate().toString().padStart(2, "0")}/${date.getFullYear()}`;
+        case "ymd":
+          return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}`;
+        case "short":
+          options.month = "short";
+          options.day = "numeric";
+          options.year = "numeric";
           break;
-        case 'long':
-          options.month = 'long'; options.day = 'numeric'; options.year = 'numeric';
+        case "long":
+          options.month = "long";
+          options.day = "numeric";
+          options.year = "numeric";
           break;
-        case 'weekday-short':
-          options.weekday = 'short'; options.month = 'short'; options.day = 'numeric';
+        case "weekday-short":
+          options.weekday = "short";
+          options.month = "short";
+          options.day = "numeric";
           break;
-        case 'weekday-long':
-          options.weekday = 'long'; options.month = 'long'; options.day = 'numeric';
+        case "weekday-long":
+          options.weekday = "long";
+          options.month = "long";
+          options.day = "numeric";
           break;
-        case 'weekday-only':
-          options.weekday = 'long';
+        case "weekday-only":
+          options.weekday = "long";
           break;
-        case 'day-month':
-          options.day = 'numeric'; options.month = 'long';
+        case "day-month":
+          options.day = "numeric";
+          options.month = "long";
           break;
         default:
-          options.weekday = 'short'; options.month = 'short'; options.day = 'numeric';
+          options.weekday = "short";
+          options.month = "short";
+          options.day = "numeric";
       }
 
       return date.toLocaleDateString(undefined, options);
     }
 
-
-
     function updateStyles(Homey) {
-      const appContainer = document.getElementById('app-container');
-      const widgetCard = document.getElementById('widget-card');
+      const appContainer = document.getElementById("app-container");
+      const widgetCard = document.getElementById("widget-card");
 
       // Styles applied to Card (sizes, colors, weights)
-      widgetCard.className = 'widget-card'; // Reset
-      const size = currentSettings.size || 'medium';
+      widgetCard.className = "widget-card"; // Reset
+      const size = currentSettings.size || "medium";
       widgetCard.classList.add(`size-${size}`);
       widgetCard.classList.add(`color-default`);
-      widgetCard.classList.add(`weight-${currentSettings.fontWeight || 'normal'}`);
-
-
+      widgetCard.classList.add(`weight-${currentSettings.fontWeight || "normal"}`);
 
       // Alignment applied to Wrapper
-      appContainer.className = 'widget-spacing-wrapper';
-      widgetCard.classList.add(`align-h-${currentSettings.horizontalAlignment || 'center'}`);
-
-
-
+      appContainer.className = "widget-spacing-wrapper";
+      widgetCard.classList.add(`align-h-${currentSettings.horizontalAlignment || "center"}`);
 
       // Card background is handled by widget compose transparent setting
     }
 
     function calculateTotalHeight() {
       // Use offsetHeight of the container to get actual content size
-      const appContainer = document.getElementById('app-container');
+      const appContainer = document.getElementById("app-container");
       return appContainer.offsetHeight;
     }
 
     function onHomeyReady(Homey) {
       currentSettings = Homey.getSettings();
 
-      Homey.on('settings.set', (key, value) => {
+      Homey.on("settings.set", (key, value) => {
         currentSettings[key] = value;
         updateStyles(Homey);
         updateTime();
@@ -349,7 +353,6 @@
 
       setTimeout(updateHeight, 0);
     }
-  </script>
-</body>
-
+    </script>
+  </body>
 </html>

@@ -8,7 +8,7 @@ class TimerEngine {
     this.timers = [];
     this.onUpdate = options.onUpdate || (() => {});
     this.onComplete = options.onComplete || (() => {});
-    this.persistKey = options.persistKey || 'timers';
+    this.persistKey = options.persistKey || "timers";
     this.autoRemoveFinished = options.autoRemoveFinished ?? false;
   }
 
@@ -18,7 +18,7 @@ class TimerEngine {
    * @param {string} label - Optional label for timer
    * @returns {string} Timer ID
    */
-  addTimer(duration, label = '') {
+  addTimer(duration, label = "") {
     const id = `timer-${Date.now()}-${Math.random()}`;
     const timer = {
       id,
@@ -40,7 +40,7 @@ class TimerEngine {
    * @param {string} id - Timer ID
    */
   removeTimer(id) {
-    this.timers = this.timers.filter(t => t.id !== id);
+    this.timers = this.timers.filter((t) => t.id !== id);
     this.onUpdate();
   }
 
@@ -116,7 +116,7 @@ class TimerEngine {
    * @returns {Object} Timer object
    */
   getTimer(id) {
-    return this.timers.find(t => t.id === id);
+    return this.timers.find((t) => t.id === id);
   }
 
   /**
@@ -139,14 +139,14 @@ class TimerEngine {
     const secs = Math.floor(seconds % 60);
     const millis = Math.floor((seconds % 1) * 100);
 
-    let result = '';
+    let result = "";
     if (hours > 0) {
-      result += `${String(hours).padStart(2, '0')}:`;
+      result += `${String(hours).padStart(2, "0")}:`;
     }
-    result += `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    result += `${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
 
     if (showMillis) {
-      result += `.${String(millis).padStart(2, '0')}`;
+      result += `.${String(millis).padStart(2, "0")}`;
     }
 
     return result;
@@ -156,14 +156,14 @@ class TimerEngine {
    * Internal update loop for running timers
    */
   updateLoop() {
-    const runningTimers = this.timers.filter(t => t.isRunning);
-    
+    const runningTimers = this.timers.filter((t) => t.isRunning);
+
     if (runningTimers.length === 0) return;
 
     const tick = () => {
       let anyRunning = false;
 
-      runningTimers.forEach(timer => {
+      runningTimers.forEach((timer) => {
         if (!timer.isRunning) return;
 
         const elapsed = (Date.now() - timer.startTime) / 1000;
@@ -173,7 +173,7 @@ class TimerEngine {
           timer.remaining = 0;
           timer.isRunning = false;
           this.onComplete(timer.id);
-          
+
           if (this.autoRemoveFinished) {
             this.removeTimer(timer.id);
           }
@@ -199,7 +199,7 @@ class TimerEngine {
     try {
       localStorage.setItem(this.persistKey, JSON.stringify(this.timers));
     } catch (err) {
-      console.error('Failed to save timers:', err);
+      console.error("Failed to save timers:", err);
     }
   }
 
@@ -213,7 +213,7 @@ class TimerEngine {
         this.timers = JSON.parse(data);
       }
     } catch (err) {
-      console.error('Failed to load timers:', err);
+      console.error("Failed to load timers:", err);
     }
   }
 
@@ -221,7 +221,7 @@ class TimerEngine {
    * Destroy engine and cleanup
    */
   destroy() {
-    this.timers.forEach(t => {
+    this.timers.forEach((t) => {
       if (t.isRunning) {
         t.isRunning = false;
       }
@@ -229,6 +229,6 @@ class TimerEngine {
   }
 }
 
-if (typeof module !== 'undefined' && module.exports) {
+if (typeof module !== "undefined" && module.exports) {
   module.exports = TimerEngine;
 }

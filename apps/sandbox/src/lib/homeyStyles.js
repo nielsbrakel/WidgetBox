@@ -3,16 +3,16 @@
  * Mirrors the real Homey widget runtime styling environment.
  */
 export function injectHomeyStyles(doc) {
-    if (!doc) return;
+  if (!doc) return;
 
-    let style = doc.getElementById('homey-mock-styles');
-    if (!style) {
-        style = doc.createElement('style');
-        style.id = 'homey-mock-styles';
-        doc.head.appendChild(style);
-    }
+  let style = doc.getElementById("homey-mock-styles");
+  if (!style) {
+    style = doc.createElement("style");
+    style.id = "homey-mock-styles";
+    doc.head.appendChild(style);
+  }
 
-    style.textContent = `
+  style.textContent = `
     :root {
       /* Colors */
       --homey-color-mono-000: #000;
@@ -152,18 +152,20 @@ export function injectHomeyStyles(doc) {
  * Sets body classes and injects Homey CSS variables.
  */
 export function setIframeTheme(doc, theme) {
-    if (!doc || !doc.body) return;
+  if (!doc || !doc.body) return;
 
-    doc.body.classList.remove('homey-theme-light', 'homey-theme-dark');
-    doc.body.classList.add(`homey-theme-${theme}`);
-    doc.body.dataset.theme = theme;
+  doc.body.classList.remove("homey-theme-light", "homey-theme-dark");
+  doc.body.classList.add(`homey-theme-${theme}`);
+  doc.body.dataset.theme = theme;
 
-    // Ensure homey-widget class is present by default
-    if (!doc.body.classList.contains('homey-widget') &&
-        !doc.body.classList.contains('homey-widget-small') &&
-        !doc.body.classList.contains('homey-widget-full')) {
-        doc.body.classList.add('homey-widget');
-    }
+  // Ensure homey-widget class is present by default
+  if (
+    !doc.body.classList.contains("homey-widget") &&
+    !doc.body.classList.contains("homey-widget-small") &&
+    !doc.body.classList.contains("homey-widget-full")
+  ) {
+    doc.body.classList.add("homey-widget");
+  }
 
-    injectHomeyStyles(doc);
+  injectHomeyStyles(doc);
 }

@@ -1,48 +1,29 @@
 {
   "$schema": "https://turborepo.dev/schema.json",
-  "ui": "tui",
+  "ui": "stream",
   "tasks": {
     "build": {
-      "dependsOn": [
-        "^build"
-      ],
-      "inputs": [
-        "$TURBO_DEFAULT$",
-        ".env*"
-      ],
-      "outputs": [
-        ".next/**",
-        "!.next/cache/**"
-      ]
-    },
-    "lint": {},
-    "format": {
-      "cache": false
-    },
-    "format:check": {},
-    "check-types": {
-      "dependsOn": [
-        "^check-types"
-      ]
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"]
     },
     "dev": {
       "cache": false,
       "persistent": true
     },
-    "homey:run": {
-      "cache": false,
-      "persistent": true
+    "homey:validate": {
+      "inputs": ["$TURBO_DEFAULT$", "!.homeybuild/**"],
+      "outputs": []
+    },
+    "homey:build": {
+      "inputs": ["$TURBO_DEFAULT$", "!.homeybuild/**"],
+      "outputs": [".homeybuild/**"]
     },
     "homey:install": {
       "cache": false
     },
-    "homey:build": {},
     "homey:publish": {
       "cache": false,
       "interactive": true
-    },
-    "test": {
-      "cache": false
     }
   }
 }

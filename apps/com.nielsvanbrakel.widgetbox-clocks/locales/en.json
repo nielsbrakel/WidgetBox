@@ -1,10 +1,10 @@
 {
-    "widgets": {
-        "analog-clock": {},
-        "binary-clock": {},
-        "digital-clock": {},
-        "flip-clock": {},
-        "word-clock-grid": {},
-        "word-clock-sentence": {}
-    }
+  "widgets": {
+    "analog-clock": {},
+    "binary-clock": {},
+    "digital-clock": {},
+    "flip-clock": {},
+    "word-clock-grid": {},
+    "word-clock-sentence": {}
+  }
 }

@@ -1,66 +1,63 @@
-'use strict';
-
 /**
  * Base adapter for Buienradar Data.
  * Handles fetching, caching (stale-while-revalidate), and compliance.
  */
 class BuienradarAdapter {
+  constructor() {
+    this.cache = new Map();
+    this.ATTRIBUTION = {
+      text: "Data: Buienradar.nl",
+      url: "https://www.buienradar.nl",
+      required: true,
+    };
+  }
 
-    constructor() {
-        this.cache = new Map();
-        this.ATTRIBUTION = {
-            text: "Data: Buienradar.nl",
-            url: "https://www.buienradar.nl",
-            required: true
-        };
+  /**
+   * Fetch data with stale-while-revalidate caching.
+   * @param {string} url
+   * @param {number} ttlMs Time to live in milliseconds
+   * @returns {Promise<any>} Parsed JSON or data
+   */
+  async fetchCached(url, ttlMs = 300000) {
+    const now = Date.now();
+    const cached = this.cache.get(url);
+
+    // Return cached if fresh
+    if (cached && now - cached.fetchedAt < ttlMs) {
+      return cached.data;
     }
 
-    /**
-     * Fetch data with stale-while-revalidate caching.
-     * @param {string} url 
-     * @param {number} ttlMs Time to live in milliseconds
-     * @returns {Promise<any>} Parsed JSON or data
-     */
-    async fetchCached(url, ttlMs = 300000) {
-        const now = Date.now();
-        const cached = this.cache.get(url);
+    try {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`HTTP Error ${response.status}: ${response.statusText}`);
 
-        // Return cached if fresh
-        if (cached && (now - cached.fetchedAt < ttlMs)) {
-            return cached.data;
-        }
+      const data = await this.parseResponse(response);
 
-        try {
-            const response = await fetch(url);
-            if (!response.ok) throw new Error(`HTTP Error ${response.status}: ${response.statusText}`);
+      // Update cache
+      this.cache.set(url, {
+        data,
+        fetchedAt: now,
+      });
 
-            const data = await this.parseResponse(response);
+      return data;
+    } catch (error) {
+      console.error(`[BuienradarAdapter] Fetch failed for ${url}:`, error);
 
-            // Update cache
-            this.cache.set(url, {
-                data,
-                fetchedAt: now
-            });
-
-            return data;
-        } catch (error) {
-            console.error(`[BuienradarAdapter] Fetch failed for ${url}:`, error);
-
-            // Return stale data if available
-            if (cached) {
-                return cached.data;
-            }
-            throw error;
-        }
+      // Return stale data if available
+      if (cached) {
+        return cached.data;
+      }
+      throw error;
     }
+  }
 
-    async parseResponse(response) {
-        return response.json();
-    }
+  async parseResponse(response) {
+    return response.json();
+  }
 
-    getAttribution() {
-        return this.ATTRIBUTION;
-    }
+  getAttribution() {
+    return this.ATTRIBUTION;
+  }
 }
 
 module.exports = BuienradarAdapter;

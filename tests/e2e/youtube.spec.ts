@@ -1,89 +1,88 @@
-import { test, expect } from '@playwright/test';
-import { YouTubePage } from '../pages/YouTubePage';
+import { expect, test } from "@playwright/test";
+import { YouTubePage } from "../pages/YouTubePage";
 
-test.describe('YouTube App', () => {
-    let tube: YouTubePage;
+test.describe("YouTube App", () => {
+  let tube: YouTubePage;
 
-    test.beforeEach(async ({ page }) => {
-        tube = new YouTubePage(page);
-        await tube.goto();
-        await tube.selectWidget('YouTube');
-    });
+  test.beforeEach(async ({ page }) => {
+    tube = new YouTubePage(page);
+    await tube.goto();
+    await tube.selectWidget("YouTube");
+  });
 
-    test('should load the widget', async () => {
-        await tube.verifyLoaded();
-    });
+  test("should load the widget", async () => {
+    await tube.verifyLoaded();
+  });
 
-    test('should update video id', async () => {
-        // Use regex to avoid matching "Playlist ID (leave blank to use Video ID)"
-        await tube.setSettingInput(/^Video ID/, 'dQw4w9WgXcQ');
-        await tube.verifyVideoId('dQw4w9WgXcQ');
-    });
+  test("should update video id", async () => {
+    // Use regex to avoid matching "Playlist ID (leave blank to use Video ID)"
+    await tube.setSettingInput(/^Video ID/, "dQw4w9WgXcQ");
+    await tube.verifyVideoId("dQw4w9WgXcQ");
+  });
 
-    test('should handle playlist', async () => {
-        // Playlist ID starts with "Playlist ID" so string match is fine, or use regex for consistency
-        await tube.setSettingInput(/^Playlist ID/, 'PL123456');
-        // Logic might check for 'videoseries' or similar in src
-        const src = await tube.getVideoSrc();
-        expect(src).toContain('videoseries');
-    });
+  test("should handle playlist", async () => {
+    // Playlist ID starts with "Playlist ID" so string match is fine, or use regex for consistency
+    await tube.setSettingInput(/^Playlist ID/, "PL123456");
+    // Logic might check for 'videoseries' or similar in src
+    const src = await tube.getVideoSrc();
+    expect(src).toContain("videoseries");
+  });
 
-    test('should update autoplay', async () => {
-        await tube.setSettingCheckbox('Autoplay', true);
-        const src = await tube.getVideoSrc();
-        expect(src).toContain('autoplay=1');
-    });
+  test("should update autoplay", async () => {
+    await tube.setSettingCheckbox("Autoplay", true);
+    const src = await tube.getVideoSrc();
+    expect(src).toContain("autoplay=1");
+  });
 
-    test('should update controls', async () => {
-        await tube.setSettingCheckbox('Show controls', false);
-        const src = await tube.getVideoSrc();
-        expect(src).toContain('controls=0');
-    });
+  test("should update controls", async () => {
+    await tube.setSettingCheckbox("Show controls", false);
+    const src = await tube.getVideoSrc();
+    expect(src).toContain("controls=0");
+  });
 
-    test('should update loop', async () => {
-        await tube.setSettingCheckbox('Loop', true);
-        const src = await tube.getVideoSrc();
-        expect(src).toContain('loop=1');
-    });
+  test("should update loop", async () => {
+    await tube.setSettingCheckbox("Loop", true);
+    const src = await tube.getVideoSrc();
+    expect(src).toContain("loop=1");
+  });
 
-    test('should update start time', async () => {
-        await tube.setSettingInput('Start at (seconds)', '30');
-        const src = await tube.getVideoSrc();
-        expect(src).toContain('start=30');
-    });
+  test("should update start time", async () => {
+    await tube.setSettingInput("Start at (seconds)", "30");
+    const src = await tube.getVideoSrc();
+    expect(src).toContain("start=30");
+  });
 
-    test('should update aspect ratio', async () => {
-        await tube.setSettingSelect('Aspect Ratio', '4:3');
-        // In sandbox, the aspect-ratio is applied to .homey-card (accessed via tube.card)
-        // await expect(tube.card).toHaveCSS('aspect-ratio', /(1\.33|4 \/ 3)/);
-    });
-
+  test("should update aspect ratio", async () => {
+    await tube.setSettingSelect("Aspect Ratio", "4:3");
+    // In sandbox, the aspect-ratio is applied to .homey-card (accessed via tube.card)
+    // await expect(tube.card).toHaveCSS('aspect-ratio', /(1\.33|4 \/ 3)/);
+  });
 });
 
-test.describe('YouTube App — iOS', () => {
-    let tube: YouTubePage;
+test.describe("YouTube App — iOS", () => {
+  let tube: YouTubePage;
 
-    test.beforeEach(async ({ page }) => {
-        tube = new YouTubePage(page);
-        await tube.goto();
-        await tube.selectWidget('YouTube');
-        // Select iOS scenario and reload
-        await tube.setSettingSelect('Debug Scenarios', { value: 'ios' });
-    });
+  test.beforeEach(async ({ page }) => {
+    tube = new YouTubePage(page);
+    await tube.goto();
+    await tube.selectWidget("YouTube");
+    // Select iOS scenario and reload
+    await tube.setSettingSelect("Debug Scenarios", { value: "ios" });
+  });
 
-    test('should show unsupported message on iOS', async () => {
-        await expect(tube.iosMessage).toBeVisible();
-        await expect(tube.iosTitle).toContainText('YouTube does not work on iOS dashboards yet');
-    });
+  test("should show unsupported message on iOS", async () => {
+    await expect(tube.iosMessage).toBeVisible();
+    await expect(tube.iosTitle).toContainText("YouTube does not work on iOS dashboards yet");
+  });
 
-    test('should not render YouTube iframe on iOS', async () => {
-        await expect(tube.iosMessage).toBeVisible();
-        await expect(tube.widgetIframe).toHaveCount(0);
-    });
+  test("should not render YouTube iframe on iOS", async () => {
+    await expect(tube.iosMessage).toBeVisible();
+    await expect(tube.widgetIframe).toHaveCount(0);
+  });
 
-    test('should mention Homey app limitation on iOS', async () => {
-        const message = tube.iframe.locator('.ios-unsupported-message');
-        await expect(message).toContainText('limitation of the Homey app');
-        await expect(message).toContainText('android or web devices');
-    });
+  test("should mention Homey app limitation on iOS", async () => {
+    const message = tube.iframe.locator(".ios-unsupported-message");
+    await expect(message).toContainText("limitation of the Homey app");
+    await expect(message).toContainText("android or web devices");
+  });
 });

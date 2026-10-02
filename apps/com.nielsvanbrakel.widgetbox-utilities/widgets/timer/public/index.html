@@ -1,7 +1,6 @@
 <html>
-
-<head>
-  <style>
+  <head>
+    <style>
     /* Reset & Base */
     body {
       margin: 0;
@@ -56,17 +55,17 @@
     }
 
     .timer-item::before {
-      content: '';
+      content: "";
       position: absolute;
       inset: 0;
       right: auto;
       width: var(--progress, 0%);
-      background: linear-gradient(90deg, rgba(96, 165, 250, 0.10), rgba(96, 165, 250, 0.03));
+      background: linear-gradient(90deg, rgba(96, 165, 250, 0.1), rgba(96, 165, 250, 0.03));
       transition: width 0.2s linear;
     }
 
     .timer-item.finished::before {
-      background: linear-gradient(90deg, rgba(239, 68, 68, 0.20), rgba(239, 68, 68, 0.08));
+      background: linear-gradient(90deg, rgba(239, 68, 68, 0.2), rgba(239, 68, 68, 0.08));
       width: 100%;
     }
 
@@ -75,7 +74,6 @@
     }
 
     @keyframes shake {
-
       0%,
       100% {
         transform: translateX(0);
@@ -253,7 +251,9 @@
       font-weight: 600;
       font-size: 14px;
       box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-      transition: transform 0.1s, box-shadow 0.2s;
+      transition:
+        transform 0.1s,
+        box-shadow 0.2s;
     }
 
     .btn-add:hover {
@@ -298,16 +298,20 @@
       cursor: grab;
       position: relative;
       z-index: 1;
-      -webkit-mask: linear-gradient(to bottom,
-          transparent,
-          black 16px,
-          black calc(100% - 16px),
-          transparent);
-      mask: linear-gradient(to bottom,
-          transparent,
-          black 16px,
-          black calc(100% - 16px),
-          transparent);
+      -webkit-mask: linear-gradient(
+        to bottom,
+        transparent,
+        black 16px,
+        black calc(100% - 16px),
+        transparent
+      );
+      mask: linear-gradient(
+        to bottom,
+        transparent,
+        black 16px,
+        black calc(100% - 16px),
+        transparent
+      );
     }
 
     /* Old gradient overlays removed to fix color issues */
@@ -366,13 +370,13 @@
     .countdown.finished {
       color: var(--homey-color-red-500);
     }
-  </style>
-</head>
+    </style>
+  </head>
 
-<body>
-  <div id="app"></div>
+  <body>
+    <div id="app"></div>
 
-  <script>
+    <script>
     // Config defaults (will be overridden by settings)
     const CONFIG = {
       ITEM_HEIGHT: 22,
@@ -388,7 +392,7 @@
       ALLOW_ADDING: true,
       DEFAULT_HOURS: 0,
       DEFAULT_MINUTES: 5,
-      DEFAULT_SECONDS: 0
+      DEFAULT_SECONDS: 0,
     };
 
     // State
@@ -398,7 +402,7 @@
     let tickInterval = null;
     let checkpointInterval = null;
     let settings = {};
-    let restoreReason = 'cold start';
+    let restoreReason = "cold start";
     let lastSaveTimestamp = null;
     let lastSavePayload = null;
 
@@ -408,9 +412,8 @@
     // --- Utilities ---
     const $ = (sel, ctx = document) => ctx.querySelector(sel);
     const $$ = (sel, ctx = document) => ctx.querySelectorAll(sel);
-    const pad = n => String(n).padStart(2, '0');
+    const pad = (n) => String(n).padStart(2, "0");
     const clamp = (val, min, max) => Math.max(min, Math.min(max, val));
-
 
     const formatTime = (secs) => {
       const h = Math.floor(secs / 3600);
@@ -439,7 +442,7 @@
      */
     const buildPersistState = () => {
       return {
-        timers: timers.map(t => ({
+        timers: timers.map((t) => ({
           id: t.id,
           hours: t.hours,
           minutes: t.minutes,
@@ -449,9 +452,9 @@
           isSetup: t.isSetup,
           shakeShown: t.shakeShown,
           remainingAtLastStart: t.isRunning ? t.pausedTime : t.remaining,
-          lastStartEpochMs: t.isRunning ? t.startTime : null
+          lastStartEpochMs: t.isRunning ? t.startTime : null,
         })),
-        updatedAtEpochMs: Date.now()
+        updatedAtEpochMs: Date.now(),
       };
     };
 
@@ -465,8 +468,6 @@
       lastSavePayload = state;
       lastSaveTimestamp = Date.now();
 
-
-
       try {
         // Use LocalStorage prefixed with widgetId
         localStorage.setItem(`dashy_timer_${widgetId}`, JSON.stringify(state));
@@ -474,7 +475,7 @@
         // Optionally try Homey API too if needed, but LocalStorage is reliable for this view
         // await Homey.api('PUT', `/state?widgetId=${encodeURIComponent(widgetId)}`, state);
       } catch (err) {
-        console.error('Failed to save timer state:', err);
+        console.error("Failed to save timer state:", err);
       }
     };
 
@@ -491,7 +492,7 @@
         const state = JSON.parse(raw);
         return state;
       } catch (err) {
-        console.error('Failed to load timer state:', err);
+        console.error("Failed to load timer state:", err);
         return null;
       }
     };
@@ -504,10 +505,10 @@
         return false;
       }
 
-      restoreReason = 'restored from storage';
+      restoreReason = "restored from storage";
       const now = Date.now();
 
-      timers = savedState.timers.map(saved => {
+      timers = savedState.timers.map((saved) => {
         const timer = {
           id: saved.id,
           hours: saved.hours,
@@ -516,7 +517,7 @@
           duration: saved.duration,
           isSetup: saved.isSetup,
           shakeShown: saved.shakeShown || false,
-          isNew: false
+          isNew: false,
         };
 
         if (saved.isRunning && saved.lastStartEpochMs) {
@@ -532,7 +533,6 @@
           } else {
             timer.isRunning = false;
             timer.remaining = 0;
-
           }
         } else {
           timer.remaining = saved.remainingAtLastStart ?? saved.duration;
@@ -544,7 +544,6 @@
         return timer;
       });
 
-
       return true;
     };
 
@@ -554,7 +553,7 @@
     const startCheckpoint = () => {
       if (!checkpointInterval) {
         checkpointInterval = setInterval(() => {
-          if (timers.some(t => t.isRunning)) {
+          if (timers.some((t) => t.isRunning)) {
             saveState();
           }
         }, CONFIG.CHECKPOINT_INTERVAL);
@@ -576,15 +575,19 @@
       const duration = hours * 3600 + minutes * 60 + seconds;
       return {
         id: crypto.randomUUID(),
-        hours, minutes, seconds,
-        duration, remaining: duration,
-        isRunning: false, isSetup: true,
+        hours,
+        minutes,
+        seconds,
+        duration,
+        remaining: duration,
+        isRunning: false,
+        isSetup: true,
         shakeShown: false,
-        isNew: true
+        isNew: true,
       };
     };
 
-    const getTimer = id => timers.find(t => t.id === id);
+    const getTimer = (id) => timers.find((t) => t.id === id);
 
     const updatePicker = (id, field, delta) => {
       const timer = getTimer(id);
@@ -631,7 +634,7 @@
         isRunning: false,
         isSetup: true,
         remaining: timer.duration,
-        shakeShown: false
+        shakeShown: false,
       });
 
       render();
@@ -640,7 +643,7 @@
     };
 
     const removeTimer = (id) => {
-      timers = timers.filter(t => t.id !== id);
+      timers = timers.filter((t) => t.id !== id);
       render();
       setHeight();
       saveState(); // Save on remove
@@ -663,7 +666,10 @@
         anyRunning = true;
 
         const wasActive = timer.remaining > 0;
-        timer.remaining = Math.max(0, timer.pausedTime - Math.floor((Date.now() - timer.startTime) / 1000));
+        timer.remaining = Math.max(
+          0,
+          timer.pausedTime - Math.floor((Date.now() - timer.startTime) / 1000),
+        );
 
         if (timer.remaining === 0 && wasActive) {
           timer.isRunning = false;
@@ -690,28 +696,28 @@
       const el = $(`[data-timer="${timer.id}"]`);
       if (!el) return;
 
-      const countdown = $('.countdown', el);
+      const countdown = $(".countdown", el);
       const finished = timer.remaining <= 0;
 
       if (countdown) {
         countdown.textContent = formatTime(timer.remaining);
-        countdown.classList.toggle('finished', finished);
+        countdown.classList.toggle("finished", finished);
       }
 
-      el.style.setProperty('--progress', `${(timer.remaining / timer.duration) * 100}%`);
-      el.classList.toggle('finished', finished);
+      el.style.setProperty("--progress", `${(timer.remaining / timer.duration) * 100}%`);
+      el.classList.toggle("finished", finished);
     };
-
-
 
     // --- Rendering ---
     const renderPickerCol = (timer, field, labelKey, max) => {
       const value = timer[field];
       const offset = CONFIG.ITEM_HEIGHT * (1 - value);
-      const items = Array.from({ length: max + 1 }, (_, i) =>
-        `<div class="picker-val${i === value ? ' active' : ''}" 
-              onclick="updatePicker('${timer.id}','${field}',${i - value})">${pad(i)}</div>`
-      ).join('');
+      const items = Array.from(
+        { length: max + 1 },
+        (_, i) =>
+          `<div class="picker-val${i === value ? " active" : ""}" 
+              onclick="updatePicker('${timer.id}','${field}',${i - value})">${pad(i)}</div>`,
+      ).join("");
 
       return `
         <div class="picker-col">
@@ -729,7 +735,14 @@
 
       if (showShake) timer.shakeShown = true;
 
-      const classes = ['timer-item', finished && 'finished', showShake && 'shake', isNew && 'fade-in'].filter(Boolean).join(' ');
+      const classes = [
+        "timer-item",
+        finished && "finished",
+        showShake && "shake",
+        isNew && "fade-in",
+      ]
+        .filter(Boolean)
+        .join(" ");
       if (isNew) timer.isNew = false;
       const progress = !isSetup && duration > 0 ? (remaining / duration) * 100 : 0;
       const canStart = isSetup ? duration > 0 : true;
@@ -737,14 +750,14 @@
       // Determine which buttons to show
       const isPaused = !isSetup && !isRunning && !finished;
       let controlBtn;
-      let resetBtn = '';
+      let resetBtn = "";
 
       if (finished) {
         controlBtn = `<button class="btn-round btn-secondary" onclick="resetTimer('${id}')"><div class="icon icon-reset"></div></button>`;
       } else if (isSetup) {
-        controlBtn = `<button class="btn-round btn-primary" onclick="toggleTimer('${id}')" ${canStart ? '' : 'disabled'}><div class="icon icon-play"></div></button>`;
+        controlBtn = `<button class="btn-round btn-primary" onclick="toggleTimer('${id}')" ${canStart ? "" : "disabled"}><div class="icon icon-play"></div></button>`;
       } else {
-        controlBtn = `<button class="btn-round btn-primary" onclick="toggleTimer('${id}')"><div class="icon ${isRunning ? 'icon-pause' : 'icon-play'}"></div></button>`;
+        controlBtn = `<button class="btn-round btn-primary" onclick="toggleTimer('${id}')"><div class="icon ${isRunning ? "icon-pause" : "icon-play"}"></div></button>`;
         if (isPaused) {
           resetBtn = `<button class="btn-round btn-secondary" onclick="resetTimer('${id}')"><div class="icon icon-reset"></div></button>`;
         }
@@ -752,36 +765,40 @@
 
       return `
         <div class="${classes}" data-timer="${id}" style="--progress:${progress}%">
-          ${timers.length > 1 ? `<button class="timer-close" onclick="removeTimer('${id}')">×</button>` : ''}
+          ${timers.length > 1 ? `<button class="timer-close" onclick="removeTimer('${id}')">×</button>` : ""}
           <div class="timer-controls">
             ${controlBtn}
             ${resetBtn}
           </div>
           <div class="timer-display">
-            ${isSetup ? `
+            ${
+              isSetup
+                ? `
               <div class="picker">
-                ${renderPickerCol(timer, 'hours', 'hours', 23)}
+                ${renderPickerCol(timer, "hours", "hours", 23)}
                 <span class="picker-sep">:</span>
-                ${renderPickerCol(timer, 'minutes', 'minutes', 59)}
+                ${renderPickerCol(timer, "minutes", "minutes", 59)}
                 <span class="picker-sep">:</span>
-                ${renderPickerCol(timer, 'seconds', 'seconds', 59)}
+                ${renderPickerCol(timer, "seconds", "seconds", 59)}
               </div>
-            ` : `<div class="countdown${finished ? ' finished' : ''}">${formatTime(remaining)}</div>`}
+            `
+                : `<div class="countdown${finished ? " finished" : ""}">${formatTime(remaining)}</div>`
+            }
           </div>
         </div>`;
     };
 
     const render = () => {
-      const content = timers.map(renderTimer).join('');
+      const content = timers.map(renderTimer).join("");
       const canAdd = settings.allowAddingTimers !== false && timers.length < CONFIG.MAX_TIMERS;
 
       const addBtn = canAdd
-        ? `<button class="btn btn-add" onclick="addTimer()">+ ${__('addTimer')}</button>`
-        : '';
-      const app = document.getElementById('app');
+        ? `<button class="btn btn-add" onclick="addTimer()">+ ${__("addTimer")}</button>`
+        : "";
+      const app = document.getElementById("app");
 
       app.innerHTML = `
-        <div class="timer-list ${canAdd ? 'has-add-btn' : ''}">${content}</div>
+        <div class="timer-list ${canAdd ? "has-add-btn" : ""}">${content}</div>
         ${addBtn}
       `;
 
@@ -792,17 +809,27 @@
 
     // --- Scroll/Drag Handling ---
     const attachScrollListeners = () => {
-      $$('.picker-scroll').forEach(el => {
+      $$(".picker-scroll").forEach((el) => {
         const id = el.dataset.id;
         const field = el.dataset.field;
-        let startY = 0, dragging = false;
+        let startY = 0,
+          dragging = false;
 
         const onDelta = (delta) => updatePicker(id, field, delta > 0 ? 1 : -1);
 
-        el.onwheel = (e) => { e.preventDefault(); onDelta(e.deltaY); };
+        el.onwheel = (e) => {
+          e.preventDefault();
+          onDelta(e.deltaY);
+        };
 
-        el.onmousedown = (e) => { dragging = true; startY = e.clientY; };
-        el.ontouchstart = (e) => { dragging = true; startY = e.touches[0].clientY; };
+        el.onmousedown = (e) => {
+          dragging = true;
+          startY = e.clientY;
+        };
+        el.ontouchstart = (e) => {
+          dragging = true;
+          startY = e.touches[0].clientY;
+        };
 
         const onMove = (y) => {
           if (!dragging) return;
@@ -814,8 +841,11 @@
         };
 
         el.onmousemove = (e) => onMove(e.clientY);
-        el.ontouchmove = (e) => { e.preventDefault(); onMove(e.touches[0].clientY); };
-        el.onmouseup = el.onmouseleave = el.ontouchend = () => dragging = false;
+        el.ontouchmove = (e) => {
+          e.preventDefault();
+          onMove(e.touches[0].clientY);
+        };
+        el.onmouseup = el.onmouseleave = el.ontouchend = () => (dragging = false);
       });
     };
 
@@ -827,7 +857,6 @@
       // Get widget instance ID from Homey
       widgetId = Homey.getWidgetInstanceId();
 
-
       // Apply settings to CONFIG
       CONFIG.MAX_TIMERS = settings.maxTimers ?? CONFIG.MAX_TIMERS;
       CONFIG.INITIAL_TIMERS = settings.initialTimers ?? CONFIG.INITIAL_TIMERS;
@@ -835,7 +864,6 @@
       CONFIG.DEFAULT_HOURS = settings.defaultHours ?? CONFIG.DEFAULT_HOURS;
       CONFIG.DEFAULT_MINUTES = settings.defaultMinutes ?? CONFIG.DEFAULT_MINUTES;
       CONFIG.DEFAULT_SECONDS = settings.defaultSeconds ?? CONFIG.DEFAULT_SECONDS;
-
 
       // Try to restore from persistence
       const savedState = await loadState();
@@ -852,7 +880,7 @@
       }
 
       // If any timer is running, start the tick loop
-      if (timers.some(t => t.isRunning)) {
+      if (timers.some((t) => t.isRunning)) {
         startTick();
         startCheckpoint();
       }
@@ -860,7 +888,6 @@
       render();
       Homey.ready({ height: calcHeight() });
     };
-  </script>
-</body>
-
+    </script>
+  </body>
 </html>

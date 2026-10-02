@@ -20,14 +20,14 @@ class BaseWidget {
   initSettings(settings = {}) {
     const defaults = {};
     for (const [key, config] of Object.entries(settings)) {
-      if (config.type === 'boolean') {
+      if (config.type === "boolean") {
         defaults[key] = config.value ?? false;
-      } else if (config.type === 'number') {
+      } else if (config.type === "number") {
         defaults[key] = config.value ?? config.min ?? 0;
-      } else if (config.type === 'dropdown') {
-        defaults[key] = config.values?.[0]?.id ?? config.value ?? '';
-      } else if (config.type === 'text') {
-        defaults[key] = config.value ?? '';
+      } else if (config.type === "dropdown") {
+        defaults[key] = config.values?.[0]?.id ?? config.value ?? "";
+      } else if (config.type === "text") {
+        defaults[key] = config.value ?? "";
       }
     }
     return defaults;
@@ -40,12 +40,12 @@ class BaseWidget {
    * @param {string} locale - BCP 47 language tag (e.g., 'en', 'nl')
    * @returns {string} Formatted string
    */
-  formatLocaleDateTime(date, options = {}, locale = 'en-US') {
+  formatLocaleDateTime(date, options = {}, locale = "en-US") {
     try {
       const formatter = new Intl.DateTimeFormat(locale, options);
       return formatter.format(date);
     } catch (err) {
-      console.error('LocaleDateTime format error:', err);
+      console.error("LocaleDateTime format error:", err);
       return date.toString();
     }
   }
@@ -59,13 +59,13 @@ class BaseWidget {
    */
   formatTime(date, showSeconds = false, use12Hour = false) {
     const options = {
-      hour: '2-digit',
-      minute: '2-digit',
+      hour: "2-digit",
+      minute: "2-digit",
       hour12: use12Hour,
     };
 
     if (showSeconds) {
-      options.second = '2-digit';
+      options.second = "2-digit";
     }
 
     return this.formatLocaleDateTime(date, options, this.getLocale());
@@ -77,20 +77,20 @@ class BaseWidget {
    * @returns {string} BCP 47 locale string
    */
   getLocale() {
-    if (typeof window !== 'undefined' && window.Homey) {
+    if (typeof window !== "undefined" && window.Homey) {
       const lang = window.Homey.i18n?.getLanguage?.();
       if (lang) {
         // Map simple lang codes to full locale codes
         const localeMap = {
-          en: 'en-US',
-          nl: 'nl-NL',
-          de: 'de-DE',
-          fr: 'fr-FR',
+          en: "en-US",
+          nl: "nl-NL",
+          de: "de-DE",
+          fr: "fr-FR",
         };
         return localeMap[lang] || `${lang}-${lang.toUpperCase()}`;
       }
     }
-    return 'en-US';
+    return "en-US";
   }
 
   /**
@@ -123,9 +123,9 @@ class BaseWidget {
   async fetchData(url, options = {}) {
     try {
       const response = await fetch(url, {
-        method: 'GET',
+        method: "GET",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         ...options,
       });
@@ -136,7 +136,7 @@ class BaseWidget {
 
       return await response.json();
     } catch (err) {
-      console.error('Fetch error:', err);
+      console.error("Fetch error:", err);
       throw err;
     }
   }
@@ -147,12 +147,12 @@ class BaseWidget {
    * @param {string} namespace - Widget namespace
    * @returns {any} Stored value or null
    */
-  getStorage(key, namespace = 'default') {
+  getStorage(key, namespace = "default") {
     try {
       const data = localStorage.getItem(`${namespace}:${key}`);
       return data ? JSON.parse(data) : null;
     } catch (err) {
-      console.error('Storage get error:', err);
+      console.error("Storage get error:", err);
       return null;
     }
   }
@@ -163,11 +163,11 @@ class BaseWidget {
    * @param {any} value - Value to store
    * @param {string} namespace - Widget namespace
    */
-  setStorage(key, value, namespace = 'default') {
+  setStorage(key, value, namespace = "default") {
     try {
       localStorage.setItem(`${namespace}:${key}`, JSON.stringify(value));
     } catch (err) {
-      console.error('Storage set error:', err);
+      console.error("Storage set error:", err);
     }
   }
 
@@ -176,12 +176,12 @@ class BaseWidget {
    * @param {HTMLElement} element - Element to apply theme to
    */
   applyTheme(element) {
-    if (typeof window !== 'undefined' && window.matchMedia) {
-      const darkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (typeof window !== "undefined" && window.matchMedia) {
+      const darkMode = window.matchMedia("(prefers-color-scheme: dark)").matches;
       if (darkMode) {
-        element.classList.add('homey-dark-mode');
+        element.classList.add("homey-dark-mode");
       } else {
-        element.classList.remove('homey-dark-mode');
+        element.classList.remove("homey-dark-mode");
       }
     }
   }
@@ -196,8 +196,8 @@ class BaseWidget {
   getSetting(element, attrName, defaultValue) {
     const attr = element.dataset[attrName];
     if (attr === undefined) return defaultValue;
-    if (attr === 'true') return true;
-    if (attr === 'false') return false;
+    if (attr === "true") return true;
+    if (attr === "false") return false;
     if (!isNaN(attr)) return Number(attr);
     return attr;
   }
@@ -211,6 +211,6 @@ class BaseWidget {
 }
 
 // Export for browser and Node
-if (typeof module !== 'undefined' && module.exports) {
+if (typeof module !== "undefined" && module.exports) {
   module.exports = BaseWidget;
 }

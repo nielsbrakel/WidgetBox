@@ -1,5 +1,5 @@
 /* Font: Nunito (Homey-like) */
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap");
 
 :root {
   /* Default Dark Theme (Homey Dark) */
@@ -22,7 +22,8 @@
   --accent-hover: #007acc;
   --accent-glow: rgba(0, 153, 255, 0.2);
 
-  --font-sans: 'Nunito', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-sans:
+    "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 
   --radius-sm: 4px;
   --radius-md: 8px;
@@ -31,7 +32,11 @@
   --nav-width: 280px;
   --settings-width: 320px;
 
-  --bg-preview: radial-gradient(circle at 50% 50%, rgba(20, 25, 30, 1) 0%, rgba(15, 17, 21, 1) 100%);
+  --bg-preview: radial-gradient(
+    circle at 50% 50%,
+    rgba(20, 25, 30, 1) 0%,
+    rgba(15, 17, 21, 1) 100%
+  );
 }
 
 [data-theme="light"] {
@@ -64,7 +69,9 @@ body {
   height: 100vh;
   overflow: hidden;
   -webkit-font-smoothing: antialiased;
-  transition: background-color 0.3s, color 0.3s;
+  transition:
+    background-color 0.3s,
+    color 0.3s;
 }
 
 /* Layout */
@@ -82,7 +89,9 @@ body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  transition: background 0.3s, border-color 0.3s;
+  transition:
+    background 0.3s,
+    border-color 0.3s;
 }
 
 .sidebar-header {
@@ -207,7 +216,9 @@ iframe {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  transition: background 0.3s, border-color 0.3s;
+  transition:
+    background 0.3s,
+    border-color 0.3s;
 }
 
 .settings-content {
@@ -239,7 +250,9 @@ select {
   border-radius: var(--radius-md);
   font-family: inherit;
   font-size: 0.9rem;
-  transition: border-color 0.2s, background 0.2s;
+  transition:
+    border-color 0.2s,
+    background 0.2s;
   box-sizing: border-box;
 }
 
