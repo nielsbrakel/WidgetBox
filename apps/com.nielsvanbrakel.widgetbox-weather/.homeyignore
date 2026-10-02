@@ -1,6 +1,5 @@
 # Development-only files that should not ship in the app bundle
 *.test.js
+test/
 README.md
 docs/
-*.spec.md
-AQUARIUM_SPEC.md

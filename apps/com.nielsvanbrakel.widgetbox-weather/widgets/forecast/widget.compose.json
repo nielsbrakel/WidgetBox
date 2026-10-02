@@ -1,7 +1,11 @@
 {
   "name": {
-    "en": "5 Days Forecast",
-    "nl": "5-Daagse Verwachting"
+    "en": "Weather forecast",
+    "nl": "Weersverwachting"
+  },
+  "description": {
+    "en": "Daily forecast with temperature and chance of rain",
+    "nl": "Dagelijkse verwachting met temperatuur en kans op regen"
   },
   "api": {
     "getData": {
@@ -9,39 +13,65 @@
       "path": "/"
     }
   },
+  "transparent": true,
   "settings": [
     {
-      "id": "lat",
+      "id": "latitude",
       "type": "text",
       "label": {
         "en": "Latitude",
         "nl": "Breedtegraad"
       },
-      "value": "52.1"
+      "value": "",
+      "hint": {
+        "en": "Leave empty to use the location of your Homey. Example: 52.09",
+        "nl": "Laat leeg om de locatie van je Homey te gebruiken. Bijvoorbeeld: 52,09"
+      }
     },
     {
-      "id": "lon",
+      "id": "longitude",
       "type": "text",
       "label": {
         "en": "Longitude",
         "nl": "Lengtegraad"
       },
-      "value": "5.1"
+      "value": "",
+      "hint": {
+        "en": "Leave empty to use the location of your Homey. Example: 5.12",
+        "nl": "Laat leeg om de locatie van je Homey te gebruiken. Bijvoorbeeld: 5,12"
+      }
     },
     {
-      "id": "showAttribution",
-      "type": "checkbox",
+      "id": "days",
+      "type": "dropdown",
       "label": {
-        "en": "Show Data Attribution",
-        "nl": "Toon Data Bronvermelding"
+        "en": "Number of days",
+        "nl": "Aantal dagen"
       },
-      "value": true,
-      "hint": {
-        "en": "Required for free data usage from Buienradar.",
-        "nl": "Vereist voor gratis gebruik van Buienradar data."
-      }
+      "value": "5",
+      "values": [
+        {
+          "id": "3",
+          "label": {
+            "en": "3 days",
+            "nl": "3 dagen"
+          }
+        },
+        {
+          "id": "5",
+          "label": {
+            "en": "5 days",
+            "nl": "5 dagen"
+          }
+        },
+        {
+          "id": "7",
+          "label": {
+            "en": "7 days",
+            "nl": "7 dagen"
+          }
+        }
+      ]
     }
-  ],
-  "height": 200,
-  "transparent": true
+  ]
 }

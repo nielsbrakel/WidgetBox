@@ -1,18 +1,51 @@
 {
+  "language": "en",
+  "common": {
+    "loading": "Loading…",
+    "updated": "Updated {time}",
+    "offline": "Offline · updated {time}",
+    "errorTitle": "Could not load weather data",
+    "errorRetry": "Retrying automatically",
+    "locationRequired": "Set a location in the widget settings",
+    "invalidLocation": "The location in the widget settings is not valid"
+  },
   "widgets": {
-    "buienradar": {},
-    "buienradar-map": {},
-    "buientabel": {
+    "rain-graph": {
+      "now": "Now",
       "light": "Light",
       "moderate": "Moderate",
       "heavy": "Heavy",
-      "noRain": "No rain expected",
-      "loading": "Loading...",
-      "noData": "No data available",
-      "now": "Now",
-      "error": "Something went wrong",
-      "locationError": "Location is outside the coverage area"
+      "noRain": "No rain expected in the next 2 hours",
+      "outOfRange": "The rain forecast is only available in the Netherlands and Belgium",
+      "tooltip": "{time} · {value} mm/h"
     },
-    "rainradar": {}
+    "station": {
+      "wind": "Wind",
+      "rain": "Rain last hour",
+      "humidity": "Humidity",
+      "feelsLike": "Feels like {value}°",
+      "observedAt": "Measured {time}",
+      "offline": "Offline · {time}",
+      "invalidStation": "Station not found. Check the station ID in the widget settings.",
+      "compass": "N,NE,E,SE,S,SW,W,NW"
+    },
+    "forecast": {
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "rainChance": "Chance of rain"
+    },
+    "radar-5day": {
+      "title": "5-day rain radar"
+    },
+    "rain-radar": {
+      "alt": "Rain radar map of the Netherlands"
+    },
+    "weather-map": {
+      "title": "Weather map",
+      "tapToInteract": "Tap to interact",
+      "lock": "Lock map",
+      "iosTitle": "The weather map is not available on iOS",
+      "iosMessage": "Because of a limitation of the Homey app, this widget only works on Android and in the web app."
+    }
   }
 }

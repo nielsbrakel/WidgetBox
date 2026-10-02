@@ -1,83 +1,86 @@
-import fs from "fs";
-import { JSDOM } from "jsdom";
-import path from "path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { loadWidget } from "../../test/loadWidget.js";
 
-const htmlPath = path.resolve(__dirname, "public/index.html");
-let html;
-try {
-  html = fs.readFileSync(htmlPath, "utf8");
-} catch (e) {
-  html = "<!DOCTYPE html><html><body></body></html>";
-}
+const STATION = {
+  station: {
+    id: 6260,
+    name: "De Bilt",
+    observedAt: "2026-10-02T23:10:00",
+    temperature: 9.4,
+    feelTemperature: 8.2,
+    humidity: 93,
+    windBft: 3,
+    windDirectionDegrees: 225,
+    rainLastHour: 0.2,
+    iconUrl: "https://cdn.buienradar.nl/resources/images/icons/weather/96x96/CC.png",
+    distanceKm: 4,
+  },
+  updatedAt: "2026-10-02T21:12:00.000Z",
+};
 
-describe("StationNow Widget", () => {
-  let dom;
-  let window;
-  let document;
+describe("station widget", () => {
+  beforeEach(() => vi.useFakeTimers());
+  afterEach(() => vi.useRealTimers());
 
-  beforeEach(() => {
-    try {
-      html = fs.readFileSync(htmlPath, "utf8");
-    } catch (e) {}
+  async function load(options = {}) {
+    const widget = loadWidget("station", { api: vi.fn().mockResolvedValue(STATION), ...options });
+    await vi.advanceTimersByTimeAsync(0);
+    return widget;
+  }
 
-    dom = new JSDOM(html, {
-      runScripts: "dangerously",
-      url: "http://localhost/",
-      pretendToBeVisual: true,
+  it("renders the measurements with translated labels", async () => {
+    const { $ } = await load();
+    expect($("#name").textContent).toBe("De Bilt · 4 km");
+    expect($("#temperature").textContent).toBe("9.4°");
+    expect($("#feels").textContent).toBe("Feels like 8°");
+    expect($("#wind").textContent).toBe("3 Bft SW");
+    expect($("#rain").textContent).toBe("0.2 mm");
+    expect($("#humidity").textContent).toBe("93%");
+    expect($("#humidity-label").textContent).toBe("Humidity");
+    expect($("#status").textContent).toBe("23:10");
+    expect($("#icon").hidden).toBe(false);
+  });
+
+  it("shows a dash for missing values and ignores icons from other hosts", async () => {
+    const api = vi.fn().mockResolvedValue({
+      station: { name: "X", temperature: null, iconUrl: "https://evil.example/x.png" },
+      updatedAt: STATION.updatedAt,
     });
-    window = dom.window;
-    document = window.document;
-
-    window.Homey = {
-      ready: vi.fn(),
-      on: vi.fn(),
-      getSettings: vi.fn(() => ({})),
-      setHeight: vi.fn(),
-      api: vi.fn().mockResolvedValue({}),
-      __: vi.fn((key) => key),
-    };
-
-    global.window = window;
-    global.document = document;
+    const { $ } = await load({ api });
+    expect($("#temperature").textContent).toBe("—");
+    expect($("#wind").textContent).toBe("—");
+    expect($("#humidity").textContent).toBe("—");
+    expect($("#icon").hidden).toBe(true);
+    expect($("#app").innerHTML).not.toContain("undefined");
   });
 
-  afterEach(() => {
-    vi.clearAllMocks();
+  it("passes the station id and location to the backend", async () => {
+    const { Homey } = await load({
+      settings: { latitude: "52.1", longitude: "5.1", stationId: " 6260 " },
+    });
+    expect(Homey.api).toHaveBeenCalledWith("GET", "/?latitude=52.1&longitude=5.1&stationId=6260");
   });
 
-  it("should fetch station data and render values", async () => {
-    // Mock data
-    const mockResponse = {
-      station: {
-        stationname: "De Bilt",
-        temperature: 12.5,
-        humidity: 80,
-        windspeedBft: 3,
-      },
-    };
-    window.Homey.api.mockResolvedValue(mockResponse);
-
-    if (window.onHomeyReady) {
-      await window.onHomeyReady(window.Homey);
-    }
-
-    // Wait for rendering
-    await new Promise((resolve) => setTimeout(resolve, 50));
-
-    // Check values
-    expect(document.body.textContent).toContain("De Bilt");
-    expect(document.body.textContent).toContain("12.5");
-    expect(document.body.textContent).toContain("80");
+  it("shows a readable error instead of the station name", async () => {
+    const { $ } = await load({ api: vi.fn().mockRejectedValue(new Error("INVALID_STATION")) });
+    expect($("#message").hidden).toBe(false);
+    expect($("#message").textContent).toContain("Station not found");
+    expect($("#details").hidden).toBe(true);
   });
 
-  it("should show attribution", async () => {
-    if (window.onHomeyReady) {
-      await window.onHomeyReady(window.Homey);
-    }
+  it("applies alignment and layout without refetching", async () => {
+    const { $, Homey, setSetting } = await load();
+    setSetting("horizontalAlignment", "right");
+    setSetting("style", "compact");
+    await vi.advanceTimersByTimeAsync(1000);
+    expect($("#app").className).toBe("widget align-right style-compact");
+    expect(Homey.api).toHaveBeenCalledTimes(1);
+  });
 
-    const link = document.querySelector(".attribution a");
-    expect(link).not.toBeNull();
-    expect(link.textContent).toContain("Buienradar");
+  it("calls ready exactly once", async () => {
+    const { Homey } = await load();
+    await vi.advanceTimersByTimeAsync(10 * 60 * 1000);
+    expect(Homey.ready).toHaveBeenCalledTimes(1);
+    expect(Homey.api).toHaveBeenCalledTimes(2);
   });
 });

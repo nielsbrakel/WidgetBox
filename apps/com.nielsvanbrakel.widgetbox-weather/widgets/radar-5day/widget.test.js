@@ -1,88 +1,46 @@
-import { waitFor } from "@testing-library/dom";
-import fs from "fs";
-import { JSDOM } from "jsdom";
-import path from "path";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { loadWidget } from "../../test/loadWidget.js";
 
-const html = fs.readFileSync(path.resolve(__dirname, "public/index.html"), "utf8");
+describe("radar-5day widget", () => {
+  beforeEach(() => vi.useFakeTimers());
+  afterEach(() => vi.useRealTimers());
 
-describe("Buienradar Widget", () => {
-  let dom;
-  let window;
-  let document;
-
-  beforeEach(() => {
-    dom = new JSDOM(html, {
-      runScripts: "dangerously",
-      resources: "usable",
-      url: "http://localhost/",
-      pretendToBeVisual: true,
+  function load(width = 300) {
+    return loadWidget("radar-5day", {
+      beforeReady(window) {
+        Object.defineProperty(window.document.body, "clientWidth", { value: width });
+      },
     });
-    window = dom.window;
-    document = window.document;
+  }
 
-    // Mock ResizeObserver
-    window.ResizeObserver = class ResizeObserver {
-      constructor(callback) {
-        this.callback = callback;
-      }
-      observe() {}
-      unobserve() {}
-      disconnect() {}
-    };
-
-    // Mock Homey
-    window.Homey = {
-      ready: vi.fn(),
-      on: vi.fn(),
-      getSettings: vi.fn(() => ({})),
-      setHeight: vi.fn(),
-      __: vi.fn((key) => key),
-    };
-
-    global.window = window;
-    global.document = document;
+  it("scales the gadget to the width and calls ready with the height", () => {
+    const { $, Homey } = load(256);
+    expect(Homey.ready).toHaveBeenCalledWith({ height: 406 + 22 });
+    expect($("iframe").style.transform).toBe("scale(1)");
   });
 
-  it("should render the iframe with correct fixed dimensions initially", async () => {
-    // Trigger init
-    if (window.onHomeyReady) {
-      window.onHomeyReady(window.Homey);
-    }
-
-    const iframe = document.querySelector("iframe");
-    expect(iframe).not.toBeNull();
-    expect(iframe.src).toContain("radarfivedays");
-    expect(iframe.getAttribute("width")).toBe("256");
-    expect(iframe.getAttribute("height")).toBe("406");
+  it("caps the width so the gadget does not get blurry", () => {
+    const { $, Homey } = load(720);
+    expect($("#app").style.width).toBe("360px");
+    expect(Homey.ready).toHaveBeenCalledWith({ height: Math.round(406 * (360 / 256)) + 22 });
   });
 
-  it("should be responsive and scale based on container width", async () => {
-    // Trigger init
-    if (window.onHomeyReady) {
-      window.onHomeyReady(window.Homey);
-    }
+  it("sandboxes the iframe and reloads it periodically", async () => {
+    const { $, document } = load();
+    const first = $("iframe");
+    expect(first.getAttribute("sandbox")).toBe("");
+    expect(first.getAttribute("referrerpolicy")).toBe("strict-origin-when-cross-origin");
+    first.dispatchEvent(new first.ownerDocument.defaultView.Event("load"));
+    await vi.advanceTimersByTimeAsync(15 * 60 * 1000);
+    const frames = document.querySelectorAll("iframe");
+    expect(frames).toHaveLength(2);
+    frames[1].dispatchEvent(new first.ownerDocument.defaultView.Event("load"));
+    expect(document.querySelectorAll("iframe")).toHaveLength(1);
+  });
 
-    const iframe = document.querySelector("iframe");
-    const container = document.getElementById("buienradar-container");
-
-    // Mock width (used in updateScale)
-    Object.defineProperty(document.body, "clientWidth", { configurable: true, value: 512 });
-    window.innerWidth = 512;
-
-    // Trigger the resize callback manually since JSDOM doesn't trigger ResizeObserver automatically
-    // We can access the internal logic by calling updateScale directly if exposed,
-    // or by simulating the observer callback if we had captured it.
-    // However, since we can't easily capture the observer callback from outside without more complex mocking,
-    // and updateScale is not global, we might need to rely on the fact that onHomeyReady calls render() -> updateScale()
-
-    // Re-call onHomeyReady to trigger initial scale with new width
-    window.onHomeyReady(window.Homey);
-
-    const newIframe = document.querySelector("iframe");
-    // Expected scale: 512 / 256 = 2
-    expect(newIframe.style.transform).toBe("scale(2)");
-    expect(container.style.height).toBe("812px"); // 406 * 2
-    expect(window.Homey.setHeight).toHaveBeenCalledWith(812);
+  it("opens Buienradar in a popup when tapped", () => {
+    const { $, Homey } = load();
+    $("#frame").click();
+    expect(Homey.popup).toHaveBeenCalledWith("https://www.buienradar.nl");
   });
 });

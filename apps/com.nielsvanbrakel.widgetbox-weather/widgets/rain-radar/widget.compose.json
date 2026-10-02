@@ -1,23 +1,13 @@
 {
   "name": {
-    "en": "Rain Radar",
-    "nl": "Buienradar"
+    "en": "Rain radar",
+    "nl": "Regenradar"
   },
-  "settings": [
-    {
-      "id": "showAttribution",
-      "type": "checkbox",
-      "label": {
-        "en": "Show Data Attribution",
-        "nl": "Toon Data Bronvermelding"
-      },
-      "value": true,
-      "hint": {
-        "en": "Required for free data usage from Buienradar.",
-        "nl": "Vereist voor gratis gebruik van Buienradar data."
-      }
-    }
-  ],
+  "description": {
+    "en": "Current rain radar map of the Netherlands and Belgium",
+    "nl": "Actuele regenradarkaart van Nederland en België"
+  },
   "height": "100%",
-  "transparent": false
+  "transparent": false,
+  "settings": []
 }

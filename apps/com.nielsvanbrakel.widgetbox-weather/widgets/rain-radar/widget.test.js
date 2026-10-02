@@ -1,104 +1,56 @@
-import fs from "fs";
-import { JSDOM } from "jsdom";
-import path from "path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { loadWidget } from "../../test/loadWidget.js";
 
-const html = fs.readFileSync(path.resolve(__dirname, "public/index.html"), "utf8");
-
-describe("RainRadar Widget", () => {
-  let dom;
-  let window;
-  let document;
+describe("rain-radar widget", () => {
+  let images;
 
   beforeEach(() => {
-    dom = new JSDOM(html, {
-      runScripts: "dangerously",
-      url: "http://localhost/", // resources: "usable" removed to avoid blocking on 404s
-      pretendToBeVisual: true,
-    });
-    window = dom.window;
-    document = window.document;
-
-    // Mock Homey
-    window.Homey = {
-      ready: vi.fn(),
-      on: vi.fn(),
-      getSettings: vi.fn(() => ({})),
-      setHeight: vi.fn(),
-      __: vi.fn((key) => key),
-    };
-
-    global.window = window;
-    global.document = document;
-
     vi.useFakeTimers();
+    images = [];
+  });
+  afterEach(() => vi.useRealTimers());
+
+  function load() {
+    return loadWidget("rain-radar", {
+      beforeReady(window) {
+        window.Image = function createImage() {
+          const image = window.document.createElement("img");
+          images.push(image);
+          return image;
+        };
+      },
+    });
+  }
+
+  it("keeps the Buienradar branding and caches per 5-minute period", () => {
+    const { Homey } = load();
+    expect(Homey.ready).toHaveBeenCalledTimes(1);
+    const url = new URL(images[0].src);
+    expect(url.searchParams.get("renderBranding")).toBe("True");
+    expect(url.searchParams.get("t")).toBe(String(Math.floor(Date.now() / 300000)));
   });
 
-  afterEach(() => {
-    vi.useRealTimers();
+  it("swaps the image only after it loaded", () => {
+    const { $ } = load();
+    expect($("#radar").hidden).toBe(true);
+    images[0].onload();
+    expect($("#radar")).toBe(images[0]);
+    expect($("#message").hidden).toBe(true);
   });
 
-  it("should render the radar image with correct base URL", () => {
-    console.log("Test: window.onHomeyReady type:", typeof window.onHomeyReady);
-    // Trigger init
-    if (window.onHomeyReady) {
-      window.onHomeyReady(window.Homey);
-    } else {
-      console.log("Test: window.onHomeyReady is undefined!");
-    }
-
-    const img = document.getElementById("radar-image");
-    expect(img).not.toBeNull();
-    expect(img.src).toContain("https://image.buienradar.nl/2.0/image/single/RadarMapRainNL");
-    expect(img.src).toContain("renderBackground=True");
+  it("keeps the last image and shows an offline badge when a refresh fails", async () => {
+    const { $ } = load();
+    images[0].onload();
+    await vi.advanceTimersByTimeAsync(5 * 60 * 1000);
+    images[1].onerror();
+    expect($("#radar")).toBe(images[0]);
+    expect($("#offline").hidden).toBe(false);
+    expect($("#offline").textContent).toMatch(/^Offline/);
   });
 
-  it("should handle aspect ratio setting for height", () => {
-    // Mock settings
-    window.Homey.getSettings.mockReturnValue({ aspectRatio: "16:9" });
-
-    if (window.onHomeyReady) {
-      window.onHomeyReady(window.Homey);
-    }
-
-    // 16:9 is 56.25%
-    expect(window.Homey.ready).toHaveBeenCalledWith(
-      expect.objectContaining({
-        height: "56.25%",
-      }),
-    );
-  });
-
-  it("should show attribution", () => {
-    if (window.onHomeyReady) {
-      window.onHomeyReady(window.Homey);
-    }
-
-    const attribution = document.querySelector(".attribution");
-    // Can be a link text "Data: Buienradar.nl"
-    expect(document.body.textContent).toContain("Buienradar.nl");
-
-    // Should be a link
-    const links = Array.from(document.querySelectorAll("a"));
-    const buienradarLink = links.find(
-      (a) => a.href.includes("buienradar.nl") && a.textContent.includes("Buienradar"),
-    );
-    expect(buienradarLink).not.toBeNull();
-  });
-
-  it("should refresh image every 5 minutes", () => {
-    if (window.onHomeyReady) {
-      window.onHomeyReady(window.Homey);
-    }
-
-    const img = document.getElementById("radar-image");
-    const initialSrc = img.src;
-
-    // Advance time by 5 minutes
-    vi.advanceTimersByTime(5 * 60 * 1000);
-
-    const newSrc = img.src;
-    expect(newSrc).not.toBe(initialSrc);
-    expect(newSrc).toContain("t="); // Should have timestamp to bust cache
+  it("always shows the credit and opens it in a popup", () => {
+    const { $, Homey } = load();
+    $("#credit").click();
+    expect(Homey.popup).toHaveBeenCalledWith("https://www.buienradar.nl");
   });
 });

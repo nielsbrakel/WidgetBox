@@ -1,253 +1,388 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
-    <link rel="stylesheet" href="https://apps-sdk.developer.homey.app/css/homey.widgets.css">
-    <script src="https://apps-sdk.developer.homey.app/js/homey.widgets.js"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
-    :root {
-      --homey-color-blue: var(--homey-color-blue-500);
-    }
-
-    html,
     body {
+      --text: var(--homey-text-color, #333);
+      --line: var(--homey-line-color, rgba(0, 0, 0, 0.1));
       margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
       overflow: hidden;
-      background-color: transparent;
-      color: var(--homey-color-text);
-      font-family: var(--homey-font-family);
-      box-sizing: border-box;
+      background: transparent;
+      color: var(--text);
+      font-family: var(--homey-font-family, system-ui, sans-serif);
+      -webkit-tap-highlight-color: transparent;
     }
 
-    .widget-container {
+    .widget {
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-      height: 100%;
-      padding: 16px;
-      box-sizing: border-box;
+      gap: 8px;
+      padding: 12px 14px 8px;
+      text-align: left;
     }
 
-    .station-header {
-      font-size: 11px;
-      font-weight: 500;
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+      font-size: 12px;
       opacity: 0.7;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+    }
+
+    .name {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .current {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 2px 10px;
+    }
+
+    .temperature {
+      font-size: 44px;
+      font-weight: 300;
+      line-height: 1;
+      letter-spacing: -1px;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .icon {
+      width: 40px;
+      height: 40px;
+      flex: none;
+    }
+
+    .feels {
+      font-size: 12px;
+      opacity: 0.7;
+    }
+
+    .details {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 16px;
+    }
+
+    .detail {
+      min-width: 0;
+    }
+
+    .value {
+      display: block;
+      font-size: var(--homey-font-size-small, 14px);
+      font-weight: var(--homey-font-weight-medium, 500);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      margin-bottom: 4px;
+      font-variant-numeric: tabular-nums;
     }
 
-    .main-weather {
-      flex: 1;
+    .label {
+      display: block;
+      font-size: 11px;
+      opacity: 0.7;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .footer {
       display: flex;
+      justify-content: space-between;
       align-items: center;
-      /* Center vertically */
+      gap: 8px;
+      padding-top: 6px;
+      border-top: 1px solid var(--line);
+      font-size: 11px;
     }
 
-    .temp-value {
-      font-size: 48px;
-      font-weight: 200;
-      /* Thin premium look */
-      line-height: 1;
-      letter-spacing: -2px;
-    }
-
-    .temp-unit {
-      font-size: 20px;
-      font-weight: 300;
-      margin-top: -16px;
-      /* Align top of number */
-      margin-left: 2px;
+    .status {
       opacity: 0.6;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
-    .details-row {
-      display: flex;
-      gap: 16px;
-      margin-bottom: 4px;
-    }
-
-    .detail-item {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .detail-value {
-      font-size: 14px;
-      font-weight: 600;
-    }
-
-    .detail-label {
-      font-size: 9px;
+    .credit {
+      position: relative;
+      flex: none;
+      padding: 0;
+      border: 0;
+      background: none;
+      color: inherit;
+      font: inherit;
       opacity: 0.6;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-top: 1px;
+      cursor: pointer;
     }
 
-    .attribution {
+    .credit::after {
+      content: "";
       position: absolute;
-      bottom: 6px;
-      right: 6px;
-      font-size: 9px;
-      color: rgba(255, 255, 255, 0.4);
-      text-decoration: none;
-      transition: color 0.2s;
+      inset: -14px -8px -8px;
     }
 
-    .attribution:hover {
-      color: rgba(255, 255, 255, 0.8);
+    .message {
+      font-size: var(--homey-font-size-small, 14px);
+      opacity: 0.8;
     }
-    </style>
-    <style>
-    /* Alignment Styles */
-    .widget-container.align-center {
-      align-items: center;
+
+    .align-center {
       text-align: center;
     }
 
-    .widget-container.align-right {
-      align-items: flex-end;
+    .align-center .header,
+    .align-center .current,
+    .align-center .details {
+      justify-content: center;
+    }
+
+    .align-right {
       text-align: right;
     }
 
-    .align-center .details-row {
-      justify-content: center;
-    }
-
-    .align-right .details-row {
+    .align-right .header,
+    .align-right .current,
+    .align-right .details {
       justify-content: flex-end;
     }
 
-    .align-center .main-weather {
-      justify-content: center;
+    .style-compact {
+      gap: 6px;
+      padding-top: 10px;
     }
 
-    .align-right .main-weather {
-      justify-content: flex-end;
-    }
-
-    /* Style Variants */
-    .style-compact .temp-value {
+    .style-compact .temperature {
       font-size: 32px;
     }
 
-    .style-compact .station-header {
-      font-size: 10px;
-      margin-bottom: 2px;
+    .style-compact .icon {
+      width: 30px;
+      height: 30px;
     }
 
-    .style-compact .details-row {
-      gap: 12px;
+    .style-compact .feels,
+    .style-compact .label {
+      display: none;
     }
 
-    .style-compact .detail-value {
-      font-size: 12px;
+    body:not(.homey-dark-mode) .icon {
+      filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.45));
+    }
+
+    [hidden] {
+      display: none;
     }
     </style>
   </head>
 
-  <body>
-    <div class="widget-container" id="app">
-      <div class="station-header" id="station-name">Loading...</div>
-
-      <div class="main-weather">
-        <span class="temp-value" id="main-temp">--</span>
-        <span class="temp-unit">°C</span>
+  <body class="homey-widget">
+    <div class="widget" id="app">
+      <div class="header"><span class="name" id="name"></span></div>
+      <div class="current" id="current">
+        <img class="icon" id="icon" alt="" width="40" height="40" hidden>
+        <span class="temperature" id="temperature">--°</span>
+        <span class="feels" id="feels"></span>
       </div>
-
-      <div class="details-row" id="details-row">
-        <!-- Populated by JS -->
+      <div class="message" id="message" role="status" hidden></div>
+      <div class="details" id="details">
+        <div class="detail">
+          <span class="value" id="wind">—</span>
+          <span class="label" id="wind-label"></span>
+        </div>
+        <div class="detail">
+          <span class="value" id="rain">—</span>
+          <span class="label" id="rain-label"></span>
+        </div>
+        <div class="detail">
+          <span class="value" id="humidity">—</span>
+          <span class="label" id="humidity-label"></span>
+        </div>
       </div>
-
-      <a href="https://www.buienradar.nl" target="_blank" class="attribution">Buienradar.nl</a>
+      <div class="footer">
+        <span class="status" id="status"></span>
+        <button class="credit" id="credit" type="button">Buienradar.nl</button>
+      </div>
     </div>
 
     <script>
+    const REFRESH_MS = 10 * 60 * 1000;
+    const SETTINGS_DEBOUNCE_MS = 600;
+    const DATA_SETTINGS = ["latitude", "longitude", "stationId"];
+    const ALIGNMENTS = ["left", "center", "right"];
+
+    const $ = (id) => document.getElementById(id);
+
     function onHomeyReady(Homey) {
-      const currentSettings = Homey.getSettings() || {};
+      const settings = { ...Homey.getSettings() };
+      const state = { data: null, lastFetch: 0, timer: null, debounce: null, height: null };
+      const translated = Homey.__("language");
+      const language = /^[a-z]{2}$/.test(translated) ? translated : navigator.language;
+      const decimal = new Intl.NumberFormat(language, {
+        minimumFractionDigits: 1,
+        maximumFractionDigits: 1,
+      });
+      const integer = new Intl.NumberFormat(language, { maximumFractionDigits: 0 });
 
-      function updateStyles() {
-        const container = document.getElementById("app");
-        const align = currentSettings.textAlign || "left";
-        const style = currentSettings.style || "default";
+      function t(key, tokens = {}) {
+        const text = Homey.__(key) ?? key;
+        return text.replace(/\{(\w+)\}/g, (_, name) => tokens[name] ?? "");
+      }
 
-        container.className = "widget-container"; // Reset
-        container.classList.add(`align-${align}`);
-        container.classList.add(`style-${style}`);
+      function format(value, formatter, suffix = "") {
+        return Number.isFinite(value) ? `${formatter.format(value)}${suffix}` : "—";
+      }
 
-        const attribution = document.querySelector(".attribution");
-        if (currentSettings.showAttribution === false) {
-          attribution.style.display = "none";
+      function compass(degrees) {
+        if (!Number.isFinite(degrees)) return "";
+        const points = t("widgets.station.compass").split(",");
+        return points[Math.round((((degrees % 360) + 360) % 360) / 45) % 8] ?? "";
+      }
+
+      function applyLayout() {
+        const align = ALIGNMENTS.includes(settings.horizontalAlignment)
+          ? settings.horizontalAlignment
+          : "left";
+        $("app").className =
+          `widget align-${align} style-${settings.style === "compact" ? "compact" : "default"}`;
+      }
+
+      function updateHeight() {
+        const height = Math.ceil($("app").getBoundingClientRect().height);
+        if (height === state.height) return;
+        if (state.height === null) Homey.ready({ height });
+        else Homey.setHeight(height);
+        state.height = height;
+      }
+
+      function render() {
+        const station = state.data?.station;
+        if (!station) return;
+        const distance =
+          Number.isFinite(station.distanceKm) && station.distanceKm > 0
+            ? ` · ${integer.format(station.distanceKm)} km`
+            : "";
+        $("name").textContent = `${station.name}${distance}`;
+        $("temperature").textContent = format(station.temperature, decimal, "°");
+        $("feels").textContent = Number.isFinite(station.feelTemperature)
+          ? t("widgets.station.feelsLike", { value: integer.format(station.feelTemperature) })
+          : "";
+        $("wind").textContent = Number.isFinite(station.windBft)
+          ? `${station.windBft} Bft ${compass(station.windDirectionDegrees)}`.trim()
+          : "—";
+        $("rain").textContent = format(station.rainLastHour, decimal, " mm");
+        $("humidity").textContent = format(station.humidity, integer, "%");
+
+        const icon = $("icon");
+        if (station.iconUrl?.startsWith("https://cdn.buienradar.nl/")) {
+          icon.src = station.iconUrl;
+          icon.hidden = false;
         } else {
-          attribution.style.display = "inline";
+          icon.hidden = true;
         }
+        showContent(true);
+      }
+
+      function showContent(visible) {
+        $("current").hidden = !visible;
+        $("details").hidden = !visible;
+        $("message").hidden = visible;
+      }
+
+      function renderStatus(failed) {
+        const observedAt = state.data?.station?.observedAt;
+        const time = typeof observedAt === "string" ? observedAt.slice(11, 16) : "";
+        const status = $("status");
+        status.textContent = time && failed ? t("widgets.station.offline", { time }) : time;
+        status.title = time ? t("widgets.station.observedAt", { time }) : "";
+      }
+
+      function errorText(error) {
+        const code = String(error?.message ?? "");
+        if (code.includes("LOCATION_REQUIRED")) return t("common.locationRequired");
+        if (code.includes("INVALID_LOCATION")) return t("common.invalidLocation");
+        if (code.includes("INVALID_STATION")) return t("widgets.station.invalidStation");
+        return `${t("common.errorTitle")}. ${t("common.errorRetry")}.`;
+      }
+
+      async function fetchData() {
+        const query = new URLSearchParams({
+          latitude: settings.latitude ?? "",
+          longitude: settings.longitude ?? "",
+          stationId: (settings.stationId ?? "").trim(),
+        });
+        try {
+          state.data = await Homey.api("GET", `/?${query}`);
+          render();
+          renderStatus(false);
+        } catch (error) {
+          if (state.data) {
+            renderStatus(true);
+          } else {
+            $("name").textContent = "";
+            $("message").textContent = errorText(error);
+            showContent(false);
+          }
+        }
+        updateHeight();
       }
 
       async function refresh() {
-        const lat = currentSettings.lat || "52.1";
-        const lon = currentSettings.lon || "5.1";
-        const stationId = currentSettings.stationId || "";
+        clearTimeout(state.timer);
+        state.lastFetch = Date.now();
+        await fetchData();
+        schedule();
+      }
 
-        updateStyles();
+      function schedule() {
+        clearTimeout(state.timer);
+        if (document.visibilityState === "hidden") return;
+        state.timer = setTimeout(refresh, Math.max(state.lastFetch + REFRESH_MS - Date.now(), 0));
+      }
 
-        try {
-          const data = await Homey.api("GET", `/?lat=${lat}&lon=${lon}&stationId=${stationId}`);
-          render(data.station);
-        } catch (e) {
-          console.error(e);
-          document.getElementById("station-name").textContent = "Error";
+      function onSettingChanged(key, value) {
+        settings[key] = value;
+        if (!DATA_SETTINGS.includes(key)) {
+          applyLayout();
+          updateHeight();
+          return;
         }
-      }
-
-      function render(station) {
-        if (!station) return;
-
-        document.getElementById("station-name").textContent = station.stationname;
-        document.getElementById("main-temp").textContent = station.temperature;
-
-        const details = document.getElementById("details-row");
-        details.innerHTML = "";
-
-        // Define details to show
-        const items = [
-          { label: "Wind", value: `${station.windspeedBft} Bft` },
-          { label: "Rain 1h", value: `${station.rainFallLastHour || 0} mm` },
-          { label: "Hum", value: `${station.humidity}%` },
-        ];
-
-        items.forEach((item) => {
-          const div = document.createElement("div");
-          div.className = "detail-item";
-          div.innerHTML = `
-                        <span class="detail-value">${item.value}</span>
-                        <span class="detail-label">${item.label}</span>
-                    `;
-          details.appendChild(div);
-        });
-      }
-
-      Homey.on("settings.set", (key, value) => {
-        currentSettings[key] = value;
-        // Immediate style update for responsiveness
-        if (key === "textAlign" || key === "style" || key === "showAttribution") {
-          updateStyles();
-        } else {
+        clearTimeout(state.debounce);
+        state.debounce = setTimeout(() => {
+          state.data = null;
           refresh();
-        }
+        }, SETTINGS_DEBOUNCE_MS);
+      }
+
+      $("icon").addEventListener("error", () => {
+        $("icon").hidden = true;
       });
+      $("credit").addEventListener("click", () => Homey.popup("https://www.buienradar.nl"));
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "hidden") clearTimeout(state.timer);
+        else if (Date.now() - state.lastFetch >= REFRESH_MS) refresh();
+        else schedule();
+      });
+      Homey.on("settings.set", onSettingChanged);
 
+      document.documentElement.lang = language;
+      $("wind-label").textContent = t("widgets.station.wind");
+      $("rain-label").textContent = t("widgets.station.rain");
+      $("humidity-label").textContent = t("widgets.station.humidity");
+      $("name").textContent = t("common.loading");
+      applyLayout();
+      updateHeight();
+      new ResizeObserver(updateHeight).observe($("app"));
       refresh();
-      Homey.ready();
-
-      // Refresh 10 mins
-      setInterval(refresh, 10 * 60 * 1000);
     }
+
     window.onHomeyReady = onHomeyReady;
     </script>
   </body>

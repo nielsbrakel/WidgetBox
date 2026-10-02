@@ -1,19 +1,184 @@
 {
   "name": {
-    "en": "Windy",
-    "nl": "Windy"
+    "en": "Weather map",
+    "nl": "Weerkaart"
   },
   "description": {
-    "en": "Interactive weather map with wind and weather data",
-    "nl": "Interactieve weerskaart met wind- en weergegevens"
+    "en": "Interactive wind, rain and temperature map powered by Windy.com",
+    "nl": "Interactieve wind-, regen- en temperatuurkaart van Windy.com"
   },
-  "height": 250,
+  "api": {
+    "getLocation": {
+      "method": "GET",
+      "path": "/location"
+    }
+  },
+  "transparent": false,
   "settings": [
+    {
+      "id": "latitude",
+      "type": "text",
+      "label": {
+        "en": "Latitude",
+        "nl": "Breedtegraad"
+      },
+      "value": "",
+      "hint": {
+        "en": "Leave empty to use the location of your Homey. Example: 52.09",
+        "nl": "Laat leeg om de locatie van je Homey te gebruiken. Bijvoorbeeld: 52,09"
+      }
+    },
+    {
+      "id": "longitude",
+      "type": "text",
+      "label": {
+        "en": "Longitude",
+        "nl": "Lengtegraad"
+      },
+      "value": "",
+      "hint": {
+        "en": "Leave empty to use the location of your Homey. Example: 5.12",
+        "nl": "Laat leeg om de locatie van je Homey te gebruiken. Bijvoorbeeld: 5,12"
+      }
+    },
+    {
+      "id": "zoom",
+      "type": "number",
+      "label": {
+        "en": "Zoom level",
+        "nl": "Zoomniveau"
+      },
+      "value": 5,
+      "min": 3,
+      "max": 11,
+      "step": 1,
+      "hint": {
+        "en": "From 3 (continent) to 11 (city). 5 shows a whole country.",
+        "nl": "Van 3 (continent) tot 11 (stad). Met 5 zie je een heel land."
+      }
+    },
+    {
+      "id": "overlay",
+      "type": "dropdown",
+      "label": {
+        "en": "Map layer",
+        "nl": "Kaartlaag"
+      },
+      "value": "wind",
+      "values": [
+        {
+          "id": "wind",
+          "label": {
+            "en": "Wind",
+            "nl": "Wind"
+          }
+        },
+        {
+          "id": "temp",
+          "label": {
+            "en": "Temperature",
+            "nl": "Temperatuur"
+          }
+        },
+        {
+          "id": "rain",
+          "label": {
+            "en": "Rain",
+            "nl": "Regen"
+          }
+        },
+        {
+          "id": "clouds",
+          "label": {
+            "en": "Clouds",
+            "nl": "Bewolking"
+          }
+        },
+        {
+          "id": "pressure",
+          "label": {
+            "en": "Pressure",
+            "nl": "Luchtdruk"
+          }
+        }
+      ]
+    },
+    {
+      "id": "product",
+      "type": "dropdown",
+      "label": {
+        "en": "Forecast model",
+        "nl": "Weermodel"
+      },
+      "value": "ecmwf",
+      "values": [
+        {
+          "id": "ecmwf",
+          "label": {
+            "en": "ECMWF",
+            "nl": "ECMWF"
+          }
+        },
+        {
+          "id": "gfs",
+          "label": {
+            "en": "GFS",
+            "nl": "GFS"
+          }
+        },
+        {
+          "id": "nam",
+          "label": {
+            "en": "NAM (North America)",
+            "nl": "NAM (Noord-Amerika)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "level",
+      "type": "dropdown",
+      "label": {
+        "en": "Altitude",
+        "nl": "Hoogteniveau"
+      },
+      "value": "surface",
+      "values": [
+        {
+          "id": "surface",
+          "label": {
+            "en": "Surface",
+            "nl": "Oppervlak"
+          }
+        },
+        {
+          "id": "100m",
+          "label": {
+            "en": "100 m",
+            "nl": "100 m"
+          }
+        },
+        {
+          "id": "850h",
+          "label": {
+            "en": "1,500 m (850 hPa)",
+            "nl": "1500 m (850 hPa)"
+          }
+        },
+        {
+          "id": "500h",
+          "label": {
+            "en": "5,500 m (500 hPa)",
+            "nl": "5500 m (500 hPa)"
+          }
+        }
+      ]
+    },
     {
       "id": "aspectRatio",
       "type": "dropdown",
       "label": {
-        "en": "Aspect Ratio",
+        "en": "Aspect ratio",
         "nl": "Beeldverhouding"
       },
       "value": "16:9",
@@ -35,8 +200,8 @@
         {
           "id": "16:9",
           "label": {
-            "en": "16:9 (Default)",
-            "nl": "16:9 (Standaard)"
+            "en": "16:9",
+            "nl": "16:9"
           }
         },
         {
@@ -56,158 +221,77 @@
       ]
     },
     {
-      "id": "openDetailsByDefault",
-      "type": "checkbox",
-      "label": {
-        "en": "Open Details by Default",
-        "nl": "Details Standaard Openen"
-      },
-      "hint": {
-        "en": "If enabled, the widget will show the detail view (forecast) on load instead of the map.",
-        "nl": "Indien ingeschakeld, toont de widget de detailweergave (voorspelling) bij het laden in plaats van de kaart."
-      },
-      "value": false
-    },
-    {
-      "id": "detailLatitude",
-      "type": "text",
-      "label": {
-        "en": "Detail Latitude",
-        "nl": "Detail Breedtegraad"
-      },
-      "hint": {
-        "en": "Leave blank to use main latitude. Latitude for the detail view (e.g. 52.22)",
-        "nl": "Leeg laten voor hoofd breedtegraad. Breedtegraad voor de detailweergave (bijv. 52.22)"
-      },
-      "value": ""
-    },
-    {
-      "id": "detailLongitude",
-      "type": "text",
-      "label": {
-        "en": "Detail Longitude",
-        "nl": "Detail Lengtegraad"
-      },
-      "hint": {
-        "en": "Leave blank to use main longitude. Longitude for the detail view (e.g. 6.01)",
-        "nl": "Leeg laten voor hoofd lengtegraad. Lengtegraad voor de detailweergave (bijv. 6.01)"
-      },
-      "value": ""
-    },
-    {
-      "id": "latitude",
-      "type": "text",
-      "label": {
-        "en": "Latitude",
-        "nl": "Breedtegraad"
-      },
-      "hint": {
-        "en": "Enter the latitude of your location (e.g. 52.22)",
-        "nl": "Voer de breedtegraad van je locatie in (bijv. 52.22)"
-      },
-      "value": ""
-    },
-    {
-      "id": "level",
-      "type": "dropdown",
-      "label": {
-        "en": "Height Level",
-        "nl": "Hoogtestadium"
-      },
-      "value": "surface",
-      "values": [
-        {
-          "id": "surface",
-          "label": {
-            "en": "Surface",
-            "nl": "Oppervlak"
-          }
-        },
-        {
-          "id": "10m",
-          "label": {
-            "en": "10m",
-            "nl": "10m"
-          }
-        },
-        {
-          "id": "100m",
-          "label": {
-            "en": "100m",
-            "nl": "100m"
-          }
-        }
-      ]
-    },
-    {
-      "id": "longitude",
-      "type": "text",
-      "label": {
-        "en": "Longitude",
-        "nl": "Lengtegraad"
-      },
-      "hint": {
-        "en": "Enter the longitude of your location (e.g. 6.01)",
-        "nl": "Voer de lengtegraad van je locatie in (bijv. 6.01)"
-      },
-      "value": ""
-    },
-    {
       "id": "marker",
       "type": "checkbox",
       "label": {
-        "en": "Show Location Marker",
-        "nl": "Toon Locatiemarkering"
+        "en": "Show location marker",
+        "nl": "Locatiemarkering tonen"
       },
       "value": true
+    },
+    {
+      "id": "pressure",
+      "type": "checkbox",
+      "label": {
+        "en": "Show pressure lines",
+        "nl": "Isobaren tonen"
+      },
+      "value": false
     },
     {
       "id": "message",
       "type": "checkbox",
       "label": {
         "en": "Hide promo message",
-        "nl": "Verberg promotie Bericht"
+        "nl": "Promotiebericht verbergen"
       },
       "value": true
     },
     {
-      "id": "metricRain",
-      "type": "dropdown",
+      "id": "openDetailsByDefault",
+      "type": "checkbox",
       "label": {
-        "en": "Rain Metric",
-        "nl": "Regenmetriek"
+        "en": "Show forecast details",
+        "nl": "Verwachtingsdetails tonen"
       },
-      "value": "default",
-      "values": [
-        {
-          "id": "default",
-          "label": {
-            "en": "Default",
-            "nl": "Standaard"
-          }
-        },
-        {
-          "id": "mm",
-          "label": {
-            "en": "Millimeters",
-            "nl": "Millimeters"
-          }
-        },
-        {
-          "id": "in",
-          "label": {
-            "en": "Inches",
-            "nl": "Inches"
-          }
-        }
-      ]
+      "value": false,
+      "hint": {
+        "en": "Shows the detailed forecast for a location below the map.",
+        "nl": "Toont de gedetailleerde verwachting voor een locatie onder de kaart."
+      }
+    },
+    {
+      "id": "detailLatitude",
+      "type": "text",
+      "label": {
+        "en": "Detail latitude",
+        "nl": "Breedtegraad detailweergave"
+      },
+      "value": "",
+      "hint": {
+        "en": "Leave empty to use the map location. Example: 52.22",
+        "nl": "Laat leeg om de kaartlocatie te gebruiken. Bijvoorbeeld: 52,22"
+      }
+    },
+    {
+      "id": "detailLongitude",
+      "type": "text",
+      "label": {
+        "en": "Detail longitude",
+        "nl": "Lengtegraad detailweergave"
+      },
+      "value": "",
+      "hint": {
+        "en": "Leave empty to use the map location. Example: 6.01",
+        "nl": "Laat leeg om de kaartlocatie te gebruiken. Bijvoorbeeld: 6,01"
+      }
     },
     {
       "id": "metricTemp",
       "type": "dropdown",
       "label": {
-        "en": "Temperature Metric",
-        "nl": "Temperatuurmetriek"
+        "en": "Temperature unit",
+        "nl": "Eenheid temperatuur"
       },
       "value": "default",
       "values": [
@@ -238,8 +322,8 @@
       "id": "metricWind",
       "type": "dropdown",
       "label": {
-        "en": "Wind Metric",
-        "nl": "Windmetriek"
+        "en": "Wind unit",
+        "nl": "Eenheid wind"
       },
       "value": "default",
       "values": [
@@ -253,22 +337,15 @@
         {
           "id": "kmh",
           "label": {
-            "en": "Km/h",
-            "nl": "Km/h"
-          }
-        },
-        {
-          "id": "mph",
-          "label": {
-            "en": "Mph",
-            "nl": "Mph"
+            "en": "km/h",
+            "nl": "km/u"
           }
         },
         {
           "id": "ms",
           "label": {
-            "en": "M/s",
-            "nl": "M/s"
+            "en": "m/s",
+            "nl": "m/s"
           }
         },
         {
@@ -277,108 +354,47 @@
             "en": "Knots",
             "nl": "Knopen"
           }
+        },
+        {
+          "id": "mph",
+          "label": {
+            "en": "mph",
+            "nl": "mph"
+          }
         }
       ]
     },
     {
-      "id": "overlay",
+      "id": "metricRain",
       "type": "dropdown",
       "label": {
-        "en": "Overlay",
-        "nl": "Overlay"
+        "en": "Rain unit",
+        "nl": "Eenheid neerslag"
       },
-      "value": "wind",
+      "value": "default",
       "values": [
         {
-          "id": "wind",
+          "id": "default",
           "label": {
-            "en": "Wind",
-            "nl": "Wind"
+            "en": "Default",
+            "nl": "Standaard"
           }
         },
         {
-          "id": "temp",
+          "id": "mm",
           "label": {
-            "en": "Temperature",
-            "nl": "Temperatuur"
+            "en": "Millimeters",
+            "nl": "Millimeters"
           }
         },
         {
-          "id": "rain",
+          "id": "in",
           "label": {
-            "en": "Rain",
-            "nl": "Regen"
-          }
-        },
-        {
-          "id": "clouds",
-          "label": {
-            "en": "Clouds",
-            "nl": "Wolken"
-          }
-        },
-        {
-          "id": "pressure",
-          "label": {
-            "en": "Pressure",
-            "nl": "Luchtdruk"
+            "en": "Inches",
+            "nl": "Inches"
           }
         }
       ]
-    },
-    {
-      "id": "pressure",
-      "type": "checkbox",
-      "label": {
-        "en": "Show Pressure",
-        "nl": "Toon Luchtdruk"
-      },
-      "value": false
-    },
-    {
-      "id": "product",
-      "type": "dropdown",
-      "label": {
-        "en": "Forecast Model",
-        "nl": "Voorspellingsmodel"
-      },
-      "value": "ecmwf",
-      "values": [
-        {
-          "id": "ecmwf",
-          "label": {
-            "en": "ECMWF",
-            "nl": "ECMWF"
-          }
-        },
-        {
-          "id": "gfs",
-          "label": {
-            "en": "GFS",
-            "nl": "GFS"
-          }
-        },
-        {
-          "id": "nam",
-          "label": {
-            "en": "NAM",
-            "nl": "NAM"
-          }
-        }
-      ]
-    },
-    {
-      "id": "zoom",
-      "type": "number",
-      "label": {
-        "en": "Zoom Level",
-        "nl": "Zoomniveau"
-      },
-      "hint": {
-        "en": "Map zoom level (higher = closer, e.g. 5 for country view)",
-        "nl": "Kaart zoomniveau (hoger = dichterbij, bijv. 5 voor landweergave)"
-      },
-      "value": 5
     }
   ]
 }
