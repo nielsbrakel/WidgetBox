@@ -17,6 +17,8 @@
     }
 
     :where(#app) {
+      box-sizing: border-box;
+      padding: var(--homey-su-3, 12px) var(--homey-su-4, 16px);
       --accent: var(--homey-text-color, #333);
       --max-width: 260px;
       display: flex;
@@ -111,7 +113,7 @@
     </style>
   </head>
 
-  <body>
+  <body class="homey-widget-full">
     <div id="app">
       <div class="matrix" id="matrix" aria-hidden="true"></div>
       <p class="visually-hidden" id="spoken-time" role="timer" aria-live="off"></p>

@@ -134,8 +134,9 @@ export function injectHomeyStyles(doc) {
     }
 
     /* Homey Widget Classes */
+    /* Matches the real dashboard: .homey-widget is added by default with 16px padding */
     body.homey-widget {
-      padding: 0;
+      padding: var(--homey-su-4);
       box-sizing: border-box;
     }
     body.homey-widget-small {

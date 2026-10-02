@@ -52,9 +52,30 @@
 
     .play-icon {
       position: relative;
-      width: 68px;
-      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.92);
+      color: var(--homey-text-color, #333);
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
       transition: transform 0.15s ease;
+    }
+
+    .homey-dark-mode .play-icon {
+      background: rgba(28, 28, 28, 0.85);
+      box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.3),
+        0 2px 12px rgba(0, 0, 0, 0.3);
+      color: var(--homey-text-color, #fff);
+    }
+
+    .play-icon svg {
+      width: 28px;
+      height: 28px;
+      margin-left: 3px;
     }
 
     .facade:active .play-icon {
@@ -97,6 +118,18 @@
       color: var(--homey-text-color-light, var(--homey-color-mono-600, #666));
     }
 
+    /* Short cards (narrow columns, wide ratios): keep only the title so nothing clips. */
+    @media (max-height: 130px) {
+      .message {
+        padding: 8px;
+      }
+
+      .message-icon,
+      .message-text {
+        display: none;
+      }
+    }
+
     @media (prefers-reduced-motion: reduce) {
       .play-icon {
         transition: none;
@@ -105,18 +138,15 @@
     </style>
   </head>
 
-  <body>
+  <body class="homey-widget-full">
     <div id="player"></div>
 
     <template id="play-icon">
-      <svg class="play-icon" viewBox="0 0 68 48" aria-hidden="true">
-        <path
-          d="M66.5 7.7a8.6 8.6 0 0 0-6-6C55.2.3 34 .3 34 .3s-21.2 0-26.5 1.4a8.6 8.6 0 0 0-6 6C.1 13 .1 24 .1 24s0 11 1.4 16.3a8.6 8.6 0 0 0 6 6C12.8 47.7 34 47.7 34 47.7s21.2 0 26.5-1.4a8.6 8.6 0 0 0 6-6C67.9 35 67.9 24 67.9 24s0-11-1.4-16.3z"
-          fill="#212121"
-          fill-opacity="0.8"
-        />
-        <path d="M45 24 27 14v20z" fill="#fff" />
-      </svg>
+      <span class="play-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M7 4.5v15L19.5 12z" fill="currentColor" />
+        </svg>
+      </span>
     </template>
 
     <template id="message-icon">

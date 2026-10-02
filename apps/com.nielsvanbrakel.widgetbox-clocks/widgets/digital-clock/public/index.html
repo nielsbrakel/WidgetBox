@@ -17,6 +17,8 @@
     }
 
     :where(#app) {
+      box-sizing: border-box;
+      padding: var(--homey-su-3, 12px) var(--homey-su-4, 16px);
       --accent: var(--homey-text-color, #333);
       --time-size: 42px;
       --date-size: 16px;
@@ -126,7 +128,7 @@
     </style>
   </head>
 
-  <body>
+  <body class="homey-widget-full">
     <div id="app">
       <div class="time" id="time" role="timer" aria-live="off">
         <span id="hours-minutes"></span><span class="seconds" id="seconds"></span
@@ -206,10 +208,16 @@
       }
     }
 
+    /** Width available to the clock: the #app box minus its padding. */
+    function contentWidth(element) {
+      const style = getComputedStyle(element);
+      return element.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+    }
+
     /** Shrinks the time (never grows it) so it fits the widget width without clipping. */
     function fitToWidth() {
       app.style.setProperty("--fit", "1");
-      const available = app.clientWidth;
+      const available = contentWidth(app);
       const natural = timeElement.scrollWidth;
       const fit = natural > available ? available / natural : 1;
       app.style.setProperty("--fit", fit.toFixed(3));

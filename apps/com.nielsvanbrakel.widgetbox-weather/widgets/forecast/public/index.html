@@ -350,7 +350,8 @@
       }
 
       function updateHeight() {
-        const height = Math.ceil($("app").getBoundingClientRect().height);
+        // Measure the body so Homey's .homey-widget padding is part of the reported height.
+        const height = Math.ceil(document.body.getBoundingClientRect().height);
         if (height === state.height) return;
         if (state.height === null) Homey.ready({ height });
         else Homey.setHeight(height);

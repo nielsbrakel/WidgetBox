@@ -17,6 +17,8 @@
     }
 
     :where(#app) {
+      box-sizing: border-box;
+      padding: var(--homey-su-3, 12px) var(--homey-su-4, 16px);
       --accent: var(--homey-text-color, #333);
       --unit: 10px;
       --fit: 1;
@@ -165,7 +167,7 @@
     </style>
   </head>
 
-  <body>
+  <body class="homey-widget-full">
     <div id="app">
       <div class="binary-clock" id="clock" role="img"></div>
     </div>
@@ -271,13 +273,22 @@
       );
     }
 
+    /** Width available to the clock: the #app box minus its padding. */
+    function contentWidth(element) {
+      const style = getComputedStyle(element);
+      return element.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+    }
+
     /** Shrinks the clock (never grows it) so it fits the widget width. */
     function fitToWidth() {
+      const available = contentWidth(app);
+      let fit = 1;
       app.style.setProperty("--fit", "1");
-      const available = app.clientWidth;
-      const natural = clock.scrollWidth;
-      const fit = natural > available ? available / natural : 1;
-      app.style.setProperty("--fit", fit.toFixed(3));
+      // Labels have a minimum font size, so scaling is not linear: refine a few times.
+      for (let pass = 0; pass < 3 && clock.scrollWidth > available; pass += 1) {
+        fit = Math.floor(fit * (available / clock.scrollWidth) * 1000) / 1000;
+        app.style.setProperty("--fit", String(fit));
+      }
     }
 
     function applySettings() {

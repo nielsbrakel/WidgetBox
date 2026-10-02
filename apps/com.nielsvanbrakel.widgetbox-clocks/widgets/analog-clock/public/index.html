@@ -17,6 +17,8 @@
     }
 
     :where(#app) {
+      box-sizing: border-box;
+      padding: var(--homey-su-3, 12px) var(--homey-su-4, 16px);
       --accent: var(--homey-text-color, #333);
       --max-size: 128px;
       display: flex;
@@ -170,7 +172,7 @@
     </style>
   </head>
 
-  <body>
+  <body class="homey-widget-full">
     <div id="app">
       <svg viewBox="0 0 100 100" id="clock-svg" role="img" aria-labelledby="clock-title">
         <title id="clock-title">Clock</title>

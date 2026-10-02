@@ -17,6 +17,8 @@
     }
 
     :where(#app) {
+      box-sizing: border-box;
+      padding: var(--homey-su-3, 12px) var(--homey-su-4, 16px);
       --accent: var(--homey-text-color, #333);
       --font-size: 24px;
       --font-weight: normal;
@@ -95,7 +97,7 @@
     </style>
   </head>
 
-  <body>
+  <body class="homey-widget-full">
     <div id="app">
       <p class="time-text" id="time-text" role="timer" aria-live="off"></p>
     </div>

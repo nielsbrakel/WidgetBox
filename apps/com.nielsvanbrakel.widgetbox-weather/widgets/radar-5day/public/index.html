@@ -20,6 +20,7 @@
 
     .frame {
       position: relative;
+      display: block;
       overflow: hidden;
       border: 0;
       padding: 0;
@@ -139,7 +140,10 @@
 
       /** Scales the fixed-size gadget to the widget width, capped so it does not get blurry. */
       function layout() {
-        const width = Math.min(document.body.clientWidth, MAX_WIDTH);
+        const body = getComputedStyle(document.body);
+        const padX = parseFloat(body.paddingLeft) + parseFloat(body.paddingRight);
+        const padY = parseFloat(body.paddingTop) + parseFloat(body.paddingBottom);
+        const width = Math.min(document.body.clientWidth - padX, MAX_WIDTH);
         if (width === state.width || width === 0) return;
         state.width = width;
         const scale = width / GADGET_WIDTH;
@@ -149,7 +153,7 @@
         for (const iframe of $("frame").querySelectorAll("iframe")) {
           iframe.style.transform = `scale(${scale})`;
         }
-        const height = frameHeight + FOOTER_HEIGHT;
+        const height = frameHeight + FOOTER_HEIGHT + padY;
         if (height === state.height) return;
         if (state.height === null) Homey.ready({ height });
         else Homey.setHeight(height);

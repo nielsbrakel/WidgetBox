@@ -136,6 +136,30 @@ test.describe("Clocks App", () => {
       await expect(clocks.binaryGroups).toHaveCount(3);
     });
 
+    test("should keep every dot inside a narrow, padded card", async ({ page }) => {
+      await page.locator(".device-frame").evaluate((frame) => {
+        frame.style.width = "170px";
+      });
+      await expect
+        .poll(() =>
+          clocks.binaryClock.evaluate((clock) => {
+            const app = clock.parentElement as HTMLElement;
+            const box = clock.getBoundingClientRect();
+            const style = getComputedStyle(app);
+            const padX = Number.parseFloat(style.paddingLeft);
+            const padY = Number.parseFloat(style.paddingBottom);
+            return (
+              padX > 0 &&
+              padY > 0 &&
+              box.left >= padX - 1 &&
+              box.right <= document.documentElement.clientWidth - padX + 1 &&
+              box.bottom <= window.innerHeight - padY + 1
+            );
+          }),
+        )
+        .toBe(true);
+    });
+
     test("should toggle seconds", async () => {
       await clocks.setSettingCheckbox("Show Seconds", false);
       await expect(clocks.binaryGroups).toHaveCount(2);
