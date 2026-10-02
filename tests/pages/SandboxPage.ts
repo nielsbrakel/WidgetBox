@@ -1,4 +1,4 @@
-import { expect, type FrameLocator, Locator, type Page } from "@playwright/test";
+import { expect, type FrameLocator, type Page } from "@playwright/test";
 
 export class SandboxPage {
   readonly page: Page;
@@ -15,9 +15,6 @@ export class SandboxPage {
 
   async selectWidget(name: string) {
     await expect(this.page.locator(".sidebar")).toBeVisible();
-    const widgetItem = this.page.locator(".widget-item").filter({ hasText: name });
-    // Click the first match that exactly matches the text if possible, or just the first match
-    // But better: use specific text locator
     await this.page.locator(".widget-item").getByText(name, { exact: true }).click();
     await expect(this.page.locator(".preview-toolbar")).toContainText(name);
   }

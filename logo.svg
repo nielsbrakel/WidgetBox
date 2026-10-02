@@ -1,4 +1,5 @@
-<svg width="900" height="300" viewBox="0 0 900 300" xmlns="http://www.w3.org/2000/svg">
+<svg role="img" width="900" height="300" viewBox="0 0 900 300" xmlns="http://www.w3.org/2000/svg">
+  <title>WidgetBox</title>
   <defs>
     <!-- gradient for the box -->
     <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">

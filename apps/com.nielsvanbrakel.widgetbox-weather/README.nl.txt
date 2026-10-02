@@ -1,0 +1,3 @@
+WidgetBox is een kleine familie widgets die zich thuis voelen op je Homey-dashboard. Met deze app weet je meteen of je een paraplu nodig hebt: zie hoeveel regen er de komende twee uur valt, volg de buien op de radar en bekijk de verwachting voor de komende dagen of de laatste metingen van een weerstation in de buurt.
+
+De regen- en verwachtingswidgets gebruiken gegevens van Buienradar en werken voor locaties in Nederland en België, op basis van de locatie van je Homey tenzij je zelf een andere plek kiest. Voor een breder beeld is er ook een interactieve weerkaart van Windy met wind, temperatuur en bewolking voor de hele wereld. De weerkaart werkt nog niet in de Homey-app op iPhone en iPad.

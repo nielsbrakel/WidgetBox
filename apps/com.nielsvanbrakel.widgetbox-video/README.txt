@@ -1,9 +1,3 @@
-WidgetBox adds clean, native-looking widgets to your Homey dashboard. Designed to fit perfectly with Homey's style, these widgets help you customize your dashboard just the way you like it.
+WidgetBox is a small family of widgets made to feel at home on your Homey dashboard. This one lets you play YouTube videos, livestreams and playlists right next to your lights and sensors, whether that is a crackling fireplace on a winter evening, a live view of your favorite beach or the news over breakfast.
 
-WidgetBox YouTube lets you watch YouTube videos, livestreams, and playlists directly on your Homey dashboard.
-
-Enter a video ID or playlist ID to start watching. Enable autoplay to have the video start automatically when the dashboard loads, or keep controls visible so you can play and pause at your convenience.
-
-Loop your favorite background video or ambient livestream for a continuous experience. Mute the audio if you just want the visuals. Set a start time in seconds to jump straight to the part that matters.
-
-Choose from multiple aspect ratios including standard widescreen, square, portrait, ultrawide, and panoramic to make the video fit well into your dashboard layout.
+Pick a video or playlist in the widget settings and choose how it should play, for example starting on its own, muted or on repeat. The player takes on the shape that suits your dashboard, so it sits neatly between your other widgets.

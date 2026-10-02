@@ -11,23 +11,49 @@
     "nl": "WidgetBox Video"
   },
   "description": {
-    "en": "Watch videos, livestreams, and playlists right on your dashboard",
-    "nl": "Bekijk video's, livestreams en afspeellijsten direct op je dashboard"
+    "en": "Your favorite videos and livestreams, right on your dashboard",
+    "nl": "Je favoriete video's en livestreams, gewoon op je dashboard"
   },
   "category": [
-    "tools"
+    "video"
   ],
+  "tags": {
+    "en": [
+      "video",
+      "livestream",
+      "playlist",
+      "player",
+      "youtube",
+      "embed",
+      "webcam",
+      "music",
+      "dashboard",
+      "widget"
+    ],
+    "nl": [
+      "video",
+      "livestream",
+      "afspeellijst",
+      "speler",
+      "youtube",
+      "insluiten",
+      "webcam",
+      "muziek",
+      "dashboard",
+      "widget"
+    ]
+  },
+  "brandColor": "#D84315",
   "permissions": [],
   "images": {
-    "small": "/assets/images/small.png",
-    "large": "/assets/images/large.png",
-    "xlarge": "/assets/images/xlarge.png"
+    "small": "/assets/images/small.jpg",
+    "large": "/assets/images/large.jpg",
+    "xlarge": "/assets/images/xlarge.jpg"
   },
   "author": {
     "name": "Niels van Brakel",
     "email": "info@nielsvanbrakel.com"
   },
-  "brandColor": "#FF0000",
   "bugs": {
     "url": "https://github.com/nielsbrakel/WidgetBox/issues"
   },

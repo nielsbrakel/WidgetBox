@@ -1,3 +1,3 @@
-WidgetBox adds clean, native-looking widgets to your Homey dashboard. Designed to fit perfectly with Homey's style, these widgets help you customize your dashboard just the way you like it.
+WidgetBox is a small family of widgets made to feel at home on your Homey dashboard. This one adds a cozy game to it: a small aquarium where you raise fish, feed them and keep their tank clean, all with simple taps.
 
-This app brings cozy idle games to your Homey dashboard. Start with a small aquarium where you can raise fish, feed them, keep their tank clean, and watch them swim around. Each fish has its own personality and swimming style. Check in once or twice a day to keep your fish happy — no stress, no grinding, just a peaceful digital aquarium companion living on your dashboard.
+There is no rush and no pressure. Check in for a moment once or twice a day, look after your fish, and watch your aquarium slowly grow into something that is truly your own.

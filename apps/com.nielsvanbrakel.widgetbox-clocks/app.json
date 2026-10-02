@@ -12,23 +12,53 @@
     "nl": "WidgetBox Klokken & Timers"
   },
   "description": {
-    "en": "Multiple ways to tell time on your dashboard",
-    "nl": "Meerdere manieren om de tijd op je dashboard te tonen"
+    "en": "Keep an eye on the time, your way",
+    "nl": "Houd de tijd in de gaten, op jouw manier"
   },
   "category": [
     "tools"
   ],
+  "tags": {
+    "en": [
+      "clock",
+      "time",
+      "analog clock",
+      "digital clock",
+      "flip clock",
+      "word clock",
+      "binary clock",
+      "stopwatch",
+      "timer",
+      "countdown",
+      "dashboard",
+      "widget"
+    ],
+    "nl": [
+      "klok",
+      "tijd",
+      "analoge klok",
+      "digitale klok",
+      "flipklok",
+      "woordklok",
+      "binaire klok",
+      "stopwatch",
+      "timer",
+      "aftellen",
+      "dashboard",
+      "widget"
+    ]
+  },
+  "brandColor": "#5E35B1",
   "permissions": [],
   "images": {
-    "small": "/assets/images/small.png",
-    "large": "/assets/images/large.png",
-    "xlarge": "/assets/images/xlarge.png"
+    "small": "/assets/images/small.jpg",
+    "large": "/assets/images/large.jpg",
+    "xlarge": "/assets/images/xlarge.jpg"
   },
   "author": {
     "name": "Niels van Brakel",
     "email": "info@nielsvanbrakel.com"
   },
-  "brandColor": "#4169E1",
   "bugs": {
     "url": "https://github.com/nielsbrakel/WidgetBox/issues"
   },
@@ -40,24 +70,140 @@
     "analog-clock": {
       "name": {
         "en": "Analog Clock",
-        "nl": "Analoge Klok"
+        "nl": "Analoge klok"
       },
       "description": {
         "en": "Classic analog clock face.",
         "nl": "Klassieke analoge klok."
       },
-      "height": 128,
       "transparent": false,
       "settings": [
+        {
+          "id": "style",
+          "type": "dropdown",
+          "label": {
+            "en": "Style",
+            "nl": "Stijl"
+          },
+          "value": "modern",
+          "values": [
+            {
+              "id": "modern",
+              "label": {
+                "en": "Modern (Markers)",
+                "nl": "Modern (streepjes)"
+              }
+            },
+            {
+              "id": "minimal",
+              "label": {
+                "en": "Minimal",
+                "nl": "Minimalistisch"
+              }
+            },
+            {
+              "id": "classic",
+              "label": {
+                "en": "Classic (Numbers)",
+                "nl": "Klassiek (cijfers)"
+              }
+            },
+            {
+              "id": "classic-no-numbers",
+              "label": {
+                "en": "Classic (Ticks)",
+                "nl": "Klassiek (minuutstreepjes)"
+              }
+            },
+            {
+              "id": "swiss",
+              "label": {
+                "en": "Swiss Railway",
+                "nl": "Zwitserse stationsklok"
+              }
+            }
+          ]
+        },
+        {
+          "id": "showSeconds",
+          "type": "checkbox",
+          "label": {
+            "en": "Show Second Hand",
+            "nl": "Secondewijzer tonen"
+          },
+          "value": true
+        },
+        {
+          "id": "showDate",
+          "type": "checkbox",
+          "label": {
+            "en": "Show Date",
+            "nl": "Datum tonen"
+          },
+          "value": false
+        },
+        {
+          "id": "size",
+          "type": "dropdown",
+          "label": {
+            "en": "Size",
+            "nl": "Grootte"
+          },
+          "value": "medium",
+          "values": [
+            {
+              "id": "xsmall",
+              "label": {
+                "en": "Extra Small",
+                "nl": "Extra klein"
+              }
+            },
+            {
+              "id": "small",
+              "label": {
+                "en": "Small",
+                "nl": "Klein"
+              }
+            },
+            {
+              "id": "medium",
+              "label": {
+                "en": "Medium",
+                "nl": "Gemiddeld"
+              }
+            },
+            {
+              "id": "large",
+              "label": {
+                "en": "Large",
+                "nl": "Groot"
+              }
+            },
+            {
+              "id": "xlarge",
+              "label": {
+                "en": "Extra Large",
+                "nl": "Extra groot"
+              }
+            }
+          ]
+        },
         {
           "id": "color",
           "type": "dropdown",
           "label": {
-            "en": "Second Hand Color",
-            "nl": "Kleur Secondewijzer"
+            "en": "Color",
+            "nl": "Kleur"
           },
           "value": "red",
           "values": [
+            {
+              "id": "default",
+              "label": {
+                "en": "Default",
+                "nl": "Standaard"
+              }
+            },
             {
               "id": "blue",
               "label": {
@@ -87,27 +233,24 @@
               }
             },
             {
-              "id": "black",
+              "id": "purple",
               "label": {
-                "en": "Black",
-                "nl": "Zwart"
-              }
-            },
-            {
-              "id": "white",
-              "label": {
-                "en": "White",
-                "nl": "Wit"
+                "en": "Purple",
+                "nl": "Paars"
               }
             }
-          ]
+          ],
+          "hint": {
+            "en": "Color of the second hand.",
+            "nl": "Kleur van de secondewijzer."
+          }
         },
         {
           "id": "horizontalAlignment",
           "type": "dropdown",
           "label": {
             "en": "Horizontal Alignment",
-            "nl": "Horizontale Uitlijning"
+            "nl": "Horizontale uitlijning"
           },
           "value": "center",
           "values": [
@@ -133,24 +276,88 @@
               }
             }
           ]
-        },
+        }
+      ],
+      "id": "analog-clock"
+    },
+    "binary-clock": {
+      "name": {
+        "en": "Binary Clock",
+        "nl": "Binaire klok"
+      },
+      "description": {
+        "en": "Time displayed in binary format.",
+        "nl": "Tijd weergegeven in binaire notatie."
+      },
+      "transparent": false,
+      "settings": [
         {
-          "id": "showDate",
-          "type": "checkbox",
+          "id": "clockFormat",
+          "type": "dropdown",
           "label": {
-            "en": "Show Date",
-            "nl": "Toon Datum"
+            "en": "Time Format",
+            "nl": "Tijdnotatie"
           },
-          "value": true
+          "value": "24",
+          "values": [
+            {
+              "id": "24",
+              "label": {
+                "en": "24-hour",
+                "nl": "24-uurs"
+              }
+            },
+            {
+              "id": "12",
+              "label": {
+                "en": "12-hour (AM/PM)",
+                "nl": "12-uurs (AM/PM)"
+              }
+            }
+          ]
         },
         {
           "id": "showSeconds",
           "type": "checkbox",
           "label": {
-            "en": "Show Second Hand",
-            "nl": "Toon Secondewijzer"
+            "en": "Show Seconds",
+            "nl": "Seconden tonen"
           },
           "value": true
+        },
+        {
+          "id": "showLabels",
+          "type": "checkbox",
+          "label": {
+            "en": "Show Labels",
+            "nl": "Labels tonen"
+          },
+          "value": true
+        },
+        {
+          "id": "orientation",
+          "type": "dropdown",
+          "label": {
+            "en": "Orientation",
+            "nl": "Oriëntatie"
+          },
+          "value": "horizontal",
+          "values": [
+            {
+              "id": "horizontal",
+              "label": {
+                "en": "Horizontal (rows)",
+                "nl": "Horizontaal (rijen)"
+              }
+            },
+            {
+              "id": "vertical",
+              "label": {
+                "en": "Vertical (columns)",
+                "nl": "Verticaal (kolommen)"
+              }
+            }
+          ]
         },
         {
           "id": "size",
@@ -165,7 +372,7 @@
               "id": "xsmall",
               "label": {
                 "en": "Extra Small",
-                "nl": "Extra Klein"
+                "nl": "Extra klein"
               }
             },
             {
@@ -193,93 +400,7 @@
               "id": "xlarge",
               "label": {
                 "en": "Extra Large",
-                "nl": "Extra Groot"
-              }
-            }
-          ]
-        },
-        {
-          "id": "style",
-          "type": "dropdown",
-          "label": {
-            "en": "Style",
-            "nl": "Stijl"
-          },
-          "value": "modern",
-          "values": [
-            {
-              "id": "minimal",
-              "label": {
-                "en": "Minimal (No Numbers)",
-                "nl": "Minimalistisch (Geen Cijfers)"
-              }
-            },
-            {
-              "id": "modern",
-              "label": {
-                "en": "Modern (Markers)",
-                "nl": "Modern (Markeringen)"
-              }
-            },
-            {
-              "id": "classic",
-              "label": {
-                "en": "Classic (Numbers)",
-                "nl": "Klassiek (Cijfers)"
-              }
-            },
-            {
-              "id": "classic-no-numbers",
-              "label": {
-                "en": "Classic (No Numbers)",
-                "nl": "Klassiek (Geen Cijfers)"
-              }
-            },
-            {
-              "id": "swiss",
-              "label": {
-                "en": "Swiss Railway",
-                "nl": "Zwitserse Spoorwegen"
-              }
-            }
-          ]
-        }
-      ],
-      "id": "analog-clock"
-    },
-    "binary-clock": {
-      "name": {
-        "en": "Binary Clock",
-        "nl": "Binaire Klok"
-      },
-      "description": {
-        "en": "Time displayed in binary format",
-        "nl": "Tijd weergegeven in binair formaat"
-      },
-      "height": 128,
-      "transparent": false,
-      "settings": [
-        {
-          "id": "clockFormat",
-          "type": "dropdown",
-          "label": {
-            "en": "Time Format",
-            "nl": "Tijdformaat"
-          },
-          "value": "24",
-          "values": [
-            {
-              "id": "24",
-              "label": {
-                "en": "24-hour",
-                "nl": "24-uur"
-              }
-            },
-            {
-              "id": "12",
-              "label": {
-                "en": "12-hour",
-                "nl": "12-uur"
+                "nl": "Extra groot"
               }
             }
           ]
@@ -342,7 +463,7 @@
           "type": "dropdown",
           "label": {
             "en": "Horizontal Alignment",
-            "nl": "Horizontale Uitlijning"
+            "nl": "Horizontale uitlijning"
           },
           "value": "center",
           "values": [
@@ -368,95 +489,6 @@
               }
             }
           ]
-        },
-        {
-          "id": "orientation",
-          "type": "dropdown",
-          "label": {
-            "en": "Orientation",
-            "nl": "Oriëntatie"
-          },
-          "value": "horizontal",
-          "values": [
-            {
-              "id": "vertical",
-              "label": {
-                "en": "Vertical",
-                "nl": "Verticaal"
-              }
-            },
-            {
-              "id": "horizontal",
-              "label": {
-                "en": "Horizontal",
-                "nl": "Horizontaal"
-              }
-            }
-          ]
-        },
-        {
-          "id": "showLabels",
-          "type": "checkbox",
-          "label": {
-            "en": "Show H/M/S Labels",
-            "nl": "Toon U/M/S Labels"
-          },
-          "value": true
-        },
-        {
-          "id": "showSeconds",
-          "type": "checkbox",
-          "label": {
-            "en": "Show Seconds",
-            "nl": "Toon Seconden"
-          },
-          "value": true
-        },
-        {
-          "id": "size",
-          "type": "dropdown",
-          "label": {
-            "en": "Size",
-            "nl": "Grootte"
-          },
-          "value": "medium",
-          "values": [
-            {
-              "id": "xsmall",
-              "label": {
-                "en": "Extra Small",
-                "nl": "Extra Klein"
-              }
-            },
-            {
-              "id": "small",
-              "label": {
-                "en": "Small",
-                "nl": "Klein"
-              }
-            },
-            {
-              "id": "medium",
-              "label": {
-                "en": "Medium",
-                "nl": "Gemiddeld"
-              }
-            },
-            {
-              "id": "large",
-              "label": {
-                "en": "Large",
-                "nl": "Groot"
-              }
-            },
-            {
-              "id": "xlarge",
-              "label": {
-                "en": "Extra Large",
-                "nl": "Extra Groot"
-              }
-            }
-          ]
         }
       ],
       "id": "binary-clock"
@@ -464,13 +496,12 @@
     "digital-clock": {
       "name": {
         "en": "Digital Clock",
-        "nl": "Digitale Klok"
+        "nl": "Digitale klok"
       },
       "description": {
         "en": "Clean digital clock with date and time.",
         "nl": "Strakke digitale klok met tijd en datum."
       },
-      "height": 64,
       "transparent": false,
       "settings": [
         {
@@ -478,7 +509,7 @@
           "type": "dropdown",
           "label": {
             "en": "Time Format",
-            "nl": "Tijdformaat"
+            "nl": "Tijdnotatie"
           },
           "value": "24",
           "values": [
@@ -486,24 +517,42 @@
               "id": "24",
               "label": {
                 "en": "24-hour",
-                "nl": "24-uur"
+                "nl": "24-uurs"
               }
             },
             {
               "id": "12",
               "label": {
                 "en": "12-hour (AM/PM)",
-                "nl": "12-uur (AM/PM)"
+                "nl": "12-uurs (AM/PM)"
               }
             }
           ]
+        },
+        {
+          "id": "showSeconds",
+          "type": "checkbox",
+          "label": {
+            "en": "Show Seconds",
+            "nl": "Seconden tonen"
+          },
+          "value": false
+        },
+        {
+          "id": "showDate",
+          "type": "checkbox",
+          "label": {
+            "en": "Show Date",
+            "nl": "Datum tonen"
+          },
+          "value": true
         },
         {
           "id": "dateFormat",
           "type": "dropdown",
           "label": {
             "en": "Date Format",
-            "nl": "Datumformaat"
+            "nl": "Datumnotatie"
           },
           "value": "weekday-short",
           "values": [
@@ -573,6 +622,52 @@
           ]
         },
         {
+          "id": "size",
+          "type": "dropdown",
+          "label": {
+            "en": "Size",
+            "nl": "Grootte"
+          },
+          "value": "medium",
+          "values": [
+            {
+              "id": "xsmall",
+              "label": {
+                "en": "Extra Small",
+                "nl": "Extra klein"
+              }
+            },
+            {
+              "id": "small",
+              "label": {
+                "en": "Small",
+                "nl": "Klein"
+              }
+            },
+            {
+              "id": "medium",
+              "label": {
+                "en": "Medium",
+                "nl": "Gemiddeld"
+              }
+            },
+            {
+              "id": "large",
+              "label": {
+                "en": "Large",
+                "nl": "Groot"
+              }
+            },
+            {
+              "id": "xlarge",
+              "label": {
+                "en": "Extra Large",
+                "nl": "Extra groot"
+              }
+            }
+          ]
+        },
+        {
           "id": "fontWeight",
           "type": "dropdown",
           "label": {
@@ -605,11 +700,64 @@
           ]
         },
         {
+          "id": "color",
+          "type": "dropdown",
+          "label": {
+            "en": "Color",
+            "nl": "Kleur"
+          },
+          "value": "default",
+          "values": [
+            {
+              "id": "default",
+              "label": {
+                "en": "Default",
+                "nl": "Standaard"
+              }
+            },
+            {
+              "id": "blue",
+              "label": {
+                "en": "Blue",
+                "nl": "Blauw"
+              }
+            },
+            {
+              "id": "green",
+              "label": {
+                "en": "Green",
+                "nl": "Groen"
+              }
+            },
+            {
+              "id": "orange",
+              "label": {
+                "en": "Orange",
+                "nl": "Oranje"
+              }
+            },
+            {
+              "id": "red",
+              "label": {
+                "en": "Red",
+                "nl": "Rood"
+              }
+            },
+            {
+              "id": "purple",
+              "label": {
+                "en": "Purple",
+                "nl": "Paars"
+              }
+            }
+          ]
+        },
+        {
           "id": "horizontalAlignment",
           "type": "dropdown",
           "label": {
             "en": "Horizontal Alignment",
-            "nl": "Horizontale Uitlijning"
+            "nl": "Horizontale uitlijning"
           },
           "value": "center",
           "values": [
@@ -635,24 +783,63 @@
               }
             }
           ]
-        },
+        }
+      ],
+      "id": "digital-clock"
+    },
+    "flip-clock": {
+      "name": {
+        "en": "Flip Clock",
+        "nl": "Flipklok"
+      },
+      "description": {
+        "en": "Retro flip clock with animated cards.",
+        "nl": "Retro flipklok met bewegende kaartjes."
+      },
+      "transparent": false,
+      "settings": [
         {
-          "id": "showDate",
-          "type": "checkbox",
+          "id": "clockFormat",
+          "type": "dropdown",
           "label": {
-            "en": "Show Date",
-            "nl": "Toon Datum"
+            "en": "Time Format",
+            "nl": "Tijdnotatie"
           },
-          "value": true
+          "value": "24",
+          "values": [
+            {
+              "id": "24",
+              "label": {
+                "en": "24-hour",
+                "nl": "24-uurs"
+              }
+            },
+            {
+              "id": "12",
+              "label": {
+                "en": "12-hour (AM/PM)",
+                "nl": "12-uurs (AM/PM)"
+              }
+            }
+          ]
         },
         {
           "id": "showSeconds",
           "type": "checkbox",
           "label": {
             "en": "Show Seconds",
-            "nl": "Toon Seconden"
+            "nl": "Seconden tonen"
           },
           "value": false
+        },
+        {
+          "id": "showColons",
+          "type": "checkbox",
+          "label": {
+            "en": "Show Colons",
+            "nl": "Dubbele punten tonen"
+          },
+          "value": true
         },
         {
           "id": "size",
@@ -667,7 +854,7 @@
               "id": "xsmall",
               "label": {
                 "en": "Extra Small",
-                "nl": "Extra Klein"
+                "nl": "Extra klein"
               }
             },
             {
@@ -695,47 +882,7 @@
               "id": "xlarge",
               "label": {
                 "en": "Extra Large",
-                "nl": "Extra Groot"
-              }
-            }
-          ]
-        }
-      ],
-      "id": "digital-clock"
-    },
-    "flip-clock": {
-      "name": {
-        "en": "Flip Clock",
-        "nl": "Flipklok"
-      },
-      "description": {
-        "en": "Retro style flip clock with animation",
-        "nl": "Retro stijl flip klok met animatie"
-      },
-      "height": 128,
-      "transparent": false,
-      "settings": [
-        {
-          "id": "clockFormat",
-          "type": "dropdown",
-          "label": {
-            "en": "Time Format",
-            "nl": "Tijdformaat"
-          },
-          "value": "24",
-          "values": [
-            {
-              "id": "24",
-              "label": {
-                "en": "24-hour",
-                "nl": "24-uur"
-              }
-            },
-            {
-              "id": "12",
-              "label": {
-                "en": "12-hour (AM/PM)",
-                "nl": "12-uur (AM/PM)"
+                "nl": "Extra groot"
               }
             }
           ]
@@ -752,8 +899,8 @@
             {
               "id": "default",
               "label": {
-                "en": "Default (Auto)",
-                "nl": "Standaard (Auto)"
+                "en": "Default",
+                "nl": "Standaard"
               }
             },
             {
@@ -783,6 +930,13 @@
                 "en": "Red",
                 "nl": "Rood"
               }
+            },
+            {
+              "id": "purple",
+              "label": {
+                "en": "Purple",
+                "nl": "Paars"
+              }
             }
           ]
         },
@@ -791,7 +945,7 @@
           "type": "dropdown",
           "label": {
             "en": "Horizontal Alignment",
-            "nl": "Horizontale Uitlijning"
+            "nl": "Horizontale uitlijning"
           },
           "value": "center",
           "values": [
@@ -814,70 +968,6 @@
               "label": {
                 "en": "Right",
                 "nl": "Rechts"
-              }
-            }
-          ]
-        },
-        {
-          "id": "showColons",
-          "type": "checkbox",
-          "label": {
-            "en": "Show Colons",
-            "nl": "Toon Dubbele Punt"
-          },
-          "value": false
-        },
-        {
-          "id": "showSeconds",
-          "type": "checkbox",
-          "label": {
-            "en": "Show Seconds",
-            "nl": "Toon Seconden"
-          },
-          "value": true
-        },
-        {
-          "id": "size",
-          "type": "dropdown",
-          "label": {
-            "en": "Size",
-            "nl": "Grootte"
-          },
-          "value": "medium",
-          "values": [
-            {
-              "id": "xsmall",
-              "label": {
-                "en": "Extra Small",
-                "nl": "Extra Klein"
-              }
-            },
-            {
-              "id": "small",
-              "label": {
-                "en": "Small",
-                "nl": "Klein"
-              }
-            },
-            {
-              "id": "medium",
-              "label": {
-                "en": "Medium",
-                "nl": "Gemiddeld"
-              }
-            },
-            {
-              "id": "large",
-              "label": {
-                "en": "Large",
-                "nl": "Groot"
-              }
-            },
-            {
-              "id": "xlarge",
-              "label": {
-                "en": "Extra Large",
-                "nl": "Extra Groot"
               }
             }
           ]
@@ -891,70 +981,79 @@
         "nl": "Stopwatch"
       },
       "description": {
-        "en": "Stopwatch with lap timing",
-        "nl": "Stopwatch met rondetijden"
+        "en": "One or more stopwatches with lap times, synced across your devices",
+        "nl": "Een of meer stopwatches met rondetijden, gesynchroniseerd tussen je apparaten"
       },
-      "height": 200,
       "transparent": false,
       "settings": [
         {
-          "id": "allowAddingStopwatches",
+          "id": "showMilliseconds",
           "type": "checkbox",
           "label": {
-            "en": "Allow adding stopwatches",
-            "nl": "Stopwatches toevoegen toestaan"
+            "en": "Show hundredths of a second",
+            "nl": "Honderdsten van een seconde tonen"
           },
           "value": true
-        },
-        {
-          "id": "maxStopwatches",
-          "type": "number",
-          "label": {
-            "en": "Maximum stopwatches",
-            "nl": "Maximaal aantal stopwatches"
-          },
-          "hint": {
-            "en": "Maximum number of stopwatches that can run simultaneously (1-5)",
-            "nl": "Maximaal aantal stopwatches dat tegelijk kan draaien (1-5)"
-          },
-          "min": 1,
-          "max": 10,
-          "value": 3
-        },
-        {
-          "id": "initialStopwatches",
-          "type": "number",
-          "label": {
-            "en": "Number of stopwatches to start with",
-            "nl": "Aantal stopwatches bij starten"
-          },
-          "hint": {
-            "en": "How many stopwatches to show when the widget first loads",
-            "nl": "Hoeveel stopwatches worden getoond wanneer de widget wordt geladen"
-          },
-          "min": 1,
-          "max": 5,
-          "value": 1
         },
         {
           "id": "showLaps",
           "type": "checkbox",
           "label": {
             "en": "Show lap times",
-            "nl": "Toon rondetijden"
+            "nl": "Rondetijden tonen"
           },
           "value": false
         },
         {
-          "id": "showMilliseconds",
+          "id": "allowAddingStopwatches",
           "type": "checkbox",
           "label": {
-            "en": "Show milliseconds",
-            "nl": "Toon milliseconden"
+            "en": "Allow adding and removing stopwatches",
+            "nl": "Stopwatches toevoegen en verwijderen toestaan"
           },
           "value": true
+        },
+        {
+          "id": "initialStopwatches",
+          "type": "number",
+          "label": {
+            "en": "Number of stopwatches",
+            "nl": "Aantal stopwatches"
+          },
+          "hint": {
+            "en": "How many stopwatches to show when the widget is first added (1-10). If adding is not allowed, the widget always shows this many.",
+            "nl": "Hoeveel stopwatches er worden getoond wanneer de widget wordt toegevoegd (1-10). Als toevoegen niet is toegestaan, toont de widget er altijd zoveel."
+          },
+          "min": 1,
+          "max": 10,
+          "value": 1
+        },
+        {
+          "id": "maxStopwatches",
+          "type": "number",
+          "label": {
+            "en": "Maximum number of stopwatches",
+            "nl": "Maximaal aantal stopwatches"
+          },
+          "hint": {
+            "en": "The add button is hidden once this many stopwatches are shown (1-10).",
+            "nl": "De knop om toe te voegen verdwijnt zodra er zoveel stopwatches worden getoond (1-10)."
+          },
+          "min": 1,
+          "max": 10,
+          "value": 3
         }
       ],
+      "api": {
+        "getState": {
+          "method": "GET",
+          "path": "/state"
+        },
+        "setState": {
+          "method": "PUT",
+          "path": "/state"
+        }
+      },
       "id": "stopwatch"
     },
     "timer": {
@@ -963,31 +1062,21 @@
         "nl": "Timer"
       },
       "description": {
-        "en": "Countdown timer with multiple support",
-        "nl": "Afteltimer met ondersteuning voor meerdere timers"
+        "en": "One or more countdown timers with an alert when time is up, synced across your devices",
+        "nl": "Een of meer afteltimers met een melding als de tijd om is, gesynchroniseerd tussen je apparaten"
       },
-      "height": 200,
       "transparent": false,
       "settings": [
-        {
-          "id": "allowAddingTimers",
-          "type": "checkbox",
-          "label": {
-            "en": "Allow adding new timers",
-            "nl": "Nieuwe timers toevoegen toestaan"
-          },
-          "value": true
-        },
         {
           "id": "defaultHours",
           "type": "number",
           "label": {
-            "en": "Default timer hours",
-            "nl": "Standaard timer uren"
+            "en": "Default hours",
+            "nl": "Standaard uren"
           },
           "hint": {
-            "en": "Hours for new timers (0-23)",
-            "nl": "Uren voor nieuwe timers (0-23)"
+            "en": "Hours of the starting duration for new timers (0-23).",
+            "nl": "Uren van de begintijd voor nieuwe timers (0-23)."
           },
           "min": 0,
           "max": 23,
@@ -997,12 +1086,12 @@
           "id": "defaultMinutes",
           "type": "number",
           "label": {
-            "en": "Default timer minutes",
-            "nl": "Standaard timer minuten"
+            "en": "Default minutes",
+            "nl": "Standaard minuten"
           },
           "hint": {
-            "en": "Minutes for new timers (0-59)",
-            "nl": "Minuten voor nieuwe timers (0-59)"
+            "en": "Minutes of the starting duration for new timers (0-59).",
+            "nl": "Minuten van de begintijd voor nieuwe timers (0-59)."
           },
           "min": 0,
           "max": 59,
@@ -1012,27 +1101,49 @@
           "id": "defaultSeconds",
           "type": "number",
           "label": {
-            "en": "Default timer seconds",
-            "nl": "Standaard timer seconden"
+            "en": "Default seconds",
+            "nl": "Standaard seconden"
           },
           "hint": {
-            "en": "Seconds for new timers (0-59)",
-            "nl": "Seconden voor nieuwe timers (0-59)"
+            "en": "Seconds of the starting duration for new timers (0-59).",
+            "nl": "Seconden van de begintijd voor nieuwe timers (0-59)."
           },
           "min": 0,
           "max": 59,
           "value": 0
         },
         {
+          "id": "playSound",
+          "type": "checkbox",
+          "label": {
+            "en": "Beep when time is up",
+            "nl": "Piepen als de tijd om is"
+          },
+          "hint": {
+            "en": "Plays a short beep on the device that shows the widget, after you have started a timer there.",
+            "nl": "Speelt een korte pieptoon af op het apparaat dat de widget toont, nadat je daar een timer hebt gestart."
+          },
+          "value": true
+        },
+        {
+          "id": "allowAddingTimers",
+          "type": "checkbox",
+          "label": {
+            "en": "Allow adding and removing timers",
+            "nl": "Timers toevoegen en verwijderen toestaan"
+          },
+          "value": true
+        },
+        {
           "id": "initialTimers",
           "type": "number",
           "label": {
-            "en": "Number of timers to start with",
-            "nl": "Aantal timers bij starten"
+            "en": "Number of timers",
+            "nl": "Aantal timers"
           },
           "hint": {
-            "en": "How many timers to show when the widget first loads",
-            "nl": "Hoeveel timers worden getoond wanneer de widget wordt geladen"
+            "en": "How many timers to show when the widget is first added (1-10). If adding is not allowed, the widget always shows this many.",
+            "nl": "Hoeveel timers er worden getoond wanneer de widget wordt toegevoegd (1-10). Als toevoegen niet is toegestaan, toont de widget er altijd zoveel."
           },
           "min": 1,
           "max": 10,
@@ -1042,38 +1153,129 @@
           "id": "maxTimers",
           "type": "number",
           "label": {
-            "en": "Maximum count",
-            "nl": "Aantal timers"
+            "en": "Maximum number of timers",
+            "nl": "Maximaal aantal timers"
           },
           "hint": {
-            "en": "Maximum number of timers that can be active at once (1-10)",
-            "nl": "Maximaal aantal timers dat tegelijk actief kan zijn (1-10)"
+            "en": "The add button is hidden once this many timers are shown (1-10).",
+            "nl": "De knop om toe te voegen verdwijnt zodra er zoveel timers worden getoond (1-10)."
           },
           "min": 1,
           "max": 10,
           "value": 3
         }
       ],
+      "api": {
+        "getState": {
+          "method": "GET",
+          "path": "/state"
+        },
+        "setState": {
+          "method": "PUT",
+          "path": "/state"
+        }
+      },
       "id": "timer"
     },
     "word-clock-grid": {
       "name": {
         "en": "Word Clock Grid",
-        "nl": "Woordenklok (Raster)"
+        "nl": "Woordklok (raster)"
       },
       "description": {
-        "en": "Time displayed as a word matrix with highlighted letters",
-        "nl": "Tijd weergegeven als een woordenraster met gemarkeerde letters"
+        "en": "Time spelled out in a grid of letters.",
+        "nl": "Tijd uitgeschreven in een raster van letters."
       },
-      "height": 500,
       "transparent": false,
       "settings": [
+        {
+          "id": "language",
+          "type": "dropdown",
+          "label": {
+            "en": "Language",
+            "nl": "Taal"
+          },
+          "value": "auto",
+          "hint": {
+            "en": "Language of the words. Automatic follows the language of your Homey.",
+            "nl": "Taal van de woorden. Automatisch volgt de taal van je Homey."
+          },
+          "values": [
+            {
+              "id": "auto",
+              "label": {
+                "en": "Automatic",
+                "nl": "Automatisch"
+              }
+            },
+            {
+              "id": "en",
+              "label": {
+                "en": "English",
+                "nl": "Engels"
+              }
+            },
+            {
+              "id": "nl",
+              "label": {
+                "en": "Dutch",
+                "nl": "Nederlands"
+              }
+            }
+          ]
+        },
+        {
+          "id": "size",
+          "type": "dropdown",
+          "label": {
+            "en": "Size",
+            "nl": "Grootte"
+          },
+          "value": "medium",
+          "values": [
+            {
+              "id": "xsmall",
+              "label": {
+                "en": "Extra Small",
+                "nl": "Extra klein"
+              }
+            },
+            {
+              "id": "small",
+              "label": {
+                "en": "Small",
+                "nl": "Klein"
+              }
+            },
+            {
+              "id": "medium",
+              "label": {
+                "en": "Medium",
+                "nl": "Gemiddeld"
+              }
+            },
+            {
+              "id": "large",
+              "label": {
+                "en": "Large",
+                "nl": "Groot"
+              }
+            },
+            {
+              "id": "xlarge",
+              "label": {
+                "en": "Extra Large",
+                "nl": "Extra groot"
+              }
+            }
+          ]
+        },
         {
           "id": "color",
           "type": "dropdown",
           "label": {
-            "en": "Highlight Color",
-            "nl": "Markeerkleur"
+            "en": "Color",
+            "nl": "Kleur"
           },
           "value": "default",
           "values": [
@@ -1119,14 +1321,18 @@
                 "nl": "Paars"
               }
             }
-          ]
+          ],
+          "hint": {
+            "en": "Color of the words that tell the time.",
+            "nl": "Kleur van de woorden die de tijd aangeven."
+          }
         },
         {
           "id": "horizontalAlignment",
           "type": "dropdown",
           "label": {
             "en": "Horizontal Alignment",
-            "nl": "Horizontale Uitlijning"
+            "nl": "Horizontale uitlijning"
           },
           "value": "center",
           "values": [
@@ -1149,52 +1355,6 @@
               "label": {
                 "en": "Right",
                 "nl": "Rechts"
-              }
-            }
-          ]
-        },
-        {
-          "id": "size",
-          "type": "dropdown",
-          "label": {
-            "en": "Size",
-            "nl": "Grootte"
-          },
-          "value": "medium",
-          "values": [
-            {
-              "id": "xsmall",
-              "label": {
-                "en": "Extra Small",
-                "nl": "Extra Klein"
-              }
-            },
-            {
-              "id": "small",
-              "label": {
-                "en": "Small",
-                "nl": "Klein"
-              }
-            },
-            {
-              "id": "medium",
-              "label": {
-                "en": "Medium",
-                "nl": "Gemiddeld"
-              }
-            },
-            {
-              "id": "large",
-              "label": {
-                "en": "Large",
-                "nl": "Groot"
-              }
-            },
-            {
-              "id": "xlarge",
-              "label": {
-                "en": "Extra Large",
-                "nl": "Extra Groot"
               }
             }
           ]
@@ -1205,21 +1365,134 @@
     "word-clock-sentence": {
       "name": {
         "en": "Word Clock Sentence",
-        "nl": "Woordenklok (Zin)"
+        "nl": "Woordklok (zin)"
       },
       "description": {
-        "en": "Time displayed as a natural language sentence",
-        "nl": "Tijd weergegeven als een natuurlijke zin"
+        "en": "Time written as a natural sentence.",
+        "nl": "Tijd geschreven als een gewone zin."
       },
-      "height": 200,
       "transparent": false,
       "settings": [
+        {
+          "id": "language",
+          "type": "dropdown",
+          "label": {
+            "en": "Language",
+            "nl": "Taal"
+          },
+          "value": "auto",
+          "hint": {
+            "en": "Language of the words. Automatic follows the language of your Homey.",
+            "nl": "Taal van de woorden. Automatisch volgt de taal van je Homey."
+          },
+          "values": [
+            {
+              "id": "auto",
+              "label": {
+                "en": "Automatic",
+                "nl": "Automatisch"
+              }
+            },
+            {
+              "id": "en",
+              "label": {
+                "en": "English",
+                "nl": "Engels"
+              }
+            },
+            {
+              "id": "nl",
+              "label": {
+                "en": "Dutch",
+                "nl": "Nederlands"
+              }
+            }
+          ]
+        },
+        {
+          "id": "size",
+          "type": "dropdown",
+          "label": {
+            "en": "Size",
+            "nl": "Grootte"
+          },
+          "value": "medium",
+          "values": [
+            {
+              "id": "xsmall",
+              "label": {
+                "en": "Extra Small",
+                "nl": "Extra klein"
+              }
+            },
+            {
+              "id": "small",
+              "label": {
+                "en": "Small",
+                "nl": "Klein"
+              }
+            },
+            {
+              "id": "medium",
+              "label": {
+                "en": "Medium",
+                "nl": "Gemiddeld"
+              }
+            },
+            {
+              "id": "large",
+              "label": {
+                "en": "Large",
+                "nl": "Groot"
+              }
+            },
+            {
+              "id": "xlarge",
+              "label": {
+                "en": "Extra Large",
+                "nl": "Extra groot"
+              }
+            }
+          ]
+        },
+        {
+          "id": "fontWeight",
+          "type": "dropdown",
+          "label": {
+            "en": "Font Weight",
+            "nl": "Letterdikte"
+          },
+          "value": "normal",
+          "values": [
+            {
+              "id": "thin",
+              "label": {
+                "en": "Thin",
+                "nl": "Dun"
+              }
+            },
+            {
+              "id": "normal",
+              "label": {
+                "en": "Normal",
+                "nl": "Normaal"
+              }
+            },
+            {
+              "id": "bold",
+              "label": {
+                "en": "Bold",
+                "nl": "Vetgedrukt"
+              }
+            }
+          ]
+        },
         {
           "id": "color",
           "type": "dropdown",
           "label": {
-            "en": "Highlight Color",
-            "nl": "Markeerkleur"
+            "en": "Color",
+            "nl": "Kleur"
           },
           "value": "default",
           "values": [
@@ -1265,14 +1538,18 @@
                 "nl": "Paars"
               }
             }
-          ]
+          ],
+          "hint": {
+            "en": "Color of the words that tell the time.",
+            "nl": "Kleur van de woorden die de tijd aangeven."
+          }
         },
         {
           "id": "horizontalAlignment",
           "type": "dropdown",
           "label": {
             "en": "Horizontal Alignment",
-            "nl": "Horizontale Uitlijning"
+            "nl": "Horizontale uitlijning"
           },
           "value": "center",
           "values": [
@@ -1295,52 +1572,6 @@
               "label": {
                 "en": "Right",
                 "nl": "Rechts"
-              }
-            }
-          ]
-        },
-        {
-          "id": "size",
-          "type": "dropdown",
-          "label": {
-            "en": "Size",
-            "nl": "Grootte"
-          },
-          "value": "medium",
-          "values": [
-            {
-              "id": "xsmall",
-              "label": {
-                "en": "Extra Small",
-                "nl": "Extra Klein"
-              }
-            },
-            {
-              "id": "small",
-              "label": {
-                "en": "Small",
-                "nl": "Klein"
-              }
-            },
-            {
-              "id": "medium",
-              "label": {
-                "en": "Medium",
-                "nl": "Gemiddeld"
-              }
-            },
-            {
-              "id": "large",
-              "label": {
-                "en": "Large",
-                "nl": "Groot"
-              }
-            },
-            {
-              "id": "xlarge",
-              "label": {
-                "en": "Extra Large",
-                "nl": "Extra Groot"
               }
             }
           ]

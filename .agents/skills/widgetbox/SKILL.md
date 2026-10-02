@@ -17,52 +17,52 @@ Standards and patterns for all WidgetBox Homey dashboard widgets. This skill ext
 
 ## Apps Overview
 
-| App | ID | Widgets |
-|-----|----|---------|
-| Clocks | `com.nielsvanbrakel.widgetbox-clocks` | analog-clock, digital-clock, binary-clock, flip-clock, date, word-clock-grid, word-clock-sentence |
-| Buienradar | `com.nielsvanbrakel.widgetbox-buienradar` | buienradar, buienradar-map, buientabel |
-| Windy | `com.nielsvanbrakel.widgetbox-windy` | windy |
-| Utilities | `com.nielsvanbrakel.widgetbox-utilities` | stopwatch, timer |
-| Layout | `com.nielsvanbrakel.widgetbox-layout` | spacer |
-| YouTube | `com.nielsvanbrakel.widgetbox-youtube` | youtube |
+Widgets are grouped into five apps by theme. Grouping keeps the number of installed apps (and their storage on a Homey) low, while each app stays focused on one concept (App Store guideline 2.1.3: no catch-all apps). Do not merge unrelated themes into one app, and keep third-party embeds out of apps that do not need them.
+
+| App (en / nl) | ID | Widgets | Category | Brand color |
+|---------------|----|---------|----------|-------------|
+| WidgetBox Clocks & Timers / Klokken & Timers | `com.nielsvanbrakel.widgetbox-clocks` | analog-clock, binary-clock, digital-clock, flip-clock, word-clock-grid, word-clock-sentence, stopwatch, timer | tools | `#5E35B1` |
+| WidgetBox Weather / Weer | `com.nielsvanbrakel.widgetbox-weather` | rain-graph, rain-radar, radar-5day, forecast, station (Buienradar data, NL/BE), weather-map (Windy embed) | internet | `#0277BD` |
+| WidgetBox Layout / Lay-out | `com.nielsvanbrakel.widgetbox-layout` | header, separator, spacer | tools | `#546E7A` |
+| WidgetBox Video | `com.nielsvanbrakel.widgetbox-video` | youtube (video player) | video | `#D84315` |
+| WidgetBox Games / Spellen | `com.nielsvanbrakel.widgetbox-games` | aquarium | tools | `#00796B` |
+
+Naming rules: never put a third-party brand (YouTube, Buienradar, Windy) in an app or widget name; "for YouTube videos" or "data from Buienradar" in text is fine. App names stay at four words or fewer and never contain "Homey" or "Athom".
 
 ---
 
 ## Publishing & Versioning
 
+### Versioning
+
+Every app has its **own, independent version**. Bump only the app you are releasing; the version lives in `package.json`, `app.json` and `.homeycompose/app.json` of that app and must match across those three files. Use semver: patch for fixes, minor for new widgets or settings, major for breaking setting changes.
+
 ### Workflow
 
-We use **Turbo** to publish all apps interactively.
+Publish one app at a time from its folder:
 
-1. **Ensure Versions Match**: All apps should share the same version number (e.g. `0.1.0`) across `package.json`, `app.json`, and `.homeycompose/app.json`.
-2. **Run Publish Command**:
-   ```bash
-   turbo run homey:publish --concurrency 1
-   ```
-   - **`--concurrency 1`** is required to run the interactive prompts sequentially.
-   - **`interactive: true`** is set in `turbo.json` to enable TTY.
+```bash
+cd apps/com.nielsvanbrakel.widgetbox-<app>
+homey app validate --level publish
+homey app publish
+```
 
-3. **Handle Prompts**:
-   - The CLI will ask: `? Do you want to update your app's version number?`
-   - Answer **No** if you have already set the version in the files (recommended).
-   - Answer **Yes** to let the CLI bump the version (verifying it updates all files correctly).
+- The CLI asks `Do you want to update your app's version number?`. Answer **Yes** and pick patch/minor/major to let it bump all three files, or **No** if you already set the version yourself.
+- It then asks "What's new?" and writes the answer to `.homeychangelog.json`. Give both `en` and `nl` text (edit the file afterwards if the prompt only stored English).
+- `turbo run homey:publish --concurrency 1` still exists to step through every app interactively, but releasing per app is the normal flow.
+- After publishing, submit the build for certification in the Homey Developer Tools and explain in the submission note why the app is separate from similar apps (for Weather: what it adds over the official Buienradar app).
 
 ### Asset Standards
 
-To pass validation (`homey app validate --level publish`), every app MUST have:
+`homey app validate --level publish` requires these per app:
 
-- `assets/images/small.png` (250x175)
-- `assets/images/large.png` (500x350)
-- `assets/icon.svg` (Source for icons)
+- `assets/icon.svg`: one icon per app, line style (strokes, `fill="none"`, no background), 960x960 viewBox using the full canvas, `stroke-width="40"` with round caps and joins so all WidgetBox icons read as one family.
+- `assets/images/small.jpg` (250x175), `large.jpg` (500x350), `xlarge.jpg` (1000x700): the app's real widgets on a realistic dashboard, no logos, no generic AI art. Export as JPG (quality about 82) to keep the app small on the Homey.
+- `README.txt` plus `README.nl.txt` (the description is translated, so the README must be too), and `name`, `description` and `tags` in `en` and `nl`.
+- `brandColor`: distinct per app, at least 3:1 contrast against white, not very bright.
+- Widget previews (`preview-light.png`, `preview-dark.png`): 1024x1024, transparent, simple shapes and no text, made with the Athom Figma widget preview template.
 
-**Generation**: Use the `icon.svg` to generate the PNGs if missing.
-```bash
-sips -s format png icon.svg --out small.png
-sips -Z 96 small.png # Or standard app icon size
-# Resize mainly for store assets:
-sips -z 175 250 small.png
-sips -z 350 500 large.png
-```
+The store images are rendered from the sandbox: capture each widget with Playwright, place the captures as cards on a soft dashboard background in a small HTML page, screenshot it at the three sizes and convert to JPG.
 
 ---
 
@@ -79,11 +79,11 @@ Most widgets support a `size` dropdown with these standard values:
   "label": { "en": "Size", "nl": "Grootte" },
   "value": "medium",
   "values": [
-    { "id": "xsmall", "label": { "en": "Extra Small", "nl": "Extra Klein" } },
+    { "id": "xsmall", "label": { "en": "Extra Small", "nl": "Extra klein" } },
     { "id": "small", "label": { "en": "Small", "nl": "Klein" } },
     { "id": "medium", "label": { "en": "Medium", "nl": "Gemiddeld" } },
     { "id": "large", "label": { "en": "Large", "nl": "Groot" } },
-    { "id": "xlarge", "label": { "en": "Extra Large", "nl": "Extra Groot" } }
+    { "id": "xlarge", "label": { "en": "Extra Large", "nl": "Extra groot" } }
   ]
 }
 ```
@@ -111,7 +111,7 @@ Color dropdowns use Homey's built-in color palette:
 }
 ```
 
-Map `"default"` to `var(--homey-text-color)` and named colors to `var(--homey-color-{name}-500)`.
+Map `"default"` to `var(--homey-text-color)` and named colors to `var(--homey-color-{name}-500, <hex fallback>)`. See "Color Mapping Pattern" below for the exact map.
 
 ### Horizontal Alignment
 
@@ -119,7 +119,7 @@ Map `"default"` to `var(--homey-text-color)` and named colors to `var(--homey-co
 {
   "id": "horizontalAlignment",
   "type": "dropdown",
-  "label": { "en": "Horizontal Alignment", "nl": "Horizontale Uitlijning" },
+  "label": { "en": "Horizontal Alignment", "nl": "Horizontale uitlijning" },
   "value": "center",
   "values": [
     { "id": "left", "label": { "en": "Left", "nl": "Links" } },
@@ -318,16 +318,22 @@ Always use `var(--homey-*)` variables for colors, fonts, and spacing.
 
 ## Color Mapping Pattern
 
-Map color setting IDs to CSS variables:
+WidgetBox has one color system: Homey palette variables with a hex fallback. The same map is in `.agents/skills/widget-settings-conventions/SKILL.md`; keep the two in sync.
 
 ```javascript
-function getColor(colorId) {
-  if (colorId === 'default') return 'var(--homey-text-color)';
-  if (colorId === 'white') return '#fff';
-  if (colorId === 'black') return '#000';
-  return `var(--homey-color-${colorId}-500)`;
-}
+const COLOR_MAP = {
+  default: "", // inherit var(--homey-text-color) from the stylesheet
+  blue: "var(--homey-color-blue-500, #0099ff)",
+  green: "var(--homey-color-green-500, #26c281)",
+  orange: "var(--homey-color-orange-500, #ff9500)",
+  red: "var(--homey-color-red-500, #ff3b30)",
+  purple: "var(--homey-color-purple-500, #a855f7)",
+};
 ```
+
+- Homey has no purple palette variable, so purple always uses its fallback.
+- For lines and borders, `default` is a mono step such as `var(--homey-color-mono-300, #b3b3b3)`, which flips with light and dark mode.
+- Never hardcode Tailwind or Material hex values, and never use `prefers-color-scheme`; Homey sets the `homey-dark-mode` class and updates the variables.
 
 ---
 
@@ -387,17 +393,25 @@ const __ = (key) => Homey.__(`widgets.my-widget.${key}`) ?? key;
 - **Plain text only** — no markdown, no URLs, no changelogs
 - **No app name** in the text — it already appears above the README on the store page
 - **Describe possibilities** — write a friendly story, not a technical spec
-- Every `README.txt` starts with the **shared WidgetBox intro paragraph** (see below)
+- Every `README.txt` starts with the **shared WidgetBox intro sentence** (see below)
+- Every `README.txt` has a natural Dutch `README.nl.txt` next to it
+- One or two paragraphs, no feature or settings lists
 
-### Shared intro paragraph
+### Shared intro sentence
 
-Every app's `README.txt` must start with this exact paragraph:
+Every app's README opens with this short sentence, followed directly (same paragraph) by what the app is about:
 
 ```
-WidgetBox adds clean, native-looking widgets to your Homey dashboard. Designed to fit perfectly with Homey's style, these widgets help you customize your dashboard just the way you like it.
+WidgetBox is a small family of widgets made to feel at home on your Homey dashboard.
 ```
 
-After the intro, add a blank line and then the app-specific description.
+Dutch (`README.nl.txt`):
+
+```
+WidgetBox is een kleine familie widgets die zich thuis voelen op je Homey-dashboard.
+```
+
+Keep the whole README to two short paragraphs.
 
 ### Description one-liners
 
@@ -412,7 +426,7 @@ The `description` field in `.homeycompose/app.json` is a catchy tagline shown be
 
 - **Tone**: Friendly, functional, and humble. Avoid salesy or hyperbolic words like "premium", "stunning", "ultimate", "perfectly".
 - **Generic Counts**: Use terms like "multiple", "various", or "collection of" instead of specific numbers (e.g., "7 widgets", "6 styles"). This ensures descriptions remain accurate as features are added or removed.
-- **Shared Intro**: Always use the standard intro paragraph defined above.
+- **Shared Intro**: Always use the standard intro sentence defined above.
 
 ---
 
@@ -499,7 +513,7 @@ tests/
 │   ├── clocks.spec.ts
 │   ├── utilities.spec.ts
 │   ├── windy.spec.ts
-│   ├── youtube.spec.ts
+│   ├── video.spec.ts
 │   ├── buienradar.spec.ts
 │   ├── layout.spec.ts
 │   └── sandbox-translations.spec.ts
@@ -508,7 +522,7 @@ tests/
 │   ├── ClocksPage.ts
 │   ├── UtilitiesPage.ts
 │   ├── WindyPage.ts
-│   ├── YouTubePage.ts
+│   ├── VideoPage.ts
 │   ├── BuienradarPage.ts
 │   └── LayoutPage.ts
 ```

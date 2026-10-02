@@ -12,23 +12,49 @@
     "nl": "WidgetBox Video"
   },
   "description": {
-    "en": "Watch videos, livestreams, and playlists right on your dashboard",
-    "nl": "Bekijk video's, livestreams en afspeellijsten direct op je dashboard"
+    "en": "Your favorite videos and livestreams, right on your dashboard",
+    "nl": "Je favoriete video's en livestreams, gewoon op je dashboard"
   },
   "category": [
-    "tools"
+    "video"
   ],
+  "tags": {
+    "en": [
+      "video",
+      "livestream",
+      "playlist",
+      "player",
+      "youtube",
+      "embed",
+      "webcam",
+      "music",
+      "dashboard",
+      "widget"
+    ],
+    "nl": [
+      "video",
+      "livestream",
+      "afspeellijst",
+      "speler",
+      "youtube",
+      "insluiten",
+      "webcam",
+      "muziek",
+      "dashboard",
+      "widget"
+    ]
+  },
+  "brandColor": "#D84315",
   "permissions": [],
   "images": {
-    "small": "/assets/images/small.png",
-    "large": "/assets/images/large.png",
-    "xlarge": "/assets/images/xlarge.png"
+    "small": "/assets/images/small.jpg",
+    "large": "/assets/images/large.jpg",
+    "xlarge": "/assets/images/xlarge.jpg"
   },
   "author": {
     "name": "Niels van Brakel",
     "email": "info@nielsvanbrakel.com"
   },
-  "brandColor": "#FF0000",
   "bugs": {
     "url": "https://github.com/nielsbrakel/WidgetBox/issues"
   },
@@ -39,15 +65,40 @@
   "widgets": {
     "youtube": {
       "name": {
-        "en": "YouTube",
-        "nl": "YouTube"
+        "en": "Video",
+        "nl": "Video"
       },
       "description": {
-        "en": "Play YouTube video or livestream",
-        "nl": "YouTube video of livestream afspelen"
+        "en": "Play a YouTube video, livestream or playlist",
+        "nl": "Speel een YouTube-video, livestream of afspeellijst af"
       },
-      "height": 250,
       "settings": [
+        {
+          "id": "videoId",
+          "type": "text",
+          "label": {
+            "en": "YouTube video (link or ID)",
+            "nl": "YouTube-video (link of ID)"
+          },
+          "hint": {
+            "en": "Paste a YouTube link, for example https://youtu.be/dQw4w9WgXcQ, or just the 11-character video ID. Livestream and Shorts links work too.",
+            "nl": "Plak een YouTube-link, bijvoorbeeld https://youtu.be/dQw4w9WgXcQ, of alleen de video-ID van 11 tekens. Links naar livestreams en Shorts werken ook."
+          },
+          "value": ""
+        },
+        {
+          "id": "playlistId",
+          "type": "text",
+          "label": {
+            "en": "YouTube playlist (link or ID)",
+            "nl": "YouTube-afspeellijst (link of ID)"
+          },
+          "hint": {
+            "en": "Optional. Paste a playlist link or ID (starts with PL). When a video is also set, the playlist starts with that video.",
+            "nl": "Optioneel. Plak een link of ID van een afspeellijst (begint met PL). Als er ook een video is ingesteld, begint de afspeellijst met die video."
+          },
+          "value": ""
+        },
         {
           "id": "aspectRatio",
           "type": "dropdown",
@@ -82,7 +133,7 @@
               "id": "9:16",
               "label": {
                 "en": "Portrait (9:16)",
-                "nl": "Portrait (9:16)"
+                "nl": "Staand (9:16)"
               }
             },
             {
@@ -106,31 +157,13 @@
           "type": "checkbox",
           "label": {
             "en": "Autoplay",
-            "nl": "Automatisch Afspelen"
+            "nl": "Automatisch afspelen"
           },
           "hint": {
-            "en": "While a video is playing, YouTube will prevent the default screen timeout behaviour.",
-            "nl": "Terwijl een video afspeelt, voorkomt YouTube het standaard scherm time-out gedrag."
+            "en": "Starts playing when the dashboard opens. Browsers only allow this without sound, so the video always starts muted. When off, the widget shows a preview image and loads the player when you tap it.",
+            "nl": "Begint met afspelen zodra het dashboard opent. Browsers staan dit alleen zonder geluid toe, dus de video start altijd gedempt. Staat dit uit, dan toont de widget een voorbeeldafbeelding en laadt de speler pas als je erop tikt."
           },
           "value": true
-        },
-        {
-          "id": "controls",
-          "type": "checkbox",
-          "label": {
-            "en": "Show Controls",
-            "nl": "Toon Bediening"
-          },
-          "value": false
-        },
-        {
-          "id": "loop",
-          "type": "checkbox",
-          "label": {
-            "en": "Loop",
-            "nl": "Herhalen"
-          },
-          "value": false
         },
         {
           "id": "mute",
@@ -139,46 +172,48 @@
             "en": "Muted",
             "nl": "Gedempt"
           },
-          "value": false
+          "value": false,
+          "hint": {
+            "en": "Always on while Autoplay is enabled.",
+            "nl": "Staat altijd aan als Automatisch afspelen is ingeschakeld."
+          }
         },
         {
-          "id": "playlistId",
-          "type": "text",
+          "id": "loop",
+          "type": "checkbox",
           "label": {
-            "en": "Playlist ID (leave blank to use Video ID)",
-            "nl": "Afspeellijst ID (leeg laten om Video ID te gebruiken)"
+            "en": "Loop",
+            "nl": "Herhalen"
           },
+          "value": false,
           "hint": {
-            "en": "YouTube playlist ID from the URL (e.g. PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf)",
-            "nl": "YouTube afspeellijst-ID uit de URL (bijv. PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf)"
+            "en": "Plays the video or playlist again when it ends.",
+            "nl": "Speelt de video of afspeellijst opnieuw af als die is afgelopen."
+          }
+        },
+        {
+          "id": "controls",
+          "type": "checkbox",
+          "label": {
+            "en": "Show Controls",
+            "nl": "Bediening tonen"
           },
-          "value": ""
+          "value": false
         },
         {
           "id": "start",
           "type": "number",
           "label": {
-            "en": "Start at (seconds)",
-            "nl": "Start op (seconden)"
+            "en": "Start At (seconds)",
+            "nl": "Starten op (seconden)"
           },
           "hint": {
-            "en": "Start playback at this position in seconds (0 = beginning)",
-            "nl": "Start afspelen op deze positie in seconden (0 = begin)"
+            "en": "Start playback this many seconds into the video. 0 starts at the beginning, or at the time in the link (?t=).",
+            "nl": "Begin zoveel seconden na het begin van de video. Bij 0 start de video bij het begin, of op het tijdstip in de link (?t=)."
           },
-          "value": 0
-        },
-        {
-          "id": "videoId",
-          "type": "text",
-          "label": {
-            "en": "Video ID",
-            "nl": "Video ID"
-          },
-          "hint": {
-            "en": "YouTube video ID from the URL (e.g. dQw4w9WgXcQ)",
-            "nl": "YouTube video-ID uit de URL (bijv. dQw4w9WgXcQ)"
-          },
-          "value": ""
+          "value": 0,
+          "min": 0,
+          "step": 1
         }
       ],
       "id": "youtube"
