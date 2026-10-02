@@ -85,4 +85,24 @@ describe("aquarium widget api", () => {
     const res = await api.doAction({ homey, query, body: { reset: true } });
     expect(res.save.coins).toBe(40);
   });
+
+  it("never applies the same batch twice", async () => {
+    const { homey } = fakeHomey();
+    const { save } = await api.getState({ homey, query });
+    save.coins = 0;
+    const body = { batch: "b1", actions: [{ type: "buyFood", food: "flakes" }] };
+    homey.settings.set("aquarium2_w1", { ...save, coins: 100 });
+    await api.doAction({ homey, query, body });
+    const again = await api.doAction({ homey, query, body });
+    expect(again.duplicate).toBe(true);
+    expect(again.save.coins).toBe(100 - 15);
+  });
+
+  it("keeps a broken save aside and starts fresh", async () => {
+    const { homey, store } = fakeHomey({ aquarium2_w1: { v: 2, tanks: 5 } });
+    const res = await api.getState({ homey, query });
+    expect(res.save.v).toBe(2);
+    expect(Array.isArray(res.save.tanks.pond.fish)).toBe(true);
+    expect(store.aquarium2_w1.tanks.pond).toBeTruthy();
+  });
 });

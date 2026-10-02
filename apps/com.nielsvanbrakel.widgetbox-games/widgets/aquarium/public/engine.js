@@ -24,6 +24,7 @@
   const TANK_IDS = Object.keys(C.TANKS).sort((a, b) => C.TANKS[a].order - C.TANKS[b].order);
   const STAGE = { FRY: 0, JUVENILE: 1, ADULT: 2 };
   const SIZE_RANK = { S: 0, M: 1, L: 2 };
+  const STEP = 10 * 60000;
 
   // ── Deterministic helpers ──────────────────────────────────────────
 
@@ -130,8 +131,27 @@
    * catalog rule is to never remove or rename IDs, so this is a last resort.
    */
   function migrate(save, now) {
-    if (!save || save.v !== SAVE_VERSION || !save.tanks) return createSave(now);
-    save.food = save.food || {};
+    if (!save || typeof save !== "object" || save.v !== SAVE_VERSION || !save.tanks) {
+      return createSave(now);
+    }
+    const num = (v, d = 0) => (Number.isFinite(v) ? v : d);
+    const list = (v) => (Array.isArray(v) ? v : []);
+    save.seed = num(save.seed) >>> 0;
+    save.nextId = num(save.nextId);
+    save.t = num(save.t, now);
+    save.tz = num(save.tz);
+    save.coins = Math.max(0, num(save.coins));
+    save.pearls = Math.max(0, num(save.pearls));
+    save.xp = Math.max(0, num(save.xp));
+    save.level = clamp(Math.floor(num(save.level, 1)), 1, C.RULES.maxLevel);
+    save.tut = clamp(Math.floor(num(save.tut)), 0, C.TUTORIAL.length);
+    save.tutProg = num(save.tutProg);
+    save.batches = list(save.batches);
+    save.food = save.food && typeof save.food === "object" ? save.food : {};
+    for (const k of Object.keys(save.food)) {
+      if (!Object.hasOwn(C.FOODS, k)) delete save.food[k];
+      else save.food[k] = Math.max(0, num(save.food[k]));
+    }
     save.stats = {
       coinsEarned: 0,
       hatched: 0,
@@ -142,8 +162,10 @@
       bought: 0,
       ...save.stats,
     };
-    save.dex = save.dex || {};
-    save.ach = save.ach || [];
+    save.dex = save.dex && typeof save.dex === "object" ? save.dex : {};
+    for (const k of Object.keys(save.dex)) if (!Object.hasOwn(C.SPECIES, k)) delete save.dex[k];
+    const achIds = new Set(C.ACHIEVEMENTS.map((a) => a.id));
+    save.ach = list(save.ach).filter((id) => achIds.has(id));
     save.daily = {
       day: -1,
       goals: [],
@@ -153,22 +175,35 @@
       visited: [],
       ...save.daily,
     };
+    save.daily.goals = list(save.daily.goals).filter((g) => g && Object.hasOwn(C.GOALS, g.k));
+    save.daily.visited = list(save.daily.visited);
     for (const id of TANK_IDS) {
       const base = emptyTank(id, id === "pond", save.t || now);
       const tank = { ...base, ...save.tanks[id] };
       save.tanks[id] = tank;
       tank.up = { ...base.up, ...tank.up };
       tank.crew = { ...base.crew, ...tank.crew };
-      tank.fish = tank.fish.filter((f) => C.SPECIES[f.s] && C.SPECIES[f.s].tank === id);
-      tank.eggs = tank.eggs.filter((e) => C.SPECIES[e.s]);
-      const decor = C.SLOTS.map((_, i) => tank.decor[i] || null);
-      tank.decor = decor.map((d) => (d && C.DECOR[d.d] ? d : null));
+      const species = (s) => typeof s === "string" && Object.hasOwn(C.SPECIES, s);
+      tank.fish = list(tank.fish).filter((f) => f && species(f.s) && C.SPECIES[f.s].tank === id);
+      tank.eggs = list(tank.eggs).filter((e) => e && species(e.s));
+      for (const key of ["drops", "algae", "debris", "autoFed"]) tank[key] = list(tank[key]);
+      const decor = C.SLOTS.map((_, i) => list(tank.decor)[i] || null);
+      tank.decor = decor.map((d, i) =>
+        d &&
+        typeof d.d === "string" &&
+        Object.hasOwn(C.DECOR, d.d) &&
+        C.DECOR[d.d].tank === id &&
+        slotFits(i, d.d)
+          ? d
+          : null,
+      );
+      tank.waste = clamp(num(tank.waste), 0, 3);
       for (const key of Object.keys(tank.up)) {
         const max = maxUpgrade(key);
         tank.up[key] = clamp(tank.up[key] | 0, 0, max);
       }
     }
-    if (!C.TANKS[save.active] || !save.tanks[save.active].unlocked) save.active = "pond";
+    if (!TANK_IDS.includes(save.active) || !save.tanks[save.active].unlocked) save.active = "pond";
     return save;
   }
 
@@ -530,10 +565,13 @@
    */
   function simulate(save, now, ev = []) {
     const start = save.t || now;
-    if (now <= start) return { hours: 0, coins: 0, ev };
-    const from = Math.max(start, now - C.RULES.maxIdleHours * HOUR);
-    const summary = { hours: (now - start) / HOUR, coins: 0, algae: 0, debris: 0, eggs: 0, ev };
-    const STEP = HOUR / 2;
+    // Time only advances on a fixed clock grid, so the page (ticking every second) and the
+    // server (catching up hours at once) take exactly the same steps and reach the same save.
+    const end = Math.floor(now / STEP) * STEP;
+    const summary = { hours: 0, coins: 0, algae: 0, debris: 0, eggs: 0, ev };
+    if (end <= start) return summary;
+    summary.hours = (now - start) / HOUR;
+    const from = Math.max(start, end - C.RULES.maxIdleHours * HOUR);
     for (const id of TANK_IDS) {
       const tank = save.tanks[id];
       if (!tank.unlocked) continue;
@@ -544,19 +582,16 @@
         eggs: tank.eggs.length,
       };
       // Food left drifting in the water when the widget closed turns into waste.
-      if (tank.bits > 0 && now - tank.bitsAt > 2 * 60000) {
+      if (tank.bits > 0 && end - tank.bitsAt > 2 * 60000) {
         tank.waste += tank.bits;
         tank.bits = 0;
       }
-      while (tank.waste >= 3 && tank.debris.length < C.RULES.maxDebris) {
-        tank.waste -= 3;
-        spawnDebris(save, tank, now);
-      }
+      wasteToDebris(save, tank, end);
       tank.nextAlgae = Math.max(tank.nextAlgae, from);
       tank.nextDebris = Math.max(tank.nextDebris, from);
       let t = from;
-      while (t < now) {
-        const t2 = Math.min(now, t + STEP);
+      while (t < end) {
+        const t2 = Math.min(end, (Math.floor(t / STEP) + 1) * STEP);
         stepTank(save, tank, t, t2, ev);
         t = t2;
       }
@@ -565,10 +600,19 @@
       summary.debris += Math.max(0, tank.debris.length - before.debris);
       summary.eggs += Math.max(0, tank.eggs.length - before.eggs);
     }
-    save.t = now;
-    ensureDaily(save, now, ev);
+    save.t = end;
+    ensureDaily(save, ev);
     checkAchievements(save, ev);
     return summary;
+  }
+
+  function wasteToDebris(save, tank, at) {
+    while (tank.waste >= 3 && tank.debris.length < C.RULES.maxDebris) {
+      tank.waste -= 3;
+      spawnDebris(save, tank, at);
+    }
+    // With the sand full of debris, extra waste has nowhere to go.
+    tank.waste = Math.min(tank.waste, 3);
   }
 
   function stepTank(save, tank, t, t2, ev) {
@@ -624,11 +668,13 @@
     return sum * 24;
   }
 
-  function ensureDaily(save, now, ev) {
+  function ensureDaily(save, ev) {
     if (save.tut < C.TUTORIAL.length) return;
+    const now = save.t;
     const day = localDay(save, now);
     const d = save.daily;
-    if (d.day === day) return;
+    // Never go back to an earlier day (a timezone change could otherwise re-open a bonus).
+    if (day <= d.day) return;
     if (d.lastFull < day - 1) d.streak = 0;
     d.day = day;
     d.bonus = false;
@@ -646,14 +692,16 @@
       const [lo, hi] = C.GOALS[k].n;
       let n = lo + Math.floor(rand(save.seed, day, k) * (hi - lo + 1));
       if (k === "collect") n = Math.max(30, Math.round((dailyIncome(save, now) * 0.25) / 10) * 10);
+      // Visiting counts tanks other than the one you start the day in.
+      if (k === "visit") n = Math.min(n, unlocked - 1);
       goals.push({ k, n, p: 0, done: false });
     }
     d.goals = goals;
     ev.push({ t: "daily", day });
   }
 
-  function goalReward(save, now) {
-    return Math.max(25, Math.round((dailyIncome(save, now) * 0.12) / 5) * 5);
+  function goalReward(save) {
+    return Math.max(25, Math.round((dailyIncome(save, save.t) * 0.12) / 5) * 5);
   }
 
   /*
@@ -675,12 +723,12 @@
           earn(save, step.coins);
           ev.push({ t: "tutorial", id: step.id, coins: step.coins });
           addXp(save, 15, ev);
-          if (save.tut >= C.TUTORIAL.length) ensureDaily(save, now, ev);
+          if (save.tut >= C.TUTORIAL.length) ensureDaily(save, ev);
         }
       }
       return;
     }
-    ensureDaily(save, now, ev);
+    ensureDaily(save, ev);
     const d = save.daily;
     const goalKind = kind === "buyFish" || kind === "buyDecor" ? "buy" : kind;
     for (const g of d.goals) {
@@ -688,7 +736,7 @@
       g.p = Math.min(g.n, g.p + amount);
       if (g.p >= g.n) {
         g.done = true;
-        const coins = goalReward(save, now);
+        const coins = goalReward(save);
         earn(save, coins);
         ev.push({ t: "goal", k: g.k, coins });
         addXp(save, C.RULES.xp.goal, ev);
@@ -740,8 +788,41 @@
   }
 
   function getTank(save, id) {
-    const tank = save.tanks[id || save.active];
+    const key = id || save.active;
+    const tank = TANK_IDS.includes(key) ? save.tanks[key] : null;
     return tank?.unlocked ? tank : null;
+  }
+
+  /*
+   * Actions arrive from the network, so every field is checked against the catalog (own keys
+   * only, so names like "constructor" never reach a lookup) before any handler runs.
+   */
+  const PARAM_CHECKS = {
+    tank: (v) => TANK_IDS.includes(v),
+    food: (v) => typeof v === "string" && Object.hasOwn(C.FOODS, v),
+    s: (v) => typeof v === "string" && Object.hasOwn(C.SPECIES, v),
+    d: (v) => typeof v === "string" && Object.hasOwn(C.DECOR, v),
+    kind: (v) =>
+      typeof v === "string" && (Object.hasOwn(C.UPGRADES, v) || Object.hasOwn(C.EGGS, v)),
+    id: (v) => typeof v === "string" && v.length < 24,
+    fish: (v) => typeof v === "string" && v.length < 24,
+    slot: (v) => Number.isInteger(v) && v >= 0 && v < C.SLOTS.length,
+    from: (v) => Number.isInteger(v) && v >= 0 && v < C.SLOTS.length,
+    to: (v) => Number.isInteger(v) && v >= 0 && v < C.SLOTS.length,
+    n: (v) => Number.isInteger(v) && v >= 0 && v <= 1000,
+    tz: (v) => Number.isFinite(v),
+    sell: (v) => typeof v === "boolean",
+  };
+
+  function validAction(action) {
+    if (!action || typeof action !== "object" || typeof action.type !== "string") return false;
+    if (!Object.hasOwn(ACTIONS, action.type)) return false;
+    for (const key of Object.keys(action)) {
+      if (key === "type" || action[key] == null) continue;
+      const check = PARAM_CHECKS[key];
+      if (!check || !check(action[key])) return false;
+    }
+    return true;
   }
 
   function findFish(tank, id) {
@@ -800,10 +881,7 @@
       const n = Math.min(tank.bits, Math.max(0, p.n | 0));
       tank.bits -= n;
       tank.waste += n;
-      while (tank.waste >= 3 && tank.debris.length < C.RULES.maxDebris) {
-        tank.waste -= 3;
-        spawnDebris(save, tank, now);
-      }
+      wasteToDebris(save, tank, now);
       return {};
     },
 
@@ -873,13 +951,12 @@
       let soldFor = 0;
       for (let i = 0; i < count; i++) {
         const variant = hatchVariant(save, egg, i);
+        discover(save, egg.s, variant, ev);
         if (i < room) {
           const fish = addFish(save, tank, egg.s, variant, STAGE.FRY, now);
           born.push({ id: fish.id, v: variant });
-          discover(save, egg.s, variant, ev);
         } else {
           soldFor += fishSellPrice({ s: egg.s, v: variant, stage: STAGE.FRY });
-          discover(save, egg.s, variant, ev);
         }
       }
       if (soldFor) earn(save, soldFor);
@@ -909,7 +986,7 @@
     buyEgg(save, p, now, ev) {
       const tank = getTank(save, p.tank);
       const egg = C.EGGS[p.kind];
-      if (!tank || !egg || !Object.hasOwn(C.EGGS, p.kind)) return "invalid";
+      if (!tank || !Object.hasOwn(C.EGGS, p.kind)) return "invalid";
       if (save.level < egg.level) return "level";
       if (tank.eggs.length >= C.RULES.maxEggClutches) return "eggsFull";
       const price = eggPrice(tank, p.kind);
@@ -1021,7 +1098,7 @@
 
     upgrade(save, p) {
       const tank = getTank(save, p.tank);
-      if (!tank || !C.UPGRADES[p.kind]) return "invalid";
+      if (!tank || !Object.hasOwn(C.UPGRADES, p.kind)) return "invalid";
       const cost = upgradeCost(tank, p.kind);
       if (cost == null) return "max";
       if (save.coins < cost) return "coins";
@@ -1031,15 +1108,16 @@
     },
 
     unlockTank(save, p, now, ev) {
+      if (!TANK_IDS.includes(p.tank)) return "invalid";
       const def = C.TANKS[p.tank];
       const tank = save.tanks[p.tank];
-      if (!def || !tank || tank.unlocked) return "invalid";
+      if (tank.unlocked) return "invalid";
       if (save.level < def.unlockLevel) return "level";
       if (save.coins < def.unlockCost) return "coins";
       save.coins -= def.unlockCost;
       tank.unlocked = true;
-      tank.nextAlgae = now + C.RULES.algaeEveryHours * HOUR;
-      tank.nextDebris = now + C.RULES.debrisEveryHours * HOUR;
+      tank.nextAlgae = save.t + C.RULES.algaeEveryHours * HOUR;
+      tank.nextDebris = save.t + C.RULES.debrisEveryHours * HOUR;
       save.active = p.tank;
       ev.push({ t: "tank", id: p.tank });
       return {};
@@ -1071,9 +1149,9 @@
   function apply(save, action, now) {
     const ev = [];
     simulate(save, now, ev);
-    const handler = action && Object.hasOwn(ACTIONS, action.type) ? ACTIONS[action.type] : null;
-    if (!handler) return fail("unknown");
-    const result = handler(save, action, now, ev);
+    if (!action || !Object.hasOwn(ACTIONS, action.type)) return fail("unknown");
+    if (!validAction(action)) return fail("invalid");
+    const result = ACTIONS[action.type](save, action, now, ev);
     if (typeof result === "string") return { ok: false, error: result, ev };
     checkAchievements(save, ev);
     return { ok: true, result, ev };

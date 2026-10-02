@@ -154,4 +154,70 @@ describe("aquarium engine", () => {
     expect(at(90).level).toBe(C.RULES.maxLevel);
     expect(E.TANK_IDS.every((t) => save.tanks[t].unlocked)).toBe(true);
   });
+
+  it("ignores inherited property names and wrong types in actions", () => {
+    const save = E.createSave(T0, 3);
+    E.simulate(save, T0 + H);
+    const attacks = [
+      { type: "unlockTank", tank: "constructor" },
+      { type: "setTank", tank: "__proto__" },
+      { type: "buyFood", food: "toString" },
+      { type: "upgrade", tank: "pond", kind: "constructor" },
+      { type: "buyFish", tank: "pond", s: "hasOwnProperty" },
+      { type: "buyDecor", tank: "pond", d: "anubias", slot: "4" },
+      { type: "waste", tank: "pond", n: 1e9 },
+      { type: "collect", tank: ["pond"] },
+      { type: "constructor" },
+      "collect",
+      null,
+    ];
+    for (const action of attacks) {
+      const before = JSON.stringify(save);
+      const r = E.apply(save, action, T0 + H);
+      expect(r.ok, JSON.stringify(action)).toBe(false);
+      expect(JSON.stringify(save)).toBe(before);
+    }
+    expect(Object.hasOwn(Object, "unlocked")).toBe(false);
+    expect(E.tankInfo(save, "pond", T0 + H)).toBeTruthy();
+  });
+
+  it("repairs corrupt saves instead of crashing", () => {
+    const save = E.createSave(T0, 3);
+    Object.assign(save, { coins: null, level: "x", active: "constructor", ach: "nope" });
+    save.tanks.pond.fish = null;
+    save.tanks.pond.decor = [
+      { id: "d1", d: "castle" },
+      { id: "d2", d: "anemone" },
+    ];
+    const out = E.migrate(save, T0);
+    expect(out.coins).toBe(0);
+    expect(out.level).toBe(1);
+    expect(out.active).toBe("pond");
+    expect(out.tanks.pond.fish).toEqual([]);
+    expect(out.tanks.pond.decor[0].d).toBe("castle");
+    expect(out.tanks.pond.decor[1]).toBeNull();
+    expect(() => E.simulate(out, T0 + 5 * H)).not.toThrow();
+  });
+
+  it("reaches the same save whether time passes in seconds or in one jump", () => {
+    const a = E.createSave(T0, 21);
+    const b = clone(a);
+    tutorial(a, T0 + 1000);
+    tutorial(b, T0 + 1000);
+    for (let t = T0 + 1000; t <= T0 + 6 * H; t += 1000) E.simulate(a, t);
+    E.simulate(b, T0 + 6 * H);
+    expect(JSON.stringify(a)).toBe(JSON.stringify(b));
+  });
+
+  it("only offers a visit goal that can be finished", () => {
+    for (let seed = 1; seed < 40; seed++) {
+      const save = E.createSave(T0, seed);
+      tutorial(save, T0 + 1000);
+      save.level = 6;
+      save.tanks.amazon.unlocked = true;
+      E.simulate(save, T0 + E.DAY);
+      const visit = save.daily.goals.find((g) => g.k === "visit");
+      if (visit) expect(visit.n).toBeLessThanOrEqual(1);
+    }
+  });
 });

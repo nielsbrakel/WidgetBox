@@ -25,14 +25,26 @@
       this.failures = 0;
       this.lastInput = Date.now();
       this.lastSync = 0;
+      // Bumped by every local change and every reset; a response that started before the
+      // latest bump is stale and must not overwrite newer local state.
+      this.gen = 0;
+      this.epoch = 0;
+      this.inflight = null;
     }
 
     now() {
       return Date.now() + this.offset;
     }
 
-    api(method, body) {
-      return this.homey.api(method, `/?widgetId=${encodeURIComponent(this.widgetId)}`, body);
+    async api(method, body) {
+      const t0 = Date.now();
+      const res = await this.homey.api(
+        method,
+        `/?widgetId=${encodeURIComponent(this.widgetId)}`,
+        body,
+      );
+      if (res && typeof res === "object") res.t0 = t0;
+      return res;
     }
 
     async init() {
@@ -69,8 +81,7 @@
       const res = await this.loadState();
       this.scene.resize();
       this.applyServer(res);
-      if (this.save.tz !== new Date().getTimezoneOffset())
-        this.do({ type: "setTz", tz: new Date().getTimezoneOffset() });
+      this.checkTimezone();
       document.getElementById("app").classList.remove("is-loading");
       this.ui.welcome(res.away, res.created);
       this.setupInput(canvas);
@@ -81,7 +92,9 @@
         if (!document.hidden) this.refreshFromServer();
       }, REFRESH_MS);
       document.addEventListener("visibilitychange", () => {
-        if (!document.hidden && Date.now() - this.lastSync > 30000) this.refreshFromServer();
+        if (document.hidden) return;
+        this.checkTimezone();
+        if (Date.now() - this.lastSync > 30000) this.refreshFromServer();
       });
       const ro = new ResizeObserver(() => {
         this.scene.resize();
@@ -91,13 +104,16 @@
       ro.observe(document.getElementById("app"));
     }
 
+    // The daily reset follows local midnight, which moves with daylight saving time.
+    checkTimezone() {
+      const tz = new Date().getTimezoneOffset();
+      if (this.save && this.save.tz !== tz) this.do({ type: "setTz", tz });
+    }
+
     async loadState() {
       for (let attempt = 0; ; attempt++) {
         try {
-          const t0 = Date.now();
-          const res = await this.api("GET");
-          res.t0 = t0;
-          return res;
+          return await this.api("GET");
         } catch (err) {
           if (attempt >= 2) throw err;
           await new Promise((r) => setTimeout(r, 1500 * (attempt + 1)));
@@ -121,11 +137,10 @@
 
     async refreshFromServer() {
       if (this.sending || this.queue.length) return;
+      const gen = this.gen;
       try {
-        const t0 = Date.now();
         const res = await this.api("GET");
-        res.t0 = t0;
-        if (!this.sending && !this.queue.length) this.applyServer(res);
+        if (gen === this.gen && !this.sending && !this.queue.length) this.applyServer(res);
       } catch (_) {
         // Offline: keep playing locally; the next action retries.
       }
@@ -138,6 +153,7 @@
     do(action, quiet) {
       const r = E.apply(this.save, action, this.now());
       if (r.ok) {
+        this.gen += 1;
         this.queue.push(action);
         this.scheduleFlush();
       } else if (!quiet && !SILENT_ERRORS.has(r.error)) {
@@ -158,18 +174,35 @@
     async flush() {
       if (this.sending || !this.queue.length) return;
       this.sending = true;
-      const batch = this.queue.slice(0, 50);
+      const epoch = this.epoch;
+      // A retry resends the same batch id, so the server never applies it twice.
+      if (!this.inflight) {
+        const actions = this.queue.slice(0, 50);
+        const id = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`;
+        this.inflight = { id, actions };
+      }
+      const batch = this.inflight;
       try {
-        const t0 = Date.now();
-        const res = await this.api("POST", { actions: batch });
-        res.t0 = t0;
-        this.queue.splice(0, batch.length);
-        this.failures = 0;
+        const res = await this.api("POST", { batch: batch.id, actions: batch.actions });
         this.sending = false;
+        if (epoch !== this.epoch) return;
+        this.inflight = null;
+        this.queue = this.queue.filter((a) => !batch.actions.includes(a));
+        this.failures = 0;
+        this.gen += 1;
         this.applyServer(res);
       } catch (_) {
         this.sending = false;
+        if (epoch !== this.epoch) return;
         this.failures += 1;
+        if (this.failures >= 8) {
+          // The server keeps refusing: drop the local changes and resync rather than jam.
+          this.inflight = null;
+          this.queue = [];
+          this.failures = 0;
+          this.refreshFromServer();
+          return;
+        }
         this.scheduleFlush(Math.min(30000, 1000 * 2 ** this.failures));
         return;
       }
@@ -178,11 +211,12 @@
 
     async reset() {
       this.queue = [];
+      this.inflight = null;
+      this.epoch += 1;
+      this.gen += 1;
       clearTimeout(this.flushTimer);
       try {
-        const t0 = Date.now();
         const res = await this.api("POST", { reset: true });
-        res.t0 = t0;
         this.scene.tankId = null;
         this.applyServer(res);
         this.ui.welcome(null, true);

@@ -6,8 +6,10 @@
  */
 import "/apps/com.nielsvanbrakel.widgetbox-games/widgets/aquarium/public/catalog.js";
 import "/apps/com.nielsvanbrakel.widgetbox-games/widgets/aquarium/public/engine.js";
+import "/apps/com.nielsvanbrakel.widgetbox-games/widgets/aquarium/public/server.js";
 
 const Engine = globalThis.AquaEngine;
+const Server = globalThis.AquaServer;
 const C = Engine.C;
 const HOUR = Engine.HOUR;
 const STORE_KEY = "aquarium2_sandbox";
@@ -108,7 +110,8 @@ function gallery(save, tankId) {
 }
 
 const SCENARIOS = {
-  default: (now) => Engine.createSave(now, 12345),
+  // No stored save: the handler creates one, exactly like a brand-new widget.
+  default: () => null,
   "pond-day2": (now) => {
     const s = base(now);
     s.level = 3;
@@ -300,34 +303,21 @@ export function resetAquariumScenario(scenarioId, force = false) {
   write(scenarioId, build(Date.now()));
 }
 
+// The real request handler, backed by localStorage instead of Homey settings.
+const store = {
+  get: (key) => (key === "aquarium2_sandbox" ? read()?.save || null : null),
+  set: (key, value) => {
+    if (key === "aquarium2_sandbox") write(read()?.scenario, value);
+  },
+  unset: () => {},
+};
+
 export function handleAquariumApi(widgetId, method, _endpoint, body, scenarioId) {
   if (widgetId !== "aquarium") return null;
   resetAquariumScenario(scenarioId);
+  const query = { widgetId: "sandbox" };
   const now = Date.now();
-  const stored = read();
-  const save = Engine.migrate(stored.save, now);
-
-  if (method === "GET") {
-    const away = Engine.simulate(save, now);
-    write(stored.scenario, save);
-    return {
-      save,
-      now,
-      away,
-      created: scenarioId === "default" && save.tut === 0 && save.stats.coinsEarned === 0,
-    };
-  }
-
-  if (body?.reset) {
-    const fresh = Engine.createSave(now);
-    write(stored.scenario, fresh);
-    return { save: fresh, now, results: [] };
-  }
-  const actions = Array.isArray(body?.actions) ? body.actions : [];
-  const results = actions.map((a) => {
-    const r = Engine.apply(save, a, now);
-    return { ok: r.ok, error: r.error };
-  });
-  write(stored.scenario, save);
-  return { save, now, results };
+  return method === "GET"
+    ? Server.getState(store, query, now)
+    : Server.doAction(store, query, body, now);
 }

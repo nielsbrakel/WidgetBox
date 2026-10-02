@@ -37,11 +37,12 @@ is not migrated; first-version players get a fresh tank plus a welcome gift (+25
 
 ```
 widgets/aquarium/
-  api.js              Homey widget API: load save, simulate, apply actions, persist
+  api.js              Homey widget API, a thin wrapper around public/server.js
   widget.compose.json GET / (getState) and POST / (doAction), settings day_night and motion
   public/
     catalog.js        content and balance (UMD: AquaCatalog)
     engine.js         pure rules: createSave, migrate, simulate, apply, read models (UMD: AquaEngine)
+    server.js         request handling and persistence, shared with the sandbox (UMD: AquaServer)
     art.js            procedural Canvas 2D art: biomes, 22 fish, 28 decor items, props (AquaArt)
     scene.js          the living tank: agents, behaviours, food physics, effects, hit testing (AquaScene)
     ui.js             HUD, dock, tray, cards, sheets, toasts, translations (AquaUI)
@@ -52,9 +53,11 @@ widgets/aquarium/
 **Data flow.** `main.js` keeps `save`, plus a queue of actions not yet sent.
 
 1. A tap becomes an action such as `{type: "collect", tank, id}`. `Game.do()` runs `E.apply()` on the local save at once and shows the result.
-2. Actions are batched (400 ms debounce, at most 50) and POSTed as `{actions: [...]}`. `api.js` loads the save, runs `simulate` to catch up idle time, applies each action and stores the result.
-3. The response (`{save, now, results}`) replaces the local save, and any queued actions not yet sent are replayed on top. A clock offset from the server `now` keeps the client simulation in step.
-4. GET runs on load, every 5 minutes, and when the page becomes visible. It writes the save back only when the save was just created, when it was caught up by 30 minutes or more, or when the catch-up raised events. A 5-minute refresh therefore costs no flash writes.
+2. Actions are batched (400 ms debounce, at most 50) and POSTed as `{batch, actions: [...]}`. The server loads the save, runs `simulate` to catch up idle time, applies each action and stores the result. A failing action only fails itself. The last 8 batch ids are kept in the save, so a retry after a lost response is never applied twice.
+3. The response (`{save, now, results}`) replaces the local save, and any queued actions not yet sent are replayed on top. A clock offset from the server `now` keeps the client simulation in step. Responses that started before a newer local change, or before a reset, are ignored.
+4. **Same steps on both sides.** `simulate` only advances on a fixed 10-minute clock grid. The page ticks every second and the server may catch up a week at once, but both pass the same grid boundaries in the same order, so ids, positions and hunger come out identical (a unit test checks this).
+5. **Untrusted input.** Every action field is checked against the catalog with own-key lookups before a handler runs, and `migrate` repairs wrong types. A save that still can't be read is kept under `aquarium2bad_<id>` and play starts over.
+6. GET runs on load, every 5 minutes, and when the page becomes visible. It writes the save back only when the save was just created, when it was caught up by 30 minutes or more, or when the catch-up raised events. A 5-minute refresh therefore costs no flash writes.
 
 **Settings.** `day_night`: auto (follows the Homey clock), day or night. `motion`: smooth or battery. Resetting the game is in the in-game Help pages (two taps to confirm), not in widget settings.
 
@@ -72,7 +75,7 @@ widgets/aquarium/
   daily: { day, goals: [{k, n, p, done}], bonus, streak, lastFull, visited },
   dex: { guppy: 0b011, ... },   // bit per colour variant found
   ach: ["fish_5", ...], stats: { coinsEarned, hatched, scrubbed, vacuumed, played, fed, bought },
-  ids: n,                       // id counter
+  nextId, batches: [...],       // id counter, recent batch ids
   tanks: { pond: Tank, amazon: Tank, reef: Tank, abyss: Tank }
 }
 Tank = {
@@ -115,7 +118,7 @@ Tank = {
 
 **Care.** Hunger drops per species rate. Fed fish grow from fry to juvenile to adult. Algae spawn about every 3 hours and debris about every 4 (slower with filter upgrades); both lower water quality. Uneaten food becomes waste, and waste becomes debris. Cleaner species (snail, cory, pleco, shrimp, isopod) slowly clean on their own. The feeder upgrade auto-feeds when the tank average drops below 30, from shared stock, up to its level times per day.
 
-**Feeding (touch).** The dock's food button opens the tray (food picker, stock, buy). Each tap on open water drops a portion that floats, sinks and settles; fish that eat that food swim to it. Every bite is an `eat` action. Food not eaten within 9 s of settling becomes waste.
+**Feeding (touch).** The dock's food button opens the tray (food picker, stock, buy). Each tap on open water drops a portion that floats, sinks and settles; fish that eat that food swim to it. Every bite is an `eat` action. Food not eaten within 9 s of settling becomes waste (if the widget closes first, the server turns leftovers into waste after 2 minutes).
 
 **Play.** Play mode drops a toy at the tapped spot. Rested fish (4 h cooldown) chase it and get +25% income for 6 hours.
 
