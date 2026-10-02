@@ -8,5 +8,6 @@
     "homey:build": "homey app build",
     "homey:install": "homey app install && sleep 5",
     "homey:publish": "homey app publish"
-  }
+  },
+  "license": "MIT"
 }

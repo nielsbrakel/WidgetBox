@@ -189,119 +189,57 @@ Use the `hint` property to add explanation text to settings that may not be imme
 
 ## Height Strategies
 
-Widgets use one of three height patterns:
+Pick ONE: a fixed/percentage `height` in `widget.compose.json`, OR runtime `Homey.ready({ height })` + `Homey.setHeight()`. Never both.
 
-### 1. Content-Based Height (Clock Widgets)
+### 1. Content-Based Height (clocks, stopwatch, timer, station, forecast, header)
 
-Calculates height from DOM content. Used by all clock and date widgets.
+Measure the content (not `body`, to avoid ResizeObserver feedback loops) and only report changes:
 
 ```javascript
-function calculateTotalHeight() {
-  const widget = document.getElementById('widget');
-  return widget ? widget.offsetHeight : 128;
+let lastHeight = 0;
+function reportHeight() {
+  const h = Math.ceil(document.getElementById("widget").getBoundingClientRect().height);
+  if (h === lastHeight) return;
+  lastHeight = h;
+  Homey.setHeight(h);
 }
-
-Homey.ready({ height: calculateTotalHeight() });
-new ResizeObserver(() => Homey.setHeight?.(calculateTotalHeight())).observe(document.body);
+new ResizeObserver(reportHeight).observe(document.getElementById("widget"));
 ```
 
-### 2. Aspect Ratio Height (Embed Widgets)
+Never put `height: 100%` on `html`/`body` for content-based widgets: the measured height then follows the viewport and can only grow.
 
-Calculates height as a percentage for iframe-based widgets. Used by youtube, windy, buientabel.
+### 2. Aspect Ratio Height (video, weather map, rain graph)
 
-```javascript
-function getAspectRatioPercentage(aspectRatio) {
-  const ratios = {
-    '1:1': '100%',
-    '4:3': '75%',
-    '16:9': '56.25%',
-    '9:16': '177.78%',
-    '21:9': '42.86%',
-    '3:1': '33.33%'
-  };
-  return ratios[aspectRatio] || '56.25%';
-}
-
-Homey.ready({ height: getAspectRatioPercentage(settings.aspectRatio || '16:9') });
-```
-
-### 3. Fixed/Calculated Height (Utility Widgets)
-
-Calculates from component count. Used by stopwatch, timer.
-
-```javascript
-const calcHeight = () => {
-  const itemCount = items.length;
-  const itemHeight = 60;
-  const headerHeight = 40;
-  return headerHeight + (itemCount * itemHeight) + padding;
-};
-
-Homey.ready({ height: calcHeight() });
-```
+Pass a percentage of the widget width, e.g. `Homey.ready({ height: "56.25%" })` for 16:9, and `Homey.setHeight("75%")` when the aspect ratio setting changes.
 
 ---
 
 ## Init Pattern
 
-All widgets follow this initialization flow:
-
 ```javascript
-let currentSettings = {};
-
-function onHomeyReady(Homey) {
-  currentSettings = Homey.getSettings() || {};
-  renderWidget();
-
-  Homey.on('settings.set', (key, value) => {
-    currentSettings[key] = value;
-    renderWidget();
-    Homey.setHeight?.(calculateTotalHeight());
-  });
-
-  // Start intervals (clocks: 1000ms, data: configurable)
-  Homey.ready({ height: calculateTotalHeight() });
-}
+window.onHomeyReady = async (Homey) => {
+  const settings = Homey.getSettings() ?? {};
+  const widgetId = await Homey.getWidgetInstanceId(); // may be a Promise
+  render(settings);
+  Homey.on("settings.set", (key, value) => { /* update only what changed */ });
+  Homey.ready({ height: measure() }); // exactly once
+};
 ```
 
-> **Variant**: Stopwatch/timer use `window.onHomeyReady = async (homey) => {}`, others use `function onHomeyReady(Homey) {}`. Both work.
+Rules:
+- Call `Homey.ready()` exactly once; later size changes go through `Homey.setHeight()`.
+- Align ticks to the second/minute boundary, tick only as often as the display changes, and pause on `document.visibilityState === "hidden"` (resync on visible).
+- Widget API routes must be declared in `widget.compose.json` `"api"` or `api.js` is unreachable on a real Homey (the sandbox mock does not catch this; unit-test that compose `api` keys match `api.js` exports).
+- Only `widgets/<id>/public/` is served to the webview: never reference files outside it. Never load the Homey SDK from a CDN; Homey injects it.
+- Open external links with `Homey.popup(url)`, never `target="_blank"`.
+- Touch first: no hover-only or swipe-only interactions, touch targets >= 44px, `aria-label` on icon-only buttons, respect `prefers-reduced-motion`.
+- Every page starts with `<!doctype html>`, `<html lang="en">`, `<meta charset="utf-8">` and a viewport meta.
 
 ---
 
-## Shared CSS
+## Styling
 
-Clock and utility widgets import shared styles:
-
-```html
-<link rel="stylesheet" href="../../_shared/shared-styles.css">
-```
-
-Located at `widgets/_shared/shared-styles.css`, providing:
-
-| Class | Purpose |
-|-------|---------|
-| `.widget-container` | Flex column, centered, standard padding |
-| `.widget-container--compact` | Reduced padding variant |
-| `.widget-row` / `.widget-column` | Flex row/column layouts |
-| `.widget-center` | Centered flex container |
-| `.widget-button` | Standard button with hover/active states |
-| `.widget-button--primary` | Blue primary button |
-| `.widget-button--small` | Compact button |
-| `.widget-text-display` | Large bold text (numbers) |
-| `.widget-text-title` | Medium bold text |
-| `.widget-text-body` | Default body text |
-| `.widget-text-secondary` | Secondary/muted text |
-| `.widget-text-small` | Small caption text |
-| `.widget-text-mono` | Monospace font |
-| `.widget-loading` | Loading spinner |
-| `.widget-error` | Error message |
-| `.widget-empty` | Empty state |
-| `.widget-card` | Card background with shadow |
-| `.widget-fade-in` | Fade-in animation |
-| `.widget-pulse` | Pulse animation |
-| `.widget-sr-only` | Screen reader only |
-
-Always use `var(--homey-*)` variables for colors, fonts, and spacing.
+There is no shared stylesheet: each widget keeps its CSS inline in `public/index.html` (Homey serves only `public/`). Use `var(--homey-*)` variables for colors, fonts and spacing so light and dark mode work automatically. Homey marks dark mode with the `homey-dark-mode` class on `body`; use `.homey-dark-mode` selectors when a variable is not enough and never `prefers-color-scheme`. Use `--homey-font-family` and don't override it with your own font stacks. Don't draw a second card inside Homey's card.
 
 ---
 
@@ -312,7 +250,7 @@ Always use `var(--homey-*)` variables for colors, fonts, and spacing.
 | Clock widgets | `false` | Card background for readability |
 | Stopwatch, Timer | `false` | Card background for readability |
 | Spacer | `true` | Invisible spacing element, blends with dashboard |
-| Embed widgets (buienradar, windy, youtube) | not set | Iframe handles its own background |
+| Embed widgets (radar-5day, weather map, video) | not set | Iframe handles its own background |
 
 ---
 
@@ -348,7 +286,7 @@ Keys live under `widgets.<widgetId>.<key>`:
 ```json
 {
   "widgets": {
-    "buientabel": {
+    "rain-graph": {
       "loading": "Loading...",
       "noRain": "No rain expected",
       "error": "Something went wrong"
@@ -435,7 +373,7 @@ The `description` field in `.homeycompose/app.json` is a catchy tagline shown be
 When creating a new WidgetBox widget:
 
 1. **Directory structure**: `widgets/<id>/widget.compose.json` + `public/index.html`
-2. **Import shared CSS** if using standard components: `../../_shared/shared-styles.css`
+2. **Keep CSS inline** in `public/index.html` using `--homey-*` variables
 3. **Use standard settings** from this document (size, color, alignment, etc.)
 4. **Include bilingual labels** (en + nl) for all settings
 5. **Add `hint`** to all `text` and `number` settings (bilingual)
@@ -472,7 +410,7 @@ apps/sandbox/
 │   │   ├── homeyStyles.js       # Injects Homey CSS variables into iframe
 │   │   ├── scenarios.js         # Debug scenario definitions per widget
 │   │   └── mocks/
-│   │       └── buienradarMocks.js  # Buienradar-specific mock data + real fetch
+│   │       └── weatherMocks.js     # Weather app mock data (Buienradar/Windy shapes)
 │   ├── App.jsx                  # Root component (state + composition only)
 │   ├── index.css                # All styles (no inline styles in components)
 │   ├── main.jsx                 # React entry point
@@ -511,31 +449,36 @@ tests/
 ├── e2e/           # Test specs per app/feature
 │   ├── widgets.spec.ts          # Sandbox loading tests
 │   ├── clocks.spec.ts
-│   ├── utilities.spec.ts
-│   ├── windy.spec.ts
+│   ├── timers.spec.ts
+│   ├── weather.spec.ts
+│   ├── weather-map.spec.ts
 │   ├── video.spec.ts
-│   ├── buienradar.spec.ts
 │   ├── layout.spec.ts
+│   ├── games*.spec.ts           # Aquarium game
 │   └── sandbox-translations.spec.ts
 ├── pages/         # Page Object Model
 │   ├── SandboxPage.ts           # Base page (goto, selectWidget, settings helpers)
 │   ├── ClocksPage.ts
-│   ├── UtilitiesPage.ts
-│   ├── WindyPage.ts
+│   ├── TimersPage.ts
+│   ├── WeatherPage.ts
 │   ├── VideoPage.ts
-│   ├── BuienradarPage.ts
-│   └── LayoutPage.ts
+│   ├── LayoutPage.ts
+│   └── GamesPage.ts
 ```
 
 ### Running Tests
 
 ```bash
-# Run all tests
-pnpm test:e2e
+pnpm lint        # Biome (lint + format check, includes inline widget scripts)
+pnpm test        # Vitest unit tests (apps/*/widgets/**/*.test.js, apps/*/lib/**/*.test.js)
+pnpm validate    # homey app validate --level publish for every app
+pnpm test:e2e    # Playwright against the sandbox
 
-# Run specific test file
-npx playwright test tests/e2e/clocks.spec.ts
+# Run a specific spec
+pnpm exec playwright test tests/e2e/clocks.spec.ts
 ```
+
+Each widget test should wait for the widget to be ready before changing settings. Set `PW_CHROMIUM_PATH` to use a preinstalled Chromium instead of `playwright install`.
 
 ### Writing Tests
 
