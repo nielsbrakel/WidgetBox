@@ -1,0 +1,337 @@
+/*
+ * Aquarium widget entry point: wires Homey, the engine, the scene and the UI together.
+ *
+ * Actions are applied to a local copy of the save immediately (so taps feel instant), queued,
+ * and sent to the widget API in small batches. Every server response replaces the local save
+ * and replays any actions that were not yet sent, so the server stays the source of truth.
+ */
+(function (root) {
+  "use strict";
+
+  const E = root.AquaEngine;
+  const SILENT_ERRORS = new Set(["gone", "tired", "noBits", "invalid", "notReady", "unknown"]);
+  const REFRESH_MS = 5 * 60 * 1000;
+
+  class Game {
+    constructor(homey) {
+      this.homey = homey;
+      this.widgetId = "default";
+      this.settings = {};
+      this.save = null;
+      this.offset = 0;
+      this.queue = [];
+      this.sending = false;
+      this.failures = 0;
+      this.lastInput = Date.now();
+      this.lastSync = 0;
+    }
+
+    now() {
+      return Date.now() + this.offset;
+    }
+
+    api(method, body) {
+      return this.homey.api(method, `/?widgetId=${encodeURIComponent(this.widgetId)}`, body);
+    }
+
+    async init() {
+      try {
+        const id = await this.homey.getWidgetInstanceId();
+        if (id) this.widgetId = id;
+      } catch (_) {
+        // Older Homey versions and the sandbox may not expose an instance id.
+      }
+      try {
+        this.settings = (await this.homey.getSettings()) || {};
+      } catch (_) {
+        this.settings = {};
+      }
+      try {
+        this.homey.ready();
+      } catch (_) {
+        // Not fatal: Homey shows the widget anyway once loaded.
+      }
+
+      const canvas = document.getElementById("tank");
+      this.scene = new root.AquaScene(canvas, {
+        onEat: (fish, food) => this.do({ type: "eat", tank: this.save.active, fish, food }),
+        onWaste: (n) => this.do({ type: "waste", tank: this.save.active, n }),
+        onPlay: (fish) => {
+          const r = this.do({ type: "play", tank: this.save.active, fish });
+          if (r.ok) this.ui.renderTray();
+        },
+      });
+      this.scene.lightMode = this.settings.day_night || "auto";
+      this.scene.fps = this.settings.motion === "battery" ? 30 : 60;
+      this.ui = new root.AquaUI.UI(this);
+
+      const res = await this.loadState();
+      this.scene.resize();
+      this.applyServer(res);
+      if (this.save.tz !== new Date().getTimezoneOffset()) this.do({ type: "setTz", tz: new Date().getTimezoneOffset() });
+      document.getElementById("app").classList.remove("is-loading");
+      this.ui.welcome(res.away, res.created);
+      this.setupInput(canvas);
+      this.scene.start();
+
+      setInterval(() => this.tick(), 1000);
+      setInterval(() => {
+        if (!document.hidden) this.refreshFromServer();
+      }, REFRESH_MS);
+      document.addEventListener("visibilitychange", () => {
+        if (!document.hidden && Date.now() - this.lastSync > 30000) this.refreshFromServer();
+      });
+      const ro = new ResizeObserver(() => {
+        this.scene.resize();
+        this.scene.sync(this.save, this.now(), this.save.active);
+        if (this.ui.sheet) this.ui.renderSheet();
+      });
+      ro.observe(document.getElementById("app"));
+    }
+
+    async loadState() {
+      for (let attempt = 0; ; attempt++) {
+        try {
+          const t0 = Date.now();
+          const res = await this.api("GET");
+          res.t0 = t0;
+          return res;
+        } catch (err) {
+          if (attempt >= 2) throw err;
+          await new Promise((r) => setTimeout(r, 1500 * (attempt + 1)));
+        }
+      }
+    }
+
+    applyServer(res) {
+      if (!res || !res.save) return;
+      const mid = res.t0 ? (res.t0 + Date.now()) / 2 : Date.now();
+      this.offset = res.now - mid;
+      const save = res.save;
+      // Replay actions the server has not seen yet so local progress is not lost.
+      for (const a of this.queue) E.apply(save, a, this.now());
+      this.save = save;
+      this.lastSync = Date.now();
+      this.scene.sync(save, this.now(), save.active);
+      this.ui.refresh();
+      if (this.ui.sheet) this.ui.renderSheet();
+    }
+
+    async refreshFromServer() {
+      if (this.sending || this.queue.length) return;
+      try {
+        const t0 = Date.now();
+        const res = await this.api("GET");
+        res.t0 = t0;
+        if (!this.sending && !this.queue.length) this.applyServer(res);
+      } catch (_) {
+        // Offline: keep playing locally; the next action retries.
+      }
+    }
+
+    /*
+     * Apply an action locally and queue it for the server.
+     * Returns the engine result so the UI can react immediately.
+     */
+    do(action, quiet) {
+      const r = E.apply(this.save, action, this.now());
+      if (r.ok) {
+        this.queue.push(action);
+        this.scheduleFlush();
+      } else if (!quiet && !SILENT_ERRORS.has(r.error)) {
+        this.ui.showError(r.error);
+      }
+      this.ui.handleEvents(r.ev);
+      this.scene.sync(this.save, this.now(), this.save.active);
+      this.ui.refresh();
+      if (this.ui.sheet && r.ok) this.ui.renderSheet();
+      return r;
+    }
+
+    scheduleFlush(delay) {
+      clearTimeout(this.flushTimer);
+      this.flushTimer = setTimeout(() => this.flush(), delay ?? 400);
+    }
+
+    async flush() {
+      if (this.sending || !this.queue.length) return;
+      this.sending = true;
+      const batch = this.queue.slice(0, 50);
+      try {
+        const t0 = Date.now();
+        const res = await this.api("POST", { actions: batch });
+        res.t0 = t0;
+        this.queue.splice(0, batch.length);
+        this.failures = 0;
+        this.sending = false;
+        this.applyServer(res);
+      } catch (_) {
+        this.sending = false;
+        this.failures += 1;
+        this.scheduleFlush(Math.min(30000, 1000 * 2 ** this.failures));
+        return;
+      }
+      if (this.queue.length) this.scheduleFlush();
+    }
+
+    async reset() {
+      this.queue = [];
+      clearTimeout(this.flushTimer);
+      try {
+        const t0 = Date.now();
+        const res = await this.api("POST", { reset: true });
+        res.t0 = t0;
+        this.scene.tankId = null;
+        this.applyServer(res);
+        this.ui.welcome(null, true);
+      } catch (_) {
+        this.ui.toast(this.ui.t("err.offline"), "err");
+      }
+    }
+
+    tick() {
+      if (!this.save || document.hidden) return;
+      const ev = [];
+      E.simulate(this.save, this.now(), ev);
+      if (ev.length) this.ui.handleEvents(ev);
+      this.scene.sync(this.save, this.now(), this.save.active);
+      this.ui.refresh();
+      // Smooth motion while someone is playing, save battery when the tank is just on display.
+      const idle = Date.now() - this.lastInput > 20000;
+      const fps = this.settings.motion === "battery" || idle ? 30 : 60;
+      if (this.scene.fps !== fps) this.scene.fps = fps;
+    }
+
+    interacted() {
+      this.lastInput = Date.now();
+      if (this.scene.fps < 60 && this.settings.motion !== "battery") this.scene.fps = 60;
+    }
+
+    // ── Input: taps only ─────────────────────────────────────────────
+
+    setupInput(canvas) {
+      let down = null;
+      canvas.addEventListener("pointerdown", (e) => {
+        down = { x: e.clientX, y: e.clientY, t: performance.now(), id: e.pointerId };
+      });
+      canvas.addEventListener("pointercancel", () => {
+        down = null;
+      });
+      canvas.addEventListener("pointerup", (e) => {
+        const d = down;
+        down = null;
+        if (!d || d.id !== e.pointerId) return;
+        if (Math.hypot(e.clientX - d.x, e.clientY - d.y) > 14 || performance.now() - d.t > 800) return;
+        const rect = canvas.getBoundingClientRect();
+        this.tap(e.clientX - rect.left, e.clientY - rect.top);
+      });
+    }
+
+    pillTarget() {
+      const pill = document.getElementById("coinPill").getBoundingClientRect();
+      const rect = document.getElementById("tank").getBoundingClientRect();
+      return { x: pill.left - rect.left + 14, y: pill.top - rect.top + pill.height / 2 };
+    }
+
+    tap(x, y) {
+      this.interacted();
+      const ui = this.ui;
+      const scene = this.scene;
+      const tank = this.save.active;
+      if (ui.sheet) return;
+
+      if (ui.mode === "place" || ui.mode === "move") {
+        const slot = scene.slotAt(x, y);
+        if (slot < 0) return ui.toast(ui.t("hint.place"));
+        const p = scene.locate("slot", slot);
+        const r = ui.mode === "place" ? this.do({ type: "buyDecor", tank, d: ui.place.decor, slot }) : this.do({ type: "moveDecor", tank, from: ui.place.from, to: slot });
+        if (r.ok) scene.sparkle(p.x, p.y, "#ffffff", 14);
+        ui.setMode("look");
+        return;
+      }
+
+      const hit = scene.hitTest(x, y);
+      if (hit.type === "drop") {
+        const r = this.do({ type: "collect", tank, id: hit.id });
+        if (r.ok) {
+          const target = this.pillTarget();
+          scene.coinFly(hit.x, hit.y, target.x, target.y, r.result.coins);
+          scene.floatText(hit.x, hit.y - 10, `+${r.result.coins}`);
+        }
+        return;
+      }
+      // Chores stay tappable while feeding or playing; only open water drops food or a toy.
+      const chore = hit.type === "egg" || hit.type === "algae" || hit.type === "debris";
+      if (ui.mode === "feed" && !chore) {
+        const r = this.do({ type: "drop", tank, food: ui.food });
+        if (r.ok) scene.dropFood(x, ui.food);
+        ui.lastMode = Date.now();
+        ui.renderTray();
+        return;
+      }
+      if (ui.mode === "play" && !chore) {
+        scene.placeToy(x, y);
+        ui.lastMode = Date.now();
+        return;
+      }
+
+      switch (hit.type) {
+        case "egg": {
+          // A failed hatch opens the egg card, which already explains why.
+          const r = this.do({ type: "hatch", tank, id: hit.id }, true);
+          if (r.ok) {
+            scene.sparkle(hit.x, hit.y, "#fff2b0", 16);
+            ui.toast(ui.t("hatched", { n: r.result.born.length }), "gold");
+          } else ui.showCard("egg", hit.id, hit.x);
+          break;
+        }
+        case "algae": {
+          const r = this.do({ type: "scrub", tank, id: hit.id });
+          if (r.ok) {
+            scene.scrubFx(hit.x, hit.y);
+            if (r.result.coins) {
+              scene.floatText(hit.x, hit.y - 8, `+${r.result.coins}`);
+              const target = this.pillTarget();
+              scene.coinFly(hit.x, hit.y, target.x, target.y, r.result.coins);
+            }
+          }
+          break;
+        }
+        case "debris": {
+          const r = this.do({ type: "vacuum", tank, id: hit.id });
+          if (r.ok) {
+            scene.vacuumFx(hit.x, hit.y);
+            scene.floatText(hit.x, hit.y - 8, `+${r.result.coins}`);
+          }
+          break;
+        }
+        case "fish":
+          ui.showCard("fish", hit.id, hit.x);
+          scene.hearts(hit.id);
+          break;
+        case "decor":
+          ui.showCard("decor", hit.slot, hit.x);
+          break;
+        default:
+          ui.hideCard();
+          scene.ripple(x, y, "#ffffff");
+      }
+    }
+  }
+
+  async function onHomeyReady(homey) {
+    if (homey) root.Homey = homey;
+    const game = new Game(root.Homey);
+    root.__aquarium = game;
+    try {
+      await game.init();
+    } catch (err) {
+      const loading = document.getElementById("loading");
+      if (loading) loading.innerHTML = `<div style="padding:16px;text-align:center;font-weight:700">${(game.ui && game.ui.t("err.load")) || "Could not load the aquarium."}</div>`;
+      console.error(err);
+    }
+  }
+
+  root.onHomeyReady = onHomeyReady;
+  root.AquaGame = Game;
+})(typeof self !== "undefined" ? self : this);
