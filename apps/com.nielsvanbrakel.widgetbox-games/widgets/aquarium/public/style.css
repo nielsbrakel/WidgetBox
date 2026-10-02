@@ -1,7 +1,15 @@
 /* Aquarium widget styles. Sizes scale with the widget width (vw = widget width). */
 
 :root {
-  --font: var(--homey-font-family, "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+  --font: var(
+    --homey-font-family,
+    "Nunito",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    sans-serif
+  );
   --fs: clamp(11px, 3vw, 14px);
   --fs-small: clamp(10px, 2.5vw, 12px);
   --btn: clamp(30px, 8.6vw, 44px);
@@ -1030,6 +1038,7 @@ button {
 }
 
 [hidden] {
+  /* biome-ignore lint/complexity/noImportantStyles: hidden must beat every display rule */
   display: none !important;
 }
 
@@ -1037,7 +1046,9 @@ button {
   *,
   *::before,
   *::after {
+    /* biome-ignore lint/complexity/noImportantStyles: reduced motion must override all animations */
     animation-duration: 0.01ms !important;
+    /* biome-ignore lint/complexity/noImportantStyles: reduced motion must override all transitions */
     transition-duration: 0.01ms !important;
   }
 }

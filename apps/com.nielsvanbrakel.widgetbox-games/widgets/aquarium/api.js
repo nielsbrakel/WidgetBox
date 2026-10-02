@@ -1,3 +1,4 @@
+// biome-ignore lint/suspicious/noRedundantUseStrict: Homey loads this as CommonJS
 "use strict";
 
 /*
@@ -12,7 +13,7 @@ const MAX_ACTIONS_PER_REQUEST = 50;
 const PERSIST_AFTER_HOURS = 0.5;
 
 function storeKey(query) {
-  const id = String((query && query.widgetId) || "default").slice(0, 80);
+  const id = String(query?.widgetId || "default").slice(0, 80);
   return { key: `aquarium2_${id}`, legacyKey: `aquarium_${id}` };
 }
 
@@ -36,19 +37,33 @@ module.exports = {
     const now = Date.now();
     const { key, save, created } = load(homey, query, now);
     const away = Engine.simulate(save, now);
-    if (created || away.hours >= PERSIST_AFTER_HOURS || away.ev.length) homey.settings.set(key, save);
-    return { save, now, away: { hours: away.hours, coins: away.coins, algae: away.algae, debris: away.debris, eggs: away.eggs }, created: !!created };
+    if (created || away.hours >= PERSIST_AFTER_HOURS || away.ev.length)
+      homey.settings.set(key, save);
+    return {
+      save,
+      now,
+      away: {
+        hours: away.hours,
+        coins: away.coins,
+        algae: away.algae,
+        debris: away.debris,
+        eggs: away.eggs,
+      },
+      created: !!created,
+    };
   },
 
   async doAction({ homey, query, body }) {
     const now = Date.now();
     const { key, save } = load(homey, query, now);
-    if (body && body.reset) {
+    if (body?.reset) {
       const fresh = Engine.createSave(now);
       homey.settings.set(key, fresh);
       return { save: fresh, now, results: [] };
     }
-    const actions = Array.isArray(body && body.actions) ? body.actions.slice(0, MAX_ACTIONS_PER_REQUEST) : [];
+    const actions = Array.isArray(body?.actions)
+      ? body.actions.slice(0, MAX_ACTIONS_PER_REQUEST)
+      : [];
     Engine.simulate(save, now);
     const results = actions.map((action) => {
       const r = Engine.apply(save, action, now);

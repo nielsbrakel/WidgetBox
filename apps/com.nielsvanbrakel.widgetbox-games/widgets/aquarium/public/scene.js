@@ -6,7 +6,8 @@
  * the tank (a fish eating, food dissolving, a fish catching the toy) go out through hooks.
  * Nothing here changes the save directly.
  */
-(function (root) {
+((root) => {
+  // biome-ignore lint/suspicious/noRedundantUseStrict: loaded as a classic script, not a module
   "use strict";
 
   const A = root.AquaArt;
@@ -217,7 +218,8 @@
     }
 
     sizeAgent(a) {
-      a.L = this.unit * a.art.len * STAGE_SCALE[a.stage] * (0.92 + rnd01(a.id, "size") * 0.16) * a.z;
+      a.L =
+        this.unit * a.art.len * STAGE_SCALE[a.stage] * (0.92 + rnd01(a.id, "size") * 0.16) * a.z;
       if (a.move === "eel") a.L = this.unit * 2.4 * STAGE_SCALE[a.stage];
     }
 
@@ -239,7 +241,14 @@
             break;
           }
           if (hole) {
-            a.home = { slot: i, kind: "hole", decor: d.d, hole, outline: A.decorOutline(d.d, p.x, p.y, p.scale), s: p.scale };
+            a.home = {
+              slot: i,
+              kind: "hole",
+              decor: d.d,
+              hole,
+              outline: A.decorOutline(d.d, p.x, p.y, p.scale),
+              s: p.scale,
+            };
             break;
           }
         }
@@ -311,7 +320,8 @@
         consider("egg", e.id, p.x, p.y, pad);
       }
       if (best) return best;
-      for (const a of this.algae) consider("algae", a.id, a.x * this.W, a.y * this.H, Math.max(pad, this.algaeR(a)));
+      for (const a of this.algae)
+        consider("algae", a.id, a.x * this.W, a.y * this.H, Math.max(pad, this.algaeR(a)));
       if (best) return best;
       for (const d of this.debris) {
         const p = this.debrisPos(d);
@@ -328,7 +338,8 @@
         const d = this.decor[i];
         if (!d) continue;
         const b = this.slotBox(i, C.DECOR[d.d].size);
-        if (x >= b.x && x <= b.x + b.w && y >= b.y && y <= b.y + b.h) return { type: "decor", id: d.id, slot: i, x: b.x + b.w / 2, y: b.y };
+        if (x >= b.x && x <= b.x + b.w && y >= b.y && y <= b.y + b.h)
+          return { type: "decor", id: d.id, slot: i, x: b.x + b.w / 2, y: b.y };
       }
       return { type: "water", x, y };
     }
@@ -420,7 +431,17 @@
     coinFly(x, y, tx, ty, value) {
       const n = Math.min(6, 1 + Math.floor(Math.log10(Math.max(1, value)) * 2));
       for (let i = 0; i < n; i++) {
-        this.fx.push({ kind: "coin", x, y, tx, ty, value, t0: this.t + i * 0.06, life: 0.7, ox: (Math.random() - 0.5) * 40 });
+        this.fx.push({
+          kind: "coin",
+          x,
+          y,
+          tx,
+          ty,
+          value,
+          t0: this.t + i * 0.06,
+          life: 0.7,
+          ox: (Math.random() - 0.5) * 40,
+        });
       }
     }
 
@@ -428,7 +449,16 @@
       for (let i = 0; i < (n || 8); i++) {
         const a = Math.random() * TAU;
         const sp = 20 + Math.random() * 40;
-        this.fx.push({ kind: "spark", x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, color: color || "#ffffff", t0: this.t, life: 0.5 + Math.random() * 0.3 });
+        this.fx.push({
+          kind: "spark",
+          x,
+          y,
+          vx: Math.cos(a) * sp,
+          vy: Math.sin(a) * sp,
+          color: color || "#ffffff",
+          t0: this.t,
+          life: 0.5 + Math.random() * 0.3,
+        });
       }
     }
 
@@ -441,12 +471,26 @@
 
     scrubFx(x, y) {
       this.sparkle(x, y, "#e8ffe0", 10);
-      for (let i = 0; i < 5; i++) this.bubbles.push({ x: x + (Math.random() - 0.5) * 20, y, r: 1.5 + Math.random() * 2.5, vy: 20 + Math.random() * 20, ph: Math.random() * TAU });
+      for (let i = 0; i < 5; i++)
+        this.bubbles.push({
+          x: x + (Math.random() - 0.5) * 20,
+          y,
+          r: 1.5 + Math.random() * 2.5,
+          vy: 20 + Math.random() * 20,
+          ph: Math.random() * TAU,
+        });
     }
 
     vacuumFx(x, y) {
       for (let i = 0; i < 10; i++) {
-        this.fx.push({ kind: "suck", x: x + (Math.random() - 0.5) * 24, y: y - Math.random() * 6, t0: this.t, life: 0.5, color: "#6e5a3a" });
+        this.fx.push({
+          kind: "suck",
+          x: x + (Math.random() - 0.5) * 24,
+          y: y - Math.random() * 6,
+          t0: this.t,
+          life: 0.5,
+          color: "#6e5a3a",
+        });
       }
     }
 
@@ -515,7 +559,10 @@
       if (a.move === "eel") return this.updateEel(a, dt);
 
       const hungry = a.fed < 30;
-      let base = this.unit * (a.move === "crawl" ? 0.25 : a.move === "bottom" ? 0.9 : a.move === "hover" ? 0.55 : 1.25) * a.speedK;
+      let base =
+        this.unit *
+        (a.move === "crawl" ? 0.25 : a.move === "bottom" ? 0.9 : a.move === "hover" ? 0.55 : 1.25) *
+        a.speedK;
       if (hungry) base *= 0.7;
       if (a.playful) base *= 1.15;
       let tx = a.tx;
@@ -610,7 +657,10 @@
       a.y += a.vy * dt;
       if (a.move === "crawl") a.y = this.sandY + 3;
       a.x = Math.max(a.L * 0.3, Math.min(W - a.L * 0.3, a.x));
-      a.y = Math.max(H * 0.07, Math.min(BOTTOM_MOVERS[a.move] ? this.sandY + 4 : this.sandY - a.L * 0.15, a.y));
+      a.y = Math.max(
+        H * 0.07,
+        Math.min(BOTTOM_MOVERS[a.move] ? this.sandY + 4 : this.sandY - a.L * 0.15, a.y),
+      );
 
       if (Math.abs(a.vx) > this.unit * 0.08) a.dir = a.vx > 0 ? 1 : -1;
       a.face += (a.dir - a.face) * Math.min(1, dt * 5);
@@ -645,7 +695,10 @@
         const h = home.hole;
         const out = { x: -1, y: 0.15 };
         a.peekT = (a.peekT ?? -1.2) + 0;
-        const target = a.fed < 30 || this.food.some((f) => a.sp.eats.includes(f.food)) ? 1.2 : 0.45 + 0.35 * Math.sin(this.t * 0.4 + a.speedK * 5);
+        const target =
+          a.fed < 30 || this.food.some((f) => a.sp.eats.includes(f.food))
+            ? 1.2
+            : 0.45 + 0.35 * Math.sin(this.t * 0.4 + a.speedK * 5);
         a.peek = lerp(a.peek ?? -1.2, target, dt * 0.8);
         const hx = h.x + out.x * h.rx * a.peek;
         const hy = h.y + out.y * h.rx * a.peek + Math.sin(this.t * 1.5) * h.ry * 0.12;
@@ -768,7 +821,11 @@
         route.push({ x: h.x - h.rx * 1.6, y: h.y + h.ry * 0.3 });
       }
       const n = 2 + Math.floor(r("n") * 2);
-      for (let i = 0; i < n; i++) route.push({ x: (0.08 + r(`x${i}`) * 0.84) * this.W, y: bottom - r(`y${i}`) * this.H * 0.12 });
+      for (let i = 0; i < n; i++)
+        route.push({
+          x: (0.08 + r(`x${i}`) * 0.84) * this.W,
+          y: bottom - r(`y${i}`) * this.H * 0.12,
+        });
       if (home) {
         const h = home.hole;
         a.state = "enter";
@@ -828,22 +885,50 @@
       const H = this.H;
       // Air stone in the back corner.
       if (Math.random() < dt * 5) {
-        this.bubbles.push({ x: W * 0.035 + Math.random() * 4, y: this.sandY, r: 1 + Math.random() * 2.5, vy: 30 + Math.random() * 25, ph: Math.random() * TAU });
+        this.bubbles.push({
+          x: W * 0.035 + Math.random() * 4,
+          y: this.sandY,
+          r: 1 + Math.random() * 2.5,
+          vy: 30 + Math.random() * 25,
+          ph: Math.random() * TAU,
+        });
       }
       // Decor that bubbles.
       this.decor.forEach((d, i) => {
         if (!d) return;
         const p = this.slotPos(i);
-        if ((d.d === "chest" || d.d === "golden_chest") && Math.sin(this.t * 0.35) > 0.92 && Math.random() < dt * 12) {
-          this.bubbles.push({ x: p.x + (Math.random() - 0.5) * 10 * p.scale, y: p.y - 20 * p.scale, r: 1.5 + Math.random() * 2, vy: 35, ph: Math.random() * TAU });
+        if (
+          (d.d === "chest" || d.d === "golden_chest") &&
+          Math.sin(this.t * 0.35) > 0.92 &&
+          Math.random() < dt * 12
+        ) {
+          this.bubbles.push({
+            x: p.x + (Math.random() - 0.5) * 10 * p.scale,
+            y: p.y - 20 * p.scale,
+            r: 1.5 + Math.random() * 2,
+            vy: 35,
+            ph: Math.random() * TAU,
+          });
         }
         if (d.d === "castle" && Math.random() < dt * 0.8) {
-          this.bubbles.push({ x: p.x - 38 * p.scale, y: p.y - 100 * p.scale, r: 1.5 + Math.random() * 1.5, vy: 30, ph: Math.random() * TAU });
+          this.bubbles.push({
+            x: p.x - 38 * p.scale,
+            y: p.y - 100 * p.scale,
+            r: 1.5 + Math.random() * 1.5,
+            vy: 30,
+            ph: Math.random() * TAU,
+          });
         }
       });
       for (const a of this.agents.values()) {
         if (a.move !== "eel" && a.move !== "crawl" && Math.random() < dt * 0.03) {
-          this.bubbles.push({ x: a.x + a.face * a.L * 0.5, y: a.y - 2, r: 1 + Math.random(), vy: 25, ph: 0 });
+          this.bubbles.push({
+            x: a.x + a.face * a.L * 0.5,
+            y: a.y - 2,
+            r: 1 + Math.random(),
+            vy: 25,
+            ph: 0,
+          });
         }
       }
       for (let i = this.bubbles.length - 1; i >= 0; i--) {
@@ -856,7 +941,13 @@
       // Floating motes, marine snow in the abyss.
       const want = A.BIOMES[this.tankId].snow ? 40 : 14;
       while (this.motes.length < want) {
-        this.motes.push({ x: Math.random() * W, y: Math.random() * this.sandY, r: 0.6 + Math.random() * 1.2, v: 2 + Math.random() * 5, ph: Math.random() * TAU });
+        this.motes.push({
+          x: Math.random() * W,
+          y: Math.random() * this.sandY,
+          r: 0.6 + Math.random() * 1.2,
+          v: 2 + Math.random() * 5,
+          ph: Math.random() * TAU,
+        });
       }
       for (const m of this.motes) {
         m.y += m.v * dt;
@@ -903,10 +994,17 @@
         return;
       }
       ctx.translate(a.x, a.y);
-      const tilt = BOTTOM_MOVERS[a.move] ? 0 : Math.max(-0.35, Math.min(0.35, Math.atan2(a.vy, Math.abs(a.vx) + this.unit * 0.3)));
+      const tilt = BOTTOM_MOVERS[a.move]
+        ? 0
+        : Math.max(-0.35, Math.min(0.35, Math.atan2(a.vy, Math.abs(a.vx) + this.unit * 0.3)));
       ctx.scale(a.face, 1);
       ctx.rotate(tilt);
-      A.drawFish(ctx, a.s, a.v, a.L, { phase: a.phase, effort: a.effort, mouth: a.mouth, dpr: this.dpr });
+      A.drawFish(ctx, a.s, a.v, a.L, {
+        phase: a.phase,
+        effort: a.effort,
+        mouth: a.mouth,
+        dpr: this.dpr,
+      });
       ctx.restore();
     }
 
@@ -936,7 +1034,8 @@
     isHomed(a) {
       if (!a.home) return false;
       if (a.move === "eel") return true;
-      if (a.home.kind === "anemone") return dist(a.x, a.y, a.home.x, a.home.y + 6 * a.home.s) < 22 * a.home.s;
+      if (a.home.kind === "anemone")
+        return dist(a.x, a.y, a.home.x, a.home.y + 6 * a.home.s) < 22 * a.home.s;
       return a.state === "hide" || a.hidden > 0;
     }
 
@@ -984,7 +1083,8 @@
       agents.sort((a, b) => a.z - b.z);
       for (const a of agents) if (!this.isHomed(a)) this.drawAgent(ctx, a);
 
-      for (const f of this.food) A.drawFood(ctx, f.food, f.x, f.y, Math.max(1.6, this.unit * 0.06), f.seed, t);
+      for (const f of this.food)
+        A.drawFood(ctx, f.food, f.x, f.y, Math.max(1.6, this.unit * 0.06), f.seed, t);
 
       this.decor.forEach((d, i) => {
         if (!d || C.SLOTS[i].row !== "front") return;
@@ -994,7 +1094,14 @@
 
       for (const d of this.drops) {
         const p = this.dropPos(d);
-        A.drawCoin(ctx, p.x, p.y, Math.max(6, this.unit * (0.16 + Math.min(0.12, Math.log10(d.v + 1) * 0.04))), t, d.v);
+        A.drawCoin(
+          ctx,
+          p.x,
+          p.y,
+          Math.max(6, this.unit * (0.16 + Math.min(0.12, Math.log10(d.v + 1) * 0.04))),
+          t,
+          d.v,
+        );
       }
       for (const b of this.bubbles) A.drawBubble(ctx, b.x, b.y, b.r);
       ctx.fillStyle = biome.dark ? "rgba(220,230,255,0.45)" : "rgba(255,255,255,0.35)";
@@ -1031,7 +1138,8 @@
         ctx.fillRect(0, 0, W, this.sandY + 6);
       }
 
-      for (const a of this.algae) A.drawAlgae(ctx, a.x * W, a.y * H, this.algaeR(a), a.hp, a.max, E.hash(a.id), t);
+      for (const a of this.algae)
+        A.drawAlgae(ctx, a.x * W, a.y * H, this.algaeR(a), a.hp, a.max, E.hash(a.id), t);
 
       // Glass reflection.
       const gl = ctx.createLinearGradient(0, 0, W * 0.5, H * 0.6);
@@ -1112,7 +1220,14 @@
             const e = k * k * (3 - 2 * k);
             const x = lerp(f.x, f.tx, e) + Math.sin(k * Math.PI) * f.ox;
             const y = lerp(f.y, f.ty, e) - Math.sin(k * Math.PI) * 30;
-            A.drawCoin(ctx, x, y, Math.max(5, this.unit * 0.14) * (1 - k * 0.4), this.t * 3, f.value);
+            A.drawCoin(
+              ctx,
+              x,
+              y,
+              Math.max(5, this.unit * 0.14) * (1 - k * 0.4),
+              this.t * 3,
+              f.value,
+            );
             break;
           }
           case "spark":
@@ -1127,8 +1242,22 @@
             ctx.fillStyle = `rgba(255,110,150,${1 - k})`;
             ctx.beginPath();
             ctx.moveTo(f.x, y + sz * 0.9);
-            ctx.bezierCurveTo(f.x - sz * 1.6, y - sz * 0.2, f.x - sz * 0.5, y - sz * 1.3, f.x, y - sz * 0.4);
-            ctx.bezierCurveTo(f.x + sz * 0.5, y - sz * 1.3, f.x + sz * 1.6, y - sz * 0.2, f.x, y + sz * 0.9);
+            ctx.bezierCurveTo(
+              f.x - sz * 1.6,
+              y - sz * 0.2,
+              f.x - sz * 0.5,
+              y - sz * 1.3,
+              f.x,
+              y - sz * 0.4,
+            );
+            ctx.bezierCurveTo(
+              f.x + sz * 0.5,
+              y - sz * 1.3,
+              f.x + sz * 1.6,
+              y - sz * 0.2,
+              f.x,
+              y + sz * 0.9,
+            );
             ctx.fill();
             break;
           }

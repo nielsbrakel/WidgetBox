@@ -5,7 +5,8 @@
  * and sent to the widget API in small batches. Every server response replaces the local save
  * and replays any actions that were not yet sent, so the server stays the source of truth.
  */
-(function (root) {
+((root) => {
+  // biome-ignore lint/suspicious/noRedundantUseStrict: loaded as a classic script, not a module
   "use strict";
 
   const E = root.AquaEngine;
@@ -68,7 +69,8 @@
       const res = await this.loadState();
       this.scene.resize();
       this.applyServer(res);
-      if (this.save.tz !== new Date().getTimezoneOffset()) this.do({ type: "setTz", tz: new Date().getTimezoneOffset() });
+      if (this.save.tz !== new Date().getTimezoneOffset())
+        this.do({ type: "setTz", tz: new Date().getTimezoneOffset() });
       document.getElementById("app").classList.remove("is-loading");
       this.ui.welcome(res.away, res.created);
       this.setupInput(canvas);
@@ -221,7 +223,8 @@
         const d = down;
         down = null;
         if (!d || d.id !== e.pointerId) return;
-        if (Math.hypot(e.clientX - d.x, e.clientY - d.y) > 14 || performance.now() - d.t > 800) return;
+        if (Math.hypot(e.clientX - d.x, e.clientY - d.y) > 14 || performance.now() - d.t > 800)
+          return;
         const rect = canvas.getBoundingClientRect();
         this.tap(e.clientX - rect.left, e.clientY - rect.top);
       });
@@ -244,7 +247,10 @@
         const slot = scene.slotAt(x, y);
         if (slot < 0) return ui.toast(ui.t("hint.place"));
         const p = scene.locate("slot", slot);
-        const r = ui.mode === "place" ? this.do({ type: "buyDecor", tank, d: ui.place.decor, slot }) : this.do({ type: "moveDecor", tank, from: ui.place.from, to: slot });
+        const r =
+          ui.mode === "place"
+            ? this.do({ type: "buyDecor", tank, d: ui.place.decor, slot })
+            : this.do({ type: "moveDecor", tank, from: ui.place.from, to: slot });
         if (r.ok) scene.sparkle(p.x, p.y, "#ffffff", 14);
         ui.setMode("look");
         return;
@@ -327,7 +333,8 @@
       await game.init();
     } catch (err) {
       const loading = document.getElementById("loading");
-      if (loading) loading.innerHTML = `<div style="padding:16px;text-align:center;font-weight:700">${(game.ui && game.ui.t("err.load")) || "Could not load the aquarium."}</div>`;
+      if (loading)
+        loading.innerHTML = `<div style="padding:16px;text-align:center;font-weight:700">${game.ui?.t("err.load") || "Could not load the aquarium."}</div>`;
       console.error(err);
     }
   }

@@ -124,7 +124,9 @@ describe("aquarium engine", () => {
     const golden = save.tanks.pond.eggs.find((e) => e.id === r.result.egg);
     expect(golden.m).toBe(2);
 
-    expect(E.apply(save, { type: "hatch", tank: "pond", id: golden.id }, T0 + H).error).toBe("notReady");
+    expect(E.apply(save, { type: "hatch", tank: "pond", id: golden.id }, T0 + H).error).toBe(
+      "notReady",
+    );
     const hatched = E.apply(save, { type: "hatch", tank: "pond", id: golden.id }, T0 + 3 * H);
     expect(hatched.ok).toBe(true);
     expect(hatched.result.born).toHaveLength(1);
@@ -133,7 +135,9 @@ describe("aquarium engine", () => {
 
     E.apply(save, { type: "buyEgg", tank: "pond", kind: "mystery" }, T0 + 3 * H);
     E.apply(save, { type: "buyEgg", tank: "pond", kind: "mystery" }, T0 + 3 * H);
-    expect(E.apply(save, { type: "buyEgg", tank: "pond", kind: "mystery" }, T0 + 3 * H).error).toBe("eggsFull");
+    expect(E.apply(save, { type: "buyEgg", tank: "pond", kind: "mystery" }, T0 + 3 * H).error).toBe(
+      "eggsFull",
+    );
   });
 
   it("paces a diligent player over weeks, not days", () => {

@@ -57,7 +57,12 @@ describe("aquarium widget api", () => {
     const res = await api.doAction({
       homey,
       query,
-      body: { actions: [{ type: "collect", tank: "pond", id: drop }, { type: "collect", tank: "pond", id: drop }] },
+      body: {
+        actions: [
+          { type: "collect", tank: "pond", id: drop },
+          { type: "collect", tank: "pond", id: drop },
+        ],
+      },
     });
     expect(res.results).toEqual([{ ok: true }, { ok: false, error: "gone" }]);
     expect(store.aquarium2_w1.coins).toBe(res.save.coins);
@@ -66,7 +71,9 @@ describe("aquarium widget api", () => {
   it("caps the batch size and survives junk bodies", async () => {
     const { homey } = fakeHomey();
     const many = Array.from({ length: 80 }, () => ({ type: "nope" }));
-    expect((await api.doAction({ homey, query, body: { actions: many } })).results).toHaveLength(50);
+    expect((await api.doAction({ homey, query, body: { actions: many } })).results).toHaveLength(
+      50,
+    );
     expect((await api.doAction({ homey, query, body: "junk" })).results).toEqual([]);
     expect((await api.doAction({ homey, query, body: null })).results).toEqual([]);
   });

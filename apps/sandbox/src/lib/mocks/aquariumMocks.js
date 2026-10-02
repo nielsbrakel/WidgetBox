@@ -39,31 +39,47 @@ function fish(save, tankId, species, opts = {}) {
     buff: 0,
   };
   save.tanks[tankId].fish.push(f);
-  save.dex[species] = (save.dex[species] | 0) | (1 << f.v);
+  save.dex[species] = save.dex[species] | 0 | (1 << f.v);
   return f;
 }
 
 function decor(save, tankId, ids) {
-  save.tanks[tankId].decor = C.SLOTS.map((_, i) => (ids[i] ? { id: `d${++save.nextId}`, d: ids[i] } : null));
+  save.tanks[tankId].decor = C.SLOTS.map((_, i) =>
+    ids[i] ? { id: `d${++save.nextId}`, d: ids[i] } : null,
+  );
 }
 
 function drops(save, tankId, values) {
-  values.forEach((v, i) => save.tanks[tankId].drops.push({ id: `c${++save.nextId}`, x: 0.1 + i * 0.09, v }));
+  for (const [i, v] of values.entries())
+    save.tanks[tankId].drops.push({ id: `c${++save.nextId}`, x: 0.1 + i * 0.09, v });
 }
 
 function algae(save, tankId, n) {
   for (let i = 0; i < n; i++) {
     const hp = 1 + (i % 3);
-    save.tanks[tankId].algae.push({ id: `a${++save.nextId}`, x: 0.1 + ((i * 0.23) % 0.7), y: 0.18 + ((i * 0.17) % 0.45), hp, max: hp, at: save.t });
+    save.tanks[tankId].algae.push({
+      id: `a${++save.nextId}`,
+      x: 0.1 + ((i * 0.23) % 0.7),
+      y: 0.18 + ((i * 0.17) % 0.45),
+      hp,
+      max: hp,
+      at: save.t,
+    });
   }
 }
 
 function debris(save, tankId, n) {
-  for (let i = 0; i < n; i++) save.tanks[tankId].debris.push({ id: `w${++save.nextId}`, x: 0.12 + i * 0.14, at: save.t });
+  for (let i = 0; i < n; i++)
+    save.tanks[tankId].debris.push({ id: `w${++save.nextId}`, x: 0.12 + i * 0.14, at: save.t });
 }
 
 function eggs(save, tankId, species, ready) {
-  save.tanks[tankId].eggs.push({ id: `e${++save.nextId}`, s: species, at: save.t - (ready ? 3 : 0.5) * HOUR, x: 0.3 });
+  save.tanks[tankId].eggs.push({
+    id: `e${++save.nextId}`,
+    s: species,
+    at: save.t - (ready ? 3 : 0.5) * HOUR,
+    x: 0.3,
+  });
 }
 
 function gallery(save, tankId) {
@@ -79,7 +95,16 @@ function gallery(save, tankId) {
   const L = items.filter((d) => C.DECOR[d].size === "L");
   const M = items.filter((d) => C.DECOR[d].size === "M");
   const S = items.filter((d) => C.DECOR[d].size === "S");
-  decor(save, tankId, [L[0], M[0], M[1] || S[2], L[1] || M[2], S[0], S[1], M[2] ? S[2] : null, S[3] || null]);
+  decor(save, tankId, [
+    L[0],
+    M[0],
+    M[1] || S[2],
+    L[1] || M[2],
+    S[0],
+    S[1],
+    M[2] ? S[2] : null,
+    S[3] || null,
+  ]);
 }
 
 const SCENARIOS = {
@@ -110,7 +135,16 @@ const SCENARIOS = {
     fish(s, "amazon", "angelfish");
     fish(s, "amazon", "pleco");
     fish(s, "amazon", "betta");
-    decor(s, "amazon", ["root", "sword_plant", "stump", null, "java_fern", "clay_cave", null, null]);
+    decor(s, "amazon", [
+      "root",
+      "sword_plant",
+      "stump",
+      null,
+      "java_fern",
+      "clay_cave",
+      null,
+      null,
+    ]);
     s.tanks.amazon.up.size = 3;
     drops(s, "amazon", [30, 45]);
     return s;
@@ -131,7 +165,16 @@ const SCENARIOS = {
     fish(s, "reef", "gramma");
     for (let i = 0; i < 4; i++) fish(s, "reef", "chromis");
     fish(s, "reef", "shrimp");
-    decor(s, "reef", ["rock_cave", "anemone", "staghorn", "sea_fan", "brain_coral", null, "giant_clam", null]);
+    decor(s, "reef", [
+      "rock_cave",
+      "anemone",
+      "staghorn",
+      "sea_fan",
+      "brain_coral",
+      null,
+      "giant_clam",
+      null,
+    ]);
     s.tanks.reef.up.size = 4;
     return s;
   },
@@ -149,7 +192,16 @@ const SCENARIOS = {
     fish(s, "abyss", "jelly", { v: 1 });
     fish(s, "abyss", "angler");
     fish(s, "abyss", "isopod");
-    decor(s, "abyss", ["whale_bone", "tube_worms", "sea_lily", "vent", "glow_crystal", null, "glow_crystal", null]);
+    decor(s, "abyss", [
+      "whale_bone",
+      "tube_worms",
+      "sea_lily",
+      "vent",
+      "glow_crystal",
+      null,
+      "glow_crystal",
+      null,
+    ]);
     s.tanks.abyss.up.size = 3;
     return s;
   },
@@ -167,7 +219,16 @@ const SCENARIOS = {
     s.level = 4;
     s.coins = 500;
     for (const sp of ["goldfish", "guppy", "guppy", "platy"]) fish(s, "pond", sp);
-    decor(s, "pond", ["castle", "vallisneria", "vallisneria", "driftwood", "anubias", "pebbles", "chest", "moss_ball"]);
+    decor(s, "pond", [
+      "castle",
+      "vallisneria",
+      "vallisneria",
+      "driftwood",
+      "anubias",
+      "pebbles",
+      "chest",
+      "moss_ball",
+    ]);
     eggs(s, "pond", "guppy", true);
     return s;
   },
@@ -239,7 +300,7 @@ export function resetAquariumScenario(scenarioId, force = false) {
   write(scenarioId, build(Date.now()));
 }
 
-export function handleAquariumApi(widgetId, method, endpoint, body, scenarioId) {
+export function handleAquariumApi(widgetId, method, _endpoint, body, scenarioId) {
   if (widgetId !== "aquarium") return null;
   resetAquariumScenario(scenarioId);
   const now = Date.now();
@@ -249,15 +310,20 @@ export function handleAquariumApi(widgetId, method, endpoint, body, scenarioId) 
   if (method === "GET") {
     const away = Engine.simulate(save, now);
     write(stored.scenario, save);
-    return { save, now, away, created: scenarioId === "default" && save.tut === 0 && save.stats.coinsEarned === 0 };
+    return {
+      save,
+      now,
+      away,
+      created: scenarioId === "default" && save.tut === 0 && save.stats.coinsEarned === 0,
+    };
   }
 
-  if (body && body.reset) {
+  if (body?.reset) {
     const fresh = Engine.createSave(now);
     write(stored.scenario, fresh);
     return { save: fresh, now, results: [] };
   }
-  const actions = Array.isArray(body && body.actions) ? body.actions : [];
+  const actions = Array.isArray(body?.actions) ? body.actions : [];
   const results = actions.map((a) => {
     const r = Engine.apply(save, a, now);
     return { ok: r.ok, error: r.error };

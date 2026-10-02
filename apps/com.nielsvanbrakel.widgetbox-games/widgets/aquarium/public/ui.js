@@ -4,7 +4,8 @@
  * Every control is a single tap. Lists are paged with arrow buttons instead of scrolling so
  * nothing depends on swipe gestures, which the Homey dashboard keeps for itself.
  */
-(function (root) {
+((root) => {
+  // biome-ignore lint/suspicious/noRedundantUseStrict: loaded as a classic script, not a module
   "use strict";
 
   const C = root.AquaCatalog;
@@ -13,33 +14,54 @@
 
   // ── Icons ──────────────────────────────────────────────────────────
 
-  const S = (body, vb = "0 0 24 24") => `<svg viewBox="${vb}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${body}</svg>`;
+  const S = (body, vb = "0 0 24 24") =>
+    `<svg viewBox="${vb}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${body}</svg>`;
   const ICONS = {
     coin: `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#e8a91f"/><circle cx="12" cy="11.2" r="9" fill="#ffd85a"/><circle cx="12" cy="11.2" r="5.6" fill="none" stroke="#e8a91f" stroke-width="1.6"/></svg>`,
     pearl: `<svg viewBox="0 0 24 24" aria-hidden="true"><defs><radialGradient id="pg" cx="35%" cy="30%" r="70%"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#b9b0ea"/></radialGradient></defs><circle cx="12" cy="12" r="9.5" fill="url(#pg)"/><circle cx="9" cy="8.5" r="2.2" fill="#fff" opacity=".9"/></svg>`,
-    food: S('<path d="M5 9h14l-1.5 10a2 2 0 0 1-2 1.7h-7a2 2 0 0 1-2-1.7z"/><path d="M8 9V6a4 4 0 0 1 8 0v3"/><circle cx="10" cy="14" r=".6" fill="currentColor"/><circle cx="14" cy="15.5" r=".6" fill="currentColor"/>'),
-    play: S('<circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/>'),
+    food: S(
+      '<path d="M5 9h14l-1.5 10a2 2 0 0 1-2 1.7h-7a2 2 0 0 1-2-1.7z"/><path d="M8 9V6a4 4 0 0 1 8 0v3"/><circle cx="10" cy="14" r=".6" fill="currentColor"/><circle cx="14" cy="15.5" r=".6" fill="currentColor"/>',
+    ),
+    play: S(
+      '<circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/>',
+    ),
     shop: S('<path d="M4 8h16l-1 12H5z"/><path d="M9 8a3 3 0 0 1 6 0"/>'),
     menu: S('<path d="M4 7h16M4 12h16M4 17h16"/>'),
     close: S('<path d="M6 6l12 12M18 6L6 18"/>'),
     left: S('<path d="M15 5l-7 7 7 7"/>'),
     right: S('<path d="M9 5l7 7-7 7"/>'),
-    lock: S('<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>'),
+    lock: S(
+      '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
+    ),
     check: S('<path d="M5 12l5 5 9-10"/>'),
     star: S('<path d="M12 3l2.8 5.8 6.2.9-4.5 4.4 1 6.2L12 17.4 6.5 20.3l1-6.2L3 9.7l6.2-.9z"/>'),
-    fish: S('<path d="M3 12c3-5 9-6 13-3l4-3v12l-4-3c-4 3-10 2-13-3z"/><circle cx="8" cy="11" r=".8" fill="currentColor"/>'),
-    tank: S('<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 15c3-2 5 1 9-1s6 1 9-1"/>'),
+    fish: S(
+      '<path d="M3 12c3-5 9-6 13-3l4-3v12l-4-3c-4 3-10 2-13-3z"/><circle cx="8" cy="11" r=".8" fill="currentColor"/>',
+    ),
+    tank: S(
+      '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 15c3-2 5 1 9-1s6 1 9-1"/>',
+    ),
     book: S('<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5"/>'),
-    help: S('<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 1-1 1.7v.5"/><circle cx="12" cy="17" r=".6" fill="currentColor"/>'),
-    trophy: S('<path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8 20h8"/>'),
+    help: S(
+      '<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 1-1 1.7v.5"/><circle cx="12" cy="17" r=".6" fill="currentColor"/>',
+    ),
+    trophy: S(
+      '<path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8 20h8"/>',
+    ),
     egg: S('<path d="M12 3c3.5 0 6 6 6 10a6 6 0 0 1-12 0c0-4 2.5-10 6-10z"/>'),
     water: S('<path d="M12 3s6 7 6 11a6 6 0 0 1-12 0c0-4 6-11 6-11z"/>'),
     upgrade: S('<path d="M12 19V5M6 11l6-6 6 6"/>'),
-    sparkle: S('<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5L18 18M6 18l2.5-2.5M15.5 8.5L18 6"/>'),
-    move: S('<path d="M12 3v18M3 12h18M12 3l-3 3M12 3l3 3M12 21l-3-3M12 21l3-3M3 12l3-3M3 12l3 3M21 12l-3-3M21 12l-3 3"/>'),
+    sparkle: S(
+      '<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5L18 18M6 18l2.5-2.5M15.5 8.5L18 6"/>',
+    ),
+    move: S(
+      '<path d="M12 3v18M3 12h18M12 3l-3 3M12 3l3 3M12 21l-3-3M12 21l3-3M3 12l3-3M3 12l3 3M21 12l-3-3M21 12l-3 3"/>',
+    ),
     reset: S('<path d="M4 12a8 8 0 1 0 2.3-5.7"/><path d="M4 4v4h4"/>'),
     plus: S('<path d="M12 5v14M5 12h14"/>'),
-    flame: S('<path d="M12 3c1 4 5 5 5 10a5 5 0 0 1-10 0c0-3 2-4 2-7 1.5 1 2 2 3 3 0-2 0-4 0-6z"/>'),
+    flame: S(
+      '<path d="M12 3c1 4 5 5 5 10a5 5 0 0 1-10 0c0-3 2-4 2-7 1.5 1 2 2 3 3 0-2 0-4 0-6z"/>',
+    ),
   };
 
   function icon(name) {
@@ -61,7 +83,9 @@
   function eggImage(kind) {
     const gold = kind === "golden";
     const fill = gold ? "url(#g)" : "#f3ead2";
-    const dots = gold ? "" : '<circle cx="17" cy="16" r="1.6" fill="#7aa7b5"/><circle cx="23" cy="22" r="1.3" fill="#7aa7b5"/><circle cx="16" cy="25" r="1.1" fill="#7aa7b5"/>';
+    const dots = gold
+      ? ""
+      : '<circle cx="17" cy="16" r="1.6" fill="#7aa7b5"/><circle cx="23" cy="22" r="1.3" fill="#7aa7b5"/><circle cx="16" cy="25" r="1.1" fill="#7aa7b5"/>';
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><defs><radialGradient id="g" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#fff6c8"/><stop offset=".5" stop-color="#f5c542"/><stop offset="1" stop-color="#b9831c"/></radialGradient></defs><path d="M20 5c6 0 11 10 11 17a11 11 0 0 1-22 0C9 15 14 5 20 5z" fill="${fill}" stroke="${gold ? "#8a5d10" : "#c9bb98"}" stroke-width="1.2"/>${dots}<text x="20" y="27" font-size="11" font-family="sans-serif" font-weight="700" text-anchor="middle" fill="${gold ? "#7a4d00" : "#5a7f8c"}">${gold ? "★" : "?"}</text></svg>`;
     return `data:image/svg+xml,${encodeURIComponent(svg)}`;
   }
@@ -72,14 +96,61 @@
   }
 
   function esc(s) {
-    return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+    return String(s).replace(
+      /[&<>"']/g,
+      (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c],
+    );
   }
 
   const NAMES = [
-    "Bubbles", "Finn", "Coral", "Pip", "Nori", "Splash", "Mango", "Pebble", "Ziggy", "Luna", "Sunny", "Dot",
-    "Kiwi", "Biscuit", "Wave", "Olive", "Peanut", "Jelly", "Sushi", "Taco", "Ruby", "Blue", "Marble", "Ripple",
-    "Noodle", "Pixel", "Gus", "Mila", "Otto", "Fleur", "Tiki", "Bean", "Comet", "Echo", "Poppy", "Squid",
-    "Nemo", "Dory", "Tango", "Fizz", "Bloop", "Clove", "Iris", "Juno", "Kai", "Lilo", "Moss", "Sprout",
+    "Bubbles",
+    "Finn",
+    "Coral",
+    "Pip",
+    "Nori",
+    "Splash",
+    "Mango",
+    "Pebble",
+    "Ziggy",
+    "Luna",
+    "Sunny",
+    "Dot",
+    "Kiwi",
+    "Biscuit",
+    "Wave",
+    "Olive",
+    "Peanut",
+    "Jelly",
+    "Sushi",
+    "Taco",
+    "Ruby",
+    "Blue",
+    "Marble",
+    "Ripple",
+    "Noodle",
+    "Pixel",
+    "Gus",
+    "Mila",
+    "Otto",
+    "Fleur",
+    "Tiki",
+    "Bean",
+    "Comet",
+    "Echo",
+    "Poppy",
+    "Squid",
+    "Nemo",
+    "Dory",
+    "Tango",
+    "Fizz",
+    "Bloop",
+    "Clove",
+    "Iris",
+    "Juno",
+    "Kai",
+    "Lilo",
+    "Moss",
+    "Sprout",
   ];
 
   function fishName(id) {
@@ -93,7 +164,13 @@
     abyss: "linear-gradient(#1d3460, #050b1e 75%, #2a2f45 76%)",
   };
 
-  const FOOD_DOT = { flakes: "#f2a03a", pellets: "#a8642e", worms: "#c8283a", brine: "#ff8a6a", krill: "#ff5a3a" };
+  const FOOD_DOT = {
+    flakes: "#f2a03a",
+    pellets: "#a8642e",
+    worms: "#c8283a",
+    brine: "#ff8a6a",
+    krill: "#ff5a3a",
+  };
 
   // ── UI ─────────────────────────────────────────────────────────────
 
@@ -118,12 +195,12 @@
     t(key, vars) {
       let s = null;
       try {
-        s = root.Homey && root.Homey.__ ? root.Homey.__(`widgets.aquarium.${key}`) : null;
+        s = root.Homey?.__ ? root.Homey.__(`widgets.aquarium.${key}`) : null;
       } catch (_) {
         s = null;
       }
       if (typeof s !== "string" || !s || s.includes("widgets.aquarium")) s = key.split(".").pop();
-      if (vars) s = s.replace(/\{(\w+)\}/g, (_, k) => (vars[k] ?? `{${k}}`));
+      if (vars) s = s.replace(/\{(\w+)\}/g, (_, k) => vars[k] ?? `{${k}}`);
       return s;
     }
 
@@ -280,10 +357,16 @@
         const n = save.food[this.food] || 0;
         const tank = save.tanks[save.active];
         const eaters = tank.fish.filter((f) => C.SPECIES[f.s].eats.includes(this.food)).length;
-        const hint = !n ? this.t("hint.noFood") : !eaters ? this.t("hint.noEaters", { food: this.t(`food.${this.food}`) }) : this.t("hint.feed", { food: this.t(`food.${this.food}`) });
+        const hint = !n
+          ? this.t("hint.noFood")
+          : !eaters
+            ? this.t("hint.noEaters", { food: this.t(`food.${this.food}`) })
+            : this.t("hint.feed", { food: this.t(`food.${this.food}`) });
         html += `<div class="tray-hint">${esc(hint)}</div>`;
       } else if (this.mode === "play") {
-        const ready = this.game.save.tanks[save.active].fish.filter((f) => E.playReady(f, this.game.now())).length;
+        const ready = this.game.save.tanks[save.active].fish.filter((f) =>
+          E.playReady(f, this.game.now()),
+        ).length;
         html += `<div class="tray-hint">${esc(ready ? this.t("hint.play", { n: ready }) : this.t("hint.playTired"))}</div>`;
       } else if (this.mode === "place" || this.mode === "move") {
         html += `<div class="tray-row"><div class="tray-hint">${esc(this.t("hint.place"))}</div><button type="button" class="food-btn" data-ui="cancelPlace">${icon("close")}${esc(this.t("cancel"))}</button></div>`;
@@ -310,12 +393,17 @@
       const info = E.tankInfo(save, save.active, now);
       const chips = [];
       if (info.eggsReady) chips.push(["eggs", "good", "egg", this.t("chip.eggs")]);
-      if (info.hungry) chips.push(["hungry", "warn", "food", this.t("chip.hungry", { n: info.hungry })]);
+      if (info.hungry)
+        chips.push(["hungry", "warn", "food", this.t("chip.hungry", { n: info.hungry })]);
       if (info.water < 65) chips.push(["water", "warn", "water", `${Math.round(info.water)}%`]);
-      if (info.uncollected >= info.cap && info.cap > 0) chips.push(["full", "warn", "coin", this.t("chip.full")]);
+      if (info.uncollected >= info.cap && info.cap > 0)
+        chips.push(["full", "warn", "coin", this.t("chip.full")]);
       const chipHtml = chips
         .slice(0, 2)
-        .map(([id, cls, ic, label]) => `<button type="button" class="chip ${cls}" data-ui="chip" data-arg="${id}">${icon(ic)}${esc(label)}</button>`)
+        .map(
+          ([id, cls, ic, label]) =>
+            `<button type="button" class="chip ${cls}" data-ui="chip" data-arg="${id}">${icon(ic)}${esc(label)}</button>`,
+        )
         .join("");
       const chipsEl = this.$("chips");
       if (chipsEl.dataset.html !== chipHtml) {
@@ -324,7 +412,13 @@
       }
       this.renderCoach();
       if (this.card) this.renderCard();
-      if (this.mode !== "look" && this.mode !== "place" && this.mode !== "move" && Date.now() - this.lastMode > 25000) this.setMode("look");
+      if (
+        this.mode !== "look" &&
+        this.mode !== "place" &&
+        this.mode !== "move" &&
+        Date.now() - this.lastMode > 25000
+      )
+        this.setMode("look");
     }
 
     setNum(id, value) {
@@ -360,7 +454,7 @@
       const save = this.game.save;
       const coach = this.$("coach");
       const scene = this.game.scene;
-      document.querySelectorAll(".dock-btn").forEach((b) => b.classList.remove("hint"));
+      for (const b of document.querySelectorAll(".dock-btn")) b.classList.remove("hint");
       if (save.tut >= C.TUTORIAL.length || this.sheet || this.mode === "place") {
         coach.hidden = true;
         if (!this.pointerTimer || this.pointerTimer._done) scene.setPointer(null);
@@ -417,12 +511,15 @@
         html += `<div class="card-sub">${esc(this.variantName(f.s, f.v))} · ${esc(this.t(`stage.${info.stage}`))}</div>`;
         html += `<div class="stat"><span>${esc(this.t("fed"))}</span><div class="bar ${fedCls}"><i style="width:${Math.round(f.fed)}%"></i></div><span>${Math.round(f.fed)}%</span></div>`;
         html += `<div class="stat"><span>${esc(this.t("happy"))}</span><div class="bar ${hapCls}"><i style="width:${info.happiness}%"></i></div><span>${info.happiness}%</span></div>`;
-        if (f.stage < E.STAGE.ADULT) html += `<div class="stat"><span>${esc(this.t("growth"))}</span><div class="bar"><i style="width:${Math.round(info.growPct * 100)}%;background:var(--accent)"></i></div><span>${Math.round(info.growPct * 100)}%</span></div>`;
+        if (f.stage < E.STAGE.ADULT)
+          html += `<div class="stat"><span>${esc(this.t("growth"))}</span><div class="bar"><i style="width:${Math.round(info.growPct * 100)}%;background:var(--accent)"></i></div><span>${Math.round(info.growPct * 100)}%</span></div>`;
         html += '<div class="tags">';
         html += `<span class="tag">${icon("coin")} ${fmtRate(info.income)}/${esc(this.t("hourShort"))}</span>`;
         for (const r of info.reasons) {
-          if (r.k === "playful") html += `<span class="tag plus">${esc(this.t("reason.playful"))}</span>`;
-          else if (r.v) html += `<span class="tag ${r.v > 0 ? "plus" : "minus"}">${r.v > 0 ? "+" : ""}${r.v} ${esc(this.t(`reason.${r.k}`, { home: this.t(`tag.${info.species.needs}`) }))}</span>`;
+          if (r.k === "playful")
+            html += `<span class="tag plus">${esc(this.t("reason.playful"))}</span>`;
+          else if (r.v)
+            html += `<span class="tag ${r.v > 0 ? "plus" : "minus"}">${r.v > 0 ? "+" : ""}${r.v} ${esc(this.t(`reason.${r.k}`, { home: this.t(`tag.${info.species.needs}`) }))}</span>`;
         }
         if (info.species.cleans) html += `<span class="tag">${esc(this.t("trait.cleaner"))}</span>`;
         html += "</div>";
@@ -435,17 +532,24 @@
         html += `<div class="card-sub">${item.tags.map((t) => esc(this.t(`tag.${t}`))).join(" · ")}${item.bonus ? ` · +${Math.round(item.bonus * 100)}% ${esc(this.t("income"))}` : ""}</div>`;
         const fans = save.tanks[save.active].fish.filter((f) => {
           const sp = C.SPECIES[f.s];
-          return (sp.likes || []).some((t) => item.tags.includes(t)) || item.tags.includes(sp.needs);
+          return (
+            (sp.likes || []).some((t) => item.tags.includes(t)) || item.tags.includes(sp.needs)
+          );
         });
-        if (fans.length) html += `<div class="card-sub">${esc(this.t("decorFans", { n: fans.length }))}</div>`;
-        const refund = item.pearls ? Math.floor(item.pearls * C.RULES.decorSellReturn) : Math.round(item.price * C.RULES.decorSellReturn);
+        if (fans.length)
+          html += `<div class="card-sub">${esc(this.t("decorFans", { n: fans.length }))}</div>`;
+        const refund = item.pearls
+          ? Math.floor(item.pearls * C.RULES.decorSellReturn)
+          : Math.round(item.price * C.RULES.decorSellReturn);
         html += `<div class="row"><button type="button" class="btn" data-ui="cardAction" data-arg="moveDecor">${icon("move")}${esc(this.t("move"))}</button>`;
         html += `<button type="button" class="btn danger" data-ui="cardAction" data-arg="sellDecor">${esc(this.t("sell"))} ${icon(item.pearls ? "pearl" : "coin")}${refund}</button></div>`;
       } else if (card.kind === "egg") {
         const egg = save.tanks[save.active].eggs.find((e) => e.id === card.id);
         if (!egg) return this.hideCard();
         const ready = E.eggReady(egg, now);
-        const title = egg.m ? this.t(egg.m === 2 ? "egg.golden" : "egg.mystery") : this.t("eggsOf", { name: this.speciesName(egg.s) });
+        const title = egg.m
+          ? this.t(egg.m === 2 ? "egg.golden" : "egg.mystery")
+          : this.t("eggsOf", { name: this.speciesName(egg.s) });
         html += `<div class="card-title">${esc(title)}</div>`;
         if (!ready) {
           const left = egg.at + C.RULES.eggHatchHours * E.HOUR - now;
@@ -477,7 +581,12 @@
         const save = this.game.save;
         const decor = save.tanks[tank].decor;
         const item = decor[card.id];
-        const slots = C.SLOTS.map((_, i) => i).filter((i) => i !== card.id && E.slotFits(i, item.d) && (!decor[i] || E.slotFits(card.id, decor[i].d)));
+        const slots = C.SLOTS.map((_, i) => i).filter(
+          (i) =>
+            i !== card.id &&
+            E.slotFits(i, item.d) &&
+            (!decor[i] || E.slotFits(card.id, decor[i].d)),
+        );
         if (!slots.length) return this.toast(this.t("err.fit"), "err");
         this.setMode("move", { from: card.id, slots });
       } else if (action === "sellEggs") {
@@ -537,12 +646,24 @@
         sh.kind === "shop" || sh.kind === "tanks"
           ? `<span class="pill">${icon("coin")}<span style="color:var(--gold)">${fmt(save.coins)}</span></span><span class="pill">${icon("pearl")}<span style="color:var(--pearl)">${fmt(save.pearls)}</span></span>`
           : "";
-      this.$("sheetTabs").innerHTML = tabs ? tabs.map((t) => `<button type="button" class="tab ${t === sh.tab ? "on" : ""}" data-ui="tab" data-arg="${t}">${esc(this.t(`tab.${t}`))}</button>`).join("") : "";
+      this.$("sheetTabs").innerHTML = tabs
+        ? tabs
+            .map(
+              (t) =>
+                `<button type="button" class="tab ${t === sh.tab ? "on" : ""}" data-ui="tab" data-arg="${t}">${esc(this.t(`tab.${t}`))}</button>`,
+            )
+            .join("")
+        : "";
       const body = this.$("sheetBody");
       body.innerHTML = "";
       const view = {
         shop: () => (sh.tab === "upgrades" ? this.viewUpgrades() : this.viewShop()),
-        journal: () => (sh.tab === "dex" ? this.viewDex() : sh.tab === "trophies" ? this.viewTrophies() : this.viewGoals()),
+        journal: () =>
+          sh.tab === "dex"
+            ? this.viewDex()
+            : sh.tab === "trophies"
+              ? this.viewTrophies()
+              : this.viewGoals(),
         tanks: () => this.viewTanks(),
         menu: () => this.viewMenu(),
         help: () => this.viewHelp(),
@@ -551,7 +672,10 @@
       body.innerHTML = out.body;
       body.style.gridTemplateColumns = out.cols ? `repeat(${out.cols}, 1fr)` : "";
       body.style.gridAutoRows = out.rowH ? `${out.rowH}px` : "";
-      const pager = out.pages > 1 ? `<div class="pager"><button type="button" class="icon-btn" data-ui="page" data-arg="-1" ${sh.page <= 0 ? "disabled" : ""}>${icon("left")}</button>${sh.page + 1}/${out.pages}<button type="button" class="icon-btn" data-ui="page" data-arg="1" ${sh.page >= out.pages - 1 ? "disabled" : ""}>${icon("right")}</button></div>` : "";
+      const pager =
+        out.pages > 1
+          ? `<div class="pager"><button type="button" class="icon-btn" data-ui="page" data-arg="-1" ${sh.page <= 0 ? "disabled" : ""}>${icon("left")}</button>${sh.page + 1}/${out.pages}<button type="button" class="icon-btn" data-ui="page" data-arg="1" ${sh.page >= out.pages - 1 ? "disabled" : ""}>${icon("right")}</button></div>`
+          : "";
       this.$("sheetFoot").innerHTML = (out.foot || "") + pager;
       // The grid is sized from the space left by the footer; if the new footer is taller than
       // the old one, lay out once more so items never slide under it.
@@ -647,7 +771,11 @@
       } else if (tab === "fish") {
         const sp = C.SPECIES[id];
         const block = E.speciesBlock(save, tank, id);
-        const likes = sp.needs ? this.t("needs", { tag: this.t(`tag.${sp.needs}`) }) : sp.likes && sp.likes.length ? this.t("likes", { tags: sp.likes.map((t) => this.t(`tag.${t}`)).join(", ") }) : "";
+        const likes = sp.needs
+          ? this.t("needs", { tag: this.t(`tag.${sp.needs}`) })
+          : sp.likes?.length
+            ? this.t("likes", { tags: sp.likes.map((t) => this.t(`tag.${t}`)).join(", ") })
+            : "";
         info = `<b>${esc(this.speciesName(id))}</b><br><span class="muted">${icon("coin")}${sp.income}/${esc(this.t("hourShort"))} · ${esc(this.t("space", { n: sp.space }))}${likes ? ` · ${esc(likes)}` : ""} · ${esc(this.t("eats", { foods: sp.eats.map((f) => this.t(`food.${f}`)).join("/") }))}${sp.cleans ? ` · ${esc(this.t("trait.cleaner"))}` : ""}</span>`;
         btn = `<button type="button" class="btn primary" style="flex:none" data-ui="action" data-arg="buyFish:${id}" ${block && block !== "coins" ? "disabled" : ""}>${block === "level" ? `${icon("lock")}${this.t("levelN", { n: sp.level })}` : block === "space" ? esc(this.t("err.space")) : block === "max" ? esc(this.t("err.max")) : `${esc(this.t("buy"))} ${icon("coin")}${fmt(sp.price)}`}</button>`;
       } else if (tab === "decor") {
@@ -657,8 +785,13 @@
         btn = `<button type="button" class="btn primary" style="flex:none" data-ui="action" data-arg="buyDecor:${id}" ${block && block !== "coins" && block !== "pearls" ? "disabled" : ""}>${block === "level" ? `${icon("lock")}${this.t("levelN", { n: item.level })}` : block === "slot" ? esc(this.t("err.slot")) : `${esc(this.t("buy"))} ${icon(item.pearls ? "pearl" : "coin")}${fmt(item.pearls || item.price)}`}</button>`;
       } else if (tab === "food") {
         const food = C.FOODS[id];
-        const eaters = Object.keys(C.SPECIES).filter((s) => C.SPECIES[s].eats.includes(id) && C.SPECIES[s].level <= save.level + 3);
-        info = `<b>${esc(cap(this.t(`food.${id}`)))}</b> <span class="muted">(${save.food[id] || 0})</span><br><span class="muted">${esc(this.t("foodInfo", { n: food.pack, portion: food.portion }))} · ${eaters.slice(0, 4).map((s) => esc(this.speciesName(s))).join(", ")}</span>`;
+        const eaters = Object.keys(C.SPECIES).filter(
+          (s) => C.SPECIES[s].eats.includes(id) && C.SPECIES[s].level <= save.level + 3,
+        );
+        info = `<b>${esc(cap(this.t(`food.${id}`)))}</b> <span class="muted">(${save.food[id] || 0})</span><br><span class="muted">${esc(this.t("foodInfo", { n: food.pack, portion: food.portion }))} · ${eaters
+          .slice(0, 4)
+          .map((s) => esc(this.speciesName(s)))
+          .join(", ")}</span>`;
         btn = `<button type="button" class="btn primary" style="flex:none" data-ui="action" data-arg="buyFood:${id}" ${save.level < food.level ? "disabled" : ""}>${save.level < food.level ? `${icon("lock")}${this.t("levelN", { n: food.level })}` : `+${food.pack} ${icon("coin")}${fmt(food.price)}`}</button>`;
       }
       return `<div class="foot-info">${info}</div>${btn}`;
@@ -675,11 +808,23 @@
         const lvl = tank.up[k];
         const max = C.UPGRADES[k].cost.length;
         const cost = E.upgradeCost(tank, k);
-        const pips = Array.from({ length: max }, (_, i) => `<i class="${i < lvl ? "on" : ""}"></i>`).join("");
-        const desc = this.t(`upgradeDesc.${k}`, { n: C.UPGRADES.size.perLevel, h: C.UPGRADES.chest.hours[Math.min(lvl + 1, max)], f: lvl + 1 });
+        const pips = Array.from(
+          { length: max },
+          (_, i) => `<i class="${i < lvl ? "on" : ""}"></i>`,
+        ).join("");
+        const desc = this.t(`upgradeDesc.${k}`, {
+          n: C.UPGRADES.size.perLevel,
+          h: C.UPGRADES.chest.hours[Math.min(lvl + 1, max)],
+          f: lvl + 1,
+        });
         body += `<div class="list-row"><div class="grow"><div class="title">${esc(this.t(`upgrade.${k}`))}</div><div class="sub">${esc(cost == null ? this.t("maxed") : desc)}</div><div class="pips">${pips}</div></div>${cost == null ? icon("check") : `<button type="button" class="btn ${save.coins >= cost ? "primary" : ""}" style="flex:none" data-ui="action" data-arg="upgrade:${k}">${icon("coin")}${fmt(cost)}</button>`}</div>`;
       }
-      return { body, rowH: L.itemH, pages, foot: `<div class="foot-info"><span class="muted">${esc(this.t("upgradeHint", { tank: this.t(`tank.${save.active}`) }))}</span></div>` };
+      return {
+        body,
+        rowH: L.itemH,
+        pages,
+        foot: `<div class="foot-info"><span class="muted">${esc(this.t("upgradeHint", { tank: this.t(`tank.${save.active}`) }))}</span></div>`,
+      };
     }
 
     viewTanks() {
@@ -696,7 +841,10 @@
         if (tank.unlocked) {
           const info = E.tankInfo(save, id, now);
           sub = `${tank.fish.length} ${this.t("fishCount")} · ${icon("coin")}${fmtRate(info.income)}/${this.t("hourShort")}${info.uncollected ? ` · ${fmt(info.uncollected)} ${this.t("waiting")}` : ""}`;
-          right = id === save.active ? `<span class="tag">${esc(this.t("here"))}</span>` : `<button type="button" class="btn primary" style="flex:none" data-ui="action" data-arg="visit:${id}">${esc(this.t("visit"))}</button>`;
+          right =
+            id === save.active
+              ? `<span class="tag">${esc(this.t("here"))}</span>`
+              : `<button type="button" class="btn primary" style="flex:none" data-ui="action" data-arg="visit:${id}">${esc(this.t("visit"))}</button>`;
         } else {
           const lvlOk = save.level >= def.unlockLevel;
           sub = `${icon("lock")} ${esc(this.t("levelN", { n: def.unlockLevel }))} · ${icon("coin")}${fmt(def.unlockCost)}`;
@@ -709,10 +857,18 @@
 
     viewMenu() {
       const save = this.game.save;
-      const dexCount = Object.values(save.dex).reduce((n, m) => n + (m & 1) + ((m >> 1) & 1) + ((m >> 2) & 1), 0);
+      const dexCount = Object.values(save.dex).reduce(
+        (n, m) => n + (m & 1) + ((m >> 1) & 1) + ((m >> 2) & 1),
+        0,
+      );
       const total = Object.keys(C.SPECIES).length * 3;
       const tiles = [
-        ["tanks", "tank", this.t("sheet.tanks"), `${E.TANK_IDS.filter((id) => save.tanks[id].unlocked).length}/${E.TANK_IDS.length}`],
+        [
+          "tanks",
+          "tank",
+          this.t("sheet.tanks"),
+          `${E.TANK_IDS.filter((id) => save.tanks[id].unlocked).length}/${E.TANK_IDS.length}`,
+        ],
         ["journal", "book", this.t("sheet.journal"), this.t("dexProgress", { n: dexCount, total })],
         ["shop", "upgrade", this.t("tab.upgrades"), this.t(`tank.${save.active}`), "upgrades"],
         ["help", "help", this.t("sheet.help"), this.t("helpSub")],
@@ -755,7 +911,9 @@
       for (const id of pageItems) {
         const mask = save.dex[id] | 0;
         const img = A.preview("fish", id, 0, 96, { silhouette: !mask });
-        const dots = [0, 1, 2].map((v) => `<i class="${mask & (1 << v) ? "on" : ""} ${v ? "rare" : ""}"></i>`).join("");
+        const dots = [0, 1, 2]
+          .map((v) => `<i class="${mask & (1 << v) ? "on" : ""} ${v ? "rare" : ""}"></i>`)
+          .join("");
         body += `<button type="button" class="card-item ${sh.sel === id ? "sel" : ""}" data-ui="sel" data-arg="${id}"><img alt="" src="${img}" style="max-height:${size}px"><span class="name">${mask ? esc(this.speciesName(id)) : "???"}</span><span class="vdots">${dots}</span></button>`;
       }
       let foot = `<div class="foot-info"><span class="muted">${esc(this.t("dexHint"))}</span></div>`;
@@ -763,9 +921,14 @@
         const id = sh.sel;
         const mask = save.dex[id] | 0;
         const imgs = [0, 1, 2]
-          .map((v) => `<img alt="" src="${A.preview("fish", id, v, 64, { silhouette: !(mask & (1 << v)) })}" style="width:${Math.min(56, L.itemH * 0.7)}px">`)
+          .map(
+            (v) =>
+              `<img alt="" src="${A.preview("fish", id, v, 64, { silhouette: !(mask & (1 << v)) })}" style="width:${Math.min(56, L.itemH * 0.7)}px">`,
+          )
           .join("");
-        const names = [0, 1, 2].map((v) => (mask & (1 << v) ? this.variantName(id, v) : "???")).join(" · ");
+        const names = [0, 1, 2]
+          .map((v) => (mask & (1 << v) ? this.variantName(id, v) : "???"))
+          .join(" · ");
         foot = `<div style="display:flex;gap:2px">${imgs}</div><div class="foot-info"><b>${mask ? esc(this.speciesName(id)) : "???"}</b><br><span class="muted">${esc(names)}</span></div>`;
       }
       return { body, cols: L.cols, rowH: L.itemH, pages, foot };
@@ -774,7 +937,9 @@
     viewTrophies() {
       const save = this.game.save;
       const L = this.layout(46, 999);
-      const list = C.ACHIEVEMENTS.slice().sort((a, b) => save.ach.includes(a.id) - save.ach.includes(b.id));
+      const list = C.ACHIEVEMENTS.slice().sort(
+        (a, b) => save.ach.includes(a.id) - save.ach.includes(b.id),
+      );
       const { pageItems, pages } = this.paged(list, L.rows);
       let body = "";
       for (const a of pageItems) {
@@ -782,7 +947,12 @@
         const v = Math.min(a.n, E.statValue(save, a.stat));
         body += `<div class="list-row ${done ? "done" : ""}">${icon("trophy")}<div class="grow"><div class="title">${esc(this.t(`ach.${a.stat}`, { n: fmt(a.n) }))}</div>${done ? "" : `<div class="bar"><i style="width:${Math.round((v / a.n) * 100)}%"></i></div>`}</div>${done ? icon("check") : `<span class="price" style="color:var(--pearl)">${icon("pearl")}${a.pearls}</span>`}</div>`;
       }
-      return { body, rowH: L.itemH, pages, foot: `<div class="foot-info"><span class="muted">${esc(this.t("trophyCount", { n: save.ach.length, total: C.ACHIEVEMENTS.length }))}</span></div>` };
+      return {
+        body,
+        rowH: L.itemH,
+        pages,
+        foot: `<div class="foot-info"><span class="muted">${esc(this.t("trophyCount", { n: save.ach.length, total: C.ACHIEVEMENTS.length }))}</span></div>`,
+      };
     }
 
     viewHelp() {
@@ -791,7 +961,8 @@
       sh.page = Math.min(Math.max(0, sh.page), pages.length - 1);
       const p = pages[sh.page];
       let body = `<div class="help-page"><h3>${esc(this.t(`help.${p}.title`))}</h3><p>${esc(this.t(`help.${p}.text`))}</p>`;
-      if (p === "reset") body += `<div class="row"><button type="button" class="btn danger" data-ui="action" data-arg="reset">${icon("reset")}${esc(this.t("resetGame"))}</button></div>`;
+      if (p === "reset")
+        body += `<div class="row"><button type="button" class="btn danger" data-ui="action" data-arg="reset">${icon("reset")}${esc(this.t("resetGame"))}</button></div>`;
       body += "</div>";
       return { body, pages: pages.length };
     }
@@ -874,32 +1045,49 @@
         switch (e.t) {
           case "level": {
             const unlocks = [];
-            for (const id of Object.keys(C.SPECIES)) if (C.SPECIES[id].level === e.level) unlocks.push(this.speciesName(id));
-            for (const id of E.TANK_IDS) if (C.TANKS[id].unlockLevel === e.level && e.level > 1) unlocks.push(this.t(`tank.${id}`));
-            this.banner(this.t("levelUp", { n: e.level }), unlocks.length ? this.t("newUnlocks", { list: unlocks.join(", ") }) : `+${e.coins} ${this.t("coins")}`);
+            for (const id of Object.keys(C.SPECIES))
+              if (C.SPECIES[id].level === e.level) unlocks.push(this.speciesName(id));
+            for (const id of E.TANK_IDS)
+              if (C.TANKS[id].unlockLevel === e.level && e.level > 1)
+                unlocks.push(this.t(`tank.${id}`));
+            this.banner(
+              this.t("levelUp", { n: e.level }),
+              unlocks.length
+                ? this.t("newUnlocks", { list: unlocks.join(", ") })
+                : `+${e.coins} ${this.t("coins")}`,
+            );
             break;
           }
           case "goal":
             this.toast(this.t("goalDone", { n: e.coins }), "gold");
             break;
           case "allgoals":
-            this.banner(this.t("allGoals"), `+${e.pearls} ${this.t("pearls")} · ${this.t("streak", { n: e.streak })}`);
+            this.banner(
+              this.t("allGoals"),
+              `+${e.pearls} ${this.t("pearls")} · ${this.t("streak", { n: e.streak })}`,
+            );
             break;
           case "tutorial":
             this.toast(this.t("tutDone", { n: e.coins }), "gold");
             break;
           case "ach":
-            this.toast(`${this.t("trophy")}: ${this.t(`ach.${C.ACHIEVEMENTS.find((a) => a.id === e.id).stat}`, { n: fmt(C.ACHIEVEMENTS.find((a) => a.id === e.id).n) })} +${e.pearls}`, "gold", 3);
+            this.toast(
+              `${this.t("trophy")}: ${this.t(`ach.${C.ACHIEVEMENTS.find((a) => a.id === e.id).stat}`, { n: fmt(C.ACHIEVEMENTS.find((a) => a.id === e.id).n) })} +${e.pearls}`,
+              "gold",
+              3,
+            );
             break;
           case "dex":
             if (e.v > 0) this.banner(this.t("rareFound"), this.variantName(e.s, e.v));
-            else if (e.pearls) this.toast(this.t("dexNew", { name: this.speciesName(e.s) }), "gold");
+            else if (e.pearls)
+              this.toast(this.t("dexNew", { name: this.speciesName(e.s) }), "gold");
             break;
           case "eggs":
             this.toast(this.t("eggsLaid", { name: this.speciesName(e.s) }), "gold", 3);
             break;
           case "grow":
-            if (e.stage === E.STAGE.ADULT) this.toast(this.t("grownUp", { name: fishName(e.fish) }));
+            if (e.stage === E.STAGE.ADULT)
+              this.toast(this.t("grownUp", { name: fishName(e.fish) }));
             break;
           case "tank":
             this.banner(this.t(`tank.${e.id}`), this.t("tankUnlocked"));
@@ -919,12 +1107,17 @@
         return;
       }
       if (!away || away.hours < 0.5) return;
-      const hungry = E.TANK_IDS.reduce((n, id) => n + (save.tanks[id].unlocked ? save.tanks[id].fish.filter((f) => f.fed < 30).length : 0), 0);
+      const hungry = E.TANK_IDS.reduce(
+        (n, id) =>
+          n + (save.tanks[id].unlocked ? save.tanks[id].fish.filter((f) => f.fed < 30).length : 0),
+        0,
+      );
       const lines = [];
       if (away.coins) lines.push(["coin", this.t("away.coins", { n: fmt(away.coins) })]);
       if (away.eggs) lines.push(["egg", this.t("away.eggs", { n: away.eggs })]);
       if (hungry) lines.push(["food", this.t("away.hungry", { n: hungry })]);
-      if (away.algae + away.debris) lines.push(["water", this.t("away.dirty", { n: away.algae + away.debris })]);
+      if (away.algae + away.debris)
+        lines.push(["water", this.t("away.dirty", { n: away.algae + away.debris })]);
       if (!lines.length) return;
       modal.innerHTML = `<div class="modal-box"><h2>${esc(this.t("away.title"))}</h2><div class="sub">${esc(this.t("away.sub", { time: this.duration(away.hours * E.HOUR) }))}</div>${lines.map(([ic, text]) => `<div class="modal-line">${icon(ic)}<span>${esc(text)}</span></div>`).join("")}<div class="row"><button type="button" class="btn primary" data-ui="modalClose">${esc(this.t("away.go"))}</button></div></div>`;
       modal.hidden = false;

@@ -5,7 +5,8 @@
  * Fish bodies are pre-rendered into small sprites (cached per species/variant/size);
  * only fins and tails are drawn live so they can move. Coordinates are CSS pixels.
  */
-(function (root) {
+((root) => {
+  // biome-ignore lint/suspicious/noRedundantUseStrict: loaded as a classic script, not a module
   "use strict";
 
   const TAU = Math.PI * 2;
@@ -144,7 +145,12 @@
       ctx.lineWidth = 2 + rnd() * 3;
       ctx.beginPath();
       ctx.moveTo(x, sandY + 2);
-      ctx.quadraticCurveTo(x + (rnd() - 0.5) * 30, sandY - h * 0.6, x + (rnd() - 0.5) * 20, sandY - h);
+      ctx.quadraticCurveTo(
+        x + (rnd() - 0.5) * 30,
+        sandY - h * 0.6,
+        x + (rnd() - 0.5) * 20,
+        sandY - h,
+      );
       ctx.stroke();
     }
 
@@ -259,7 +265,15 @@
    */
   const FISH = {
     guppy: {
-      len: 0.66, top: 0.16, belly: 0.18, nose: 0.6, tail: "veil", tailSize: 0.52, dorsal: "flag", anal: "small", pattern: "tailspots",
+      len: 0.66,
+      top: 0.16,
+      belly: 0.18,
+      nose: 0.6,
+      tail: "veil",
+      tailSize: 0.52,
+      dorsal: "flag",
+      anal: "small",
+      pattern: "tailspots",
       pal: [
         { body: "#b8c6cc", belly: "#eef3f3", fin: "#ff8a3d", accent: "#2f8cff" },
         { body: "#9fbf6c", belly: "#e2efc8", fin: "#e8c63a", accent: "#2e4a26", pattern: "snake" },
@@ -267,7 +281,15 @@
       ],
     },
     danio: {
-      len: 0.56, top: 0.11, belly: 0.12, nose: 0.7, tail: "fork", tailSize: 0.42, dorsal: "small", anal: "small", pattern: "stripesH",
+      len: 0.56,
+      top: 0.11,
+      belly: 0.12,
+      nose: 0.7,
+      tail: "fork",
+      tailSize: 0.42,
+      dorsal: "small",
+      anal: "small",
+      pattern: "stripesH",
       pal: [
         { body: "#efe6bd", belly: "#fbf7e6", fin: "#e9dfb0", accent: "#2d58ad" },
         { body: "#efe3b0", belly: "#fbf7e6", fin: "#e9dfb0", accent: "#4b3b26", pattern: "spots" },
@@ -275,7 +297,15 @@
       ],
     },
     platy: {
-      len: 0.6, top: 0.2, belly: 0.2, nose: 0.4, tail: "fan", tailSize: 0.45, dorsal: "small", anal: "small", pattern: "none",
+      len: 0.6,
+      top: 0.2,
+      belly: 0.2,
+      nose: 0.4,
+      tail: "fan",
+      tailSize: 0.45,
+      dorsal: "small",
+      anal: "small",
+      pattern: "none",
       pal: [
         { body: "#ff6d2e", belly: "#ffb46b", fin: "#ff8f3c", accent: "#d94a1a" },
         { body: "#ffc93c", belly: "#fff0b0", fin: "#ffd56a", accent: "#1b1b1b", pattern: "mickey" },
@@ -283,23 +313,76 @@
       ],
     },
     goldfish: {
-      len: 0.9, top: 0.3, belly: 0.3, nose: 0.3, tail: "double", tailSize: 0.8, dorsal: "tall", anal: "small", pattern: "scales",
+      len: 0.9,
+      top: 0.3,
+      belly: 0.3,
+      nose: 0.3,
+      tail: "double",
+      tailSize: 0.8,
+      dorsal: "tall",
+      anal: "small",
+      pattern: "scales",
       pal: [
         { body: "#ff8a1c", belly: "#ffc874", fin: "#ffa640", accent: "#e06a08" },
-        { body: "#f4efe7", belly: "#ffffff", fin: "#f7d9c4", accent: "#ff7b1c", accent2: "#262626", pattern: "calico" },
+        {
+          body: "#f4efe7",
+          belly: "#ffffff",
+          fin: "#f7d9c4",
+          accent: "#ff7b1c",
+          accent2: "#262626",
+          pattern: "calico",
+        },
         { body: "#2b2c35", belly: "#4a4b57", fin: "#3a3b46", accent: "#1b1c23", eye: "#111" },
       ],
     },
     neon: {
-      len: 0.5, top: 0.12, belly: 0.12, nose: 0.6, tail: "fork", tailSize: 0.38, dorsal: "small", anal: "small", pattern: "neon",
+      len: 0.5,
+      top: 0.12,
+      belly: 0.12,
+      nose: 0.6,
+      tail: "fork",
+      tailSize: 0.38,
+      dorsal: "small",
+      anal: "small",
+      pattern: "neon",
       pal: [
-        { body: "#9fb0c2", belly: "#e6edf3", fin: "#d6e2ec", accent: "#22d8ff", accent2: "#ff2d4f", glow: "#22d8ff" },
-        { body: "#c9b98a", belly: "#f2ecd6", fin: "#e8dcb6", accent: "#ffd23d", accent2: "#ff7a2d", glow: "#ffd23d" },
-        { body: "#c8d4e0", belly: "#f6fbff", fin: "#e8f2fa", accent: "#e9fdff", accent2: "#7fe9ff", glow: "#bff6ff" },
+        {
+          body: "#9fb0c2",
+          belly: "#e6edf3",
+          fin: "#d6e2ec",
+          accent: "#22d8ff",
+          accent2: "#ff2d4f",
+          glow: "#22d8ff",
+        },
+        {
+          body: "#c9b98a",
+          belly: "#f2ecd6",
+          fin: "#e8dcb6",
+          accent: "#ffd23d",
+          accent2: "#ff7a2d",
+          glow: "#ffd23d",
+        },
+        {
+          body: "#c8d4e0",
+          belly: "#f6fbff",
+          fin: "#e8f2fa",
+          accent: "#e9fdff",
+          accent2: "#7fe9ff",
+          glow: "#bff6ff",
+        },
       ],
     },
     cory: {
-      len: 0.6, top: 0.24, belly: 0.13, nose: 0.25, tail: "fork", tailSize: 0.4, dorsal: "tall", anal: "small", pattern: "spots", barbels: true,
+      len: 0.6,
+      top: 0.24,
+      belly: 0.13,
+      nose: 0.25,
+      tail: "fork",
+      tailSize: 0.4,
+      dorsal: "tall",
+      anal: "small",
+      pattern: "spots",
+      barbels: true,
       pal: [
         { body: "#b9a487", belly: "#e9dcc4", fin: "#cdbb9c", accent: "#5a4a3a" },
         { body: "#f1ede4", belly: "#ffffff", fin: "#e7e2d8", accent: "#1f1f24", pattern: "panda" },
@@ -307,7 +390,16 @@
       ],
     },
     angelfish: {
-      len: 0.72, top: 0.3, belly: 0.3, nose: 0.55, tail: "fan", tailSize: 0.5, dorsal: "tall", anal: "tall", feelers: true, pattern: "bars",
+      len: 0.72,
+      top: 0.3,
+      belly: 0.3,
+      nose: 0.55,
+      tail: "fan",
+      tailSize: 0.5,
+      dorsal: "tall",
+      anal: "tall",
+      feelers: true,
+      pattern: "bars",
       pal: [
         { body: "#e2e5e8", belly: "#f7f8f9", fin: "#d5d9de", accent: "#2b2b31" },
         { body: "#f2f2f2", belly: "#ffffff", fin: "#e3e3e3", accent: "#1f1f24", pattern: "marble" },
@@ -315,15 +407,39 @@
       ],
     },
     betta: {
-      len: 0.66, top: 0.17, belly: 0.17, nose: 0.5, tail: "veil", tailSize: 1.25, dorsal: "long", anal: "long", pattern: "none",
+      len: 0.66,
+      top: 0.17,
+      belly: 0.17,
+      nose: 0.5,
+      tail: "veil",
+      tailSize: 1.25,
+      dorsal: "long",
+      anal: "long",
+      pattern: "none",
       pal: [
         { body: "#c41a2e", belly: "#e0414f", fin: "#d81f37", accent: "#5a0b3e" },
-        { body: "#f6f2ef", belly: "#ffffff", fin: "#ff7b2e", accent: "#262626", accent2: "#ff7b2e", pattern: "calico" },
+        {
+          body: "#f6f2ef",
+          belly: "#ffffff",
+          fin: "#ff7b2e",
+          accent: "#262626",
+          accent2: "#ff7b2e",
+          pattern: "calico",
+        },
         { body: "#c7cdd4", belly: "#e8ecf0", fin: "#d31d2a", accent: "#9aa3ad", pattern: "scales" },
       ],
     },
     pleco: {
-      len: 0.95, top: 0.15, belly: 0.09, nose: 0.2, tail: "fork", tailSize: 0.42, dorsal: "sail", anal: "small", pattern: "spots", sucker: true,
+      len: 0.95,
+      top: 0.15,
+      belly: 0.09,
+      nose: 0.2,
+      tail: "fork",
+      tailSize: 0.42,
+      dorsal: "sail",
+      anal: "small",
+      pattern: "spots",
+      sucker: true,
       pal: [
         { body: "#6b5a3e", belly: "#8a7656", fin: "#5e4f37", accent: "#d9c79a" },
         { body: "#f2d9b8", belly: "#fbecd8", fin: "#ecd0ab", accent: "#fffaf0", eye: "#d0283c" },
@@ -331,7 +447,15 @@
       ],
     },
     discus: {
-      len: 0.86, top: 0.42, belly: 0.42, nose: 0.25, tail: "fan", tailSize: 0.3, dorsal: "fringe", anal: "fringe", pattern: "wavy",
+      len: 0.86,
+      top: 0.42,
+      belly: 0.42,
+      nose: 0.25,
+      tail: "fan",
+      tailSize: 0.3,
+      dorsal: "fringe",
+      anal: "fringe",
+      pattern: "wavy",
       pal: [
         { body: "#c8572c", belly: "#e07a46", fin: "#b5482a", accent: "#3fc7dc" },
         { body: "#f4e9d4", belly: "#fffaf0", fin: "#f0d8b0", accent: "#e0452c", pattern: "pepper" },
@@ -339,7 +463,15 @@
       ],
     },
     chromis: {
-      len: 0.5, top: 0.19, belly: 0.16, nose: 0.5, tail: "fork", tailSize: 0.5, dorsal: "small", anal: "small", pattern: "shimmer",
+      len: 0.5,
+      top: 0.19,
+      belly: 0.16,
+      nose: 0.5,
+      tail: "fork",
+      tailSize: 0.5,
+      dorsal: "small",
+      anal: "small",
+      pattern: "shimmer",
       pal: [
         { body: "#62dcbc", belly: "#c4fff0", fin: "#8ff0d4", accent: "#bffcff" },
         { body: "#3d8dff", belly: "#a9d0ff", fin: "#69a9ff", accent: "#d4ecff" },
@@ -347,15 +479,51 @@
       ],
     },
     clownfish: {
-      len: 0.58, top: 0.21, belly: 0.19, nose: 0.35, tail: "round", tailSize: 0.36, dorsal: "double", anal: "small", pattern: "clown",
+      len: 0.58,
+      top: 0.21,
+      belly: 0.19,
+      nose: 0.35,
+      tail: "round",
+      tailSize: 0.36,
+      dorsal: "double",
+      anal: "small",
+      pattern: "clown",
       pal: [
-        { body: "#ff7a1a", belly: "#ff9a45", fin: "#ff8526", accent: "#ffffff", accent2: "#1a1a1f" },
-        { body: "#ff7a1a", belly: "#ff9a45", fin: "#ff8526", accent: "#ffffff", accent2: "#1a1a1f", pattern: "snowflake" },
-        { body: "#1d1e26", belly: "#2b2c36", fin: "#24252e", accent: "#f2f2f2", accent2: "#ff7a1a", pattern: "clown" },
+        {
+          body: "#ff7a1a",
+          belly: "#ff9a45",
+          fin: "#ff8526",
+          accent: "#ffffff",
+          accent2: "#1a1a1f",
+        },
+        {
+          body: "#ff7a1a",
+          belly: "#ff9a45",
+          fin: "#ff8526",
+          accent: "#ffffff",
+          accent2: "#1a1a1f",
+          pattern: "snowflake",
+        },
+        {
+          body: "#1d1e26",
+          belly: "#2b2c36",
+          fin: "#24252e",
+          accent: "#f2f2f2",
+          accent2: "#ff7a1a",
+          pattern: "clown",
+        },
       ],
     },
     gramma: {
-      len: 0.58, top: 0.17, belly: 0.16, nose: 0.55, tail: "fork", tailSize: 0.42, dorsal: "long", anal: "small", pattern: "split",
+      len: 0.58,
+      top: 0.17,
+      belly: 0.16,
+      nose: 0.55,
+      tail: "fork",
+      tailSize: 0.42,
+      dorsal: "long",
+      anal: "small",
+      pattern: "split",
       pal: [
         { body: "#8a3fd1", belly: "#a865e6", fin: "#9b50dd", accent: "#ffd23a" },
         { body: "#ff5f3d", belly: "#ff8a64", fin: "#ff7350", accent: "#ffd23a" },
@@ -363,23 +531,76 @@
       ],
     },
     tang: {
-      len: 0.95, top: 0.32, belly: 0.3, nose: 0.5, tail: "lunate", tailSize: 0.42, dorsal: "long", anal: "long", pattern: "tang",
+      len: 0.95,
+      top: 0.32,
+      belly: 0.3,
+      nose: 0.5,
+      tail: "lunate",
+      tailSize: 0.42,
+      dorsal: "long",
+      anal: "long",
+      pattern: "tang",
       pal: [
-        { body: "#1f6fe0", belly: "#3d8cf0", fin: "#1a5fc4", accent: "#101423", tailFin: "#ffd400" },
-        { body: "#ffd60a", belly: "#ffe45c", fin: "#ffcc00", accent: "#ffffff", pattern: "none", tailFin: "#ffd60a" },
-        { body: "#5ab4ff", belly: "#8ccaff", fin: "#ffd400", accent: "#1b2340", pattern: "powder", tailFin: "#5ab4ff" },
+        {
+          body: "#1f6fe0",
+          belly: "#3d8cf0",
+          fin: "#1a5fc4",
+          accent: "#101423",
+          tailFin: "#ffd400",
+        },
+        {
+          body: "#ffd60a",
+          belly: "#ffe45c",
+          fin: "#ffcc00",
+          accent: "#ffffff",
+          pattern: "none",
+          tailFin: "#ffd60a",
+        },
+        {
+          body: "#5ab4ff",
+          belly: "#8ccaff",
+          fin: "#ffd400",
+          accent: "#1b2340",
+          pattern: "powder",
+          tailFin: "#5ab4ff",
+        },
       ],
     },
     lantern: {
-      len: 0.5, top: 0.14, belly: 0.15, nose: 0.4, tail: "fork", tailSize: 0.42, dorsal: "small", anal: "small", pattern: "photophores", bigEye: true,
+      len: 0.5,
+      top: 0.14,
+      belly: 0.15,
+      nose: 0.4,
+      tail: "fork",
+      tailSize: 0.42,
+      dorsal: "small",
+      anal: "small",
+      pattern: "photophores",
+      bigEye: true,
       pal: [
         { body: "#3d4f6b", belly: "#55698a", fin: "#4a5d7c", accent: "#67e8ff", glow: "#67e8ff" },
         { body: "#4a3a3a", belly: "#6b5050", fin: "#5a4545", accent: "#ff9a3d", glow: "#ff9a3d" },
-        { body: "#3a3f66", belly: "#565c8a", fin: "#474d7a", accent: "#9dff7a", accent2: "#ff7ae8", glow: "#b8ffa0" },
+        {
+          body: "#3a3f66",
+          belly: "#565c8a",
+          fin: "#474d7a",
+          accent: "#9dff7a",
+          accent2: "#ff7ae8",
+          glow: "#b8ffa0",
+        },
       ],
     },
     hatchet: {
-      len: 0.46, top: 0.1, belly: 0.42, nose: 0.5, tail: "fork", tailSize: 0.34, dorsal: "small", anal: "small", pattern: "silver", bigEye: true,
+      len: 0.46,
+      top: 0.1,
+      belly: 0.42,
+      nose: 0.5,
+      tail: "fork",
+      tailSize: 0.34,
+      dorsal: "small",
+      anal: "small",
+      pattern: "silver",
+      bigEye: true,
       pal: [
         { body: "#b8c7d9", belly: "#e6eef7", fin: "#c9d6e6", accent: "#8fdcff", glow: "#8fdcff" },
         { body: "#e5c36a", belly: "#fff0c0", fin: "#efd590", accent: "#ffe9a3", glow: "#ffd76a" },
@@ -387,7 +608,17 @@
       ],
     },
     angler: {
-      len: 1.05, top: 0.32, belly: 0.34, nose: 0.05, tail: "round", tailSize: 0.32, dorsal: "small", anal: "small", pattern: "spots", lure: true, teeth: true,
+      len: 1.05,
+      top: 0.32,
+      belly: 0.34,
+      nose: 0.05,
+      tail: "round",
+      tailSize: 0.32,
+      dorsal: "small",
+      anal: "small",
+      pattern: "spots",
+      lure: true,
+      teeth: true,
       pal: [
         { body: "#3a2f3f", belly: "#4b3e50", fin: "#332838", accent: "#4f4255", glow: "#9fffe0" },
         { body: "#1a1f3a", belly: "#262c4f", fin: "#161a33", accent: "#2b3260", glow: "#6aa8ff" },
@@ -460,11 +691,25 @@
     const n = def.nose;
     const p = new Path2D();
     p.moveTo(nx, bot * 0.05);
-    p.bezierCurveTo(nx - L * (0.05 + 0.1 * (1 - n)), -top * (0.6 + 0.4 * (1 - n)), L * 0.18, -top, 0, -top);
+    p.bezierCurveTo(
+      nx - L * (0.05 + 0.1 * (1 - n)),
+      -top * (0.6 + 0.4 * (1 - n)),
+      L * 0.18,
+      -top,
+      0,
+      -top,
+    );
     p.bezierCurveTo(-L * 0.18, -top, -L * 0.3, -ty * 1.4, tx, -ty);
     p.lineTo(tx, ty);
     p.bezierCurveTo(-L * 0.3, ty * 1.4, -L * 0.18, bot, 0, bot);
-    p.bezierCurveTo(L * 0.2, bot, nx - L * (0.04 + 0.1 * (1 - n)), bot * (0.55 + 0.4 * (1 - n)), nx, bot * 0.05);
+    p.bezierCurveTo(
+      L * 0.2,
+      bot,
+      nx - L * (0.04 + 0.1 * (1 - n)),
+      bot * (0.55 + 0.4 * (1 - n)),
+      nx,
+      bot * 0.05,
+    );
     p.closePath();
     return p;
   }
@@ -554,7 +799,15 @@
         for (let i = 0; i < 9; i++) {
           ctx.fillStyle = colors[i % 2];
           ctx.beginPath();
-          ctx.ellipse((rnd() - 0.5) * L * 0.8, (rnd() - 0.5) * (top + bot), L * (0.04 + rnd() * 0.07), L * (0.03 + rnd() * 0.05), rnd() * 3, 0, TAU);
+          ctx.ellipse(
+            (rnd() - 0.5) * L * 0.8,
+            (rnd() - 0.5) * (top + bot),
+            L * (0.04 + rnd() * 0.07),
+            L * (0.03 + rnd() * 0.05),
+            rnd() * 3,
+            0,
+            TAU,
+          );
           ctx.fill();
         }
         break;
@@ -572,7 +825,14 @@
         for (let i = 0; i < 4; i++) {
           ctx.beginPath();
           ctx.moveTo((rnd() - 0.5) * L, (rnd() - 0.5) * top * 2);
-          ctx.bezierCurveTo((rnd() - 0.5) * L, (rnd() - 0.5) * top * 2, (rnd() - 0.5) * L, (rnd() - 0.5) * top * 2, (rnd() - 0.5) * L, (rnd() - 0.5) * top * 2);
+          ctx.bezierCurveTo(
+            (rnd() - 0.5) * L,
+            (rnd() - 0.5) * top * 2,
+            (rnd() - 0.5) * L,
+            (rnd() - 0.5) * top * 2,
+            (rnd() - 0.5) * L,
+            (rnd() - 0.5) * top * 2,
+          );
           ctx.stroke();
         }
         break;
@@ -626,7 +886,15 @@
           ctx.strokeStyle = pal.accent2;
           ctx.beginPath();
           if (pattern === "snowflake") {
-            ctx.ellipse(L * x, (rnd() - 0.5) * top * 0.4, w * (1.2 + rnd() * 0.8), top * 1.3, (rnd() - 0.5) * 0.6, 0, TAU);
+            ctx.ellipse(
+              L * x,
+              (rnd() - 0.5) * top * 0.4,
+              w * (1.2 + rnd() * 0.8),
+              top * 1.3,
+              (rnd() - 0.5) * 0.6,
+              0,
+              TAU,
+            );
           } else {
             ctx.ellipse(L * x, 0, w, top * 1.3, 0, 0, TAU);
           }
@@ -807,27 +1075,56 @@
     switch (kind) {
       case "small":
         ctx.moveTo(L * 0.12, s * base * 0.9);
-        ctx.quadraticCurveTo(-L * 0.02, s * (base + L * 0.1), -L * 0.14 + wave, s * (base + L * 0.06));
+        ctx.quadraticCurveTo(
+          -L * 0.02,
+          s * (base + L * 0.1),
+          -L * 0.14 + wave,
+          s * (base + L * 0.06),
+        );
         ctx.lineTo(-L * 0.12, s * base * 0.8);
         break;
       case "flag":
         ctx.moveTo(L * 0.05, s * base * 0.9);
-        ctx.quadraticCurveTo(-L * 0.12, s * (base + L * 0.16), -L * 0.3 + wave, s * (base + L * 0.1));
+        ctx.quadraticCurveTo(
+          -L * 0.12,
+          s * (base + L * 0.16),
+          -L * 0.3 + wave,
+          s * (base + L * 0.1),
+        );
         ctx.lineTo(-L * 0.2, s * base * 0.6);
         break;
       case "tall":
         ctx.moveTo(L * 0.16, s * base * 0.9);
-        ctx.bezierCurveTo(L * 0.05, s * (base + L * 0.25), -L * 0.15, s * (base + L * 0.45), -L * 0.35 + wave, s * (base + L * 0.5));
+        ctx.bezierCurveTo(
+          L * 0.05,
+          s * (base + L * 0.25),
+          -L * 0.15,
+          s * (base + L * 0.45),
+          -L * 0.35 + wave,
+          s * (base + L * 0.5),
+        );
         ctx.quadraticCurveTo(-L * 0.15, s * (base + L * 0.1), -L * 0.18, s * base * 0.7);
         break;
       case "long":
         ctx.moveTo(L * 0.15, s * base * 0.9);
-        ctx.bezierCurveTo(-L * 0.05, s * (base + L * 0.22), -L * 0.4, s * (base + L * 0.28), -L * 0.6 + wave * 2, s * (base + L * 0.15));
+        ctx.bezierCurveTo(
+          -L * 0.05,
+          s * (base + L * 0.22),
+          -L * 0.4,
+          s * (base + L * 0.28),
+          -L * 0.6 + wave * 2,
+          s * (base + L * 0.15),
+        );
         ctx.quadraticCurveTo(-L * 0.4, s * base * 0.8, -L * 0.3, s * base * 0.5);
         break;
       case "sail":
         ctx.moveTo(L * 0.25, s * base * 0.9);
-        ctx.quadraticCurveTo(L * 0.15, s * (base + L * 0.3), -L * 0.15 + wave, s * (base + L * 0.18));
+        ctx.quadraticCurveTo(
+          L * 0.15,
+          s * (base + L * 0.3),
+          -L * 0.15 + wave,
+          s * (base + L * 0.18),
+        );
         ctx.lineTo(-L * 0.1, s * base * 0.8);
         break;
       case "fringe":
@@ -877,7 +1174,14 @@
         break;
       case "veil":
         ctx.moveTo(0, -top * 0.3);
-        ctx.bezierCurveTo(-T * 0.4, -h * 1.1, -T * 0.9, -h * 1.3 + wave, -T * 1.05, -h * 0.6 + wave * 1.6);
+        ctx.bezierCurveTo(
+          -T * 0.4,
+          -h * 1.1,
+          -T * 0.9,
+          -h * 1.3 + wave,
+          -T * 1.05,
+          -h * 0.6 + wave * 1.6,
+        );
         ctx.quadraticCurveTo(-T * 1.15, wave * 2, -T * 1.05, h * 0.6 + wave * 1.6);
         ctx.bezierCurveTo(-T * 0.9, h * 1.3 + wave, -T * 0.4, h * 1.1, 0, top * 0.3);
         break;
@@ -1000,7 +1304,8 @@
     if (def.lure) glowAt(L * 0.55, -def.top * L - L * 0.25, L * 0.3, 0.9);
     else if (id === "jelly") glowAt(0, -L * 0.1, L * 0.7, 0.35);
     else if (def.pattern === "photophores" || def.pattern === "silver") {
-      for (let i = 0; i < 4; i++) glowAt(L * 0.25 - i * L * 0.16, def.belly * L * 0.65, L * 0.14, 0.55);
+      for (let i = 0; i < 4; i++)
+        glowAt(L * 0.25 - i * L * 0.16, def.belly * L * 0.65, L * 0.14, 0.55);
     } else glowAt(0, 0, L * 0.7, 0.28);
     ctx.restore();
   }
@@ -1077,7 +1382,14 @@
       for (const k of [1, 0.6]) {
         ctx.beginPath();
         ctx.moveTo(L * 0.4, -L * 0.2);
-        ctx.bezierCurveTo(L * 0.8, -L * 0.6 * k, L * 1.0, -L * 0.3 * k + Math.sin(o.phase) * L * 0.08, L * 1.2, -L * 0.5 * k);
+        ctx.bezierCurveTo(
+          L * 0.8,
+          -L * 0.6 * k,
+          L * 1.0,
+          -L * 0.3 * k + Math.sin(o.phase) * L * 0.08,
+          L * 1.2,
+          -L * 0.5 * k,
+        );
         ctx.stroke();
       }
       // Curved segmented body.
@@ -1175,7 +1487,14 @@
       for (const s of [-1, 1]) {
         ctx.beginPath();
         ctx.moveTo(s * bw * 0.15, 0);
-        ctx.bezierCurveTo(s * bw * 0.3, L * 0.25, -s * bw * 0.2, L * 0.4, s * bw * 0.1 + Math.sin(o.phase * 0.4) * L * 0.05, L * 0.6);
+        ctx.bezierCurveTo(
+          s * bw * 0.3,
+          L * 0.25,
+          -s * bw * 0.2,
+          L * 0.4,
+          s * bw * 0.1 + Math.sin(o.phase * 0.4) * L * 0.05,
+          L * 0.6,
+        );
         ctx.stroke();
       }
       const g = ctx.createRadialGradient(0, -bh * 0.4, 0, 0, -bh * 0.2, bw * 1.1);
@@ -1193,7 +1512,8 @@
       ctx.stroke();
       ctx.strokeStyle = rgba(pal.accent, 0.6);
       ctx.beginPath();
-      for (let i = 0; i < 4; i++) ctx.ellipse(0, -bh * 0.35, bw * 0.2, bh * 0.16, (i / 4) * Math.PI, 0, TAU);
+      for (let i = 0; i < 4; i++)
+        ctx.ellipse(0, -bh * 0.35, bw * 0.2, bh * 0.16, (i / 4) * Math.PI, 0, TAU);
       ctx.stroke();
     },
   };
@@ -1241,8 +1561,18 @@
       const p = pts[i];
       const r = W * 0.45 * (1 - i / pts.length);
       ctx.beginPath();
-      if (pal.pattern === "bands") ctx.ellipse(p.x, p.y, r * 0.5, r * 1.6, Math.atan2(pts[i - 1].y - p.y, pts[i - 1].x - p.x), 0, TAU);
-      else ctx.ellipse(p.x + ((i * 7) % 5) - 2, p.y + ((i * 3) % 3) - 1, r * 0.6, r * 0.45, i, 0, TAU);
+      if (pal.pattern === "bands")
+        ctx.ellipse(
+          p.x,
+          p.y,
+          r * 0.5,
+          r * 1.6,
+          Math.atan2(pts[i - 1].y - p.y, pts[i - 1].x - p.x),
+          0,
+          TAU,
+        );
+      else
+        ctx.ellipse(p.x + ((i * 7) % 5) - 2, p.y + ((i * 3) % 3) - 1, r * 0.6, r * 0.45, i, 0, TAU);
       ctx.fill();
     }
     // Dorsal ridge.
@@ -1507,7 +1837,8 @@
           g.addColorStop(1, shade(stone, -0.3));
           ctx.fillStyle = g;
           ctx.fillRect(cx - w / 2, top, w, y - top);
-          for (let i = 0; i < 3; i++) ctx.fillRect(cx - w / 2 + i * (w / 2.5), top - 6 * s, w / 5, 6 * s);
+          for (let i = 0; i < 3; i++)
+            ctx.fillRect(cx - w / 2 + i * (w / 2.5), top - 6 * s, w / 5, 6 * s);
           ctx.fillStyle = "#2a2a33";
           ctx.fillRect(cx - 2 * s, top + 12 * s, 4 * s, 8 * s);
         };
@@ -1551,13 +1882,31 @@
     java_fern(ctx, x, y, s, t) {
       for (let i = 0; i < 8; i++) {
         const a = -Math.PI / 2 + (i - 3.5) * 0.25 + sway(t, x + i * 9, 0.08);
-        leaf(ctx, x + (i - 3.5) * 2 * s, y, (26 + (i % 3) * 7) * s, 4 * s, a, i % 2 ? "#2f6d34" : "#3b8240", "#1f4f24");
+        leaf(
+          ctx,
+          x + (i - 3.5) * 2 * s,
+          y,
+          (26 + (i % 3) * 7) * s,
+          4 * s,
+          a,
+          i % 2 ? "#2f6d34" : "#3b8240",
+          "#1f4f24",
+        );
       }
     },
     sword_plant(ctx, x, y, s, t) {
       for (let i = 0; i < 11; i++) {
         const a = -Math.PI / 2 + (i - 5) * 0.2 + sway(t, x + i * 5, 0.06);
-        leaf(ctx, x, y, (48 + (5 - Math.abs(i - 5)) * 9) * s, 7 * s, a, i % 2 ? "#3f9f3a" : "#4fb447", "#2c7a2a");
+        leaf(
+          ctx,
+          x,
+          y,
+          (48 + (5 - Math.abs(i - 5)) * 9) * s,
+          7 * s,
+          a,
+          i % 2 ? "#3f9f3a" : "#4fb447",
+          "#2c7a2a",
+        );
       }
     },
     root(ctx, x, y, s, t) {
@@ -1569,11 +1918,27 @@
         ctx.lineWidth = (4 + rnd() * 5) * s;
         ctx.beginPath();
         ctx.moveTo(x0, y);
-        ctx.bezierCurveTo(x0 + (rnd() - 0.5) * 50 * s, y - 40 * s, x0 + (rnd() - 0.5) * 70 * s, y - 70 * s, x0 + (rnd() - 0.5) * 60 * s, y - (90 + rnd() * 30) * s);
+        ctx.bezierCurveTo(
+          x0 + (rnd() - 0.5) * 50 * s,
+          y - 40 * s,
+          x0 + (rnd() - 0.5) * 70 * s,
+          y - 70 * s,
+          x0 + (rnd() - 0.5) * 60 * s,
+          y - (90 + rnd() * 30) * s,
+        );
         ctx.stroke();
       }
       for (let i = 0; i < 6; i++) {
-        leaf(ctx, x + (rnd() - 0.5) * 60 * s, y - (60 + rnd() * 50) * s, 10 * s, 4 * s, rnd() * TAU + sway(t, i, 0.2), "#4f9a46", null);
+        leaf(
+          ctx,
+          x + (rnd() - 0.5) * 60 * s,
+          y - (60 + rnd() * 50) * s,
+          10 * s,
+          4 * s,
+          rnd() * TAU + sway(t, i, 0.2),
+          "#4f9a46",
+          null,
+        );
       }
     },
     stump: {
@@ -1749,7 +2114,14 @@
     },
     brain_coral(ctx, x, y, s) {
       const r = 22 * s;
-      const g = ctx.createRadialGradient(x - r * 0.3, y - r * 0.9, r * 0.2, x, y - r * 0.5, r * 1.1);
+      const g = ctx.createRadialGradient(
+        x - r * 0.3,
+        y - r * 0.9,
+        r * 0.2,
+        x,
+        y - r * 0.5,
+        r * 1.1,
+      );
       g.addColorStop(0, "#f5d58a");
       g.addColorStop(1, "#b98a3a");
       ctx.fillStyle = g;
@@ -1808,7 +2180,12 @@
         const a = -Math.PI / 2 + (i / 27 - 0.5) * 2.2;
         ctx.beginPath();
         ctx.moveTo(0, -6 * s);
-        ctx.quadraticCurveTo(Math.cos(a) * 40 * s, -6 * s + Math.sin(a) * 50 * s, Math.cos(a) * 60 * s, Math.sin(a) * 92 * s);
+        ctx.quadraticCurveTo(
+          Math.cos(a) * 40 * s,
+          -6 * s + Math.sin(a) * 50 * s,
+          Math.cos(a) * 60 * s,
+          Math.sin(a) * 92 * s,
+        );
         ctx.stroke();
       }
       ctx.strokeStyle = "rgba(220,90,140,0.7)";
@@ -1865,7 +2242,13 @@
           ctx.fillStyle = ["#c86aa0", "#e0905a", "#8a6ad0", "#6ac0a0"][i % 4];
           ctx.beginPath();
           const a = Math.PI + rnd() * Math.PI;
-          ctx.arc(x + Math.cos(a) * 50 * s * rnd(), y - 10 * s + Math.sin(a) * 70 * s * (0.5 + rnd() * 0.5), (2 + rnd() * 3) * s, 0, TAU);
+          ctx.arc(
+            x + Math.cos(a) * 50 * s * rnd(),
+            y - 10 * s + Math.sin(a) * 70 * s * (0.5 + rnd() * 0.5),
+            (2 + rnd() * 3) * s,
+            0,
+            TAU,
+          );
           ctx.fill();
         }
       },
@@ -1902,7 +2285,7 @@
         glowDot(ctx, x, y - 9 * s, 10 * s, "#ffffff", (open - 0.6) * 1.5);
       }
     },
-    glow_crystal(ctx, x, y, s, t) {
+    glow_crystal(ctx, x, y, s) {
       const shards = [
         [-10, 34, -0.25],
         [0, 46, 0],
@@ -1993,7 +2376,12 @@
         ctx.moveTo(x + b, y - h);
         const ex = x + b + Math.cos(a) * len;
         const ey = y - h + Math.sin(a) * len;
-        ctx.quadraticCurveTo(x + b + Math.cos(a) * len * 0.5, y - h + Math.sin(a) * len * 0.3 - 6 * s, ex, ey);
+        ctx.quadraticCurveTo(
+          x + b + Math.cos(a) * len * 0.5,
+          y - h + Math.sin(a) * len * 0.3 - 6 * s,
+          ex,
+          ey,
+        );
         ctx.stroke();
         for (let k = 1; k < 5; k++) {
           const px = x + b + Math.cos(a) * len * (k / 5);
@@ -2040,7 +2428,7 @@
       glowDot(ctx, x, y - 92 * s, 18 * s, "#ff8a3a", 0.35 * glow);
       // Smoke plume.
       for (let i = 0; i < 9; i++) {
-        const k = ((t * 0.25 + i / 9) % 1);
+        const k = (t * 0.25 + i / 9) % 1;
         const py = y - 92 * s - k * 120 * s;
         const px = x + Math.sin(k * 6 + t) * 8 * s * k;
         ctx.fillStyle = `rgba(60,52,62,${0.22 * (1 - k)})`;
@@ -2121,12 +2509,12 @@
 
   function decorHole(id, x, y, s) {
     const d = DECOR[id];
-    return d && d.hole ? d.hole(x, y, s) : null;
+    return d?.hole ? d.hole(x, y, s) : null;
   }
 
   function decorOutline(id, x, y, s) {
     const d = DECOR[id];
-    return d && d.outline ? d.outline(x, y, s) : null;
+    return d?.outline ? d.outline(x, y, s) : null;
   }
 
   function drawDecorGlow(ctx, id, x, y, s, t) {
@@ -2187,7 +2575,14 @@
       const a = rnd() * TAU;
       const d = rnd() * r * 0.6;
       const pr = r * (0.35 + rnd() * 0.45) * k;
-      const g = ctx.createRadialGradient(x + Math.cos(a) * d, y + Math.sin(a) * d, 0, x + Math.cos(a) * d, y + Math.sin(a) * d, pr);
+      const g = ctx.createRadialGradient(
+        x + Math.cos(a) * d,
+        y + Math.sin(a) * d,
+        0,
+        x + Math.cos(a) * d,
+        y + Math.sin(a) * d,
+        pr,
+      );
       g.addColorStop(0, `rgba(70,140,50,${0.55 * k})`);
       g.addColorStop(1, "rgba(70,140,50,0)");
       ctx.fillStyle = g;
@@ -2198,7 +2593,13 @@
     ctx.fillStyle = `rgba(150,200,90,${0.5 * k})`;
     for (let i = 0; i < 10; i++) {
       ctx.beginPath();
-      ctx.arc(x + (rnd() - 0.5) * r * 1.2, y + (rnd() - 0.5) * r * 1.2, r * 0.05 + rnd() * r * 0.05, 0, TAU);
+      ctx.arc(
+        x + (rnd() - 0.5) * r * 1.2,
+        y + (rnd() - 0.5) * r * 1.2,
+        r * 0.05 + rnd() * r * 0.05,
+        0,
+        TAU,
+      );
       ctx.fill();
     }
     // A faint pulsing ring hints that it can be tapped.
@@ -2218,7 +2619,15 @@
     for (let i = 0; i < 7; i++) {
       ctx.fillStyle = ["#5a4630", "#6e5a3a", "#4a3a28", "#7a6a48"][i % 4];
       ctx.beginPath();
-      ctx.ellipse(x + (rnd() - 0.5) * r * 2, y - rnd() * r * 0.4, r * (0.25 + rnd() * 0.3), r * (0.15 + rnd() * 0.15), rnd() * 3, 0, TAU);
+      ctx.ellipse(
+        x + (rnd() - 0.5) * r * 2,
+        y - rnd() * r * 0.4,
+        r * (0.25 + rnd() * 0.3),
+        r * (0.15 + rnd() * 0.15),
+        rnd() * 3,
+        0,
+        TAU,
+      );
       ctx.fill();
     }
   }
@@ -2272,14 +2681,27 @@
     ctx.fill();
     if (!gold) {
       ctx.fillStyle = "rgba(90,140,160,0.55)";
-      for (const [dx, dy, dr] of [[-0.3, -0.55, 0.09], [0.25, -0.35, 0.07], [-0.1, -0.15, 0.06], [0.35, -0.7, 0.05]]) {
+      for (const [dx, dy, dr] of [
+        [-0.3, -0.55, 0.09],
+        [0.25, -0.35, 0.07],
+        [-0.1, -0.15, 0.06],
+        [0.35, -0.7, 0.05],
+      ]) {
         ctx.beginPath();
         ctx.arc(dx * w * 1.4, dy * h, dr * r, 0, TAU);
         ctx.fill();
       }
     }
     ctx.restore();
-    if (gold || ready) glowDot(ctx, x, y - r * 0.2, r * 1.8, gold ? "#ffd75a" : "#fff2b0", (gold ? 0.3 : 0.2) + 0.15 * Math.sin(t * 3));
+    if (gold || ready)
+      glowDot(
+        ctx,
+        x,
+        y - r * 0.2,
+        r * 1.8,
+        gold ? "#ffd75a" : "#fff2b0",
+        (gold ? 0.3 : 0.2) + 0.15 * Math.sin(t * 3),
+      );
   }
 
   const FOOD_COLORS = {
@@ -2362,7 +2784,7 @@
   const previewCache = new Map();
 
   function preview(kind, id, variant, size, opts) {
-    const silhouette = opts && opts.silhouette;
+    const silhouette = opts?.silhouette;
     const key = `${kind}|${id}|${variant}|${size}|${silhouette ? 1 : 0}`;
     if (previewCache.has(key)) return previewCache.get(key);
     const dpr = Math.min(2, (typeof devicePixelRatio === "number" && devicePixelRatio) || 1);
@@ -2375,7 +2797,11 @@
       const art = speciesArt(id);
       if (id === "moray") {
         const pts = [];
-        for (let i = 0; i < 16; i++) pts.push({ x: size * 0.85 - i * size * 0.05, y: size * 0.5 + Math.sin(i * 0.7) * size * 0.08 });
+        for (let i = 0; i < 16; i++)
+          pts.push({
+            x: size * 0.85 - i * size * 0.05,
+            y: size * 0.5 + Math.sin(i * 0.7) * size * 0.08,
+          });
         drawEel(ctx, variant, pts, size * 0.06, { phase: 1 });
       } else {
         // Big veil tails reach far behind the body, so shrink those fish and shift them forward.

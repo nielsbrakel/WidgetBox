@@ -40,11 +40,15 @@ export class AquariumPage extends SandboxPage {
     return this.iframe.locator("#toasts");
   }
   get scenarioSelect() {
-    return this.page.locator("select").filter({ has: this.page.locator('option[value="pond-day2"]') });
+    return this.page
+      .locator("select")
+      .filter({ has: this.page.locator('option[value="pond-day2"]') });
   }
 
   ui(name: string, arg?: string): Locator {
-    return this.iframe.locator(arg ? `[data-ui="${name}"][data-arg="${arg}"]` : `[data-ui="${name}"]`).first();
+    return this.iframe
+      .locator(arg ? `[data-ui="${name}"][data-arg="${arg}"]` : `[data-ui="${name}"]`)
+      .first();
   }
 
   dock(name: "feed" | "play" | "shop" | "menu") {
@@ -58,7 +62,9 @@ export class AquariumPage extends SandboxPage {
     await this.ready();
     if (scenario !== "default") {
       // Picking a scenario reloads the widget frame.
-      const reloaded = this.page.waitForEvent("framenavigated", (f) => f.url().includes("/widgets/aquarium/"));
+      const reloaded = this.page.waitForEvent("framenavigated", (f) =>
+        f.url().includes("/widgets/aquarium/"),
+      );
       await this.scenarioSelect.selectOption(scenario);
       await reloaded;
       await this.ready();
@@ -84,7 +90,12 @@ export class AquariumPage extends SandboxPage {
 
   async locate(kind: string, arg?: unknown): Promise<Point | null> {
     return this.frame().evaluate(
-      ([k, a]) => (window as unknown as { __aquarium: { scene: { locate: (k: unknown, a: unknown) => Point | null } } }).__aquarium.scene.locate(k, a),
+      ([k, a]) =>
+        (
+          window as unknown as {
+            __aquarium: { scene: { locate: (k: unknown, a: unknown) => Point | null } };
+          }
+        ).__aquarium.scene.locate(k, a),
       [kind, arg] as const,
     );
   }

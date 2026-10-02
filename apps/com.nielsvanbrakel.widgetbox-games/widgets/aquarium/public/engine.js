@@ -10,10 +10,12 @@
  * timestamp, never from Math.random, so client and server reach the same result.
  * Functions never read the clock; callers pass `now` (ms).
  */
-(function (root, factory) {
-  if (typeof module === "object" && module.exports) module.exports = factory(require("./catalog.js"));
+((root, factory) => {
+  if (typeof module === "object" && module.exports)
+    module.exports = factory(require("./catalog.js"));
   else root.AquaEngine = factory(root.AquaCatalog);
-})(typeof self !== "undefined" ? self : this, function (C) {
+})(typeof self !== "undefined" ? self : this, (C) => {
+  // biome-ignore lint/suspicious/noRedundantUseStrict: loaded as a classic script, not a module
   "use strict";
 
   const SAVE_VERSION = 2;
@@ -130,13 +132,31 @@
   function migrate(save, now) {
     if (!save || save.v !== SAVE_VERSION || !save.tanks) return createSave(now);
     save.food = save.food || {};
-    save.stats = { coinsEarned: 0, hatched: 0, scrubbed: 0, vacuumed: 0, played: 0, fed: 0, bought: 0, ...save.stats };
+    save.stats = {
+      coinsEarned: 0,
+      hatched: 0,
+      scrubbed: 0,
+      vacuumed: 0,
+      played: 0,
+      fed: 0,
+      bought: 0,
+      ...save.stats,
+    };
     save.dex = save.dex || {};
     save.ach = save.ach || [];
-    save.daily = { day: -1, goals: [], bonus: false, streak: 0, lastFull: -1, visited: [], ...save.daily };
+    save.daily = {
+      day: -1,
+      goals: [],
+      bonus: false,
+      streak: 0,
+      lastFull: -1,
+      visited: [],
+      ...save.daily,
+    };
     for (const id of TANK_IDS) {
       const base = emptyTank(id, id === "pond", save.t || now);
-      const tank = (save.tanks[id] = { ...base, ...save.tanks[id] });
+      const tank = { ...base, ...save.tanks[id] };
+      save.tanks[id] = tank;
       tank.up = { ...base.up, ...tank.up };
       tank.crew = { ...base.crew, ...tank.crew };
       tank.fish = tank.fish.filter((f) => C.SPECIES[f.s] && C.SPECIES[f.s].tank === id);
@@ -209,7 +229,7 @@
     reasons.push({ k: "water", v: wqPts });
     tags = tags || decorTags(tank);
     let likePts = 0;
-    if (sp.likes && sp.likes.length) {
+    if (sp.likes?.length) {
       for (const t of sp.likes) if (tags.has(t)) likePts += 8;
       likePts = Math.min(16, likePts);
     } else likePts = 8;
@@ -248,7 +268,8 @@
   function potentialIncome(tank) {
     const bonus = tankBonus(tank);
     let sum = 0;
-    for (const f of tank.fish) sum += C.SPECIES[f.s].income * C.RULES.stageIncome[f.stage] * (1 + bonus);
+    for (const f of tank.fish)
+      sum += C.SPECIES[f.s].income * C.RULES.stageIncome[f.stage] * (1 + bonus);
     return sum;
   }
 
@@ -265,7 +286,15 @@
 
   function fishSellPrice(fish) {
     const sp = C.SPECIES[fish.s];
-    return Math.max(1, Math.round(sp.price * C.RULES.sellReturn * C.RULES.stageSell[fish.stage] * C.RULES.variantSellMult[fish.v]));
+    return Math.max(
+      1,
+      Math.round(
+        sp.price *
+          C.RULES.sellReturn *
+          C.RULES.stageSell[fish.stage] *
+          C.RULES.variantSellMult[fish.v],
+      ),
+    );
   }
 
   function upgradeCost(tank, kind) {
@@ -306,7 +335,9 @@
 
   function eggPrice(tank, kind) {
     const egg = C.EGGS[kind];
-    return egg.pearls ? { pearls: egg.pearls } : { coins: Math.round(egg.price * C.TANKS[tank.id].costMult) };
+    return egg.pearls
+      ? { pearls: egg.pearls }
+      : { coins: Math.round(egg.price * C.TANKS[tank.id].costMult) };
   }
 
   function playReady(fish, now) {
@@ -316,7 +347,17 @@
   // ── Mutating helpers ───────────────────────────────────────────────
 
   function addFish(save, tank, speciesId, variant, stage, now) {
-    const fish = { id: nextId(save, "f"), s: speciesId, v: variant, born: now, stage, growth: 0, fed: 80, played: 0, buff: 0 };
+    const fish = {
+      id: nextId(save, "f"),
+      s: speciesId,
+      v: variant,
+      born: now,
+      stage,
+      growth: 0,
+      fed: 80,
+      played: 0,
+      buff: 0,
+    };
     tank.fish.push(fish);
     return fish;
   }
@@ -361,7 +402,14 @@
     const id = nextId(save, "a");
     const r = (k) => rand(save.seed, id, k);
     const hp = 1 + Math.floor(r("hp") * 3);
-    tank.algae.push({ id, x: round2(0.07 + r("x") * 0.74), y: round2(0.14 + r("y") * 0.5), hp, max: hp, at });
+    tank.algae.push({
+      id,
+      x: round2(0.07 + r("x") * 0.74),
+      y: round2(0.14 + r("y") * 0.5),
+      hp,
+      max: hp,
+      at,
+    });
   }
 
   function spawnDebris(save, tank, at) {
@@ -386,7 +434,7 @@
     const crew = [];
     for (const f of tank.fish) {
       const c = C.SPECIES[f.s].cleans;
-      if (c && c[kind]) {
+      if (c?.[kind]) {
         rate += c[kind] * (f.stage === STAGE.FRY ? 0.5 : 1);
         crew.push(f);
       }
@@ -442,7 +490,9 @@
     const portions = Math.min(save.food[best], Math.ceil(bestCount / food.portion));
     let bitsLeft = portions * food.portion;
     save.food[best] -= portions;
-    const eaters = tank.fish.filter((f) => C.SPECIES[f.s].eats.includes(best)).sort((a, b) => a.fed - b.fed);
+    const eaters = tank.fish
+      .filter((f) => C.SPECIES[f.s].eats.includes(best))
+      .sort((a, b) => a.fed - b.fed);
     for (const f of eaters) {
       if (!bitsLeft) break;
       f.fed = Math.min(100, f.fed + food.restore);
@@ -487,7 +537,12 @@
     for (const id of TANK_IDS) {
       const tank = save.tanks[id];
       if (!tank.unlocked) continue;
-      const before = { coins: uncollected(tank) + tank.pending, algae: tank.algae.length, debris: tank.debris.length, eggs: tank.eggs.length };
+      const before = {
+        coins: uncollected(tank) + tank.pending,
+        algae: tank.algae.length,
+        debris: tank.debris.length,
+        eggs: tank.eggs.length,
+      };
       // Food left drifting in the water when the widget closed turns into waste.
       if (tank.bits > 0 && now - tank.bitsAt > 2 * 60000) {
         tank.waste += tank.bits;
@@ -526,7 +581,8 @@
       tank.nextAlgae += spawnInterval(tank, C.RULES.algaeEveryHours, "algae");
     }
     while (tank.nextDebris <= t2) {
-      if (tank.fish.length && tank.debris.length < C.RULES.maxDebris) spawnDebris(save, tank, tank.nextDebris);
+      if (tank.fish.length && tank.debris.length < C.RULES.maxDebris)
+        spawnDebris(save, tank, tank.nextDebris);
       tank.nextDebris += spawnInterval(tank, C.RULES.debrisEveryHours, "debris");
     }
     runCrew(tank, "algae", dt);
@@ -607,7 +663,10 @@
   function progress(save, kind, amount, now, ev) {
     if (save.tut < C.TUTORIAL.length) {
       const step = C.TUTORIAL[save.tut];
-      const match = step.id === kind || (step.id === "buy_decor" && kind === "buyDecor") || (step.id === "buy_fish" && kind === "buyFish");
+      const match =
+        step.id === kind ||
+        (step.id === "buy_decor" && kind === "buyDecor") ||
+        (step.id === "buy_fish" && kind === "buyFish");
       if (match) {
         save.tutProg += amount;
         if (save.tutProg >= step.target) {
@@ -682,7 +741,7 @@
 
   function getTank(save, id) {
     const tank = save.tanks[id || save.active];
-    return tank && tank.unlocked ? tank : null;
+    return tank?.unlocked ? tank : null;
   }
 
   function findFish(tank, id) {
@@ -803,7 +862,11 @@
       const count = egg.m ? 1 : 1 + Math.floor(rand(save.seed, egg.id, "n") * 3);
       const free = capacity(tank) - usedSpace(tank);
       const sameCount = tank.fish.filter((f) => f.s === egg.s).length;
-      const room = Math.min(count, Math.floor(free / sp.space), sp.max ? Math.max(0, sp.max - sameCount) : count);
+      const room = Math.min(
+        count,
+        Math.floor(free / sp.space),
+        sp.max ? Math.max(0, sp.max - sameCount) : count,
+      );
       if (room <= 0 && !p.sell) return "full";
       tank.eggs.splice(tank.eggs.indexOf(egg), 1);
       const born = [];
@@ -853,7 +916,9 @@
       if (price.coins && save.coins < price.coins) return "coins";
       if (price.pearls && save.pearls < price.pearls) return "pearls";
       const id = nextId(save, "e");
-      const pool = Object.keys(C.SPECIES).filter((s) => C.SPECIES[s].tank === tank.id && C.SPECIES[s].level <= save.level);
+      const pool = Object.keys(C.SPECIES).filter(
+        (s) => C.SPECIES[s].tank === tank.id && C.SPECIES[s].level <= save.level,
+      );
       if (!pool.length) return "invalid";
       const m = p.kind === "golden" ? 2 : 1;
       let s = pool[Math.floor(rand(save.seed, id, "sp") * pool.length)];
@@ -861,18 +926,27 @@
       if (m === 2) {
         // Golden eggs aim for a colour the player is still missing.
         const missing = [];
-        for (const sp of pool) for (const bit of [1, 2]) if (!((save.dex[sp] | 0) & (1 << bit))) missing.push([sp, bit]);
-        if (missing.length) [s, v] = missing[Math.floor(rand(save.seed, id, "miss") * missing.length)];
+        for (const sp of pool)
+          for (const bit of [1, 2]) if (!((save.dex[sp] | 0) & (1 << bit))) missing.push([sp, bit]);
+        if (missing.length)
+          [s, v] = missing[Math.floor(rand(save.seed, id, "miss") * missing.length)];
       }
       save.coins -= price.coins || 0;
       save.pearls -= price.pearls || 0;
-      tank.eggs.push({ id, s, at: now, x: round2(0.1 + rand(save.seed, id, "x") * 0.7), m, ...(v ? { v } : {}) });
+      tank.eggs.push({
+        id,
+        s,
+        at: now,
+        x: round2(0.1 + rand(save.seed, id, "x") * 0.7),
+        m,
+        ...(v ? { v } : {}),
+      });
       addXp(save, C.RULES.xp.buy, ev);
       progress(save, "buyFish", 1, now, ev);
       return { egg: id };
     },
 
-    sellFish(save, p, now) {
+    sellFish(save, p) {
       const tank = getTank(save, p.tank);
       if (!tank) return "invalid";
       const fish = findFish(tank, p.fish);
@@ -1069,7 +1143,8 @@
     const item = C.DECOR[id];
     if (save.level < item.level) return "level";
     if (!freeSlots(tank, id).length) return "slot";
-    if (item.pearls ? save.pearls < item.pearls : save.coins < item.price) return item.pearls ? "pearls" : "coins";
+    if (item.pearls ? save.pearls < item.pearls : save.coins < item.price)
+      return item.pearls ? "pearls" : "coins";
     return null;
   }
 
@@ -1084,13 +1159,18 @@
   function speciesFor(tankId) {
     return Object.keys(C.SPECIES)
       .filter((s) => C.SPECIES[s].tank === tankId)
-      .sort((a, b) => C.SPECIES[a].level - C.SPECIES[b].level || C.SPECIES[a].price - C.SPECIES[b].price);
+      .sort(
+        (a, b) =>
+          C.SPECIES[a].level - C.SPECIES[b].level || C.SPECIES[a].price - C.SPECIES[b].price,
+      );
   }
 
   function decorFor(tankId) {
     return Object.keys(C.DECOR)
       .filter((d) => C.DECOR[d].tank === tankId)
-      .sort((a, b) => !!C.DECOR[a].pearls - !!C.DECOR[b].pearls || C.DECOR[a].level - C.DECOR[b].level);
+      .sort(
+        (a, b) => !!C.DECOR[a].pearls - !!C.DECOR[b].pearls || C.DECOR[a].level - C.DECOR[b].level,
+      );
   }
 
   function nextUnlock(save) {

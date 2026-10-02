@@ -57,7 +57,9 @@ test.describe("Aquarium widget", () => {
     await aq.closeWelcome();
     await aq.tapThing("drop");
     await expect.poll(() => aq.state((g) => g.queue.length)).toBe(0);
-    const stored = await aq.frame().evaluate(() => JSON.parse(localStorage.getItem("aquarium2_sandbox") || "{}"));
+    const stored = await aq
+      .frame()
+      .evaluate(() => JSON.parse(localStorage.getItem("aquarium2_sandbox") || "{}"));
     expect(stored.save.tut).toBe(1);
   });
 
@@ -127,7 +129,9 @@ test.describe("Aquarium widget", () => {
   test("lets the moray eel leave and return to its cave", async () => {
     await aq.open("reef");
     await aq.closeWelcome();
-    const eel = await aq.state((g) => [...g.scene.agents.values()].some((a) => a.move === "eel" && a.home));
+    const eel = await aq.state((g) =>
+      [...g.scene.agents.values()].some((a) => a.move === "eel" && a.home),
+    );
     expect(eel).toBe(true);
     await aq.state((g) => {
       const a = [...g.scene.agents.values()].find((x) => x.move === "eel");
@@ -135,9 +139,14 @@ test.describe("Aquarium widget", () => {
       a.peek = 1;
       return true;
     });
-    await expect.poll(() => aq.state((g) => [...g.scene.agents.values()].find((a) => a.move === "eel").state)).not.toBe("home");
     await expect
-      .poll(() => aq.state((g) => [...g.scene.agents.values()].find((a) => a.move === "eel").state), { timeout: 40000 })
+      .poll(() => aq.state((g) => [...g.scene.agents.values()].find((a) => a.move === "eel").state))
+      .not.toBe("home");
+    await expect
+      .poll(
+        () => aq.state((g) => [...g.scene.agents.values()].find((a) => a.move === "eel").state),
+        { timeout: 40000 },
+      )
       .toBe("home");
   });
 });
