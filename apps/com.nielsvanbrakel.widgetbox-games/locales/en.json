@@ -245,7 +245,8 @@
         "slot": "No free spot",
         "full": "Tank is full",
         "offline": "Can't reach Homey right now",
-        "load": "Could not load the aquarium."
+        "load": "Could not load the aquarium.",
+        "eggsFull": "The nest is full"
       },
       "upgrade": {
         "size": "Bigger tank",
@@ -323,7 +324,16 @@
         "hungry": "{n} fish are hungry",
         "dirty": "{n} spots need cleaning",
         "go": "Let's go"
-      }
+      },
+      "egg": {
+        "mystery": "Mystery egg",
+        "golden": "Golden egg"
+      },
+      "eggInfo": {
+        "mystery": "Hatches a random {tank} fish, with three times the chance of a rare colour.",
+        "golden": "Always hatches a rare colour, preferring ones missing from your Fishdex."
+      },
+      "eggBought": "Egg placed on the sand. It hatches in 2 hours."
     }
   }
 }

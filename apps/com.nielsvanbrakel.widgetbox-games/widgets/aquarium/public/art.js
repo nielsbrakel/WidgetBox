@@ -2223,7 +2223,8 @@
     }
   }
 
-  function drawEggs(ctx, x, y, r, ready, t) {
+  function drawEggs(ctx, x, y, r, ready, t, m) {
+    if (m) return drawShopEgg(ctx, x, y, r, ready, t, m === 2);
     const rnd = prng(Math.round(x * 31));
     for (let i = 0; i < 9; i++) {
       const ex = x + (rnd() - 0.5) * r * 1.8;
@@ -2243,6 +2244,42 @@
       }
     }
     if (ready) glowDot(ctx, x, y, r * 1.6, "#fff2b0", 0.25 + 0.15 * Math.sin(t * 3));
+  }
+
+  // A single bought egg resting on the sand, rocking gently once it is ready to hatch.
+  function drawShopEgg(ctx, x, y, r, ready, t, gold) {
+    const rock = ready ? Math.sin(t * 6) * 0.12 * Math.max(0, Math.sin(t * 1.3)) : 0;
+    ctx.save();
+    ctx.translate(x, y + r * 0.2);
+    ctx.rotate(rock);
+    const h = r * 0.95;
+    const w = r * 0.7;
+    const g = ctx.createRadialGradient(-w * 0.3, -h * 0.5, 0, 0, -h * 0.3, h * 1.1);
+    if (gold) {
+      g.addColorStop(0, "#fff6c8");
+      g.addColorStop(0.5, "#f5c542");
+      g.addColorStop(1, "#a8741a");
+    } else {
+      g.addColorStop(0, "#fffdf4");
+      g.addColorStop(1, "#d9cca8");
+    }
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.moveTo(0, -h);
+    ctx.bezierCurveTo(w, -h, w, 0, w * 0.95, -h * 0.05);
+    ctx.bezierCurveTo(w * 0.9, h * 0.3, -w * 0.9, h * 0.3, -w * 0.95, -h * 0.05);
+    ctx.bezierCurveTo(-w, 0, -w, -h, 0, -h);
+    ctx.fill();
+    if (!gold) {
+      ctx.fillStyle = "rgba(90,140,160,0.55)";
+      for (const [dx, dy, dr] of [[-0.3, -0.55, 0.09], [0.25, -0.35, 0.07], [-0.1, -0.15, 0.06], [0.35, -0.7, 0.05]]) {
+        ctx.beginPath();
+        ctx.arc(dx * w * 1.4, dy * h, dr * r, 0, TAU);
+        ctx.fill();
+      }
+    }
+    ctx.restore();
+    if (gold || ready) glowDot(ctx, x, y - r * 0.2, r * 1.8, gold ? "#ffd75a" : "#fff2b0", (gold ? 0.3 : 0.2) + 0.15 * Math.sin(t * 3));
   }
 
   const FOOD_COLORS = {
@@ -2341,8 +2378,11 @@
         for (let i = 0; i < 16; i++) pts.push({ x: size * 0.85 - i * size * 0.05, y: size * 0.5 + Math.sin(i * 0.7) * size * 0.08 });
         drawEel(ctx, variant, pts, size * 0.06, { phase: 1 });
       } else {
-        const L = size * 0.62 * Math.min(1.25, Math.max(0.8, art.len));
-        ctx.translate(size * (id === "jelly" ? 0.5 : 0.56), size * (id === "jelly" ? 0.4 : SPECIAL[id] ? 0.66 : 0.52));
+        // Big veil tails reach far behind the body, so shrink those fish and shift them forward.
+        const tail = Math.max(1, art.tailSize || 0);
+        const L = (size * 0.62 * Math.min(1.25, Math.max(0.8, art.len))) / (1 + (tail - 1) * 1.6);
+        const x = id === "jelly" ? 0.5 : 0.56 + (tail - 1) * 0.6;
+        ctx.translate(size * x, size * (id === "jelly" ? 0.4 : SPECIAL[id] ? 0.66 : 0.52));
         drawFish(ctx, id, variant, L, { phase: 1.2, effort: 0, dpr });
       }
     } else if (kind === "decor") {

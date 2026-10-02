@@ -978,7 +978,7 @@
       }
       for (const e of this.eggs) {
         const p = this.eggPos(e);
-        A.drawEggs(ctx, p.x, p.y, this.unit * 0.25, e.ready, t);
+        A.drawEggs(ctx, p.x, p.y, this.unit * 0.25, e.ready, t, e.m);
       }
 
       agents.sort((a, b) => a.z - b.z);

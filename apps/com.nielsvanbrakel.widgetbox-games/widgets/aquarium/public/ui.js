@@ -57,6 +57,15 @@
     return n < 10 ? n.toFixed(1).replace(/\.0$/, "") : fmt(n);
   }
 
+  // Shop picture for a bought egg: a speckled one for mystery eggs, a shiny one for golden.
+  function eggImage(kind) {
+    const gold = kind === "golden";
+    const fill = gold ? "url(#g)" : "#f3ead2";
+    const dots = gold ? "" : '<circle cx="17" cy="16" r="1.6" fill="#7aa7b5"/><circle cx="23" cy="22" r="1.3" fill="#7aa7b5"/><circle cx="16" cy="25" r="1.1" fill="#7aa7b5"/>';
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><defs><radialGradient id="g" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#fff6c8"/><stop offset=".5" stop-color="#f5c542"/><stop offset="1" stop-color="#b9831c"/></radialGradient></defs><path d="M20 5c6 0 11 10 11 17a11 11 0 0 1-22 0C9 15 14 5 20 5z" fill="${fill}" stroke="${gold ? "#8a5d10" : "#c9bb98"}" stroke-width="1.2"/>${dots}<text x="20" y="27" font-size="11" font-family="sans-serif" font-weight="700" text-anchor="middle" fill="${gold ? "#7a4d00" : "#5a7f8c"}">${gold ? "★" : "?"}</text></svg>`;
+    return `data:image/svg+xml,${encodeURIComponent(svg)}`;
+  }
+
   // Food names are lower case for use mid-sentence; capitalise them for titles.
   function cap(s) {
     return s.charAt(0).toUpperCase() + s.slice(1);
@@ -436,7 +445,8 @@
         const egg = save.tanks[save.active].eggs.find((e) => e.id === card.id);
         if (!egg) return this.hideCard();
         const ready = E.eggReady(egg, now);
-        html += `<div class="card-title">${esc(this.t("eggsOf", { name: this.speciesName(egg.s) }))}</div>`;
+        const title = egg.m ? this.t(egg.m === 2 ? "egg.golden" : "egg.mystery") : this.t("eggsOf", { name: this.speciesName(egg.s) });
+        html += `<div class="card-title">${esc(title)}</div>`;
         if (!ready) {
           const left = egg.at + C.RULES.eggHatchHours * E.HOUR - now;
           html += `<div class="card-sub">${esc(this.t("eggsHatchIn", { time: this.duration(left) }))}</div>`;
@@ -514,7 +524,7 @@
       return { cols, rows, per: cols * rows, itemH: Math.floor((h - (rows - 1) * 6) / rows) };
     }
 
-    renderSheet() {
+    renderSheet(relayout) {
       const sh = this.sheet;
       if (!sh) return;
       const save = this.game.save;
@@ -543,6 +553,9 @@
       body.style.gridAutoRows = out.rowH ? `${out.rowH}px` : "";
       const pager = out.pages > 1 ? `<div class="pager"><button type="button" class="icon-btn" data-ui="page" data-arg="-1" ${sh.page <= 0 ? "disabled" : ""}>${icon("left")}</button>${sh.page + 1}/${out.pages}<button type="button" class="icon-btn" data-ui="page" data-arg="1" ${sh.page >= out.pages - 1 ? "disabled" : ""}>${icon("right")}</button></div>` : "";
       this.$("sheetFoot").innerHTML = (out.foot || "") + pager;
+      // The grid is sized from the space left by the footer; if the new footer is taller than
+      // the old one, lay out once more so items never slide under it.
+      if (!relayout && body.scrollHeight > body.clientHeight + 2) this.renderSheet(true);
     }
 
     paged(items, per) {
@@ -563,7 +576,10 @@
       const tank = save.tanks[tankId];
       const L = this.layout(88, 74);
       let items = [];
-      if (sh.tab === "fish") items = E.speciesFor(tankId).map((id) => ({ id, kind: "fish" }));
+      if (sh.tab === "fish") {
+        items = E.speciesFor(tankId).map((id) => ({ id, kind: "fish" }));
+        for (const k of Object.keys(C.EGGS)) items.push({ id: `egg_${k}`, kind: "egg", egg: k });
+      }
       if (sh.tab === "decor") items = E.decorFor(tankId).map((id) => ({ id, kind: "decor" }));
       if (sh.tab === "food") items = Object.keys(C.FOODS).map((id) => ({ id, kind: "food" }));
       const { pageItems, pages } = this.paged(items, L.per);
@@ -584,6 +600,13 @@
           if (locked) lock = `${icon("lock")}${sp.level}`;
           const n = tank.fish.filter((f) => f.s === it.id).length;
           if (n) owned = `×${n}`;
+        } else if (it.kind === "egg") {
+          const egg = C.EGGS[it.egg];
+          const cost = E.eggPrice(tank, it.egg);
+          img = eggImage(it.egg);
+          name = this.t(`egg.${it.egg}`);
+          price = this.priceTag(cost.coins, cost.pearls, save);
+          if (save.level < egg.level) lock = `${icon("lock")}${egg.level}`;
         } else if (it.kind === "decor") {
           const item = C.DECOR[it.id];
           const locked = save.level < item.level;
@@ -613,7 +636,15 @@
       const tank = save.tanks[save.active];
       let info = "";
       let btn = "";
-      if (tab === "fish") {
+      if (tab === "fish" && id.startsWith("egg_")) {
+        const kind = id.slice(4);
+        const egg = C.EGGS[kind];
+        const cost = E.eggPrice(tank, kind);
+        const full = tank.eggs.length >= C.RULES.maxEggClutches;
+        const locked = save.level < egg.level;
+        info = `<b>${esc(this.t(`egg.${kind}`))}</b><br><span class="muted">${esc(this.t(`eggInfo.${kind}`, { tank: this.t(`tank.${tank.id}`) }))}</span>`;
+        btn = `<button type="button" class="btn primary" style="flex:none" data-ui="action" data-arg="buyEgg:${kind}" ${locked || full ? "disabled" : ""}>${locked ? `${icon("lock")}${this.t("levelN", { n: egg.level })}` : full ? esc(this.t("err.eggsFull")) : `${esc(this.t("buy"))} ${icon(cost.pearls ? "pearl" : "coin")}${fmt(cost.pearls || cost.coins)}`}</button>`;
+      } else if (tab === "fish") {
         const sp = C.SPECIES[id];
         const block = E.speciesBlock(save, tank, id);
         const likes = sp.needs ? this.t("needs", { tag: this.t(`tag.${sp.needs}`) }) : sp.likes && sp.likes.length ? this.t("likes", { tags: sp.likes.map((t) => this.t(`tag.${t}`)).join(", ") }) : "";
@@ -773,6 +804,12 @@
         const r = this.game.do({ type: "buyFish", tank, s: id });
         if (r.ok) {
           this.toast(this.t("welcomeFish", { name: fishName(r.result.fish) }), "gold");
+          this.closeSheet();
+        }
+      } else if (kind === "buyEgg") {
+        const r = this.game.do({ type: "buyEgg", tank, kind: id });
+        if (r.ok) {
+          this.toast(this.t("eggBought"), "gold");
           this.closeSheet();
         }
       } else if (kind === "buyDecor") {

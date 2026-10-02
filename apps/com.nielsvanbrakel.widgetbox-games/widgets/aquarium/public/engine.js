@@ -155,7 +155,7 @@
   // ── Derived values (never persisted) ───────────────────────────────
 
   function xpFor(level) {
-    return Math.round(30 * level ** 1.6);
+    return Math.round(25 * level ** 1.9);
   }
 
   function maxUpgrade(kind) {
@@ -291,6 +291,22 @@
 
   function eggReady(egg, now) {
     return now >= egg.at + C.RULES.eggHatchHours * HOUR;
+  }
+
+  function hatchVariant(save, egg, i) {
+    const roll = rand(save.seed, egg.id, "variant", i);
+    if (egg.m === 2) {
+      if (egg.v) return egg.v;
+      return roll < C.EGGS.golden.epicChance ? 2 : 1;
+    }
+    const boost = egg.m === 1 ? C.EGGS.mystery.boost : 1;
+    const epic = C.VARIANT_ODDS[2] * boost;
+    return roll < epic ? 2 : roll < epic + C.VARIANT_ODDS[1] * boost ? 1 : 0;
+  }
+
+  function eggPrice(tank, kind) {
+    const egg = C.EGGS[kind];
+    return egg.pearls ? { pearls: egg.pearls } : { coins: Math.round(egg.price * C.TANKS[tank.id].costMult) };
   }
 
   function playReady(fish, now) {
@@ -783,7 +799,8 @@
       if (!egg) return "gone";
       if (!eggReady(egg, now)) return "notReady";
       const sp = C.SPECIES[egg.s];
-      const count = 1 + Math.floor(rand(save.seed, egg.id, "n") * 3);
+      // Bought eggs hold a single fish; laid clutches hold one to three.
+      const count = egg.m ? 1 : 1 + Math.floor(rand(save.seed, egg.id, "n") * 3);
       const free = capacity(tank) - usedSpace(tank);
       const sameCount = tank.fish.filter((f) => f.s === egg.s).length;
       const room = Math.min(count, Math.floor(free / sp.space), sp.max ? Math.max(0, sp.max - sameCount) : count);
@@ -792,8 +809,7 @@
       const born = [];
       let soldFor = 0;
       for (let i = 0; i < count; i++) {
-        const roll = rand(save.seed, egg.id, "variant", i);
-        const variant = roll < C.VARIANT_ODDS[2] ? 2 : roll < C.VARIANT_ODDS[2] + C.VARIANT_ODDS[1] ? 1 : 0;
+        const variant = hatchVariant(save, egg, i);
         if (i < room) {
           const fish = addFish(save, tank, egg.s, variant, STAGE.FRY, now);
           born.push({ id: fish.id, v: variant });
@@ -825,6 +841,35 @@
       addXp(save, C.RULES.xp.buy, ev);
       progress(save, "buyFish", 1, now, ev);
       return { fish: fish.id };
+    },
+
+    buyEgg(save, p, now, ev) {
+      const tank = getTank(save, p.tank);
+      const egg = C.EGGS[p.kind];
+      if (!tank || !egg || !Object.hasOwn(C.EGGS, p.kind)) return "invalid";
+      if (save.level < egg.level) return "level";
+      if (tank.eggs.length >= C.RULES.maxEggClutches) return "eggsFull";
+      const price = eggPrice(tank, p.kind);
+      if (price.coins && save.coins < price.coins) return "coins";
+      if (price.pearls && save.pearls < price.pearls) return "pearls";
+      const id = nextId(save, "e");
+      const pool = Object.keys(C.SPECIES).filter((s) => C.SPECIES[s].tank === tank.id && C.SPECIES[s].level <= save.level);
+      if (!pool.length) return "invalid";
+      const m = p.kind === "golden" ? 2 : 1;
+      let s = pool[Math.floor(rand(save.seed, id, "sp") * pool.length)];
+      let v = 0;
+      if (m === 2) {
+        // Golden eggs aim for a colour the player is still missing.
+        const missing = [];
+        for (const sp of pool) for (const bit of [1, 2]) if (!((save.dex[sp] | 0) & (1 << bit))) missing.push([sp, bit]);
+        if (missing.length) [s, v] = missing[Math.floor(rand(save.seed, id, "miss") * missing.length)];
+      }
+      save.coins -= price.coins || 0;
+      save.pearls -= price.pearls || 0;
+      tank.eggs.push({ id, s, at: now, x: round2(0.1 + rand(save.seed, id, "x") * 0.7), m, ...(v ? { v } : {}) });
+      addXp(save, C.RULES.xp.buy, ev);
+      progress(save, "buyFish", 1, now, ev);
+      return { egg: id };
     },
 
     sellFish(save, p, now) {
@@ -1085,6 +1130,7 @@
     freeSlots,
     eggReady,
     playReady,
+    eggPrice,
     fishInfo,
     tankInfo,
     speciesBlock,

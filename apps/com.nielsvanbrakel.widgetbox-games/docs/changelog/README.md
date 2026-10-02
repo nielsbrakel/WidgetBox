@@ -9,4 +9,5 @@ When updating the spec, always:
 
 ## Versions
 
+- [2.0.0](2.0.0.md) — Full rebuild: taps only, four tanks, Fishdex and eggs (2026-10-02)
 - [1.0.0](1.0.0.md) — Initial spec version (2026-02-19)

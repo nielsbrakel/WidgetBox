@@ -192,6 +192,17 @@
     streakPearls: 5,
   };
 
+  /*
+   * Eggs for sale, the long-term sink for coins and pearls. Species is drawn at random from
+   * the tank's unlocked species, so they drive the hunt for rare colour variants.
+   *  mystery  coins × tank costMult, rare odds multiplied by `boost`
+   *  golden   pearls, always hatches a rare variant (preferring ones not yet found)
+   */
+  const EGGS = {
+    mystery: { level: 2, price: 150, boost: 3 },
+    golden: { level: 3, pearls: 20, epicChance: 0.3 },
+  };
+
   // Tutorial steps run before the daily goals start.
   const TUTORIAL = [
     { id: "collect", target: 1, coins: 10 },
@@ -241,5 +252,5 @@
   // Pearls for Fishdex discoveries.
   const DEX_PEARLS = { species: 1, rare: 3, tankComplete: 10 };
 
-  return { TANKS, SPECIES, VARIANTS, VARIANT_ODDS, FOODS, DECOR, SLOTS, UPGRADES, RULES, TUTORIAL, GOALS, ACHIEVEMENTS, DEX_PEARLS };
+  return { TANKS, SPECIES, VARIANTS, VARIANT_ODDS, FOODS, DECOR, SLOTS, UPGRADES, RULES, EGGS, TUTORIAL, GOALS, ACHIEVEMENTS, DEX_PEARLS };
 });

@@ -245,7 +245,8 @@
         "slot": "Geen vrije plek",
         "full": "Bak is vol",
         "offline": "Homey is nu niet bereikbaar",
-        "load": "Kon het aquarium niet laden."
+        "load": "Kon het aquarium niet laden.",
+        "eggsFull": "Het nest is vol"
       },
       "upgrade": {
         "size": "Grotere bak",
@@ -323,7 +324,16 @@
         "hungry": "{n} vissen hebben honger",
         "dirty": "{n} plekken moeten schoon",
         "go": "Aan de slag"
-      }
+      },
+      "egg": {
+        "mystery": "Verrassingsei",
+        "golden": "Gouden ei"
+      },
+      "eggInfo": {
+        "mystery": "Komt uit als een willekeurige vis van {tank}, met drie keer zoveel kans op een zeldzame kleur.",
+        "golden": "Komt altijd uit als een zeldzame kleur, bij voorkeur een die nog in je Visboek ontbreekt."
+      },
+      "eggBought": "Ei op het zand gelegd. Het komt over 2 uur uit."
     }
   }
 }
