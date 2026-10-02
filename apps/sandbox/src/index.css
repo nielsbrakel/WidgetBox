@@ -114,6 +114,12 @@ body {
 }
 
 .widget-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  background: none;
   padding: 0.75rem 1rem;
   margin-bottom: 0.5rem;
   border-radius: var(--radius-md);
@@ -271,7 +277,7 @@ select:focus {
   cursor: pointer;
 }
 
-.checkbox-row label {
+.checkbox-row .setting-label {
   cursor: pointer;
   margin-bottom: 0;
 }

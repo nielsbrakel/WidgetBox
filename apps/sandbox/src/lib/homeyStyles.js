@@ -109,7 +109,8 @@ export function injectHomeyStyles(doc) {
     }
 
     /* Dark Mode Overrides */
-    .homey-theme-dark {
+    .homey-theme-dark,
+    .homey-dark-mode {
       --homey-text-color: #fff;
       --homey-background-color: #2c2c2c;
 
@@ -152,10 +153,12 @@ export function injectHomeyStyles(doc) {
  * Sets body classes and injects Homey CSS variables.
  */
 export function setIframeTheme(doc, theme) {
-  if (!doc || !doc.body) return;
+  if (!doc?.body) return;
 
   doc.body.classList.remove("homey-theme-light", "homey-theme-dark");
   doc.body.classList.add(`homey-theme-${theme}`);
+  // Real Homey dashboards mark dark mode with the homey-dark-mode class.
+  doc.body.classList.toggle("homey-dark-mode", theme === "dark");
   doc.body.dataset.theme = theme;
 
   // Ensure homey-widget class is present by default

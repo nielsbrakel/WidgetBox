@@ -1,5 +1,5 @@
 import { handleAquariumApi, resetAquariumScenario } from "./mocks/aquariumMocks";
-import { handleBuienradarApi } from "./mocks/buienradarMocks";
+import { handleWeatherApi } from "./mocks/weatherMocks";
 import { SCENARIOS } from "./scenarios";
 
 class SimpleEventEmitter {
@@ -17,7 +17,7 @@ class SimpleEventEmitter {
 
   emit(event, ...args) {
     if (!this.events[event]) return false;
-    this.events[event].forEach((listener) => listener(...args));
+    for (const listener of this.events[event]) listener(...args);
     return true;
   }
 
@@ -100,6 +100,11 @@ class MockHomey extends SimpleEventEmitter {
     return this.widgetInstanceId;
   }
 
+  async popup(url) {
+    console.log(`[MockHomey] popup: ${url}`);
+    this.lastPopupUrl = url;
+  }
+
   setScenario(scenarioId) {
     this.activeScenario = scenarioId;
     // Reset persisted mock state so the new scenario loads fresh
@@ -122,14 +127,14 @@ class MockHomey extends SimpleEventEmitter {
     }
 
     // Delegate to widget-specific mock handlers
-    const buienradarResult = await handleBuienradarApi(
+    const weatherResult = await handleWeatherApi(
       this.widgetId,
       { ...scenarioDef, id: this.activeScenario },
       this.settings,
       method,
       endpoint,
     );
-    if (buienradarResult !== null) return buienradarResult;
+    if (weatherResult !== null) return weatherResult;
 
     // Aquarium widget
     const aquariumResult = handleAquariumApi(
@@ -149,15 +154,22 @@ class MockHomey extends SimpleEventEmitter {
     const urlParts = endpoint.split("?");
     const queryParams = new URLSearchParams(urlParts[1]);
     const widgetId = queryParams.get("widgetId");
-    const key = `mock_state_${widgetId}`;
+    // Scoped per widget type, like the `<prefix>_<instanceId>` settings keys on a real Homey
+    const key = `mock_state_${this.widgetId}_${widgetId}`;
 
+    // Mirrors lib/widgetState.js: both calls return the stored state plus Homey's clock
     if (method === "PUT") {
-      localStorage.setItem(key, JSON.stringify(body));
-      return { success: true };
+      const state = { ...body, updatedAt: Date.now() };
+      localStorage.setItem(key, JSON.stringify(state));
+      return { ...state, serverNow: Date.now() };
     }
     if (method === "GET") {
       const data = localStorage.getItem(key);
-      return data ? JSON.parse(data) : {};
+      return data ? { ...JSON.parse(data), serverNow: Date.now() } : null;
+    }
+    if (method === "DELETE") {
+      localStorage.removeItem(key);
+      return null;
     }
   }
 }

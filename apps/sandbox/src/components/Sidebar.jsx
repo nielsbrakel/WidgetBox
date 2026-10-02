@@ -14,14 +14,15 @@ export default function Sidebar({ groupedWidgets, selectedWidget, onSelectWidget
               {appId.split(".").pop().replace("widgetbox-", "")}
             </div>
             {widgets.map((w) => (
-              <div
+              <button
+                type="button"
                 key={w.id}
                 className={`widget-item ${selectedWidget?.id === w.id ? "active" : ""}`}
                 onClick={() => onSelectWidget(w)}
               >
                 <span className="widget-name">{w.name?.en || w.id}</span>
                 <span className="widget-app">{w.id}</span>
-              </div>
+              </button>
             ))}
           </div>
         ))}

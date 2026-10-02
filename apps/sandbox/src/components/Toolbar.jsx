@@ -26,6 +26,7 @@ export default function Toolbar({
         <div className="width-switcher">
           {WIDTH_PRESETS.map(({ width, label, title }) => (
             <button
+              type="button"
               key={width}
               className={`toolbar-btn width-btn ${previewWidth === width ? "active" : ""}`}
               onClick={() => onSetPreviewWidth(width)}
@@ -35,10 +36,10 @@ export default function Toolbar({
             </button>
           ))}
         </div>
-        <button onClick={onToggleTheme} title="Toggle Theme" className="toolbar-btn">
+        <button type="button" onClick={onToggleTheme} title="Toggle Theme" className="toolbar-btn">
           {theme === "dark" ? <MoonIcon /> : <SunIcon />}
         </button>
-        <button onClick={onReload} title="Reload Widget" className="toolbar-btn">
+        <button type="button" onClick={onReload} title="Reload Widget" className="toolbar-btn">
           <RefreshIcon />
         </button>
       </div>

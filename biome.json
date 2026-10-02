@@ -10,6 +10,7 @@
       "**",
       "!**/.homeybuild",
       "!**/app.json",
+      "!**/assets",
       "!pnpm-lock.yaml",
       "!apps/com.nielsvanbrakel.widgetbox-games/widgets/aquarium",
       "!apps/sandbox/src/lib/mocks/aquariumMocks.js",
@@ -29,7 +30,7 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true
+      "preset": "recommended"
     }
   },
   "formatter": {
@@ -43,5 +44,17 @@
       "quoteStyle": "double",
       "semicolons": "always"
     }
-  }
+  },
+  "overrides": [
+    {
+      "includes": ["playwright.config.ts"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noUndeclaredEnvVars": "off"
+          }
+        }
+      }
+    }
+  ]
 }

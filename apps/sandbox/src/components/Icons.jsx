@@ -1,5 +1,6 @@
 export const RefreshIcon = () => (
   <svg
+    aria-hidden="true"
     width="18"
     height="18"
     viewBox="0 0 24 24"
@@ -17,6 +18,7 @@ export const RefreshIcon = () => (
 
 export const MoonIcon = () => (
   <svg
+    aria-hidden="true"
     width="18"
     height="18"
     viewBox="0 0 24 24"
@@ -32,6 +34,7 @@ export const MoonIcon = () => (
 
 export const SunIcon = () => (
   <svg
+    aria-hidden="true"
     width="18"
     height="18"
     viewBox="0 0 24 24"
@@ -55,6 +58,7 @@ export const SunIcon = () => (
 
 export const SettingsIcon = () => (
   <svg
+    aria-hidden="true"
     width="18"
     height="18"
     viewBox="0 0 24 24"
@@ -71,6 +75,7 @@ export const SettingsIcon = () => (
 
 export const BugIcon = () => (
   <svg
+    aria-hidden="true"
     width="18"
     height="18"
     viewBox="0 0 24 24"
@@ -88,6 +93,7 @@ export const BugIcon = () => (
 
 export const CubeIcon = () => (
   <svg
+    aria-hidden="true"
     width="20"
     height="20"
     viewBox="0 0 24 24"

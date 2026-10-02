@@ -16,6 +16,10 @@ function App() {
   const [widgetHeight, setWidgetHeight] = useState(160);
   const [previewWidth, setPreviewWidth] = useState(480);
   const [settingsValues, setSettingsValues] = useState({});
+  // Latest values for async callbacks (iframe load awaits the locale fetch).
+  const settingsRef = useRef(settingsValues);
+  settingsRef.current = settingsValues;
+  const mockRef = useRef(null);
   const [key, setKey] = useState(0);
   const [theme, setTheme] = useState(localStorage.getItem("sandbox-theme") || "dark");
   const [activeScenario, setActiveScenario] = useState(DEFAULT_SCENARIO);
@@ -38,12 +42,20 @@ function App() {
     }
   }, [activeScenario, mockHomeyInstance]);
 
-  // Reset scenario when widget changes
-  useEffect(() => {
+  const selectWidget = useCallback((widget) => {
+    setSelectedWidget(widget);
+    const defaults = {};
+    widget.settings.forEach((s) => {
+      defaults[s.id] = s.value;
+    });
+    setSettingsValues(defaults);
+    setKey((prev) => prev + 1);
+    setWidgetHeight(widget.height || 160);
     setActiveScenario(DEFAULT_SCENARIO);
-  }, [selectedWidget]);
+  }, []);
 
-  // Handle URL routing
+  // Handle URL routing (once, on mount)
+  // biome-ignore lint/correctness/useExhaustiveDependencies: initial selection must only run on mount
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const widgetId = params.get("widget");
@@ -81,17 +93,6 @@ function App() {
     }
   }, [theme]);
 
-  const selectWidget = useCallback((widget) => {
-    setSelectedWidget(widget);
-    const defaults = {};
-    widget.settings.forEach((s) => {
-      defaults[s.id] = s.value;
-    });
-    setSettingsValues(defaults);
-    setKey((prev) => prev + 1);
-    setWidgetHeight(widget.height || 160);
-  }, []);
-
   const reloadWidget = useCallback(() => {
     setKey((prev) => prev + 1);
   }, []);
@@ -128,7 +129,8 @@ function App() {
       mock.setLocaleData(localeData);
     }
 
-    mock.settings = { ...settingsValues };
+    mock.settings = { ...settingsRef.current };
+    mockRef.current = mock;
     setMockHomeyInstance(mock);
 
     if (mock.setScenario) {
@@ -147,18 +149,14 @@ function App() {
         console.error("Error calling onHomeyReady:", err);
       }
     }
-  }, [theme, selectedWidget, settingsValues, activeScenario]);
+  }, [theme, selectedWidget, activeScenario]);
 
-  const updateSetting = useCallback(
-    (id, value) => {
-      const newSettings = { ...settingsValues, [id]: value };
-      setSettingsValues(newSettings);
-      if (mockHomeyInstance) {
-        mockHomeyInstance.updateSettings({ ...newSettings });
-      }
-    },
-    [settingsValues, mockHomeyInstance],
-  );
+  const updateSetting = useCallback((id, value) => {
+    const newSettings = { ...settingsRef.current, [id]: value };
+    settingsRef.current = newSettings;
+    setSettingsValues(newSettings);
+    mockRef.current?.updateSettings({ ...newSettings });
+  }, []);
 
   return (
     <div className="app-container">

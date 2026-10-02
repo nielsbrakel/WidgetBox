@@ -1,28 +1,33 @@
 export const SCENARIOS = {
-  "buienradar-graph": {
+  "rain-graph": {
     default: { label: "Dynamic Rain (Default)", type: "mock" },
     real: { label: "Real Data (Live)", type: "real" },
     "no-rain": { label: "No Rain", type: "mock" },
     "light-rain": { label: "Light Rain", type: "mock" },
     "heavy-rain": { label: "Heavy Rain", type: "mock" },
+    "out-of-range": { label: "Outside NL/BE", type: "mock" },
+    "no-location": { label: "No Location", type: "mock" },
     error: { label: "API Error", type: "error" },
   },
-  "buienradar-station": {
+  station: {
     default: { label: "Station Data (Default)", type: "mock" },
     real: { label: "Real Data (Live)", type: "real" },
+    "no-location": { label: "No Location", type: "mock" },
     error: { label: "API Error", type: "error" },
   },
-  "buienradar-forecast": {
+  forecast: {
     default: { label: "Forecast (Default)", type: "mock" },
     real: { label: "Real Data (Live)", type: "real" },
+    "no-location": { label: "No Location", type: "mock" },
     error: { label: "API Error", type: "error" },
   },
   youtube: {
     default: { label: "Normal (Default)", type: "mock" },
     ios: { label: "Simulate iOS", type: "mock" },
   },
-  windy: {
+  "weather-map": {
     default: { label: "Normal (Default)", type: "mock" },
+    "no-location": { label: "No Homey Location", type: "mock" },
     ios: { label: "Simulate iOS", type: "mock" },
   },
   aquarium: {

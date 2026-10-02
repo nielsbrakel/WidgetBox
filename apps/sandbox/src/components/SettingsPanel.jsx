@@ -91,26 +91,23 @@ export default function SettingsPanel({
           selectedWidget.settings.map((setting) => (
             <div key={setting.id} className="setting-group">
               {setting.type === "checkbox" ? (
-                <div
-                  className="checkbox-row"
-                  onClick={() => onUpdateSetting(setting.id, !settingsValues[setting.id])}
-                >
-                  <label className="setting-label" style={{ marginBottom: 0 }}>
-                    {setting.label?.en || setting.id}
-                  </label>
+                <label className="checkbox-row">
+                  <span className="setting-label">{setting.label?.en || setting.id}</span>
                   <input
                     type="checkbox"
                     checked={!!settingsValues[setting.id]}
                     onChange={(e) => onUpdateSetting(setting.id, e.target.checked)}
-                    onClick={(e) => e.stopPropagation()}
                   />
-                </div>
+                </label>
               ) : (
                 <>
-                  <label className="setting-label">{setting.label?.en || setting.id}</label>
+                  <label className="setting-label" htmlFor={`setting-${setting.id}`}>
+                    {setting.label?.en || setting.id}
+                  </label>
 
                   {setting.type === "text" && (
                     <input
+                      id={`setting-${setting.id}`}
                       type="text"
                       value={settingsValues[setting.id] || ""}
                       onChange={(e) => onUpdateSetting(setting.id, e.target.value)}
@@ -119,6 +116,7 @@ export default function SettingsPanel({
                   )}
                   {setting.type === "number" && (
                     <input
+                      id={`setting-${setting.id}`}
                       type="number"
                       value={settingsValues[setting.id] || ""}
                       onChange={(e) => onUpdateSetting(setting.id, Number(e.target.value))}
@@ -129,6 +127,7 @@ export default function SettingsPanel({
                   )}
                   {setting.type === "dropdown" && (
                     <select
+                      id={`setting-${setting.id}`}
                       value={settingsValues[setting.id] || ""}
                       onChange={(e) => onUpdateSetting(setting.id, e.target.value)}
                     >
