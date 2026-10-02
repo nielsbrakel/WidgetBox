@@ -377,7 +377,7 @@
     /** Remaining ms; negative once a running timer has passed zero (overtime). */
     const remainingOf = (timer) =>
       timer.status === "running"
-        ? timer.remainingMs - (now() - timer.startedAt)
+        ? timer.remainingMs - Math.max(0, now() - timer.startedAt)
         : timer.remainingMs;
 
     const isFinished = (timer) => timer.status === "running" && remainingOf(timer) <= 0;
@@ -454,14 +454,17 @@
 
     const statePath = () => `/state?widgetId=${encodeURIComponent(widgetId)}`;
 
-    const serialize = () =>
-      timers.map(({ id, status, durationMs, remainingMs, startedAt }) => ({
+    /** Canonical form of the items, as stored on Homey: same fields, order and rounding. */
+    const canonical = (items) =>
+      items.map(({ id, status, durationMs, remainingMs, startedAt }) => ({
         id,
         status,
         durationMs,
         remainingMs: Math.round(remainingMs),
         startedAt,
       }));
+
+    const serialize = () => canonical(timers);
 
     const updateClockOffset = (state) => {
       if (typeof state?.serverNow === "number") clockOffsetMs = state.serverNow - Date.now();
@@ -471,7 +474,7 @@
     const applyState = (state) => {
       updateClockOffset(state);
       if (!Array.isArray(state?.items)) return false;
-      const json = JSON.stringify(state.items);
+      const json = JSON.stringify(canonical(state.items));
       if (json === lastSyncedJson) return false;
       lastSyncedJson = json;
       timers = state.items.map((item) => ({ ...item, isNew: false }));
@@ -573,7 +576,8 @@
     const actions = {
       toggle(timer) {
         if (timer.status === "running") {
-          timer.remainingMs = Math.max(0, remainingOf(timer));
+          // Clock offset jitter can make the elapsed time negative; the server rejects > duration.
+          timer.remainingMs = Math.min(timer.durationMs, Math.max(0, remainingOf(timer)));
           Object.assign(timer, { status: "paused", startedAt: null });
         } else if (timer.remainingMs > 0) {
           Object.assign(timer, { status: "running", startedAt: now() });

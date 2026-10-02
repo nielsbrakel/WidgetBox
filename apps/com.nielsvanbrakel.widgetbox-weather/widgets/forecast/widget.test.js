@@ -21,7 +21,7 @@ function forecast(count) {
 describe("forecast widget", () => {
   beforeEach(() => {
     vi.useFakeTimers();
-    vi.setSystemTime(new Date(2026, 9, 2, 9, 0));
+    vi.setSystemTime(new Date("2026-10-02T07:00:00Z"));
   });
   afterEach(() => vi.useRealTimers());
 
@@ -49,6 +49,15 @@ describe("forecast widget", () => {
     expect(rows[2].querySelector(".rain").textContent).toBe("20%");
     expect(rows[0].querySelector(".rain").textContent).toBe("");
     expect(document.querySelector("#status").textContent).toMatch(/^Utrecht · /);
+  });
+
+  it("drops days before today in Amsterdam after midnight", async () => {
+    vi.setSystemTime(new Date("2026-10-02T22:30:00Z"));
+    const { document } = await load();
+    const rows = document.querySelectorAll(".day");
+    expect(rows).toHaveLength(4);
+    expect(rows[0].querySelector(".long").textContent).toBe("Today");
+    expect(rows[1].querySelector(".long").textContent).toBe("Tomorrow");
   });
 
   it("only loads icons from the Buienradar CDN", async () => {

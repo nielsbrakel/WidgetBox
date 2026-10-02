@@ -1,5 +1,6 @@
 const RequestCache = require("./RequestCache");
 const {
+  amsterdamDate,
   findNearestStation,
   normalizeForecastDays,
   normalizeStation,
@@ -45,8 +46,10 @@ class WeatherService {
     fetchImpl = globalThis.fetch,
     cache = new RequestCache(),
     timeoutMs = 10000,
+    now = () => new Date(),
   } = {}) {
     this.fetchImpl = fetchImpl;
+    this.now = now;
     this.cache = cache;
     this.timeoutMs = timeoutMs;
   }
@@ -120,7 +123,8 @@ class WeatherService {
       data: await this.request(`${URLS.forecast}${place.id}`),
       updatedAt: new Date().toISOString(),
     }));
-    const days = normalizeForecastDays(forecast.data, count);
+    // Filtered at read time: cached data fetched before midnight must not start with yesterday.
+    const days = normalizeForecastDays(forecast.data, count, amsterdamDate(this.now()));
     if (days.length === 0) throw new WeatherError("NO_DATA");
     return { place: place.name, days, updatedAt: forecast.updatedAt };
   }

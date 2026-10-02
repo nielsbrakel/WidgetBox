@@ -199,6 +199,12 @@
     const REFRESH_MS = 30 * 60 * 1000;
     const SETTINGS_DEBOUNCE_MS = 600;
     const DAY_OPTIONS = [3, 5, 7];
+    const AMSTERDAM_DATE = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Europe/Amsterdam",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
 
     const $ = (id) => document.getElementById(id);
 
@@ -227,6 +233,11 @@
         return new Date(year, month - 1, day);
       }
 
+      /** Today as "YYYY-MM-DD" in Europe/Amsterdam, the time zone of Buienradar's dates. */
+      function today() {
+        return AMSTERDAM_DATE.format(new Date());
+      }
+
       function capitalize(text) {
         return text.charAt(0).toUpperCase() + text.slice(1);
       }
@@ -234,9 +245,7 @@
       /** Long and short labels for a date, e.g. "Tomorrow" and "Sat". */
       function dayNames(text) {
         const date = parseDate(text);
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const offset = Math.round((date - today) / 86400000);
+        const offset = Math.round((date - parseDate(today())) / 86400000);
         const short = capitalize(weekdayShort.format(date).replace(".", ""));
         if (offset === 0) return [t("widgets.forecast.today"), t("widgets.forecast.today")];
         if (offset === 1) return [t("widgets.forecast.tomorrow"), short];
@@ -311,7 +320,10 @@
       }
 
       function render() {
-        const days = state.data?.days?.filter((day) => typeof day.date === "string") ?? [];
+        const from = today();
+        const days = (state.data?.days ?? [])
+          .filter((day) => typeof day.date === "string" && day.date >= from)
+          .slice(0, dayCount());
         const temperatures = days.flatMap((day) => [day.min, day.max]).filter(Number.isFinite);
         const bounds = temperatures.length
           ? { min: Math.min(...temperatures), max: Math.max(...temperatures) }

@@ -53,6 +53,25 @@ test.describe("Clocks App", () => {
     });
   });
 
+  test.describe("Analog Clock after sleep", () => {
+    test("should resync the hour hand when the page wakes in the same minute", async ({ page }) => {
+      const start = new Date(2026, 9, 2, 22, 15, 10);
+      await page.clock.install({ time: start });
+      await clocks.goto();
+      await clocks.selectWidget("Analog Clock");
+      await clocks.verifyAnalogLoaded();
+      await clocks.setSettingCheckbox("Show Second Hand", false);
+      await expect(clocks.analogTitle).toHaveText(/10:15/);
+
+      // The screen slept for exactly an hour: same minute, different hour, no timers fired.
+      await page.clock.setSystemTime(new Date(start.getTime() + 60 * 60 * 1000));
+      await clocks.iframe
+        .locator("body")
+        .evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
+      await expect(clocks.analogTitle).toHaveText(/11:15/);
+    });
+  });
+
   test.describe("Digital Clock", () => {
     test.beforeEach(async () => {
       await clocks.selectWidget("Digital Clock");

@@ -83,6 +83,13 @@ describe("stopwatch state api", () => {
     expect(loaded.serverNow).toBeTypeOf("number");
   });
 
+  it("returns items in the same key order as the widgets serialize them (id first)", async () => {
+    const saved = await stopwatchApi.setState({ homey, query, body: { items: [stopwatch()] } });
+    expect(JSON.stringify(saved.items)).toBe(JSON.stringify([stopwatch()]));
+    const timers = await timerApi.setState({ homey, query, body: { items: [timer()] } });
+    expect(JSON.stringify(timers.items)).toBe(JSON.stringify([timer()]));
+  });
+
   it("still saves when the realtime broadcast fails", async () => {
     homey.api.realtime.mockImplementation(() => {
       throw new Error("offline");

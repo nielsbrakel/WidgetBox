@@ -285,8 +285,10 @@
       const seconds = now.getSeconds();
 
       if (settings.showSeconds) rotate(secondHand, seconds * 6);
-      if (minutes === renderedMinute) return;
-      renderedMinute = minutes;
+      // Epoch minute, not minute of the hour: after waking from sleep the hour or date may differ.
+      const minuteKey = Math.floor(now.getTime() / 60000);
+      if (minuteKey === renderedMinute) return;
+      renderedMinute = minuteKey;
 
       rotate(hourHand, (hours % 12) * 30 + minutes * 0.5);
       rotate(minuteHand, minutes * 6);

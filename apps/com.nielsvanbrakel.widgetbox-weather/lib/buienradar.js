@@ -83,20 +83,40 @@ function findNearestStation(feed, origin) {
   return nearest;
 }
 
-/** Normalizes the daily forecast of forecast.buienradar.nl. Dates stay as "YYYY-MM-DD". */
-function normalizeForecastDays(forecast, count) {
+const AMSTERDAM_DATE = new Intl.DateTimeFormat("en-CA", {
+  timeZone: "Europe/Amsterdam",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+});
+
+/** "YYYY-MM-DD" of `date` in Europe/Amsterdam, the time zone of Buienradar's forecast dates. */
+function amsterdamDate(date) {
+  return AMSTERDAM_DATE.format(date);
+}
+
+/**
+ * Normalizes the daily forecast of forecast.buienradar.nl. Dates stay as "YYYY-MM-DD".
+ * Days before `today` ("YYYY-MM-DD") are dropped, so cached data never starts with yesterday.
+ */
+function normalizeForecastDays(forecast, count, today = "") {
   const days = Array.isArray(forecast?.days) ? forecast.days : [];
-  return days.slice(0, count).map((day) => ({
-    date: typeof day.date === "string" ? day.date.slice(0, 10) : null,
-    min: toNumber(day.mintemperature),
-    max: toNumber(day.maxtemperature),
-    rainChance: toNumber(day.precipitation),
-    rainMm: toNumber(day.precipitationmm),
-    iconUrl: iconUrlFromCode(day.iconcode),
-  }));
+  return days
+    .map((day) => ({ day, date: typeof day.date === "string" ? day.date.slice(0, 10) : null }))
+    .filter(({ date }) => date === null || date >= today)
+    .slice(0, count)
+    .map(({ day, date }) => ({
+      date,
+      min: toNumber(day.mintemperature),
+      max: toNumber(day.maxtemperature),
+      rainChance: toNumber(day.precipitation),
+      rainMm: toNumber(day.precipitationmm),
+      iconUrl: iconUrlFromCode(day.iconcode),
+    }));
 }
 
 module.exports = {
+  amsterdamDate,
   findNearestStation,
   intensityToMmPerHour,
   normalizeForecastDays,

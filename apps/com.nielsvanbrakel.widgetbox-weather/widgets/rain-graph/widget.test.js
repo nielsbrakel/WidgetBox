@@ -21,7 +21,8 @@ const DRY = forecast(Array(24).fill(0));
 describe("rain-graph widget", () => {
   beforeEach(() => {
     vi.useFakeTimers();
-    vi.setSystemTime(new Date(2026, 9, 2, 10, 12));
+    // 10:12 in Amsterdam (CEST), whatever the time zone of the test machine.
+    vi.setSystemTime(new Date("2026-10-02T08:12:00Z"));
   });
 
   afterEach(() => {
@@ -87,6 +88,39 @@ describe("rain-graph widget", () => {
     const now = document.querySelector("#now");
     expect(now.hidden).toBe(false);
     expect(Number.parseFloat(now.style.left)).toBeCloseTo((2.4 / 23) * 100, 1);
+  });
+
+  it("moves the now line every minute between data refreshes", async () => {
+    const { document, Homey } = await load({ settings: { refreshInterval: "1800" } });
+    const now = document.querySelector("#now");
+    const before = Number.parseFloat(now.style.left);
+    await vi.advanceTimersByTimeAsync(10 * 60 * 1000);
+    expect(Homey.api).toHaveBeenCalledTimes(1);
+    expect(Number.parseFloat(now.style.left)).toBeCloseTo((4.4 / 23) * 100, 1);
+    expect(Number.parseFloat(now.style.left)).toBeGreaterThan(before);
+  });
+
+  it("stops moving the now line while hidden", async () => {
+    const { document, window } = await load({ settings: { refreshInterval: "1800" } });
+    const now = document.querySelector("#now");
+    const before = now.style.left;
+    Object.defineProperty(window.document, "visibilityState", {
+      configurable: true,
+      get: () => "hidden",
+    });
+    document.dispatchEvent(new window.Event("visibilitychange"));
+    await vi.advanceTimersByTimeAsync(10 * 60 * 1000);
+    expect(now.style.left).toBe(before);
+  });
+
+  it("uses Amsterdam time for the now line, whatever the viewer's time zone", async () => {
+    // Raintext times are Amsterdam wall-clock; 09:12 UTC is 11:12 CEST.
+    vi.setSystemTime(new Date("2026-10-02T09:12:00Z"));
+    const { document } = await load();
+    expect(Number.parseFloat(document.querySelector("#now").style.left)).toBeCloseTo(
+      (14.4 / 23) * 100,
+      1,
+    );
   });
 
   it("shows a tooltip on tap", async () => {

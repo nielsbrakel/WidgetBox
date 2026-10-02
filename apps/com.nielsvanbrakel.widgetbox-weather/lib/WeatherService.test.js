@@ -15,9 +15,9 @@ function jsonResponse(body, status = 200) {
   return { ok: status >= 200 && status < 300, status, json: async () => body };
 }
 
-function createService(handler) {
+function createService(handler, now = new Date("2026-10-03T10:00:00Z")) {
   const fetchImpl = vi.fn(async (url) => handler(String(url)));
-  return { service: new WeatherService({ fetchImpl }), fetchImpl };
+  return { service: new WeatherService({ fetchImpl, now: () => now }), fetchImpl };
 }
 
 const FEED = {
@@ -182,6 +182,23 @@ describe("WeatherService.getForecast", () => {
       rainMm: 0,
       iconUrl: "https://cdn.buienradar.nl/resources/images/icons/weather/96x96/J.png",
     });
+  });
+
+  it("drops days before today in Amsterdam, also from cached data", async () => {
+    let now = new Date("2026-10-03T21:00:00Z");
+    const fetchImpl = vi.fn(async (url) =>
+      String(url).startsWith(URLS.geoLocation)
+        ? jsonResponse({ id: 1, name: "X" })
+        : jsonResponse(forecast),
+    );
+    const service = new WeatherService({ fetchImpl, now: () => now });
+    expect((await service.getForecast(UTRECHT, 3)).days[0].date).toBe("2026-10-03");
+
+    // 22:30 UTC is already 00:30 on the 4th in Amsterdam; the cache still holds the same data.
+    now = new Date("2026-10-03T22:30:00Z");
+    const { days } = await service.getForecast(UTRECHT, 3);
+    expect(fetchImpl).toHaveBeenCalledTimes(2);
+    expect(days.map((day) => day.date)).toEqual(["2026-10-04", "2026-10-05", "2026-10-06"]);
   });
 
   it("clamps the day count", async () => {

@@ -356,13 +356,16 @@
 
     const statePath = () => `/state?widgetId=${encodeURIComponent(widgetId)}`;
 
-    const serialize = () =>
-      stopwatches.map(({ id, elapsedMs, startedAt, laps }) => ({
+    /** Canonical form of the items, as stored on Homey: same fields, order and rounding. */
+    const canonical = (items) =>
+      items.map(({ id, elapsedMs, startedAt, laps }) => ({
         id,
         elapsedMs: Math.round(elapsedMs),
         startedAt,
-        laps,
+        laps: laps.map(Math.round),
       }));
+
+    const serialize = () => canonical(stopwatches);
 
     const updateClockOffset = (state) => {
       if (typeof state?.serverNow === "number") clockOffsetMs = state.serverNow - Date.now();
@@ -372,7 +375,7 @@
     const applyState = (state) => {
       updateClockOffset(state);
       if (!Array.isArray(state?.items)) return false;
-      const json = JSON.stringify(state.items);
+      const json = JSON.stringify(canonical(state.items));
       if (json === lastSyncedJson) return false;
       lastSyncedJson = json;
       stopwatches = state.items.map((item) => ({ ...item, isNew: false }));

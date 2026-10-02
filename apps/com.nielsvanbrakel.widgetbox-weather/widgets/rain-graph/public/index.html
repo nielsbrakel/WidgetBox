@@ -248,6 +248,7 @@
     const SCALE_POWER = 0.7;
     const MIN_REFRESH_MS = 5 * 60 * 1000;
     const TOOLTIP_TIMEOUT_MS = 4000;
+    const NOW_LINE_MS = 60 * 1000;
     const SETTINGS_DEBOUNCE_MS = 500;
     const DATA_SETTINGS = ["latitude", "longitude"];
 
@@ -275,10 +276,23 @@
       });
     }
 
+    const AMSTERDAM_TIME = new Intl.DateTimeFormat("en-GB", {
+      timeZone: "Europe/Amsterdam",
+      hour: "2-digit",
+      minute: "2-digit",
+      hourCycle: "h23",
+    });
+
+    /** Minutes since midnight in Europe/Amsterdam, the time zone of the raintext "HH:MM" values. */
+    function amsterdamMinutes(date) {
+      const [h, m] = AMSTERDAM_TIME.format(date).split(":").map(Number);
+      return h * 60 + m;
+    }
+
     /** Fractional index of the current time within the forecast, or null when outside it. */
     function nowIndex(points, date = new Date()) {
       const timeline = toTimeline(points);
-      let now = date.getHours() * 60 + date.getMinutes();
+      let now = amsterdamMinutes(date);
       if (now < timeline[0] - 720) now += 1440;
       if (now < timeline[0] || now > timeline[timeline.length - 1]) return null;
       for (let i = 1; i < timeline.length; i++) {
@@ -324,6 +338,7 @@
         lastFetch: 0,
         timer: null,
         tooltipTimer: null,
+        nowTimer: null,
         debounce: null,
         needsFetch: false,
       };
@@ -419,6 +434,19 @@
         const index = nowIndex(points);
         $("now").hidden = index === null;
         if (index !== null) $("now").style.left = `${(index / (points.length - 1)) * 100}%`;
+      }
+
+      /** Moves the now line on every minute boundary while visible, between data refreshes. */
+      function scheduleNowLine() {
+        clearTimeout(state.nowTimer);
+        if (document.visibilityState === "hidden") return;
+        state.nowTimer = setTimeout(
+          () => {
+            if (state.data?.points?.length) renderNowLine(state.data.points);
+            scheduleNowLine();
+          },
+          NOW_LINE_MS - (Date.now() % NOW_LINE_MS),
+        );
       }
 
       function render() {
@@ -551,11 +579,15 @@
       document.addEventListener("visibilitychange", () => {
         if (document.visibilityState === "hidden") {
           clearTimeout(state.timer);
-        } else if (Date.now() - state.lastFetch >= refreshMs()) {
+          clearTimeout(state.nowTimer);
+          return;
+        }
+        scheduleNowLine();
+        if (Date.now() - state.lastFetch >= refreshMs()) {
           refresh();
         } else {
           schedule();
-          if (state.data) renderNowLine(state.data.points);
+          if (state.data?.points?.length) renderNowLine(state.data.points);
         }
       });
       Homey.on("settings.set", onSettingChanged);
@@ -564,6 +596,7 @@
       showMessage(t("common.loading"));
       Homey.ready({ height: heightFor() });
       refresh();
+      scheduleNowLine();
     }
 
     window.onHomeyReady = onHomeyReady;

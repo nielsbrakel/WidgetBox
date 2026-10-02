@@ -54,7 +54,7 @@ const sanitizeState = (body, sanitizeItem) => {
 
   const items = body.items.map((item) => {
     if (!item || typeof item !== "object") throw invalid("item is not an object");
-    return { ...sanitizeItem(item), id: toItemId(item.id) };
+    return { id: toItemId(item.id), ...sanitizeItem(item) };
   });
   if (new Set(items.map((item) => item.id)).size !== items.length) throw invalid("duplicate ids");
 

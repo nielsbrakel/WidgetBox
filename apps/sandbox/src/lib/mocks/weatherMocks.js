@@ -8,9 +8,19 @@ const WEATHER_WIDGETS = ["rain-graph", "station", "forecast", "weather-map"];
 const MOCK_LOCATION = { latitude: 52.09, longitude: 5.12 };
 const ICON_BASE = "https://cdn.buienradar.nl/resources/images/icons/weather/96x96/";
 
-function pad(value) {
-  return String(value).padStart(2, "0");
-}
+// Buienradar reports times and dates in Europe/Amsterdam, whatever the viewer's time zone.
+const AMSTERDAM_TIME = new Intl.DateTimeFormat("en-GB", {
+  timeZone: "Europe/Amsterdam",
+  hour: "2-digit",
+  minute: "2-digit",
+  hourCycle: "h23",
+});
+const AMSTERDAM_DATE = new Intl.DateTimeFormat("en-CA", {
+  timeZone: "Europe/Amsterdam",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+});
 
 function rainIntensity(scenario, index) {
   if (scenario === "no-rain") return 0;
@@ -26,7 +36,7 @@ function mockRainForecast(scenario) {
   const points = Array.from({ length: 24 }, (_, index) => {
     const time = new Date(start + index * step);
     return {
-      time: `${pad(time.getHours())}:${pad(time.getMinutes())}`,
+      time: AMSTERDAM_TIME.format(time),
       mmPerHour: Math.round(rainIntensity(scenario, index) * 100) / 100,
     };
   });
@@ -55,13 +65,13 @@ function mockStation() {
 
 function mockForecast(days = 5) {
   const icons = ["A", "B", "C", "F", "Q", "J", "R"];
-  const today = new Date();
+  const [year, month, day] = AMSTERDAM_DATE.format(new Date()).split("-").map(Number);
   return {
     place: "Utrecht",
     days: Array.from({ length: days }, (_, index) => {
-      const date = new Date(today.getFullYear(), today.getMonth(), today.getDate() + index);
+      const date = new Date(Date.UTC(year, month - 1, day + index));
       return {
-        date: `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`,
+        date: date.toISOString().slice(0, 10),
         min: 6 + ((index * 3) % 5),
         max: 12 + ((index * 5) % 8),
         rainChance: (index * 23) % 90,
