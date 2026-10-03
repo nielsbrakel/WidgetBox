@@ -1375,13 +1375,17 @@
             ctx.stroke();
             break;
           case "text":
-            ctx.font = `800 ${Math.round(13 * Math.max(0.9, this.s))}px var(--homey-font-family, sans-serif)`;
+            ctx.font = `700 ${Math.round(14 * Math.max(0.9, this.s))}px "Pixelify Sans", sans-serif`;
             ctx.textAlign = "center";
-            ctx.lineWidth = 3;
-            ctx.strokeStyle = `rgba(0,0,0,${0.45 * (1 - k)})`;
-            ctx.fillStyle = A.rgba(f.color, 1 - k * k);
-            ctx.strokeText(f.text, f.x, f.y - k * 26);
-            ctx.fillText(f.text, f.x, f.y - k * 26);
+            {
+              // A hard drop shadow and whole-pixel rise keep the text in the pixel style.
+              const ty = Math.round(f.y - k * 26);
+              const sh = Math.max(1, Math.round(1 / this.dpr));
+              ctx.fillStyle = `rgba(8,18,28,${0.8 * (1 - k * k)})`;
+              ctx.fillText(f.text, Math.round(f.x) + sh, ty + sh);
+              ctx.fillStyle = A.rgba(f.color, 1 - k * k);
+              ctx.fillText(f.text, Math.round(f.x), ty);
+            }
             break;
           case "coin": {
             const e = k * k * (3 - 2 * k);

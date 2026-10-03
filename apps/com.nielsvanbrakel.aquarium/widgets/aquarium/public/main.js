@@ -80,6 +80,7 @@
 
       const res = await this.loadState();
       this.scene.resize();
+      this.ui.fitPixels(this.scene);
       this.applyServer(res);
       this.checkTimezone();
       document.getElementById("app").classList.remove("is-loading");
@@ -102,6 +103,7 @@
         clearTimeout(resizeTimer);
         resizeTimer = setTimeout(() => {
           this.scene.resize();
+          this.ui.fitPixels(this.scene);
           this.scene.sync(this.save, this.now(), this.save.active);
           if (this.ui.sheet) this.ui.renderSheet();
         }, 120);

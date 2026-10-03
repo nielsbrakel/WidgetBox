@@ -1,35 +1,59 @@
-/* Aquarium widget styles. Sizes scale with the widget width (vw = widget width). */
+/* Aquarium widget styles. Sizes scale with the widget width (vw = widget width).
+ *
+ * The interface is drawn as pixel art to match the tank: a pixel font, pixel icons and solid
+ * panels with a one-pixel outline, cut corners and a hard bevel. --px is one art pixel of the
+ * scene (set by UI.fitPixels), so frames sit on the same pixel grid as the fish. */
+
+@font-face {
+  font-family: "Pixelify Sans";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("fonts/pixelify-sans-latin-400-normal.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Pixelify Sans";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("fonts/pixelify-sans-latin-700-normal.woff2") format("woff2");
+}
 
 :root {
-  --font: var(
-    --homey-font-family,
-    "Nunito",
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    Roboto,
-    sans-serif
-  );
+  --font: "Pixelify Sans", var(--homey-font-family, sans-serif);
   /* One layout unit that follows the smaller side, so tiny and wide widgets both fit. */
   --u: min(1vw, 1.333vh);
-  --fs: clamp(10px, calc(var(--u) * 3.4), 14px);
-  --fs-small: clamp(9px, calc(var(--u) * 2.8), 12px);
+  --fs: clamp(11px, calc(var(--u) * 3.6), 15px);
+  --fs-small: clamp(10px, calc(var(--u) * 3), 13px);
   --btn: clamp(28px, calc(var(--u) * 11), 46px);
   --pad: clamp(5px, calc(var(--u) * 2), 10px);
-  --glass: rgba(6, 30, 46, 0.66);
+  /* Pixel grid: frame pixel, dock icon pixel and small icon pixel. */
+  --px: 2px;
+  --ip: 2px;
+  --ips: 1.5px;
+  --np: calc(var(--px) * -1);
+
+  /* Palette */
+  --ink: #08131e;
+  --panel: #173450;
+  --panel-hi: #2f5f80;
+  --panel-lo: #0e2236;
+  --well: #0d2133;
+  --well-hi: #1c3e5a;
+  --sheet: #0b1c2c;
+  --text: #f3eedb;
+  --muted: #9cb4c3;
+  --gold: #ffcf3a;
+  --pearl: #d9d2ff;
+  --good: #7be08a;
+  --warn: #ffb347;
+  --bad: #ff6b6b;
+  --accent: #6fd6e8;
   --feed: #ff9f43;
   --play: #b18cff;
-  --shop: #2fd3b6;
-  --glass-strong: rgba(6, 22, 34, 0.92);
-  --line: rgba(255, 255, 255, 0.16);
-  --text: #f2f8fb;
-  --muted: rgba(230, 242, 248, 0.68);
-  --gold: #ffd85a;
-  --pearl: #e9e4ff;
-  --good: #6fe0a0;
-  --warn: #ffb04a;
-  --bad: #ff6f7a;
-  --accent: #5fd0e8;
+  --shop: #3fd6b0;
+  --menu: #9fbdd0;
 }
 
 * {
@@ -47,6 +71,8 @@ body {
   color: var(--text);
   font-family: var(--font);
   font-size: var(--fs);
+  line-height: 1.2;
+  -webkit-font-smoothing: none;
   -webkit-tap-highlight-color: transparent;
   -webkit-user-select: none;
   user-select: none;
@@ -60,6 +86,11 @@ button {
   background: none;
   cursor: pointer;
   touch-action: manipulation;
+}
+
+img,
+canvas {
+  image-rendering: pixelated;
 }
 
 #app {
@@ -82,23 +113,113 @@ button {
 
 .ico {
   display: inline-flex;
-  width: 1.15em;
-  height: 1.15em;
+  width: calc(var(--ips) * 10);
+  height: calc(var(--ips) * 10);
   flex: none;
 }
 
 .ico svg {
   width: 100%;
   height: 100%;
+  shape-rendering: crispEdges;
+}
+
+/* ── Pixel frame ───────────────────────────────────── */
+/* Every panel and button is one solid block: a dark outline drawn with box shadows (which leaves
+   the corner pixels out, giving the stepped pixel corner), a light top edge and a dark bottom
+   edge. Raised controls add a second outline row underneath and sink into it when pressed. */
+
+.pill,
+.chip,
+.level,
+.dock-btn,
+#coach,
+.tray-hint,
+.food-btn,
+.btn,
+.icon-btn,
+.tab,
+.card-item,
+.list-row,
+.tile,
+.tag,
+#card,
+.toast,
+.banner-box,
+.modal-box {
+  --bg: var(--panel);
+  --hi: var(--panel-hi);
+  --lo: var(--panel-lo);
+  --o: var(--ink);
+  --drop: 0 0 transparent;
+  border: 0;
+  border-radius: 0;
+  background: var(--bg);
+  box-shadow:
+    0 var(--np) 0 var(--o),
+    0 var(--px) 0 var(--o),
+    var(--np) 0 0 var(--o),
+    var(--px) 0 0 var(--o),
+    inset 0 var(--px) 0 var(--hi),
+    inset 0 var(--np) 0 var(--lo),
+    var(--drop);
+}
+
+/* Raised controls */
+.pill,
+.level,
+.dock-btn,
+.food-btn,
+.btn,
+.icon-btn,
+.tile,
+.card-item {
+  --drop: 0 calc(var(--px) * 2) 0 var(--ink);
+  transition: transform 0.08s steps(1);
+}
+
+.pill:active,
+.level:active,
+.dock-btn:active,
+.food-btn:active,
+.btn:active,
+.icon-btn:active,
+.tile:active,
+.card-item:active {
+  --drop: 0 0 transparent;
+  transform: translateY(var(--px));
+}
+
+/* Inset wells (list rows, tags, inactive tabs) */
+.list-row,
+.tag,
+.tab {
+  --bg: var(--well);
+  --hi: var(--panel-lo);
+  --lo: var(--well-hi);
+}
+
+/* Text on top of the tank gets a hard pixel shadow. */
+.pill,
+.chip,
+.level,
+.dock-btn .lbl,
+.tray-hint,
+#coach,
+.toast,
+.banner-box,
+.card-title,
+.sheet-title {
+  text-shadow: 0 var(--px) 0 var(--ink);
 }
 
 /* ── HUD ───────────────────────────────────────────── */
 
 #hud {
   position: absolute;
-  top: var(--pad);
-  left: var(--pad);
-  right: var(--pad);
+  top: calc(var(--pad) + var(--px));
+  left: calc(var(--pad) + var(--px));
+  right: calc(var(--pad) + var(--px));
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -110,7 +231,7 @@ button {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 4px;
+  gap: calc(var(--px) * 3);
   /* The right column belongs to the dock. */
   max-width: calc(100% - var(--btn) - var(--pad));
 }
@@ -123,15 +244,11 @@ button {
 .pill {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: calc(var(--px) * 2);
   height: calc(var(--btn) * 0.62);
-  padding: 0 9px 0 6px;
-  border-radius: 999px;
-  background: var(--glass);
-  border: 1px solid var(--line);
-  font-weight: 800;
+  padding: 0 calc(var(--px) * 4) 0 calc(var(--px) * 3);
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
-  transition: transform 0.15s;
 }
 
 #coinVal {
@@ -143,12 +260,12 @@ button {
 }
 
 .pill.bump {
-  transform: scale(1.14);
+  transform: translateY(calc(var(--px) * -2));
 }
 
 #chips {
   display: flex;
-  gap: 5px;
+  gap: calc(var(--px) * 3);
   flex-wrap: wrap;
   width: 100%;
 }
@@ -156,110 +273,106 @@ button {
 .chip {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  height: calc(var(--btn) * 0.54);
-  padding: 0 8px 0 5px;
-  border-radius: 999px;
+  gap: calc(var(--px) * 2);
+  height: calc(var(--btn) * 0.56);
+  padding: 0 calc(var(--px) * 4) 0 calc(var(--px) * 3);
   font-size: var(--fs-small);
   font-weight: 700;
-  background: var(--glass);
-  border: 1px solid var(--line);
-  animation: chip-in 0.3s ease-out;
+  animation: chip-in 0.24s steps(3);
 }
 
 .chip.warn {
-  border-color: rgba(255, 176, 74, 0.6);
-  color: #ffd9a6;
+  --bg: #5a3414;
+  --hi: #8a5523;
+  --lo: #3a200a;
+  color: #ffe0b0;
 }
 
 .chip.good {
-  border-color: rgba(111, 224, 160, 0.6);
-  color: #c4ffd9;
+  --bg: #1d4d2c;
+  --hi: #2f7a46;
+  --lo: #10301b;
+  color: #d4ffd8;
 }
 
 @keyframes chip-in {
   from {
     opacity: 0;
-    transform: translateY(-4px);
+    transform: translateY(calc(var(--px) * -3));
   }
 }
 
+/* Level badge: the level number over a stepped experience bar. */
 .level {
   position: relative;
   width: calc(var(--btn) * 0.78);
   height: calc(var(--btn) * 0.78);
-  font-size: var(--fs-small);
-  border-radius: 50%;
-  background: var(--glass);
-  border: 1px solid var(--line);
+  font-size: var(--fs);
+  font-weight: 700;
+  color: var(--accent);
   display: grid;
   place-items: center;
-  font-weight: 900;
+  padding-bottom: calc(var(--px) * 3);
 }
 
-.level svg {
+.level .xp {
   position: absolute;
-  inset: 2px;
-  transform: rotate(-90deg);
+  left: calc(var(--px) * 2);
+  right: calc(var(--px) * 2);
+  bottom: calc(var(--px) * 2);
+  height: calc(var(--px) * 3);
+  background: var(--ink);
 }
 
-.level circle {
-  fill: none;
-  stroke-width: 3;
-}
-
-.ring-bg {
-  stroke: rgba(255, 255, 255, 0.15);
-}
-
-.ring {
-  stroke: var(--accent);
-  stroke-linecap: round;
-  stroke-dasharray: 97.4;
-  stroke-dashoffset: 97.4;
-  transition: stroke-dashoffset 0.6s;
+.level .xp i {
+  display: block;
+  width: 0;
+  height: 100%;
+  background: var(--accent);
+  box-shadow: inset 0 var(--px) 0 #c4f3fb;
 }
 
 .dot {
   position: absolute;
-  top: -1px;
-  right: -1px;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
+  top: var(--np);
+  right: var(--np);
+  width: calc(var(--px) * 4);
+  height: calc(var(--px) * 4);
   background: var(--warn);
-  border: 2px solid #0a2030;
+  box-shadow: 0 0 0 var(--px) var(--ink);
+  animation: blink 1s steps(1) infinite;
+}
+
+@keyframes blink {
+  50% {
+    background: #fff1c2;
+  }
 }
 
 /* ── Dock ──────────────────────────────────────────── */
 
 #dock {
   position: absolute;
-  right: var(--pad);
-  bottom: var(--pad);
+  right: calc(var(--pad) + var(--px));
+  bottom: calc(var(--pad) + var(--px) * 2);
   display: flex;
   flex-direction: column;
-  gap: clamp(3px, calc(var(--u) * 1.4), 8px);
+  gap: clamp(5px, calc(var(--u) * 1.6), 10px);
   z-index: 10;
 }
 
-/* Dock buttons are glassy bubbles; each action has its own colour so it is known at a glance. */
+/* Dock buttons are coloured blocks, one colour per action, so each is known at a glance. */
 .dock-btn {
-  --tone: #e8f4f8;
+  --tone: var(--menu);
+  --bg: var(--tone);
+  --hi: color-mix(in srgb, var(--tone) 55%, #ffffff);
+  --lo: color-mix(in srgb, var(--tone) 62%, #000000);
   position: relative;
   width: var(--btn);
   height: var(--btn);
-  border-radius: 50%;
-  background:
-    radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0) 42%),
-    var(--glass);
-  border: 1.5px solid color-mix(in srgb, var(--tone) 55%, transparent);
-  color: var(--tone);
+  color: var(--ink);
   display: grid;
   place-items: center;
-  transition:
-    transform 0.12s,
-    background 0.2s;
 }
 
 .dock-btn[data-ui="feed"] {
@@ -275,39 +388,31 @@ button {
 }
 
 .dock-btn .ico {
-  width: 54%;
-  height: 54%;
-}
-
-.dock-btn:active,
-.btn:active,
-.card-item:active,
-.pill:active {
-  transform: scale(0.94);
+  width: calc(var(--ip) * 10);
+  height: calc(var(--ip) * 10);
 }
 
 .dock-btn.hint {
-  animation: hint 1.2s ease-in-out infinite;
+  animation: hint 0.9s steps(1) infinite;
 }
 
 @keyframes hint {
   50% {
-    box-shadow: 0 0 0 5px rgba(95, 208, 232, 0.55);
-    border-color: var(--accent);
+    /* Flashes instead of moving, so the button never shifts under a finger. */
+    filter: brightness(1.3);
+    --o: #ffffff;
   }
 }
 
+/* The active mode stays pressed in, with a light outline. */
 .dock-btn.on {
-  background:
-    radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0) 45%),
-    var(--tone);
-  border-color: rgba(255, 255, 255, 0.75);
-  color: #06202c;
-}
-
-.dock-btn .badge {
-  position: absolute;
-  margin: -1.6em 0 0 1.6em;
+  --bg: color-mix(in srgb, var(--tone) 70%, #000000);
+  --hi: color-mix(in srgb, var(--tone) 45%, #000000);
+  --lo: color-mix(in srgb, var(--tone) 85%, #ffffff);
+  --o: var(--text);
+  --drop: 0 0 transparent;
+  color: var(--text);
+  transform: translateY(var(--px));
 }
 
 /* ── Tray (mode bar) ───────────────────────────────── */
@@ -322,38 +427,31 @@ button {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 5px;
+  gap: calc(var(--px) * 4);
   z-index: 11;
-  animation: rise 0.2s ease-out;
+  animation: rise 0.2s steps(3);
 }
 
 .tray-row {
   display: flex;
-  gap: 5px;
+  gap: calc(var(--px) * 4);
   flex-wrap: wrap;
   justify-content: center;
 }
 
 .tray-hint {
   font-size: var(--fs-small);
-  font-weight: 700;
-  padding: 4px 10px;
-  border-radius: 999px;
-  background: var(--glass);
-  border: 1px solid var(--line);
+  padding: calc(var(--px) * 2) calc(var(--px) * 4);
   text-align: center;
 }
 
 .food-btn {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: calc(var(--px) * 2);
   height: calc(var(--btn) * 0.72);
-  padding: 0 9px 0 5px;
-  border-radius: 999px;
-  background: var(--glass);
-  border: 1px solid var(--line);
-  font-weight: 800;
+  padding: 0 calc(var(--px) * 4) 0 calc(var(--px) * 2);
+  font-weight: 700;
   font-size: var(--fs-small);
 }
 
@@ -363,9 +461,12 @@ button {
 }
 
 .food-btn.on {
-  background: rgba(255, 216, 90, 0.9);
-  color: #3a2a00;
-  border-color: #fff3c0;
+  --bg: var(--gold);
+  --hi: #fff1a8;
+  --lo: #c88f12;
+  --o: var(--text);
+  color: #3a2600;
+  text-shadow: none;
 }
 
 .food-btn.empty {
@@ -375,24 +476,21 @@ button {
 @keyframes rise {
   from {
     opacity: 0;
-    transform: translate(calc(-50% - var(--btn) * 0.5), 8px);
+    transform: translate(calc(-50% - var(--btn) * 0.5), calc(var(--px) * 4));
   }
 }
 
 /* ── Coach (tutorial hint) ─────────────────────────── */
 
 #coach {
+  --o: var(--accent);
   width: 100%;
   max-width: 260px;
-  padding: 6px 10px;
-  border-radius: 12px;
-  background: var(--glass-strong);
-  border: 1px solid rgba(95, 208, 232, 0.5);
+  padding: calc(var(--px) * 3) calc(var(--px) * 4);
   font-size: var(--fs-small);
-  font-weight: 700;
   line-height: 1.3;
   pointer-events: none;
-  animation: chip-in 0.3s ease-out;
+  animation: chip-in 0.24s steps(3);
 }
 
 #coach b {
@@ -405,17 +503,13 @@ button {
   position: absolute;
   top: calc(var(--btn) * 0.95 + var(--pad) * 2);
   width: min(62%, 230px);
-  padding: 9px 10px;
-  border-radius: 14px;
-  background: var(--glass-strong);
-  border: 1px solid var(--line);
+  padding: calc(var(--px) * 4) calc(var(--px) * 5);
   z-index: 12;
-  animation: chip-in 0.2s ease-out;
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+  animation: chip-in 0.2s steps(3);
 }
 
 #card.left {
-  left: var(--pad);
+  left: calc(var(--pad) + var(--px));
 }
 
 #card.right {
@@ -423,39 +517,40 @@ button {
 }
 
 .card-title {
-  font-weight: 900;
-  font-size: calc(var(--fs) * 1.08);
+  font-weight: 700;
+  font-size: calc(var(--fs) * 1.1);
   line-height: 1.15;
 }
 
 .card-sub {
   color: var(--muted);
   font-size: var(--fs-small);
-  margin-bottom: 6px;
+  margin-bottom: calc(var(--px) * 3);
 }
 
 .stat {
   display: grid;
   grid-template-columns: 4.6em 1fr 2.6em;
   align-items: center;
-  gap: 6px;
+  gap: calc(var(--px) * 3);
   font-size: var(--fs-small);
-  margin: 3px 0;
+  margin: calc(var(--px) * 2) 0;
 }
 
+/* Meters are a dark trough with a solid fill that has a light top row. */
 .bar {
-  height: 6px;
-  border-radius: 3px;
-  background: rgba(255, 255, 255, 0.12);
+  height: calc(var(--px) * 4);
+  background: var(--ink);
+  padding: var(--px);
   overflow: hidden;
 }
 
 .bar > i {
   display: block;
   height: 100%;
-  border-radius: 3px;
   background: var(--good);
-  transition: width 0.4s;
+  box-shadow: inset 0 var(--px) 0 rgba(255, 255, 255, 0.45);
+  transition: width 0.4s steps(5);
 }
 
 .bar.warn > i {
@@ -469,62 +564,73 @@ button {
 .tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
-  margin: 6px 0 2px;
+  gap: calc(var(--px) * 3);
+  margin: calc(var(--px) * 3) 0 var(--px);
 }
 
 .tag {
-  font-size: calc(var(--fs-small) * 0.92);
-  padding: 2px 6px;
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.08);
-  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--px);
+  font-size: calc(var(--fs-small) * 0.95);
+  padding: var(--px) calc(var(--px) * 3);
 }
 
 .tag.plus {
-  color: #b4ffd0;
+  color: #b4ffc0;
 }
 
 .tag.minus {
-  color: #ffb6bd;
+  color: #ffb6b6;
 }
 
 .row {
   display: flex;
-  gap: 6px;
-  margin-top: 8px;
+  gap: calc(var(--px) * 4);
+  margin-top: calc(var(--px) * 4);
 }
 
 .btn {
+  --bg: #2c5677;
+  --hi: #4a7fa3;
+  --lo: #1a3851;
   flex: 1;
   min-height: calc(var(--btn) * 0.72);
-  padding: 0 10px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid var(--line);
-  font-weight: 800;
+  padding: 0 calc(var(--px) * 5);
+  font-weight: 700;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
-  transition: transform 0.12s;
+  gap: calc(var(--px) * 2);
+  text-shadow: 0 var(--px) 0 var(--ink);
 }
 
 .btn.primary {
-  background: linear-gradient(180deg, #6fe0f4, #3fb6d6);
-  color: #052430;
-  border-color: rgba(255, 255, 255, 0.5);
+  --bg: #3fbcd6;
+  --hi: #a6ecf7;
+  --lo: #217a92;
+  color: var(--ink);
+  text-shadow: none;
 }
 
 .btn.danger {
-  background: rgba(255, 111, 122, 0.22);
-  border-color: rgba(255, 111, 122, 0.5);
-  color: #ffd0d4;
+  --bg: #a8383f;
+  --hi: #d96066;
+  --lo: #6b1e24;
 }
 
 .btn.confirm {
-  background: var(--bad);
-  color: #fff;
+  --bg: #e0484f;
+  --hi: #ff9195;
+  --lo: #8c1f25;
+  color: #ffffff;
+}
+
+.btn.short {
+  --bg: var(--well);
+  --hi: var(--well-hi);
+  --lo: var(--panel-lo);
+  color: var(--muted);
 }
 
 .btn:disabled {
@@ -541,7 +647,7 @@ button {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 5px;
+  gap: calc(var(--px) * 4);
   z-index: 30;
   pointer-events: none;
   width: 90%;
@@ -549,39 +655,38 @@ button {
 
 .toast {
   max-width: 100%;
-  padding: 6px 12px;
-  border-radius: 999px;
-  background: var(--glass-strong);
-  border: 1px solid var(--line);
+  padding: calc(var(--px) * 3) calc(var(--px) * 6);
   font-size: var(--fs-small);
-  font-weight: 800;
+  font-weight: 700;
   text-align: center;
   animation:
-    toast-in 0.25s ease-out,
-    toast-out 0.4s ease-in forwards;
+    toast-in 0.2s steps(3),
+    toast-out 0.3s steps(3) forwards;
   animation-delay: 0s, var(--life, 2.4s);
 }
 
 .toast.err {
-  border-color: rgba(255, 111, 122, 0.6);
+  --bg: #4a1c22;
+  --hi: #7a3038;
+  --lo: #2c0e12;
 }
 
 .toast.gold {
-  border-color: rgba(255, 216, 90, 0.7);
+  --o: var(--gold);
   color: #fff1bd;
 }
 
 @keyframes toast-in {
   from {
     opacity: 0;
-    transform: translateY(-6px) scale(0.96);
+    transform: translateY(calc(var(--px) * -3));
   }
 }
 
 @keyframes toast-out {
   to {
     opacity: 0;
-    transform: translateY(-6px);
+    transform: translateY(calc(var(--px) * -3));
   }
 }
 
@@ -595,23 +700,24 @@ button {
 }
 
 .banner-box {
+  --o: var(--gold);
+  --drop: 0 calc(var(--px) * 3) 0 var(--ink);
   text-align: center;
-  padding: 14px 24px;
-  border-radius: 18px;
-  background: radial-gradient(circle at 50% 0%, rgba(95, 208, 232, 0.45), var(--glass-strong) 70%);
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  animation: pop 2.6s ease-in-out forwards;
+  padding: calc(var(--px) * 6) calc(var(--px) * 10);
+  animation: pop 2.6s steps(26) forwards;
 }
 
 .banner-big {
   font-size: calc(var(--fs) * 1.9);
-  font-weight: 900;
+  font-weight: 700;
   color: var(--gold);
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+  text-shadow:
+    0 calc(var(--px) * 2) 0 #7a4a0c,
+    0 calc(var(--px) * 3) 0 var(--ink);
 }
 
 .banner-small {
-  font-weight: 800;
+  font-weight: 700;
   color: var(--muted);
 }
 
@@ -642,40 +748,45 @@ button {
   position: absolute;
   inset: 0;
   z-index: 20;
-  background: rgba(4, 18, 28, 0.985);
+  background: var(--sheet);
+  box-shadow:
+    inset 0 0 0 var(--px) var(--ink),
+    inset 0 0 0 calc(var(--px) * 2) var(--panel-hi);
   display: flex;
   flex-direction: column;
-  padding: var(--pad);
-  gap: 6px;
-  animation: sheet-in 0.22s ease-out;
+  padding: calc(var(--pad) + var(--px) * 2);
+  gap: calc(var(--px) * 4);
+  animation: sheet-in 0.2s steps(3);
 }
 
 @keyframes sheet-in {
   from {
     opacity: 0;
-    transform: translateY(14px);
+    transform: translateY(calc(var(--px) * 6));
   }
 }
 
 .sheet-head {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: calc(var(--px) * 4);
 }
 
 .sheet-title {
-  font-weight: 900;
-  font-size: calc(var(--fs) * 1.2);
+  font-weight: 700;
+  font-size: calc(var(--fs) * 1.25);
+  color: var(--gold);
 }
 
 .sheet-meta {
   flex: 1;
   display: flex;
-  gap: 5px;
+  gap: calc(var(--px) * 4);
   justify-content: flex-end;
 }
 
 .sheet-meta .pill {
+  --drop: 0 0 transparent;
   height: calc(var(--btn) * 0.55);
   font-size: var(--fs-small);
 }
@@ -683,20 +794,18 @@ button {
 .icon-btn {
   width: max(34px, calc(var(--btn) * 0.8));
   height: max(34px, calc(var(--btn) * 0.8));
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
   display: grid;
   place-items: center;
 }
 
 .icon-btn .ico {
-  width: 50%;
-  height: 50%;
+  width: calc(var(--ips) * 10);
+  height: calc(var(--ips) * 10);
 }
 
 .tabs {
   display: flex;
-  gap: 4px;
+  gap: calc(var(--px) * 3);
 }
 
 .tabs:empty {
@@ -706,17 +815,20 @@ button {
 .tab {
   flex: 1;
   height: max(30px, calc(var(--btn) * 0.7));
-  border-radius: 9px;
-  background: rgba(255, 255, 255, 0.07);
-  font-weight: 800;
+  font-weight: 700;
   font-size: var(--fs-small);
   color: var(--muted);
+  padding: 0 var(--px);
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .tab.on {
-  background: rgba(95, 208, 232, 0.22);
+  --bg: var(--panel);
+  --hi: var(--accent);
+  --lo: var(--panel-lo);
+  --o: var(--accent);
   color: var(--text);
-  box-shadow: inset 0 -2px 0 var(--accent);
 }
 
 .sheet-body {
@@ -725,14 +837,16 @@ button {
   /* Views page to fit; scrolling is only a fallback for the very smallest widgets. */
   overflow-y: auto;
   display: grid;
-  gap: 6px;
+  gap: calc(var(--px) * 4);
   align-content: start;
+  /* Room for the outlines of the first and last items. */
+  padding: var(--px) var(--px) calc(var(--px) * 3);
 }
 
 .sheet-foot {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: calc(var(--px) * 4);
   min-height: calc(var(--btn) * 0.8);
 }
 
@@ -759,15 +873,10 @@ button {
 .pager {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: calc(var(--px) * 3);
   font-size: var(--fs-small);
   color: var(--muted);
-  font-weight: 800;
-}
-
-.pager .icon-btn {
-  width: max(34px, calc(var(--btn) * 0.8));
-  height: max(34px, calc(var(--btn) * 0.8));
+  font-weight: 700;
 }
 
 .pager .icon-btn:disabled {
@@ -776,15 +885,16 @@ button {
 
 .grid {
   display: grid;
-  gap: 6px;
+  gap: calc(var(--px) * 4);
 }
 
+/* Shop and journal tiles look like little tank windows. */
 .card-item {
+  --bg: var(--well);
+  --hi: var(--panel-lo);
+  --lo: var(--well-hi);
   position: relative;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 4px;
+  padding: calc(var(--px) * 2);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -792,12 +902,12 @@ button {
   text-align: center;
   min-width: 0;
   overflow: hidden;
-  transition: transform 0.12s;
 }
 
 .card-item.sel {
-  border-color: var(--accent);
-  background: rgba(95, 208, 232, 0.16);
+  --bg: #17405a;
+  --o: var(--accent);
+  --hi: #1f5573;
 }
 
 .card-item img {
@@ -809,7 +919,7 @@ button {
 
 .card-item .name {
   font-size: var(--fs-small);
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1.1;
   white-space: nowrap;
   overflow: hidden;
@@ -819,10 +929,10 @@ button {
 
 .card-item .price {
   font-size: var(--fs-small);
-  font-weight: 800;
+  font-weight: 700;
   display: inline-flex;
   align-items: center;
-  gap: 3px;
+  gap: var(--px);
   color: var(--gold);
 }
 
@@ -836,39 +946,37 @@ button {
 
 .card-item .lock {
   position: absolute;
-  top: 4px;
-  right: 4px;
+  top: calc(var(--px) * 2);
+  right: calc(var(--px) * 2);
   font-size: calc(var(--fs-small) * 0.9);
-  font-weight: 800;
-  background: rgba(0, 0, 0, 0.5);
-  border-radius: 6px;
-  padding: 1px 5px;
+  font-weight: 700;
+  background: var(--ink);
+  padding: 0 calc(var(--px) * 2);
   display: inline-flex;
   align-items: center;
-  gap: 2px;
+  gap: var(--px);
 }
 
 .card-item .owned {
   position: absolute;
-  top: 4px;
-  left: 4px;
+  top: calc(var(--px) * 2);
+  left: calc(var(--px) * 3);
   font-size: calc(var(--fs-small) * 0.9);
-  font-weight: 900;
+  font-weight: 700;
   color: var(--accent);
 }
 
 .vdots {
   display: flex;
-  gap: 3px;
+  gap: var(--px);
   justify-content: center;
-  margin: 2px 0;
+  margin: var(--px) 0;
 }
 
 .vdots i {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.18);
+  width: calc(var(--px) * 3);
+  height: calc(var(--px) * 3);
+  background: var(--well-hi);
 }
 
 .vdots i.on {
@@ -882,10 +990,8 @@ button {
 .list-row {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 8px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.06);
+  gap: calc(var(--px) * 4);
+  padding: calc(var(--px) * 3) calc(var(--px) * 4);
   min-height: calc(var(--btn) * 0.8);
 }
 
@@ -895,7 +1001,7 @@ button {
 }
 
 .list-row .title {
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1.15;
 }
 
@@ -905,80 +1011,77 @@ button {
 }
 
 .list-row .bar {
-  margin-top: 4px;
+  margin-top: calc(var(--px) * 2);
 }
 
 .list-row.done {
   opacity: 0.6;
 }
 
-.list-row .check {
+.list-row > .ico {
   color: var(--good);
-  width: 1.4em;
-  height: 1.4em;
 }
 
 .pips {
   display: flex;
-  gap: 3px;
-  margin-top: 3px;
+  gap: var(--px);
+  margin-top: calc(var(--px) * 2);
 }
 
 .pips i {
-  width: 12px;
-  height: 5px;
-  border-radius: 3px;
-  background: rgba(255, 255, 255, 0.15);
+  width: calc(var(--px) * 6);
+  height: calc(var(--px) * 3);
+  background: var(--well-hi);
 }
 
 .pips i.on {
   background: var(--accent);
+  box-shadow: inset 0 var(--px) 0 #c4f3fb;
 }
 
 .help-page {
-  line-height: 1.45;
+  line-height: 1.4;
   font-size: var(--fs);
   overflow: hidden;
 }
 
 .help-page h3 {
   font-size: calc(var(--fs) * 1.1);
-  margin-bottom: 4px;
+  font-weight: 700;
+  margin-bottom: calc(var(--px) * 2);
   color: var(--accent);
 }
 
 .help-page p {
-  margin-bottom: 6px;
+  margin-bottom: calc(var(--px) * 3);
 }
 
 .tile-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
+  gap: calc(var(--px) * 5);
+  padding-bottom: calc(var(--px) * 2);
 }
 
 .tile {
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.1);
   min-height: calc(var(--btn) * 1.4);
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 10px;
-  font-weight: 800;
+  gap: calc(var(--px) * 4);
+  padding: calc(var(--px) * 4) calc(var(--px) * 5);
+  font-weight: 700;
   text-align: left;
 }
 
 .tile .ico {
-  width: 1.6em;
-  height: 1.6em;
+  width: calc(var(--ip) * 10);
+  height: calc(var(--ip) * 10);
   color: var(--accent);
 }
 
 .tile small {
   display: block;
-  font-weight: 700;
+  font-weight: 400;
   color: var(--muted);
   font-size: var(--fs-small);
 }
@@ -986,9 +1089,10 @@ button {
 .tank-swatch {
   width: calc(var(--btn) * 1.2);
   height: calc(var(--btn) * 0.9);
-  border-radius: 8px;
   flex: none;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow:
+    0 0 0 var(--px) var(--ink),
+    inset 0 var(--px) 0 rgba(255, 255, 255, 0.3);
 }
 
 /* ── Modal (welcome back) ──────────────────────────── */
@@ -999,41 +1103,36 @@ button {
   z-index: 35;
   display: grid;
   place-items: center;
-  background: rgba(2, 10, 18, 0.55);
+  background: rgba(2, 10, 18, 0.6);
 }
 
 .modal-box {
+  --o: var(--panel-hi);
+  --drop: 0 calc(var(--px) * 3) 0 var(--ink);
   width: min(86%, 300px);
-  padding: 12px 14px;
-  border-radius: 16px;
-  background: var(--glass-strong);
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  animation: sheet-in 0.25s ease-out;
+  padding: calc(var(--px) * 6) calc(var(--px) * 7);
+  animation: sheet-in 0.2s steps(3);
 }
 
 .modal-box h2 {
-  font-size: calc(var(--fs) * 1.25);
-  font-weight: 900;
-  margin-bottom: 2px;
+  font-size: calc(var(--fs) * 1.3);
+  font-weight: 700;
+  color: var(--gold);
+  text-shadow: 0 var(--px) 0 var(--ink);
+  margin-bottom: var(--px);
 }
 
 .modal-box .sub {
   color: var(--muted);
   font-size: var(--fs-small);
-  margin-bottom: 8px;
+  margin-bottom: calc(var(--px) * 4);
 }
 
 .modal-line {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 3px 0;
-  font-weight: 700;
-}
-
-.modal-line .ico {
-  width: 1.3em;
-  height: 1.3em;
+  gap: calc(var(--px) * 4);
+  padding: var(--px) 0;
 }
 
 /* ── Loading ───────────────────────────────────────── */
@@ -1043,9 +1142,9 @@ button {
   inset: 0;
   display: grid;
   place-items: center;
-  background: linear-gradient(#3a9fae, #1d5e72);
+  background: #1a5468;
   z-index: 50;
-  transition: opacity 0.4s;
+  transition: opacity 0.3s steps(3);
 }
 
 #app:not(.is-loading) #loading {
@@ -1053,26 +1152,31 @@ button {
   visibility: hidden;
   pointer-events: none;
   transition:
-    opacity 0.4s,
-    visibility 0s 0.4s;
+    opacity 0.3s steps(3),
+    visibility 0s 0.3s;
 }
 
+/* A little pixel bubble that bobs while the tank loads. */
 .spinner {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  border: 3px solid rgba(255, 255, 255, 0.25);
-  border-top-color: #fff;
-  animation: spin 0.8s linear infinite;
+  width: 8px;
+  height: 8px;
+  background: #e8fbff;
+  box-shadow:
+    0 -4px 0 #e8fbff,
+    0 4px 0 #e8fbff,
+    -4px 0 0 #e8fbff,
+    4px 0 0 #e8fbff,
+    -4px -4px 0 #8fd8ea;
+  animation: bob 0.8s steps(2) infinite;
 }
 
 #app:not(.is-loading) .spinner {
   animation: none;
 }
 
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
+@keyframes bob {
+  50% {
+    transform: translateY(-6px);
   }
 }
 
@@ -1108,28 +1212,24 @@ button {
   display: none;
 }
 
-/* Labels under the bubbles only where there is plenty of room. */
+/* Labels under the icons only where there is plenty of room. */
 @media (min-width: 400px) and (min-height: 300px) {
   .dock-btn {
-    border-radius: 34%;
-    height: calc(var(--btn) * 1.18);
+    height: calc(var(--btn) * 1.2);
     grid-template-rows: 1fr auto;
-    padding: 4px 0 3px;
+    padding: calc(var(--px) * 2) 0;
   }
 
   .dock-btn .ico {
-    width: 50%;
-    height: auto;
-    aspect-ratio: 1;
     align-self: end;
   }
 
   .dock-btn .lbl {
     display: block;
-    font-size: 9px;
-    font-weight: 800;
+    font-size: 11px;
+    font-weight: 700;
     line-height: 1;
-    opacity: 0.9;
+    color: var(--text);
   }
 }
 
@@ -1138,6 +1238,7 @@ button {
   #dock {
     display: grid;
     grid-template-columns: repeat(2, var(--btn));
+    gap: calc(var(--px) * 4);
   }
 
   .hud-left {
@@ -1149,8 +1250,8 @@ button {
   }
 
   #sheet {
-    gap: 3px;
-    padding: 4px 5px;
+    gap: calc(var(--px) * 2);
+    padding: calc(var(--px) * 3) calc(var(--px) * 4);
   }
 
   .sheet-meta {
@@ -1168,8 +1269,7 @@ button {
 
   .tab {
     height: 24px;
-    border-radius: 7px;
-    font-size: 9px;
+    font-size: 10px;
   }
 
   .sheet-foot {
@@ -1182,11 +1282,10 @@ button {
   }
 
   .modal-box {
-    width: calc(100% - 10px);
-    max-height: calc(100% - 10px);
+    width: calc(100% - 12px);
+    max-height: calc(100% - 12px);
     overflow-y: auto;
-    padding: 7px 9px;
-    border-radius: 12px;
+    padding: calc(var(--px) * 3) calc(var(--px) * 5);
   }
 
   .modal-box h2 {
@@ -1194,23 +1293,23 @@ button {
   }
 
   .modal-box .sub {
-    margin-bottom: 5px;
+    margin-bottom: calc(var(--px) * 2);
   }
 
   #coach,
   .tray-hint {
-    padding: 3px 7px;
-    font-size: 9px;
+    padding: var(--px) calc(var(--px) * 3);
+    font-size: 10px;
     line-height: 1.2;
   }
 
   #tray {
-    left: var(--pad);
-    bottom: var(--pad);
+    left: calc(var(--pad) + var(--px));
+    bottom: calc(var(--pad) + var(--px) * 2);
     transform: none;
     max-width: calc(100% - var(--btn) * 2 - var(--pad) * 3);
     align-items: flex-start;
-    gap: 3px;
+    gap: calc(var(--px) * 3);
   }
 
   .tray-row {
@@ -1218,8 +1317,8 @@ button {
   }
 
   .list-row {
-    gap: 5px;
-    padding: 3px 7px;
+    gap: calc(var(--px) * 3);
+    padding: var(--px) calc(var(--px) * 3);
     min-height: 0;
   }
 
@@ -1228,130 +1327,16 @@ button {
   }
 
   .list-row .bar {
-    margin-top: 2px;
+    margin-top: var(--px);
   }
 
   .food-btn {
     height: 24px;
-    padding: 0 6px 0 3px;
+    padding: 0 calc(var(--px) * 3) 0 var(--px);
   }
 }
 
-.btn.short {
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--muted);
-}
-
-/* ── Pixel theme ───────────────────────────────────── */
-/* Panels and buttons share one pixel-art frame: square corners with a stepped notch, a solid
-   two-pixel border and a hard top highlight, matching the pixelated tank. */
-
-img,
-canvas {
-  image-rendering: pixelated;
-}
-
-.ico svg {
-  shape-rendering: crispEdges;
-}
-
-.pill,
-.chip,
-.level,
-.dock-btn,
-#coach,
-.tray-hint,
-.food-btn,
-.btn,
-.tab,
-.icon-btn,
-.card-item,
-.list-row,
-.modal-box,
-#card,
-.toast,
-.banner-box {
-  --notch: 3px;
-  border-radius: 0;
-  clip-path: polygon(
-    0 var(--notch),
-    var(--notch) var(--notch),
-    var(--notch) 0,
-    calc(100% - var(--notch)) 0,
-    calc(100% - var(--notch)) var(--notch),
-    100% var(--notch),
-    100% calc(100% - var(--notch)),
-    calc(100% - var(--notch)) calc(100% - var(--notch)),
-    calc(100% - var(--notch)) 100%,
-    var(--notch) 100%,
-    var(--notch) calc(100% - var(--notch)),
-    0 calc(100% - var(--notch))
-  );
-}
-
-.pill,
-.chip,
-.level,
-.dock-btn,
-#coach,
-.tray-hint,
-.food-btn,
-.icon-btn,
-.modal-box,
-#card,
-.toast,
-.banner-box {
-  background: rgba(10, 26, 42, 0.9);
-  border: 2px solid #3d6680;
-  box-shadow:
-    inset 0 2px 0 rgba(255, 255, 255, 0.14),
-    inset 0 -2px 0 rgba(0, 0, 0, 0.35);
-}
-
-.dock-btn {
-  border-color: var(--tone);
-  background: rgba(10, 26, 42, 0.9);
-}
-
-.dock-btn.on {
-  background: var(--tone);
-  border-color: #ffffff;
-}
-
-.level svg {
-  inset: 3px;
-}
-
-.level circle {
-  shape-rendering: crispEdges;
-}
-
-.tab {
-  background: rgba(255, 255, 255, 0.06);
-  border: 2px solid transparent;
-}
-
-.tab.on {
-  background: rgba(95, 208, 232, 0.18);
-  border-color: var(--accent);
-  box-shadow: none;
-}
-
-.card-item,
-.list-row {
-  border: 2px solid rgba(255, 255, 255, 0.1);
-}
-
-.card-item.sel {
-  border-color: var(--accent);
-}
-
-.btn.primary {
-  box-shadow:
-    inset 0 2px 0 rgba(255, 255, 255, 0.35),
-    inset 0 -3px 0 rgba(0, 0, 0, 0.25);
-}
-
-.dot {
-  border-radius: 0;
+/* Trophy rows lead with a gold icon; checks on the right stay green. */
+.list-row > .ico:first-child {
+  color: var(--gold);
 }

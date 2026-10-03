@@ -13,58 +13,342 @@
   const A = root.AquaArt;
 
   // ── Icons ──────────────────────────────────────────────────────────
+  // Pixel icons on a 10 by 10 grid, drawn like the tank sprites. "x" takes the text colour, "d" is
+  // the text colour at low opacity and the other letters are fixed colours from ICON_COLORS.
 
-  const S = (body, vb = "0 0 24 24") =>
-    `<svg viewBox="${vb}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${body}</svg>`;
-  const ICONS = {
-    coin: `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#e8a91f"/><circle cx="12" cy="11.2" r="9" fill="#ffd85a"/><circle cx="12" cy="11.2" r="5.6" fill="none" stroke="#e8a91f" stroke-width="1.6"/></svg>`,
-    pearl: `<svg viewBox="0 0 24 24" aria-hidden="true"><defs><radialGradient id="pg" cx="35%" cy="30%" r="70%"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#b9b0ea"/></radialGradient></defs><circle cx="12" cy="12" r="9.5" fill="url(#pg)"/><circle cx="9" cy="8.5" r="2.2" fill="#fff" opacity=".9"/></svg>`,
-    // A food shaker sprinkling flakes.
-    food: S(
-      '<rect x="7" y="2.5" width="10" height="4" rx="1.2"/><path d="M7.5 6.5h9l-1 9.5a2 2 0 0 1-2 1.8h-3a2 2 0 0 1-2-1.8z"/><circle cx="9" cy="21" r=".9" fill="currentColor"/><circle cx="12.5" cy="20.5" r=".9" fill="currentColor"/><circle cx="15.5" cy="21.5" r=".9" fill="currentColor"/>',
-    ),
-    // A wand with a spark: play drops a light toy for the fish to chase.
-    play: S(
-      '<path d="M4 20L14 10"/><path d="M17 3v3M17 12v3M12.5 7.5h3M18.5 7.5h3M14.5 5l1.2 1.2M18.3 8.8l1.2 1.2M14.5 10l1.2-1.2M18.3 6.2l1.2-1.2"/>',
-    ),
-    shop: S('<path d="M4 8h16l-1 12H5z"/><path d="M9 8a3 3 0 0 1 6 0"/>'),
-    menu: S('<path d="M4 7h16M4 12h16M4 17h16"/>'),
-    close: S('<path d="M6 6l12 12M18 6L6 18"/>'),
-    left: S('<path d="M15 5l-7 7 7 7"/>'),
-    right: S('<path d="M9 5l7 7-7 7"/>'),
-    lock: S(
-      '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
-    ),
-    check: S('<path d="M5 12l5 5 9-10"/>'),
-    star: S('<path d="M12 3l2.8 5.8 6.2.9-4.5 4.4 1 6.2L12 17.4 6.5 20.3l1-6.2L3 9.7l6.2-.9z"/>'),
-    fish: S(
-      '<path d="M3 12c3-5 9-6 13-3l4-3v12l-4-3c-4 3-10 2-13-3z"/><circle cx="8" cy="11" r=".8" fill="currentColor"/>',
-    ),
-    tank: S(
-      '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 15c3-2 5 1 9-1s6 1 9-1"/>',
-    ),
-    book: S('<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5"/>'),
-    help: S(
-      '<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 1-1 1.7v.5"/><circle cx="12" cy="17" r=".6" fill="currentColor"/>',
-    ),
-    trophy: S(
-      '<path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8 20h8"/>',
-    ),
-    egg: S('<path d="M12 3c3.5 0 6 6 6 10a6 6 0 0 1-12 0c0-4 2.5-10 6-10z"/>'),
-    water: S('<path d="M12 3s6 7 6 11a6 6 0 0 1-12 0c0-4 6-11 6-11z"/>'),
-    upgrade: S('<path d="M12 19V5M6 11l6-6 6 6"/>'),
-    sparkle: S(
-      '<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5L18 18M6 18l2.5-2.5M15.5 8.5L18 6"/>',
-    ),
-    move: S(
-      '<path d="M12 3v18M3 12h18M12 3l-3 3M12 3l3 3M12 21l-3-3M12 21l3-3M3 12l3-3M3 12l3 3M21 12l-3-3M21 12l-3 3"/>',
-    ),
-    reset: S('<path d="M4 12a8 8 0 1 0 2.3-5.7"/><path d="M4 4v4h4"/>'),
-    plus: S('<path d="M12 5v14M5 12h14"/>'),
-    flame: S(
-      '<path d="M12 3c1 4 5 5 5 10a5 5 0 0 1-10 0c0-3 2-4 2-7 1.5 1 2 2 3 3 0-2 0-4 0-6z"/>',
-    ),
+  const ICON_COLORS = {
+    o: "#7a4a0c",
+    y: "#ffcf3a",
+    w: "#fff3b0",
+    s: "#e3961c",
+    q: "#5e5396",
+    p: "#d9d2ff",
+    h: "#ffffff",
+    m: "#a89ee6",
+    f: "#ff7a2a",
+    g: "#ffd23e",
   };
+
+  function pixelIcon(rows) {
+    const paths = {};
+    rows.forEach((row, y) => {
+      for (let x = 0; x < row.length; ) {
+        const c = row[x];
+        let n = 1;
+        while (row[x + n] === c) n++;
+        if (c !== ".") paths[c] = `${paths[c] || ""}M${x} ${y}h${n}v1h-${n}z`;
+        x += n;
+      }
+    });
+    const body = Object.entries(paths)
+      .map(([c, d]) => {
+        const fill = ICON_COLORS[c] || "currentColor";
+        return `<path d="${d}" fill="${fill}"${c === "d" ? ' opacity=".45"' : ""}/>`;
+      })
+      .join("");
+    return `<svg viewBox="0 0 ${rows[0].length} ${rows.length}" shape-rendering="crispEdges" aria-hidden="true">${body}</svg>`;
+  }
+
+  const mirror = (rows) => rows.map((r) => [...r].reverse().join(""));
+
+  const LEFT = [
+    "..........",
+    ".....xx...",
+    "....xx....",
+    "...xx.....",
+    "..xx......",
+    "..xx......",
+    "...xx.....",
+    "....xx....",
+    ".....xx...",
+    "..........",
+  ];
+
+  const GRIDS = {
+    coin: [
+      "...oooo...",
+      ".ooyyyyoo.",
+      ".oywwyyyo.",
+      "oywyyyyyso",
+      "oywyyyyyso",
+      "oyyyyyyyso",
+      "oyyyyyysso",
+      ".oyyyysso.",
+      ".oossssoo.",
+      "...oooo...",
+    ],
+    pearl: [
+      "...qqqq...",
+      ".qqppppqq.",
+      ".qphhpppq.",
+      "qphhppppmq",
+      "qphpppppmq",
+      "qpppppppmq",
+      "qppppppmmq",
+      ".qppppmmq.",
+      ".qqmmmmqq.",
+      "...qqqq...",
+    ],
+    // A tin of flakes with food sprinkling out.
+    food: [
+      "d...d...d.",
+      "..d...d...",
+      "..xxxxxx..",
+      ".xxxxxxxx.",
+      "..xxxxxx..",
+      "..xddddx..",
+      "..xdxxdx..",
+      "..xddddx..",
+      "..xxxxxx..",
+      "..xxxxxx..",
+    ],
+    // A wand with a spark: play drops a light toy for the fish to chase.
+    play: [
+      "....d..x..",
+      "......xxx.",
+      ".......x..",
+      ".....x...d",
+      "....xx....",
+      "...xx.....",
+      "..xx......",
+      ".xx.......",
+      "xx........",
+      "x.........",
+    ],
+    shop: [
+      "...xxxx...",
+      "..x....x..",
+      "..x....x..",
+      "xxxxxxxxxx",
+      ".xxdxxdxx.",
+      ".xxxxxxxx.",
+      ".xxxxxxxx.",
+      ".xxxxxxxx.",
+      ".xxxxxxxx.",
+      "..xxxxxx..",
+    ],
+    menu: [
+      "..........",
+      ".xxxxxxxx.",
+      ".xxxxxxxx.",
+      "..........",
+      ".xxxxxxxx.",
+      ".xxxxxxxx.",
+      "..........",
+      ".xxxxxxxx.",
+      ".xxxxxxxx.",
+      "..........",
+    ],
+    close: [
+      "..........",
+      ".xx....xx.",
+      ".xxx..xxx.",
+      "..xxxxxx..",
+      "...xxxx...",
+      "...xxxx...",
+      "..xxxxxx..",
+      ".xxx..xxx.",
+      ".xx....xx.",
+      "..........",
+    ],
+    left: LEFT,
+    right: mirror(LEFT),
+    lock: [
+      "...xxxx...",
+      "..xx..xx..",
+      "..x....x..",
+      "..x....x..",
+      ".xxxxxxxx.",
+      ".xxxddxxx.",
+      ".xxxddxxx.",
+      ".xxxxxxxx.",
+      ".xxxxxxxx.",
+      "..........",
+    ],
+    check: [
+      "..........",
+      "..........",
+      "........xx",
+      ".......xx.",
+      "......xx..",
+      "xx...xx...",
+      ".xx.xx....",
+      "..xxx.....",
+      "...x......",
+      "..........",
+    ],
+    star: [
+      "....xx....",
+      "....xx....",
+      "...xxxx...",
+      "xxxxxxxxxx",
+      ".xxxxxxxx.",
+      "..xxxxxx..",
+      "..xxxxxx..",
+      ".xxx..xxx.",
+      ".xx....xx.",
+      "..........",
+    ],
+    fish: [
+      "..........",
+      "..........",
+      "...xxxx...",
+      ".xxxxxxx.x",
+      "xx.xxxxxxx",
+      "xxxxxxxxxx",
+      ".xxxxxxx.x",
+      "...xxxx...",
+      "..........",
+      "..........",
+    ],
+    tank: [
+      "..........",
+      "x........x",
+      "x........x",
+      "xddddddddx",
+      "xdddxxdxdx",
+      "xddxxxxxdx",
+      "xdddxxdxdx",
+      "xddddddddx",
+      "xxxxxxxxxx",
+      ".x......x.",
+    ],
+    book: [
+      "..xxxxxxx.",
+      ".x.xxxxxx.",
+      ".x.xddddx.",
+      ".x.xxxxxx.",
+      ".x.xxxxxx.",
+      ".x.xxxxxx.",
+      ".x.xxxxxx.",
+      ".x.xxxxxx.",
+      ".xddddddx.",
+      "..xxxxxxx.",
+    ],
+    help: [
+      "..xxxxx...",
+      ".xx...xx..",
+      ".xx...xx..",
+      "......xx..",
+      ".....xx...",
+      "....xx....",
+      "....xx....",
+      "..........",
+      "....xx....",
+      "....xx....",
+    ],
+    trophy: [
+      ".xxxxxxxx.",
+      "xxxxxxxxxx",
+      "x.xxxxxx.x",
+      "x.xxxxxx.x",
+      ".xxxxxxxx.",
+      "..xxxxxx..",
+      "....xx....",
+      "....xx....",
+      "..xxxxxx..",
+      "..xxxxxx..",
+    ],
+    egg: [
+      "....xx....",
+      "...xxxx...",
+      "..xxxxxx..",
+      "..xdxxxx..",
+      ".xdxxxxxx.",
+      ".xxxxxxxx.",
+      ".xxxxxxxx.",
+      ".xxxxxxxx.",
+      "..xxxxxx..",
+      "...xxxx...",
+    ],
+    water: [
+      "....xx....",
+      "....xx....",
+      "...xxxx...",
+      "...xxxx...",
+      "..xxxxxx..",
+      ".xdxxxxxx.",
+      ".xdxxxxxx.",
+      ".xxxxxxxx.",
+      "..xxxxxx..",
+      "...xxxx...",
+    ],
+    upgrade: [
+      "....xx....",
+      "...xxxx...",
+      "..xxxxxx..",
+      ".xxxxxxxx.",
+      "xxx.xx.xxx",
+      "....xx....",
+      "....xx....",
+      "....xx....",
+      "....xx....",
+      "..........",
+    ],
+    sparkle: [
+      "....x.....",
+      "....x.....",
+      "...xxx....",
+      "xxxxxxxxx.",
+      "...xxx....",
+      "....x.....",
+      "....x.....",
+      "........x.",
+      ".......xxx",
+      "........x.",
+    ],
+    move: [
+      "....xx....",
+      "...xxxx...",
+      "....xx....",
+      ".x..xx..x.",
+      "xxxxxxxxxx",
+      "xxxxxxxxxx",
+      ".x..xx..x.",
+      "....xx....",
+      "...xxxx...",
+      "....xx....",
+    ],
+    reset: [
+      "....xxx...",
+      "x.xxx.xxx.",
+      "xxx.....xx",
+      "xxxx....xx",
+      "........xx",
+      "xx......xx",
+      "xx......xx",
+      ".xx....xx.",
+      "..xxxxxx..",
+      "..........",
+    ],
+    plus: [
+      "..........",
+      "....xx....",
+      "....xx....",
+      "....xx....",
+      ".xxxxxxxx.",
+      ".xxxxxxxx.",
+      "....xx....",
+      "....xx....",
+      "....xx....",
+      "..........",
+    ],
+    flame: [
+      "....f.....",
+      "....ff....",
+      "...fff....",
+      "...ffff.f.",
+      "..fffffff.",
+      ".fffgffff.",
+      ".fffggfff.",
+      ".ffggggff.",
+      "..ffggff..",
+      "...ffff...",
+    ],
+  };
+
+  const ICONS = {};
+  for (const [name, rows] of Object.entries(GRIDS)) ICONS[name] = pixelIcon(rows);
 
   function icon(name) {
     return `<span class="ico">${ICONS[name] || ""}</span>`;
@@ -193,6 +477,29 @@
       });
       document.getElementById("app").addEventListener("click", (e) => this.onClick(e));
       for (const el of document.querySelectorAll("[data-t]")) el.textContent = this.t(el.dataset.t);
+    }
+
+    /**
+     * Sizes the pixel grid of the interface from the tank: one frame pixel is one art pixel of
+     * the scene, and icons get a whole number of screen pixels per cell so they stay crisp.
+     */
+    fitPixels(scene) {
+      const app = document.getElementById("app");
+      const screen = scene.screen || 1;
+      const u = Math.min(scene.W / 100, (scene.H * 1.333) / 100);
+      const btn = Math.max(28, Math.min(46, u * 11));
+      const fs = Math.max(10, Math.min(14, u * 3.4));
+      // Very tall widgets have big art pixels, so frames use half of one there.
+      const frame = scene.dev / screen > 3.2 ? Math.round(scene.dev / 2) : scene.dev;
+      app.style.setProperty("--px", `${frame / screen}px`);
+      app.style.setProperty(
+        "--ip",
+        `${Math.max(1, Math.floor((btn * 0.56 * screen) / 10)) / screen}px`,
+      );
+      app.style.setProperty(
+        "--ips",
+        `${Math.max(1, Math.round((fs * 1.2 * screen) / 10)) / screen}px`,
+      );
     }
 
     t(key, vars) {
@@ -409,9 +716,10 @@
       this.setText("levelVal", save.level);
       const need = E.xpFor(save.level);
       const pct = save.level >= C.RULES.maxLevel ? 1 : Math.min(1, save.xp / need);
-      const dash = String(97.4 * (1 - pct));
-      const ring = this.$("levelRing");
-      if (ring.style.strokeDashoffset !== dash) ring.style.strokeDashoffset = dash;
+      // The bar fills in whole steps, like a pixel meter.
+      const width = `${Math.floor(pct * 10) * 10}%`;
+      const bar = this.$("levelBar");
+      if (bar.style.width !== width) bar.style.width = width;
       const goalsOpen = save.tut < C.TUTORIAL.length || save.daily.goals.some((g) => !g.done);
       this.$("goalDot").hidden = !goalsOpen;
 
