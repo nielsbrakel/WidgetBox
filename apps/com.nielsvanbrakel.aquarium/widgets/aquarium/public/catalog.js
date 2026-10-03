@@ -404,11 +404,12 @@
    *  tags   matched against species likes/needs
    *  pearls price in pearls instead of coins
    *  bonus  extra income for the whole tank (0.1 = +10%)
+   *  bloom  the plant flowers now and then once fully grown (see GROWTH)
    */
   const DECOR = {
     // Pond
-    vallisneria: { tank: "pond", level: 1, size: "M", price: 30, tags: ["plant"] },
-    anubias: { tank: "pond", level: 1, size: "S", price: 20, tags: ["plant"] },
+    vallisneria: { tank: "pond", level: 1, size: "M", price: 30, tags: ["plant"], bloom: true },
+    anubias: { tank: "pond", level: 1, size: "S", price: 20, tags: ["plant"], bloom: true },
     pebbles: { tank: "pond", level: 1, size: "S", price: 25, tags: ["rock"] },
     moss_ball: { tank: "pond", level: 2, size: "S", price: 15, tags: ["plant"] },
     chest: { tank: "pond", level: 2, size: "S", price: 60, tags: ["ornament"] },
@@ -417,10 +418,10 @@
     golden_chest: { tank: "pond", level: 3, size: "S", pearls: 15, tags: ["ornament"], bonus: 0.1 },
     // Amazon
     java_fern: { tank: "amazon", level: 5, size: "S", price: 90, tags: ["plant"] },
-    sword_plant: { tank: "amazon", level: 5, size: "M", price: 120, tags: ["plant"] },
+    sword_plant: { tank: "amazon", level: 5, size: "M", price: 120, tags: ["plant"], bloom: true },
     root: { tank: "amazon", level: 6, size: "L", price: 300, tags: ["wood"] },
     stump: { tank: "amazon", level: 7, size: "M", price: 250, tags: ["wood", "cave"] },
-    ludwigia: { tank: "amazon", level: 8, size: "M", price: 200, tags: ["plant"] },
+    ludwigia: { tank: "amazon", level: 8, size: "M", price: 200, tags: ["plant"], bloom: true },
     clay_cave: { tank: "amazon", level: 8, size: "S", price: 180, tags: ["cave"] },
     idol: { tank: "amazon", level: 7, size: "M", pearls: 25, tags: ["ornament"], bonus: 0.1 },
     // Reef
@@ -554,6 +555,16 @@
   // Pearls for Fishdex discoveries.
   const DEX_PEARLS = { species: 1, rare: 3, tankComplete: 10 };
 
+  /*
+   * Living decor grows in place after it is bought. Plants take a few days from cutting to full
+   * size; items marked bloom then flower for a few hours every couple of days. Coral grows
+   * slower and does not flower. Purely visual.
+   */
+  const GROWTH = {
+    plant: { days: 3, start: 0.15, bloomEveryDays: 2, bloomHours: 8 },
+    coral: { days: 6, start: 0.25 },
+  };
+
   return {
     TANKS,
     SPECIES,
@@ -569,5 +580,6 @@
     GOALS,
     ACHIEVEMENTS,
     DEX_PEARLS,
+    GROWTH,
   };
 });

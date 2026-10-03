@@ -15,7 +15,7 @@
   const E = root.AquaEngine;
   const TAU = Math.PI * 2;
   const STAGE_SCALE = [0.58, 0.8, 1];
-  const MIN_FISH_PX = 24;
+  const MIN_FISH_PX = 20;
   const ZONES = { top: [0.1, 0.38], mid: [0.22, 0.62], low: [0.5, 0.74] };
   const BOTTOM_MOVERS = { crawl: true, bottom: true };
 
@@ -31,10 +31,21 @@
     return Math.hypot(ax - bx, ay - by);
   }
 
+  // The tank is painted into a small buffer of about this many rows and scaled up with hard
+  // edges, which gives the high-resolution pixel-art look.
+  const PIXEL_ROWS = 180;
+  // Colour levels per channel after ordered dithering; fewer levels look more retro.
+  const COLOR_LEVELS = 20;
+  const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map((v) => v / 16 - 0.5);
+
   class Scene {
     constructor(canvas, hooks) {
       this.canvas = canvas;
-      this.ctx = canvas.getContext("2d");
+      this.out = canvas.getContext("2d");
+      this.lo = document.createElement("canvas");
+      this.ctx = this.lo.getContext("2d", { willReadFrequently: true });
+      this.layer = document.createElement("canvas");
+      this.lctx = this.layer.getContext("2d", { willReadFrequently: true });
       this.hooks = hooks;
       this.W = 0;
       this.H = 0;
@@ -73,15 +84,25 @@
       const rect = this.canvas.getBoundingClientRect();
       const W = Math.max(1, Math.round(rect.width));
       const H = Math.max(1, Math.round(rect.height));
-      const dpr = Math.min(2, window.devicePixelRatio || 1);
-      if (W === this.W && H === this.H && dpr === this.dpr) return;
+      const screen = Math.min(3, window.devicePixelRatio || 1);
+      // Whole device pixels per art pixel keep every art pixel the same size on screen.
+      const dev = Math.max(2, Math.round((H * screen) / PIXEL_ROWS));
+      if (W === this.W && H === this.H && dev === this.dev && screen === this.screen) return;
       const sx = this.W ? W / this.W : 1;
       const sy = this.H ? H / this.H : 1;
       this.W = W;
       this.H = H;
-      this.dpr = dpr;
-      this.canvas.width = Math.round(W * dpr);
-      this.canvas.height = Math.round(H * dpr);
+      this.screen = screen;
+      this.dev = dev;
+      // Art pixels per CSS pixel: everything below draws in CSS units at this scale.
+      this.dpr = screen / dev;
+      A.setArtPixel(1 / this.dpr);
+      this.lo.width = Math.ceil(W * this.dpr);
+      this.lo.height = Math.ceil(H * this.dpr);
+      this.layer.width = this.lo.width;
+      this.layer.height = this.lo.height;
+      this.canvas.width = Math.round(W * screen);
+      this.canvas.height = Math.round(H * screen);
       this.bg = null;
       for (const a of this.agents.values()) {
         a.x *= sx;
@@ -141,7 +162,9 @@
         this.motes = [];
       }
       this.tankInfo = E.tankInfo(save, tankId, now);
-      this.decor = tank.decor.map((d) => (d ? { id: d.id, d: d.d } : null));
+      this.decor = tank.decor.map((d) =>
+        d ? { id: d.id, d: d.d, look: E.decorGrowth(d, now) } : null,
+      );
 
       const seen = new Set();
       tank.fish.forEach((f, index) => {
@@ -222,7 +245,7 @@
     sizeAgent(a) {
       // Small species are drawn relatively larger than in real life, with a floor in CSS
       // pixels, so every fish keeps a readable shape on a tiny dashboard widget.
-      const adult = Math.max(MIN_FISH_PX, this.unit * (0.45 + 0.6 * a.art.len));
+      const adult = Math.max(MIN_FISH_PX, this.unit * (0.3 + 0.75 * a.art.len));
       a.L = Math.max(
         MIN_FISH_PX * 0.6,
         adult * STAGE_SCALE[a.stage] * (0.94 + rnd01(a.id, "size") * 0.12) * a.z,
@@ -1064,6 +1087,7 @@
       const H = this.H;
       const t = this.t;
       ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+      ctx.imageSmoothingEnabled = false;
       this.ensureBackground();
       ctx.drawImage(this.bg, 0, 0, W, H);
       const biome = A.BIOMES[this.tankId];
@@ -1081,34 +1105,38 @@
       }
 
       // Back row decor, with homed fish between its back and front layers.
-      this.decor.forEach((d, i) => {
-        if (!d || C.SLOTS[i].row !== "back") return;
-        const p = this.slotPos(i);
-        A.drawDecor(ctx, d.d, p.x, p.y, p.scale, t, "back");
-        const list = homed.get(i);
-        if (list) for (const a of list) this.drawHomed(ctx, a);
-        A.drawDecor(ctx, d.d, p.x, p.y, p.scale, t, "front");
+      this.crisp((c) => {
+        this.decor.forEach((d, i) => {
+          if (!d || C.SLOTS[i].row !== "back") return;
+          const p = this.slotPos(i);
+          A.drawDecor(c, d.d, p.x, p.y, p.scale, t, "back", d.look);
+          const list = homed.get(i);
+          if (list) for (const a of list) this.drawHomed(c, a);
+          A.drawDecor(c, d.d, p.x, p.y, p.scale, t, "front", d.look);
+        });
+        for (const d of this.debris) {
+          const p = this.debrisPos(d);
+          A.drawDebris(c, p.x, p.y, this.unit * 0.22, E.hash(d.id));
+        }
+        for (const e of this.eggs) {
+          const p = this.eggPos(e);
+          A.drawEggs(c, p.x, p.y, this.unit * 0.25, e.ready, t, e.m);
+        }
       });
 
-      for (const d of this.debris) {
-        const p = this.debrisPos(d);
-        A.drawDebris(ctx, p.x, p.y, this.unit * 0.22, E.hash(d.id));
-      }
-      for (const e of this.eggs) {
-        const p = this.eggPos(e);
-        A.drawEggs(ctx, p.x, p.y, this.unit * 0.25, e.ready, t, e.m);
-      }
+      this.crisp((c) => {
+        agents.sort((a, b) => a.z - b.z);
+        for (const a of agents) if (!this.isHomed(a)) this.drawAgent(c, a);
+        for (const f of this.food)
+          A.drawFood(c, f.food, f.x, f.y, Math.max(1.6, this.unit * 0.06), f.seed, t);
+      });
 
-      agents.sort((a, b) => a.z - b.z);
-      for (const a of agents) if (!this.isHomed(a)) this.drawAgent(ctx, a);
-
-      for (const f of this.food)
-        A.drawFood(ctx, f.food, f.x, f.y, Math.max(1.6, this.unit * 0.06), f.seed, t);
-
-      this.decor.forEach((d, i) => {
-        if (!d || C.SLOTS[i].row !== "front") return;
-        const p = this.slotPos(i);
-        A.drawDecor(ctx, d.d, p.x, p.y, p.scale, t, "all");
+      this.crisp((c) => {
+        this.decor.forEach((d, i) => {
+          if (!d || C.SLOTS[i].row !== "front") return;
+          const p = this.slotPos(i);
+          A.drawDecor(c, d.d, p.x, p.y, p.scale, t, "all", d.look);
+        });
       });
 
       for (const b of this.bubbles) A.drawBubble(ctx, b.x, b.y, b.r);
@@ -1176,6 +1204,52 @@
       if (this.slotHighlight) this.drawSlots(ctx);
       this.drawFx(ctx);
       if (this.pointer) this.drawPointer(ctx);
+      this.present();
+    }
+
+    // Draw into a scratch layer, then harden its anti-aliased edges into whole pixels before
+    // compositing.
+    crisp(draw) {
+      const c = this.lctx;
+      const w = this.layer.width;
+      const h = this.layer.height;
+      c.setTransform(1, 0, 0, 1, 0, 0);
+      c.clearRect(0, 0, w, h);
+      c.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+      c.imageSmoothingEnabled = false;
+      draw(c);
+      c.setTransform(1, 0, 0, 1, 0, 0);
+      A.hardenEdges(c, w, h);
+      const ctx = this.ctx;
+      ctx.save();
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.drawImage(this.layer, 0, 0);
+      ctx.restore();
+    }
+
+    // Snap the buffer to a limited palette with ordered dithering, then scale it up with hard
+    // pixel edges.
+    present() {
+      const w = this.lo.width;
+      const h = this.lo.height;
+      const img = this.ctx.getImageData(0, 0, w, h);
+      const d = img.data;
+      const step = 255 / (COLOR_LEVELS - 1);
+      for (let y = 0; y < h; y++) {
+        const row = (y & 3) << 2;
+        for (let x = 0; x < w; x++) {
+          const bias = BAYER[row | (x & 3)] * step;
+          const i = (y * w + x) << 2;
+          d[i] = Math.round((d[i] + bias) / step) * step;
+          d[i + 1] = Math.round((d[i + 1] + bias) / step) * step;
+          d[i + 2] = Math.round((d[i + 2] + bias) / step) * step;
+        }
+      }
+      this.ctx.putImageData(img, 0, 0);
+      const out = this.out;
+      out.setTransform(1, 0, 0, 1, 0, 0);
+      out.imageSmoothingEnabled = false;
+      out.drawImage(this.lo, 0, 0, w * this.dev, h * this.dev);
     }
 
     drawSlots(ctx) {

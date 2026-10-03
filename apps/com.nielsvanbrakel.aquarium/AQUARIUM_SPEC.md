@@ -81,7 +81,7 @@ widgets/aquarium/
 Tank = {
   id, unlocked, up: { size, filter, feeder, chest },
   fish:   [{ id, s, v, born, stage, growth, fed, played, buff }],
-  decor:  [8 slots: { id, d } | null],
+  decor:  [8 slots: { id, d, at } | null],   at = purchase time, drives growth (0 = mature)
   drops:  [{ id, x, v }],        // coins on the sand
   algae:  [{ id, x, y, hp, max }], debris: [{ id, x }],
   eggs:   [{ id, s, at, x, m?, v? }],   // m: 1 mystery, 2 golden (bought eggs)
@@ -128,6 +128,8 @@ Tank = {
 
 **Decor.** There are 8 fixed slots per tank: 4 back (L, M, M, L) behind the fish and 4 front (S) in front of them. S fits any slot, M fits M and L, and L only fits L. Placing is a mode: after buying, valid slots glow and a tap places the item. Decor can be moved or sold (two taps) from its card. Pearl decor adds +10% tank income. Caves are real shelters: shy fish hide in them, and the moray lives in its rock cave (see §7).
 
+**Growth.** Plants and coral grow in place after they are bought (`GROWTH` in the catalog, `decorGrowth` in the engine). A plant starts as a small cutting and reaches full size in 3 days, gaining leaves and height as it goes. Coral takes 6 days. Plants marked `bloom` (vallisneria, anubias, Amazon sword, ludwigia) then flower for about 8 hours every 2 days, at a time seeded by the item id. Growth is visual only and follows from the save, so it is the same on every device.
+
 **Upgrades (per tank).** Size (+2 space, 5 levels), filter (slower algae and debris, 5 levels), feeder (auto-feeds per day, 3 levels) and coin chest (6/9/12/18/24 hours of storage). Prices scale with the tank multiplier.
 
 **Progression.** XP comes from every chore and purchase. Level `n` needs `25·n^1.9` XP and unlocks species, decor, foods and tanks. A 5-step tutorial (collect, feed ×3, scrub, buy decor, buy fish) runs before daily goals start. There are 21 achievements and pearls for Fishdex discoveries (1 per species, 3 per rare colour).
@@ -136,7 +138,9 @@ Tank = {
 
 ## 7. Rendering
 
-Everything is drawn with Canvas 2D, procedurally, so it stays sharp at any DPR and needs no image assets.
+Everything is drawn with Canvas 2D, procedurally, so it needs no image assets. The look is high-resolution pixel art with fairly realistic fish and plants.
+
+- **Pixel pipeline:** the tank is painted into a small buffer of about 180 rows (`PIXEL_ROWS`), using a whole number of device pixels per art pixel. Decor and fish are drawn on scratch layers whose anti-aliased edges are snapped to whole pixels (`hardenEdges`). The frame is then reduced to 20 levels per channel with 4×4 ordered dithering and scaled up with hard edges. Outlines are one art pixel wide. Shop and Fishdex previews use the same treatment on a 56-pixel grid.
 
 - **Layers (back to front):** cached biome background (gradient, far silhouettes, sand) → light rays → back decor → back-decor glows → fish (sorted by depth `z`) → front decor → coins, algae, debris, eggs → food → caustics, bubbles, particles → effects.
 - **Fish:** the body is a cached sprite per species, colour and size, and the tail and fins are drawn live with a swim phase. Species have their own movement: swim, school (leader and followers), bottom, crawl, hover, jelly pulse and eel.
@@ -147,7 +151,8 @@ Everything is drawn with Canvas 2D, procedurally, so it stays sharp at any DPR a
 
 ## 8. Interface
 
-- **HUD:** coins and pearls pills, status chips (eggs ready, hungry count, water %, chest full) and the level ring (opens the journal; a dot means goals are still open today). The coach bubble shows the next tutorial or goal hint while nothing else is open.
+- **Style:** panels and buttons use one pixel-art frame (square, notched corners, a two-pixel border, a hard highlight) so the UI matches the tank.
+- **HUD:** level ring, coins and pearls in one row on the left, status chips (eggs ready, hungry count, water %, chest full) and the level ring (opens the journal; a dot means goals are still open today). The coach bubble shows the next tutorial or goal hint while nothing else is open.
 - **Dock (right edge):** Feed, Play, Shop, Menu. A pulsing hint marks the button the tutorial wants.
 - **Cards:** tapping a fish, decor item or egg opens a small card with stats, happiness reasons and actions. Destructive buttons need a second tap.
 - **Sheets:** Shop (fish and eggs, decor, food, upgrades), Journal (goals, Fishdex, trophies), Tanks, Menu and Help (7 pages plus reset). Grids are sized to the available space and page with arrows.

@@ -109,6 +109,22 @@ function gallery(save, tankId) {
   ]);
 }
 
+// Plants at different ages: a fresh cutting, a half-grown one, mature ones and some in flower.
+function garden(save, tankId, plan, now) {
+  unlock(save, tankId);
+  save.active = tankId;
+  save.level = 30;
+  save.tanks[tankId].decor = C.SLOTS.map((_, i) => {
+    const p = plan[i];
+    if (!p) return null;
+    const item = { id: `d${++save.nextId}`, d: p.d, at: now - p.days * Engine.DAY };
+    // Pick an id whose flowering window is open right now, so the scenario always shows blooms.
+    for (let k = 0; p.bloom && k < 400 && !(Engine.decorGrowth(item, now).bloom > 0.6); k++)
+      item.id = `d${++save.nextId}`;
+    return item;
+  });
+}
+
 const SCENARIOS = {
   // No stored save: the handler creates one, exactly like a brand-new widget.
   default: () => null,
@@ -252,6 +268,46 @@ const SCENARIOS = {
     for (const id of Object.keys(C.FOODS)) s.food[id] = 99;
     for (const sp of ["guppy", "platy", "goldfish"]) fish(s, "pond", sp);
     decor(s, "pond", [null, "vallisneria", null, null, "anubias", null, null, null]);
+    return s;
+  },
+  "garden-pond": (now) => {
+    const s = base(now);
+    garden(
+      s,
+      "pond",
+      [
+        null,
+        { d: "vallisneria", days: 10, bloom: true },
+        { d: "vallisneria", days: 0.3 },
+        null,
+        { d: "anubias", days: 10, bloom: true },
+        { d: "moss_ball", days: 1 },
+        { d: "anubias", days: 1.2 },
+        null,
+      ],
+      now,
+    );
+    for (const sp of ["guppy", "guppy", "platy", "goldfish"]) fish(s, "pond", sp);
+    return s;
+  },
+  "garden-amazon": (now) => {
+    const s = base(now);
+    garden(
+      s,
+      "amazon",
+      [
+        null,
+        { d: "sword_plant", days: 10, bloom: true },
+        { d: "ludwigia", days: 10, bloom: true },
+        null,
+        { d: "java_fern", days: 0.5 },
+        { d: "java_fern", days: 8 },
+        { d: "sword_plant", days: 1 },
+        null,
+      ],
+      now,
+    );
+    for (const sp of ["neon", "neon", "neon", "angelfish", "cory"]) fish(s, "amazon", sp);
     return s;
   },
   "gallery-pond": (now) => {

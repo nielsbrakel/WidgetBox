@@ -112,7 +112,7 @@
     for (const id of TANK_IDS) save.tanks[id] = emptyTank(id, id === "pond", now);
 
     const pond = save.tanks.pond;
-    pond.decor[1] = { id: nextId(save, "d"), d: "vallisneria" };
+    pond.decor[1] = { id: nextId(save, "d"), d: "vallisneria", at: now };
     pond.decor[5] = { id: nextId(save, "d"), d: "pebbles" };
     for (let i = 0; i < 2; i++) addFish(save, pond, "guppy", 0, STAGE.JUVENILE, now);
     // Starters arrive peckish so the feeding lesson has hungry mouths to fill.
@@ -194,7 +194,7 @@
         Object.hasOwn(C.DECOR, d.d) &&
         C.DECOR[d.d].tank === id &&
         slotFits(i, d.d)
-          ? d
+          ? { ...d, at: Number.isFinite(d.at) ? d.at : 0 }
           : null,
       );
       tank.waste = clamp(num(tank.waste), 0, 3);
@@ -1054,7 +1054,7 @@
         if (save.coins < item.price) return "coins";
         save.coins -= item.price;
       }
-      tank.decor[slot] = { id: nextId(save, "d"), d: p.d };
+      tank.decor[slot] = { id: nextId(save, "d"), d: p.d, at: now };
       addXp(save, C.RULES.xp.buy, ev);
       progress(save, "buyDecor", 1, now, ev);
       return {};
@@ -1266,6 +1266,30 @@
     return best;
   }
 
+  /*
+   * How far a piece of living decor has grown (g, 0..1) and whether it is flowering right now
+   * (bloom, 0..1, rising and falling over the bloom window). Items without a purchase time, such
+   * as decor from older saves, count as mature. Returns null for decor that does not grow.
+   */
+  function decorGrowth(item, now) {
+    const def = C.DECOR[item?.d];
+    if (!def) return null;
+    const kind = def.tags.includes("plant") ? "plant" : def.tags.includes("coral") ? "coral" : null;
+    if (!kind) return null;
+    const rule = C.GROWTH[kind];
+    const age = Math.max(0, now - (item.at || 0)) / DAY;
+    const g = clamp(rule.start + ((1 - rule.start) * age) / rule.days, 0, 1);
+    const seed = hash(item.id) % 7;
+    let bloom = 0;
+    if (g >= 1 && def.bloom && rule.bloomEveryDays) {
+      const cycle = rule.bloomEveryDays * 24;
+      const hours = (now / HOUR + (hash(item.id, "bloom") % cycle)) % cycle;
+      if (hours < rule.bloomHours)
+        bloom = Math.min(1, Math.sin((Math.PI * hours) / rule.bloomHours) * 1.6);
+    }
+    return { g, bloom, seed };
+  }
+
   return {
     SAVE_VERSION,
     HOUR,
@@ -1274,6 +1298,7 @@
     STAGE,
     C,
     hash,
+    decorGrowth,
     rand,
     createSave,
     migrate,

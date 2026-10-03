@@ -277,3 +277,34 @@ describe("aquarium engine", () => {
     }
   });
 });
+
+describe("living decor", () => {
+  it("grows from a cutting to full size and then flowers now and then", () => {
+    const item = { id: "d7", d: "vallisneria", at: T0 };
+    expect(E.decorGrowth(item, T0).g).toBeCloseTo(C.GROWTH.plant.start);
+    expect(E.decorGrowth(item, T0 + E.DAY).g).toBeGreaterThan(0.3);
+    expect(E.decorGrowth(item, T0 + 3 * E.DAY).g).toBe(1);
+    let blooms = 0;
+    for (let h = 0; h < 96; h++)
+      if (E.decorGrowth(item, T0 + 4 * E.DAY + h * H).bloom > 0) blooms++;
+    expect(blooms).toBeGreaterThan(0);
+    expect(blooms).toBeLessThan(48);
+  });
+
+  it("treats decor from older saves as mature and ignores non-living decor", () => {
+    const save = E.createSave(T0, 3);
+    delete save.tanks.pond.decor[1].at;
+    const out = E.migrate(save, T0);
+    expect(E.decorGrowth(out.tanks.pond.decor[1], T0).g).toBe(1);
+    expect(E.decorGrowth({ id: "d1", d: "pebbles" }, T0)).toBeNull();
+  });
+
+  it("plants bought today start small", () => {
+    const save = E.createSave(T0, 3);
+    save.coins = 500;
+    expect(E.apply(save, { type: "buyDecor", tank: "pond", d: "anubias", slot: 4 }, T0).ok).toBe(
+      true,
+    );
+    expect(E.decorGrowth(save.tanks.pond.decor[4], T0).g).toBeLessThan(0.5);
+  });
+});

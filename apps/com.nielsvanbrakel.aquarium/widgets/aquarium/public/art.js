@@ -39,15 +39,22 @@
 
   // Small deterministic PRNG for decorative detail (spots, pebbles…).
   // Fish read on tiny screens thanks to a dark ink outline in their own hue.
-  // Dark fish swim in dark water, so they get a light rim instead.
+  // Size of one art pixel in CSS px; the scene sets it so outlines are exactly one pixel wide.
+  let artPx = 1;
+  function setArtPixel(px) {
+    artPx = px;
+  }
+
+  // Pixel-art outline in a darker tone of the fill. Dark fish swim in dark water, so they get a
+  // lighter rim instead.
   function ink(hex) {
     const [r, g, b] = hexToRgb(hex);
     const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-    return lum < 0.3 ? rgba(shade(hex, 0.55), 0.85) : rgba(shade(hex, -0.62), 0.9);
+    return lum < 0.3 ? shade(hex, 0.45) : shade(hex, -0.5);
   }
 
-  function inkWidth(L) {
-    return Math.max(1, L * 0.028);
+  function inkWidth() {
+    return artPx;
   }
 
   // Below this length (CSS px) fine detail turns into noise, so patterns get bolder and simpler.
@@ -1056,21 +1063,20 @@
     }
 
     // Eye.
-    const eyeR = Math.max(1.6, L * (def.bigEye ? 0.095 : 0.072));
+    const eyeR = Math.max(artPx * 0.8, L * (def.bigEye ? 0.07 : 0.045));
     const ex = L * (def.teeth ? 0.25 : 0.33);
     const ey = -top * 0.28;
-    c.fillStyle = "#ffffff";
+    // A real fish eye: a thin metallic iris around a large dark pupil, with one glint.
+    c.fillStyle = pal.eye ? shade(pal.eye, 0.4) : "#c9b57a";
     c.beginPath();
     c.arc(ex, ey, eyeR, 0, TAU);
     c.fill();
-    c.fillStyle = pal.eye || "#141418";
+    c.fillStyle = pal.eye || "#101014";
     c.beginPath();
-    c.arc(ex + eyeR * 0.15, ey, eyeR * 0.68, 0, TAU);
+    c.arc(ex + eyeR * 0.1, ey, eyeR * 0.72, 0, TAU);
     c.fill();
-    c.fillStyle = "rgba(255,255,255,0.9)";
-    c.beginPath();
-    c.arc(ex + eyeR * 0.35, ey - eyeR * 0.3, eyeR * 0.25, 0, TAU);
-    c.fill();
+    c.fillStyle = "rgba(255,255,255,0.85)";
+    c.fillRect(ex + eyeR * 0.15, ey - eyeR * 0.55, artPx, artPx);
 
     if (def.barbels || def.sucker) {
       c.strokeStyle = rgba(shade(pal.body, -0.3), 0.8);
@@ -1168,7 +1174,7 @@
   function drawTail(ctx, kind, size, top, pal, wave, L) {
     const T = L * size;
     const fin = pal.tailFin || pal.fin;
-    ctx.fillStyle = rgba(fin, 0.92);
+    ctx.fillStyle = rgba(fin, 0.8);
     ctx.strokeStyle = ink(fin);
     ctx.lineWidth = inkWidth(L);
     ctx.beginPath();
@@ -1220,7 +1226,7 @@
     ctx.fill();
     ctx.stroke();
     // Fin rays.
-    ctx.strokeStyle = rgba(shade(fin, -0.25), 0.35);
+    ctx.strokeStyle = rgba(shade(fin, -0.3), 0.6);
     for (let i = -2; i <= 2; i++) {
       ctx.beginPath();
       ctx.moveTo(0, i * top * 0.1);
@@ -1244,7 +1250,7 @@
     ctx.save();
     ctx.rotate(Math.sin(o.phase) * 0.03 * (0.5 + o.effort));
     // Dorsal and anal fins sit behind the body.
-    ctx.fillStyle = rgba(pal.fin, 0.9);
+    ctx.fillStyle = rgba(pal.fin, 0.8);
     ctx.strokeStyle = ink(pal.fin);
     ctx.lineWidth = inkWidth(L);
     if (finPath(ctx, def.dorsal, L, top, bot, finWave, true)) {
@@ -1687,6 +1693,22 @@
     ctx.restore();
   }
 
+  // A small flower: round petals around a contrasting centre.
+  function flower(ctx, x, y, r, petal, centre, petals) {
+    if (r <= 0) return;
+    ctx.fillStyle = petal;
+    for (let i = 0; i < petals; i++) {
+      const a = (i / petals) * TAU - Math.PI / 2;
+      ctx.beginPath();
+      ctx.arc(x + Math.cos(a) * r * 0.7, y + Math.sin(a) * r * 0.7, r * 0.6, 0, TAU);
+      ctx.fill();
+    }
+    ctx.fillStyle = centre;
+    ctx.beginPath();
+    ctx.arc(x, y, r * 0.38, 0, TAU);
+    ctx.fill();
+  }
+
   function rockBlob(ctx, x, y, rx, ry, color, seed) {
     const rnd = prng(seed);
     const g = ctx.createLinearGradient(x, y - ry, x, y + ry);
@@ -1721,28 +1743,60 @@
 
   const DECOR = {
     vallisneria(ctx, x, y, s, t) {
-      const rnd = prng(11);
-      for (let i = 0; i < 9; i++) {
-        const bx = x + (i - 4) * 5 * s;
-        const h = (70 + rnd() * 60) * s;
+      // Runners add blades as the plant spreads; blades lengthen as it matures.
+      const rnd = prng(11 + look.seed);
+      const n = 3 + Math.round(look.g * 6);
+      const tall = 0.3 + 0.7 * look.g;
+      for (let i = 0; i < n; i++) {
+        const bx = x + (i - (n - 1) / 2) * 5 * s;
+        const h = (70 + rnd() * 60) * s * tall;
         const c = i % 2 ? "#3f9a4a" : "#57b55a";
-        leafBlade(ctx, bx, y, h, 5 * s, sway(t + i * 0.4, bx, 10 * s) + (i - 4) * 4 * s, c);
+        const bend = sway(t + i * 0.4, bx, 10 * s) + (i - n / 2) * 4 * s * tall;
+        leafBlade(ctx, bx, y, h, 5 * s, bend, c);
+      }
+      // Female flowers ride a thin spiral stalk up to the light.
+      if (look.bloom > 0) {
+        const fx = x + 3 * s + sway(t, x, 6 * s);
+        const fy = y - 150 * s * (0.6 + 0.4 * look.bloom);
+        ctx.strokeStyle = "#7cbf6a";
+        ctx.lineWidth = s;
+        ctx.beginPath();
+        ctx.moveTo(x + 3 * s, y);
+        ctx.quadraticCurveTo(x - 6 * s, (y + fy) / 2, fx, fy);
+        ctx.stroke();
+        flower(ctx, fx, fy, 6 * s * look.bloom, "#f4f0ff", "#f2d14a", 3);
       }
     },
     anubias(ctx, x, y, s, t) {
       ctx.strokeStyle = "#2f5e2f";
       ctx.lineWidth = 2 * s;
-      const rnd = prng(12);
-      for (let i = 0; i < 6; i++) {
-        const a = -Math.PI / 2 + (i - 2.5) * 0.4 + sway(t, x + i, 0.06);
-        const len = (14 + rnd() * 10) * s;
+      const rnd = prng(12 + look.seed);
+      const n = 2 + Math.round(look.g * 4);
+      const k = 0.55 + 0.45 * look.g;
+      for (let i = 0; i < n; i++) {
+        const a = -Math.PI / 2 + (i - (n - 1) / 2) * 0.4 + sway(t, x + i, 0.06);
+        const len = (14 + rnd() * 10) * s * k;
         const ex = x + Math.cos(a) * len;
         const ey = y - 4 * s + Math.sin(a) * len;
         ctx.beginPath();
         ctx.moveTo(x, y - 2 * s);
         ctx.lineTo(ex, ey);
         ctx.stroke();
-        leaf(ctx, ex, ey, 16 * s, 7 * s, a, i % 2 ? "#2e7a3a" : "#3a8f45", "#5fb86a");
+        leaf(ctx, ex, ey, 16 * s * k, 7 * s * k, a, i % 2 ? "#2e7a3a" : "#3a8f45", "#5fb86a");
+      }
+      // A white spathe on its own stalk, like a small peace lily.
+      if (look.bloom > 0) {
+        const fx = x + 4 * s;
+        const fy = y - 30 * s;
+        ctx.strokeStyle = "#4f8a46";
+        ctx.lineWidth = 1.4 * s;
+        ctx.beginPath();
+        ctx.moveTo(x + 2 * s, y - 3 * s);
+        ctx.quadraticCurveTo(x + 6 * s, y - 18 * s, fx, fy);
+        ctx.stroke();
+        leaf(ctx, fx, fy, 14 * s * look.bloom, 7 * s * look.bloom, -1.25, "#f5f2e6", "#d8d3c0");
+        ctx.fillStyle = "#e8d27a";
+        ctx.fillRect(fx + 1 * s, fy - 9 * s * look.bloom, 2.2 * s, 7 * s * look.bloom);
       }
       rockBlob(ctx, x, y, 12 * s, 6 * s, "#7d7a70", 3);
     },
@@ -1754,7 +1808,7 @@
       rockBlob(ctx, x + 18 * s, y + 1, 6 * s, 4 * s, cols[3], 4);
     },
     moss_ball(ctx, x, y, s, t) {
-      const r = 11 * s;
+      const r = 11 * s * (0.45 + 0.55 * look.g);
       const cy = y - r * 0.9 + Math.sin(t * 0.5) * 0.6 * s;
       const g = ctx.createRadialGradient(x - r * 0.3, cy - r * 0.3, r * 0.2, x, cy, r);
       g.addColorStop(0, "#7cc46a");
@@ -1913,13 +1967,15 @@
       },
     },
     java_fern(ctx, x, y, s, t) {
-      for (let i = 0; i < 8; i++) {
-        const a = -Math.PI / 2 + (i - 3.5) * 0.25 + sway(t, x + i * 9, 0.08);
+      const n = 3 + Math.round(look.g * 5);
+      const k = 0.45 + 0.55 * look.g;
+      for (let i = 0; i < n; i++) {
+        const a = -Math.PI / 2 + (i - (n - 1) / 2) * 0.25 + sway(t, x + i * 9, 0.08);
         leaf(
           ctx,
-          x + (i - 3.5) * 2 * s,
+          x + (i - (n - 1) / 2) * 2 * s,
           y,
-          (26 + (i % 3) * 7) * s,
+          (26 + (i % 3) * 7) * s * k,
           4 * s,
           a,
           i % 2 ? "#2f6d34" : "#3b8240",
@@ -1928,14 +1984,35 @@
       }
     },
     sword_plant(ctx, x, y, s, t) {
-      for (let i = 0; i < 11; i++) {
-        const a = -Math.PI / 2 + (i - 5) * 0.2 + sway(t, x + i * 5, 0.06);
+      const n = 5 + 2 * Math.round(look.g * 3);
+      const k = 0.35 + 0.65 * look.g;
+      const mid = (n - 1) / 2;
+      // A long flower stalk with whorls of small white flowers, drawn behind the leaves.
+      if (look.bloom > 0) {
+        const top = y - 120 * s * (0.5 + 0.5 * look.bloom);
+        const bend = sway(t, x, 8 * s);
+        ctx.strokeStyle = "#5f9a4a";
+        ctx.lineWidth = 1.3 * s;
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.quadraticCurveTo(x, (y + top) / 2, x + bend, top);
+        ctx.stroke();
+        for (let w = 0; w < 3; w++) {
+          const f = 0.62 + w * 0.17;
+          const wx = x + bend * f * f;
+          const wy = y + (top - y) * f;
+          flower(ctx, wx - 4 * s, wy, 4 * s * look.bloom, "#ffffff", "#f0d25a", 3);
+          flower(ctx, wx + 4 * s, wy, 4 * s * look.bloom, "#ffffff", "#f0d25a", 3);
+        }
+      }
+      for (let i = 0; i < n; i++) {
+        const a = -Math.PI / 2 + (i - mid) * 0.2 + sway(t, x + i * 5, 0.06);
         leaf(
           ctx,
           x,
           y,
-          (48 + (5 - Math.abs(i - 5)) * 9) * s,
-          7 * s,
+          (48 + (mid - Math.abs(i - mid)) * 9) * s * k,
+          7 * s * (0.6 + 0.4 * k),
           a,
           i % 2 ? "#3f9f3a" : "#4fb447",
           "#2c7a2a",
@@ -2022,9 +2099,10 @@
       },
     },
     ludwigia(ctx, x, y, s, t) {
-      for (let st = 0; st < 4; st++) {
-        const bx = x + (st - 1.5) * 9 * s;
-        const h = (60 + st * 12) * s;
+      const stems = 2 + Math.round(look.g * 2);
+      for (let st = 0; st < stems; st++) {
+        const bx = x + (st - (stems - 1) / 2) * 9 * s;
+        const h = (60 + st * 12) * s * (0.3 + 0.7 * look.g);
         const bend = sway(t + st, bx, 6 * s);
         ctx.strokeStyle = "#7a3b2a";
         ctx.lineWidth = 1.5 * s;
@@ -2039,6 +2117,9 @@
           const c = mix("#5f9a3a", "#e0452c", f);
           leaf(ctx, lx, ly, 8 * s, 3 * s, -0.5, c, null);
           leaf(ctx, lx, ly, 8 * s, 3 * s, Math.PI + 0.5, c, null);
+        }
+        if (look.bloom > 0 && st % 2 === 0) {
+          flower(ctx, bx + bend, y - h - 3 * s, 5 * s * look.bloom, "#ffd84a", "#e08a1a", 4);
         }
       }
     },
@@ -2526,11 +2607,34 @@
   // Bounding size used for hit testing and slot previews (in units of s).
   const DECOR_BOX = { S: { w: 44, h: 40 }, M: { w: 60, h: 100 }, L: { w: 120, h: 110 } };
 
-  function drawDecor(ctx, id, x, y, s, t, pass) {
+  // Growth state of the item being drawn: g 0..1 from sprout to mature, bloom 0..1 while it
+  // flowers. Plants read it to add leaves and flowers; other living decor (coral) just scales.
+  const MATURE = { g: 1, bloom: 0, seed: 0 };
+  let look = MATURE;
+  const GROWS_BY_ITSELF = new Set([
+    "vallisneria",
+    "anubias",
+    "moss_ball",
+    "java_fern",
+    "sword_plant",
+    "ludwigia",
+  ]);
+
+  function drawDecor(ctx, id, x, y, s, t, pass, state) {
     const d = DECOR[id];
     if (!d) return;
+    look = state || MATURE;
     if (typeof d === "function") {
-      if (pass !== "back") d(ctx, x, y, s, t);
+      if (pass === "back") return;
+      if (look.g < 1 && !GROWS_BY_ITSELF.has(id)) {
+        const k = 0.4 + 0.6 * look.g;
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.scale(k, k);
+        d(ctx, 0, 0, s, t);
+        ctx.restore();
+      } else d(ctx, x, y, s, t);
+      look = MATURE;
       return;
     }
     if (pass === "back" || pass === "all") d.back(ctx, x, y, s, t);
@@ -2836,16 +2940,34 @@
    */
   const previewCache = new Map();
 
+  const PREVIEW_PIXELS = 56;
+
+  // Snap anti-aliased edges to whole pixels; translucent areas keep one partial alpha step.
+  function hardenEdges(ctx, w, h) {
+    const img = ctx.getImageData(0, 0, w, h);
+    const d = img.data;
+    for (let i = 3; i < d.length; i += 4) {
+      const a = d[i];
+      if (a === 0 || a === 255) continue;
+      d[i] = a < 90 ? 0 : a > 200 ? 255 : 170;
+    }
+    ctx.putImageData(img, 0, 0);
+  }
+
   function preview(kind, id, variant, size, opts) {
     const silhouette = opts?.silhouette;
     const key = `${kind}|${id}|${variant}|${size}|${silhouette ? 1 : 0}`;
     if (previewCache.has(key)) return previewCache.get(key);
-    const dpr = Math.min(2, (typeof devicePixelRatio === "number" && devicePixelRatio) || 1);
+    // Previews are pixel art too: a small grid the page scales up with image-rendering: pixelated.
+    const dpr = PREVIEW_PIXELS / size;
     const canvas = document.createElement("canvas");
-    canvas.width = size * dpr;
-    canvas.height = size * dpr;
-    const ctx = canvas.getContext("2d");
+    canvas.width = PREVIEW_PIXELS;
+    canvas.height = PREVIEW_PIXELS;
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
     ctx.scale(dpr, dpr);
+    ctx.imageSmoothingEnabled = false;
+    const tankPx = artPx;
+    artPx = 1 / dpr;
     if (kind === "fish") {
       const art = speciesArt(id);
       if (id === "moray") {
@@ -2869,6 +2991,8 @@
       const s = Math.min((size * 0.9) / box.w, (size * 0.9) / box.h);
       drawDecor(ctx, id, size / 2, size * 0.94, s, 1, "all");
     }
+    artPx = tankPx;
+    hardenEdges(ctx, PREVIEW_PIXELS, PREVIEW_PIXELS);
     if (silhouette) {
       ctx.globalCompositeOperation = "source-in";
       ctx.fillStyle = "rgba(20,40,60,0.55)";
@@ -2880,6 +3004,8 @@
   }
 
   root.AquaArt = {
+    setArtPixel,
+    hardenEdges,
     BIOMES,
     SAND_TOP,
     FISH,

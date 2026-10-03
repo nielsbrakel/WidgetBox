@@ -40,6 +40,8 @@ export const SCENARIOS = {
     "tank-full": { label: "Tank full + eggs", type: "mock", group: "Situations" },
     neglected: { label: "Away for 3 days", type: "mock", group: "Situations" },
     rich: { label: "Everything unlocked", type: "mock", group: "Situations" },
+    "garden-pond": { label: "Garden: Pond plants growing", type: "mock", group: "Art gallery" },
+    "garden-amazon": { label: "Garden: Amazon in bloom", type: "mock", group: "Art gallery" },
     "gallery-pond": { label: "Gallery: Pond", type: "mock", group: "Art gallery" },
     "gallery-amazon": { label: "Gallery: Amazon", type: "mock", group: "Art gallery" },
     "gallery-reef": { label: "Gallery: Reef", type: "mock", group: "Art gallery" },
