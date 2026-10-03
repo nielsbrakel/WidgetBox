@@ -7,7 +7,7 @@
     body {
       --text: var(--homey-text-color, #333);
       --line: var(--homey-line-color, rgba(0, 0, 0, 0.1));
-      --rain: var(--homey-color-blue-500, #0099ff);
+      --rain: var(--homey-color-blue-700, #0066ad);
       --cold: var(--homey-color-blue-400, #1a9eff);
       --warm: var(--homey-color-orange-500, #ff9500);
       margin: 0;
@@ -60,6 +60,10 @@
       filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.45));
     }
 
+    .homey-dark-mode {
+      --rain: var(--homey-color-blue-300, #4db8ff);
+    }
+
     .rain {
       color: var(--rain);
       font-size: 12px;
@@ -75,7 +79,7 @@
     }
 
     .min {
-      opacity: 0.6;
+      opacity: 0.7;
       text-align: right;
     }
 
@@ -140,7 +144,7 @@
     }
 
     .status {
-      opacity: 0.6;
+      opacity: 0.7;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -154,7 +158,7 @@
       background: none;
       color: inherit;
       font: inherit;
-      opacity: 0.6;
+      opacity: 0.7;
       cursor: pointer;
     }
 

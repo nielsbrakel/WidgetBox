@@ -68,7 +68,7 @@
     }
 
     .status {
-      opacity: 0.6;
+      opacity: 0.7;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -77,12 +77,14 @@
     .credit {
       position: relative;
       flex: none;
-      padding: 0;
+      /* A 24px target (WCAG 2.5.8) without changing the layout. */
+      padding: 6px 0;
+      margin: -6px 0;
       border: 0;
       background: none;
       color: inherit;
       font: inherit;
-      opacity: 0.6;
+      opacity: 0.7;
       cursor: pointer;
     }
 

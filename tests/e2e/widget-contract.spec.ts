@@ -1,23 +1,9 @@
-import { readdirSync, readFileSync } from "node:fs";
-import path from "node:path";
 import { expect, test } from "@playwright/test";
+import { widgets } from "./catalog";
 
 // Every widget, in both languages, behaves the way a real Homey needs (D-016):
 // it calls Homey.ready() exactly once, uses no translation key that is missing, and throws nothing.
 // The aquarium is rebuilt separately and checked by its own specs.
-const APPS_DIR = path.resolve(import.meta.dirname, "../../apps");
-const widgets = readdirSync(APPS_DIR)
-  .filter((app) => app.startsWith("com."))
-  .flatMap((app) =>
-    readdirSync(path.join(APPS_DIR, app, "widgets")).map((id) => ({
-      id,
-      name: JSON.parse(
-        readFileSync(path.join(APPS_DIR, app, "widgets", id, "widget.compose.json"), "utf8"),
-      ).name.en as string,
-    })),
-  )
-  .filter((widget) => widget.id !== "aquarium");
-
 type HomeyProbe = { readyCount: number; missing: string[] } | null;
 
 for (const widget of widgets) {
