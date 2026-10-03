@@ -13,7 +13,8 @@
     "test:e2e": "playwright test",
     "validate": "pnpm -r --filter \"./apps/com.*\" run homey:validate",
     "sandbox": "pnpm --filter sandbox dev",
-    "prepare": "node scripts/install-hooks.mjs"
+    "prepare": "node scripts/install-hooks.mjs",
+    "test:bundle": "node scripts/check-bundles.mjs"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",

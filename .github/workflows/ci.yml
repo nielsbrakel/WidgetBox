@@ -40,7 +40,7 @@ jobs:
       - run: pnpm test
 
   homey:
-    name: homey (validate --level publish, app.json drift)
+    name: homey (validate --level publish, app.json drift, bundle contents)
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:
@@ -56,6 +56,8 @@ jobs:
       # Validate regenerates app.json from the compose files; a stale or hand-edited app.json shows up here.
       - name: Committed app.json files match their compose sources
         run: git diff --exit-code -- 'apps/*/app.json'
+      - name: Bundles ship no development files and stay within budget
+        run: pnpm test:bundle
 
   e2e:
     name: e2e (Playwright, Chromium)

@@ -1,0 +1,11 @@
+{
+  "$comment": "Upper bounds in KB for what `homey app build` ships per app (scripts/check-bundles.mjs). Lower them when images shrink; raise only with a reason in the PR.",
+  "appKb": {
+    "default": 1024,
+    "com.nielsvanbrakel.widgetbox-clocks": 2300,
+    "com.nielsvanbrakel.widgetbox-games": 1000,
+    "com.nielsvanbrakel.widgetbox-layout": 620,
+    "com.nielsvanbrakel.widgetbox-video": 360,
+    "com.nielsvanbrakel.widgetbox-weather": 2150
+  }
+}
