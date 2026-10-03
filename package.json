@@ -15,10 +15,14 @@
     "sandbox": "pnpm --filter sandbox dev",
     "prepare": "node scripts/install-hooks.mjs",
     "test:bundle": "node scripts/check-bundles.mjs",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "changeset": "changeset",
+    "release:version": "changeset version && node scripts/sync-homey-versions.mjs && biome format --write apps",
+    "release:tag": "changeset git-tag"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.15",
+    "@changesets/cli": "3.0.3",
     "@commitlint/cli": "21.2.3",
     "@commitlint/config-conventional": "21.2.3",
     "@playwright/test": "1.63.0",

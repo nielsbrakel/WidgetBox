@@ -189,4 +189,12 @@ describe("Repository", () => {
     expect(images.length).toBeGreaterThan(0);
     for (const image of images) expect(image).toBe(version);
   });
+
+  it("the release workflow publishes with the Homey CLI version from the lockfile", () => {
+    const release = readFileSync(path.join(ROOT, ".github/workflows/release.yml"), "utf8");
+    const pkg = readJson(path.join(ROOT, "package.json"));
+    const pinned = [...release.matchAll(/homey@(\d[\w.-]*)/g)].map((m) => m[1]);
+    expect(pinned.length).toBeGreaterThan(0);
+    for (const version of pinned) expect(version).toBe(pkg.devDependencies.homey);
+  });
 });
