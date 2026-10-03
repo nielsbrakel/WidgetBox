@@ -14,7 +14,7 @@ The widgets are grouped into five Homey apps by theme. Grouping keeps the number
 | **WidgetBox Weather** | `com.nielsvanbrakel.widgetbox-weather` | 2-hour rain graph, rain radar, 5-day radar, weather forecast and weather station (Buienradar data, Netherlands and Belgium), interactive weather map (Windy) |
 | **WidgetBox Layout** | `com.nielsvanbrakel.widgetbox-layout` | Header, separator, spacer |
 | **WidgetBox Video** | `com.nielsvanbrakel.widgetbox-video` | Video player for YouTube videos, livestreams and playlists |
-| **WidgetBox Games** | `com.nielsvanbrakel.widgetbox-games` | Aquarium, a cozy idle game (being rebuilt, not released yet) |
+| **Pocket Aquarium** | `com.nielsvanbrakel.aquarium` | Aquarium, a cozy idle game (being rebuilt, not released yet) |
 
 ## Monorepo structure
 
@@ -25,7 +25,7 @@ WidgetBox/
 │   ├── com.nielsvanbrakel.widgetbox-weather/
 │   ├── com.nielsvanbrakel.widgetbox-layout/
 │   ├── com.nielsvanbrakel.widgetbox-video/
-│   ├── com.nielsvanbrakel.widgetbox-games/
+│   ├── com.nielsvanbrakel.aquarium/
 │   └── sandbox/             # Local preview of every widget with a mocked Homey API
 ├── tests/                   # Playwright end-to-end tests against the sandbox
 ├── turbo.json               # Turborepo task definitions

@@ -1,0 +1,368 @@
+{
+  "widgets": {
+    "aquarium": {
+      "loading": "Aquarium laden…",
+      "confirmTap": "Tik nogmaals",
+      "cancel": "Annuleren",
+      "fed": "Eten",
+      "happy": "Blij",
+      "growth": "Groei",
+      "hourShort": "u",
+      "minShort": "m",
+      "dayShort": "d",
+      "sell": "Verkoop",
+      "move": "Verplaats",
+      "income": "inkomen",
+      "coins": "munten",
+      "pearls": "parels",
+      "buy": "Koop",
+      "visit": "Bezoek",
+      "unlock": "Ontgrendel",
+      "here": "Je bent hier",
+      "maxed": "Volledig verbeterd",
+      "fishCount": "vissen",
+      "waiting": "wachten",
+      "decorFans": "{n} vissen in deze bak vinden dit fijn",
+      "eggsOf": "Eitjes van {name}",
+      "eggsHatchIn": "Klaar om uit te komen over {time}",
+      "eggsFull": "De bak is vol. Maak ruimte of verkoop de jonkies.",
+      "sellFry": "Verkoop de jonkies",
+      "soldFor": "Verkocht voor {n} munten",
+      "likes": "houdt van {tags}",
+      "needs": "heeft een {tag} nodig",
+      "space": "ruimte {n}",
+      "eats": "eet {foods}",
+      "levelN": "Level {n}",
+      "foodInfo": "{n} porties, {portion} hapjes per stuk",
+      "upgradeHint": "Verbeteringen gelden voor je {tank}.",
+      "dexProgress": "{n} van {total} gevonden",
+      "helpSub": "Hoe speel je",
+      "tutHint": "Rond deze eerste stappen af om dagelijkse doelen te openen.",
+      "streak": "{n} dagen op rij",
+      "allGoalsReward": "Alle 3 klaar: +{n} parels",
+      "newGoalsIn": "nieuwe doelen over {time}",
+      "dexHint": "Zeldzame kleuren komen alleen uit eitjes.",
+      "trophyCount": "{n} van {total} trofeeën",
+      "resetGame": "Opnieuw beginnen",
+      "welcomeFish": "Zeg hallo tegen {name}!",
+      "upgraded": "{name} verbeterd",
+      "levelUp": "Level {n}!",
+      "newUnlocks": "Nieuw: {list}",
+      "goalDone": "Doel gehaald! +{n} munten",
+      "allGoals": "Alle doelen gehaald!",
+      "tutDone": "Goed zo! +{n} munten",
+      "trophy": "Trofee",
+      "rareFound": "Zeldzame kleur!",
+      "dexNew": "Nieuw in je Visboek: {name}",
+      "eggsLaid": "{name} heeft eitjes gelegd!",
+      "grownUp": "{name} is volgroeid",
+      "tankUnlocked": "Nieuwe bak ontgrendeld",
+      "hatched": "{n} jonkies uitgekomen!",
+      "hint": {
+        "noFood": "Dit voer is op. Tik + om meer te kopen.",
+        "noEaters": "Geen vis hier eet {food}",
+        "feed": "Tik op het water om {food} te strooien",
+        "play": "Tik om het lichtje te verplaatsen · {n} willen spelen",
+        "playTired": "Je vissen rusten. Probeer het later nog eens.",
+        "place": "Kies een laag en tik waar het moet staan",
+        "clean": "Tik op algen op het glas en vuil op de bodem om schoon te maken."
+      },
+      "chip": {
+        "eggs": "Eitjes!",
+        "hungry": "{n} hongerig",
+        "full": "Vol",
+        "water": "Water {n}%"
+      },
+      "tut": {
+        "collect": "Tik op de munt in het zand om hem te pakken",
+        "feed": "Tik op de voerknop en geef je vissen 3 hapjes",
+        "feedTap": "Tik op het water boven je vissen",
+        "scrub": "Tik op de groene algen op het glas om ze weg te poetsen",
+        "buy_decor": "Open de winkel en plaats een decoratie",
+        "buy_fish": "Koop een nieuwe vis in de winkel"
+      },
+      "stage": {
+        "fry": "Jonkie",
+        "juvenile": "Tiener",
+        "adult": "Volwassen"
+      },
+      "reason": {
+        "fed": "eten",
+        "water": "water",
+        "decor": "decor",
+        "home": "geen {home}",
+        "playful": "Speels +25%",
+        "school": "school van {n}"
+      },
+      "trait": {
+        "cleaner": "Schoonmaker"
+      },
+      "tag": {
+        "plant": "planten",
+        "rock": "stenen",
+        "ornament": "ornamenten",
+        "cave": "grot",
+        "wood": "hout",
+        "anemone": "anemoon",
+        "coral": "koraal",
+        "glow": "gloed",
+        "bone": "botten",
+        "vent": "bron"
+      },
+      "decor": {
+        "vallisneria": "Vallisneria",
+        "anubias": "Anubias",
+        "pebbles": "Kiezels",
+        "moss_ball": "Mosbal",
+        "chest": "Schatkist",
+        "driftwood": "Drijfhout",
+        "castle": "Kasteel",
+        "golden_chest": "Gouden Kist",
+        "java_fern": "Javavaren",
+        "sword_plant": "Zwaardplant",
+        "root": "Mangrovewortels",
+        "stump": "Holle Stronk",
+        "ludwigia": "Rode Ludwigia",
+        "clay_cave": "Kleigrot",
+        "idol": "Junglebeeld",
+        "anemone": "Anemoon",
+        "brain_coral": "Hersenkoraal",
+        "staghorn": "Hertshoornkoraal",
+        "sea_fan": "Zeewaaier",
+        "rock_cave": "Rotsgrot",
+        "giant_clam": "Reuzenschelp",
+        "glow_crystal": "Gloeikristal",
+        "tube_worms": "Kokerwormen",
+        "whale_bone": "Walvisbotten",
+        "sea_lily": "Zeelelie",
+        "vent": "Hydrothermale Bron",
+        "relic": "Oud Relikwie",
+        "hairgrass": "Dwergnaaldgras",
+        "seiryu_stone": "Seiryu-stenen",
+        "spider_wood": "Spiderwood",
+        "monte_carlo": "Monte Carlo-tapijt",
+        "dragon_stone": "Drakensteen",
+        "rotala": "Rotala",
+        "live_rock": "Levend steen"
+      },
+      "species": {
+        "guppy": "Guppy",
+        "danio": "Zebravis",
+        "white_cloud": "Chinese danio",
+        "snail": "Appelslak",
+        "platy": "Platy",
+        "goldfish": "Goudvis",
+        "neon": "Neontetra",
+        "ember": "Ember tetra",
+        "cory": "Pantsermeerval",
+        "angelfish": "Maanvis",
+        "betta": "Kempvis",
+        "pleco": "Antennemeerval",
+        "discus": "Discus",
+        "chromis": "Groene Chromis",
+        "clownfish": "Clownvis",
+        "shrimp": "Poetsgarnaal",
+        "gramma": "Koningsgramma",
+        "tang": "Blauwe Doktersvis",
+        "moray": "Murene",
+        "lantern": "Lantaarnvis",
+        "hatchet": "Bijlvis",
+        "isopod": "Reuzenpissebed",
+        "jelly": "Oorkwal",
+        "angler": "Hengelvis"
+      },
+      "variant": {
+        "classic": "Klassieke",
+        "cobra": "Cobra",
+        "albino": "Albino",
+        "leopard": "Luipaard",
+        "glow": "Gloeiende",
+        "golden": "Gouden",
+        "ivory": "Ivoren",
+        "mickey": "Mickey",
+        "panda": "Panda",
+        "calico": "Calico",
+        "black": "Zwarte",
+        "gold": "Goud",
+        "diamond": "Diamant",
+        "marble": "Marmer",
+        "koi": "Koi",
+        "dragon": "Draken",
+        "zebra": "Zebra",
+        "pigeon": "Duivenbloed",
+        "blue": "Blauwe",
+        "snowflake": "Sneeuwvlok",
+        "midnight": "Middernacht",
+        "fire": "Vuur",
+        "ghost": "Spook",
+        "sunset": "Zonsondergang",
+        "yellow": "Gele",
+        "powder": "Poederblauwe",
+        "ember": "Gloed",
+        "aurora": "Aurora",
+        "void": "Leegte",
+        "ruby": "Robijn",
+        "pearl": "Parel",
+        "abyssal": "Diepzee",
+        "crimson": "Karmijn"
+      },
+      "food": {
+        "flakes": "vlokken",
+        "pellets": "korrels",
+        "worms": "muggenlarven",
+        "brine": "pekelkreeftjes",
+        "krill": "krill"
+      },
+      "tank": {
+        "pond": "Vijver",
+        "amazon": "Amazone",
+        "reef": "Koraalrif",
+        "abyss": "Diepzee"
+      },
+      "sheet": {
+        "shop": "Winkel",
+        "journal": "Logboek",
+        "tanks": "Aquaria",
+        "menu": "Menu",
+        "help": "Hulp"
+      },
+      "tab": {
+        "fish": "Vissen",
+        "decor": "Decor",
+        "food": "Voer",
+        "upgrades": "Verbeteren",
+        "goals": "Doelen",
+        "dex": "Visboek",
+        "trophies": "Trofeeën"
+      },
+      "shopHint": {
+        "fish": "Ruimte gebruikt: {used} van {cap}",
+        "decor": "Decor {n} van {max}. Zet het achter, in het midden of vooraan.",
+        "food": "Voer is gedeeld door alle bakken."
+      },
+      "size": {
+        "S": "klein",
+        "M": "middel",
+        "L": "groot"
+      },
+      "err": {
+        "coins": "Niet genoeg munten",
+        "pearls": "Niet genoeg parels",
+        "space": "Bak is vol",
+        "level": "Ontgrendelt op een hoger level",
+        "noFood": "Voer is op",
+        "max": "Eén per bak",
+        "fit": "Past daar niet",
+        "slot": "Geen vrije plek",
+        "full": "Bak is vol",
+        "offline": "Homey is nu niet bereikbaar",
+        "load": "Kon het aquarium niet laden.",
+        "eggsFull": "Het nest is vol"
+      },
+      "upgrade": {
+        "size": "Grotere bak",
+        "filter": "Filter",
+        "feeder": "Voerautomaat",
+        "chest": "Muntenkist"
+      },
+      "upgradeDesc": {
+        "size": "+{n} ruimte voor vissen",
+        "filter": "Minder algen en vuil",
+        "feeder": "Voert hongerige vissen {f}× per dag uit je voorraad",
+        "chest": "Bewaart {h} uur aan munten"
+      },
+      "goal": {
+        "feed": "Geef vissen {n} keer eten",
+        "collect": "Verzamel {n} munten",
+        "scrub": "Poets {n} algen weg",
+        "vacuum": "Ruim {n} vuil op",
+        "play": "Speel met {n} vissen",
+        "hatch": "Laat een legsel uitkomen",
+        "buy": "Koop een vis of decoratie",
+        "visit": "Bezoek {n} bakken"
+      },
+      "ach": {
+        "fishOwned": "Houd {n} vissen",
+        "coinsEarned": "Verdien {n} munten",
+        "tanksUnlocked": "Ontgrendel {n} bakken",
+        "speciesFound": "Ontdek {n} soorten",
+        "raresFound": "Vind {n} zeldzame kleuren",
+        "hatched": "Laat {n} legsels uitkomen",
+        "scrubbed": "Poets {n} algen",
+        "played": "Speel {n} keer",
+        "level": "Bereik level {n}"
+      },
+      "help": {
+        "tank": {
+          "title": "Je aquarium",
+          "text": "Blije vissen laten munten in het zand vallen terwijl je weg bent. Tik op munten om ze te pakken. De muntenkist bewaart maar een paar uur aan munten, dus kijk een of twee keer per dag."
+        },
+        "feed": {
+          "title": "Voeren",
+          "text": "Tik op de voerknop, kies voer en tik op het water. Elke vis eet bepaald voer. Voer dat niemand eet zinkt en wordt vuil, dus overdrijf niet."
+        },
+        "clean": {
+          "title": "Schoonmaken",
+          "text": "Algen groeien op het glas en vuil verzamelt zich op de bodem. Tik erop om op te ruimen en verdien wat munten. Slakken, pantsermeervallen, antennemeervallen en garnalen helpen zelf mee. Een beter filter remt het af."
+        },
+        "happy": {
+          "title": "Geluk",
+          "text": "Vissen zijn het blijst als ze gevoerd zijn, in schoon water zwemmen en bij decor zijn dat ze leuk vinden. Sommige vissen hebben een thuis nodig: clownvissen een anemoon, de murene een rotsgrot. Spelen met het lichtje maakt vissen een tijdje speels: ze verdienen dan 25% meer."
+        },
+        "breed": {
+          "title": "Eitjes en zeldzame kleuren",
+          "text": "Twee blije volwassen vissen van dezelfde soort leggen soms eitjes. Tik op rijpe eitjes om ze uit te laten komen. Elke soort heeft twee zeldzame kleuren die alleen uit eitjes komen. Verzamel ze allemaal in je Visboek."
+        },
+        "progress": {
+          "title": "Levels, doelen en parels",
+          "text": "Alles wat je doet levert ervaring op. Nieuwe levels ontgrendelen vissen, decor en nieuwe bakken. Dagelijkse doelen en trofeeën geven parels, waarmee je speciaal decor koopt dat het inkomen van een bak verhoogt."
+        },
+        "reset": {
+          "title": "Opnieuw beginnen",
+          "text": "Dit verwijdert je aquarium in deze widget en start een nieuw aquarium. Dit kan niet ongedaan worden gemaakt."
+        }
+      },
+      "intro": {
+        "title": "Welkom bij je aquarium!",
+        "text": "Twee kleine guppy's zijn net ingetrokken. Geef ze eten en houd de bak schoon, dan betalen ze je terug in munten. Alles werkt met een simpele tik.",
+        "go": "Duik erin"
+      },
+      "away": {
+        "title": "Welkom terug!",
+        "sub": "Je was {time} weg",
+        "coins": "{n} munten liggen klaar in het zand",
+        "eggs": "{n} nieuw legsel eitjes",
+        "hungry": "{n} vissen hebben honger",
+        "dirty": "{n} plekken moeten schoon",
+        "go": "Aan de slag",
+        "collect": "Pak {n} munten"
+      },
+      "egg": {
+        "mystery": "Verrassingsei",
+        "golden": "Gouden ei"
+      },
+      "eggInfo": {
+        "mystery": "Komt uit als een willekeurige vis van {tank}, met drie keer zoveel kans op een zeldzame kleur.",
+        "golden": "Komt altijd uit als een zeldzame kleur, bij voorkeur een die nog in je Visboek ontbreekt."
+      },
+      "eggBought": "Ei op het zand gelegd. Het komt over 2 uur uit.",
+      "tutComplete": "Uitleg klaar!",
+      "tutCompleteSub": "Dagdoelen staan open: tik op de levelring",
+      "biggerTank": "Grotere bak",
+      "streakStart": "Haal alle 3 doelen om een reeks te beginnen",
+      "dock": {
+        "feed": "Voer",
+        "play": "Spelen",
+        "shop": "Winkel",
+        "menu": "Menu"
+      },
+      "noGoals": "Morgen komen er nieuwe doelen",
+      "needMore": "Nog {n} nodig",
+      "layer": {
+        "back": "Achter",
+        "mid": "Midden",
+        "front": "Voor"
+      }
+    }
+  }
+}

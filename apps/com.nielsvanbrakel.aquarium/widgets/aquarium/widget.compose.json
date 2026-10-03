@@ -1,0 +1,81 @@
+{
+  "name": {
+    "en": "Aquarium",
+    "nl": "Aquarium"
+  },
+  "description": {
+    "en": "A cozy aquarium to keep on your dashboard: feed, clean, breed and collect fish with simple taps",
+    "nl": "Een gezellig aquarium op je dashboard: voer, poets, kweek en verzamel vissen met simpele tikken"
+  },
+  "height": "75%",
+  "transparent": false,
+  "settings": [
+    {
+      "id": "day_night",
+      "type": "dropdown",
+      "label": {
+        "en": "Lighting",
+        "nl": "Verlichting"
+      },
+      "value": "auto",
+      "values": [
+        {
+          "id": "auto",
+          "label": {
+            "en": "Follow the time of day",
+            "nl": "Volg het tijdstip"
+          }
+        },
+        {
+          "id": "day",
+          "label": {
+            "en": "Always day",
+            "nl": "Altijd dag"
+          }
+        },
+        {
+          "id": "night",
+          "label": {
+            "en": "Always night",
+            "nl": "Altijd nacht"
+          }
+        }
+      ]
+    },
+    {
+      "id": "motion",
+      "type": "dropdown",
+      "label": {
+        "en": "Animation",
+        "nl": "Animatie"
+      },
+      "value": "smooth",
+      "values": [
+        {
+          "id": "smooth",
+          "label": {
+            "en": "Smooth",
+            "nl": "Vloeiend"
+          }
+        },
+        {
+          "id": "battery",
+          "label": {
+            "en": "Battery saver",
+            "nl": "Batterijbesparing"
+          }
+        }
+      ]
+    }
+  ],
+  "api": {
+    "getState": {
+      "method": "GET",
+      "path": "/"
+    },
+    "doAction": {
+      "method": "POST",
+      "path": "/"
+    }
+  }
+}

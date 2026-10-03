@@ -6,17 +6,7 @@
     "useIgnoreFile": true
   },
   "files": {
-    "includes": [
-      "**",
-      "!**/.homeybuild",
-      "!**/app.json",
-      "!**/assets",
-      "!pnpm-lock.yaml",
-      "!apps/com.nielsvanbrakel.widgetbox-games/widgets/aquarium",
-      "!apps/sandbox/src/lib/mocks/aquariumMocks.js",
-      "!tests/e2e/games*.spec.ts",
-      "!tests/pages/GamesPage.ts"
-    ]
+    "includes": ["**", "!**/.homeybuild", "!**/app.json", "!**/assets", "!pnpm-lock.yaml"]
   },
   "assist": {
     "enabled": true
