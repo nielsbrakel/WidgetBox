@@ -22,6 +22,7 @@
 
   /*
    * Species.
+   *  cm       real adult body length in centimetres; sets the size on screen
    *  level    aquarist level that unlocks it in the shop
    *  price    coins
    *  space    tank space used
@@ -34,6 +35,7 @@
    *  eats     accepted foods
    *  likes    decor tags that raise happiness
    *  needs    decor tag the fish needs as a home (big happiness penalty without it)
+   *  school   shoaling fish: happiest in a group of at least this many of their kind
    *  max      max per tank
    *  cleans   cleanup crew: algae/debris hit points removed per hour
    */
@@ -41,6 +43,7 @@
     // Freshwater pond
     guppy: {
       tank: "pond",
+      cm: 5,
       level: 1,
       price: 20,
       space: 1,
@@ -55,20 +58,39 @@
     },
     danio: {
       tank: "pond",
+      cm: 5,
       level: 2,
       price: 14,
-      space: 1,
+      space: 0.5,
       income: 2,
       hunger: 5,
       grow: 10,
       breed: 16,
       move: "school",
+      school: 6,
+      zone: "mid",
+      eats: ["flakes"],
+      likes: ["plant"],
+    },
+    white_cloud: {
+      tank: "pond",
+      cm: 4,
+      level: 1,
+      price: 8,
+      space: 0.5,
+      income: 1.2,
+      hunger: 5,
+      grow: 8,
+      breed: 14,
+      move: "school",
+      school: 6,
       zone: "mid",
       eats: ["flakes"],
       likes: ["plant"],
     },
     snail: {
       tank: "pond",
+      cm: 5,
       level: 2,
       price: 35,
       space: 1,
@@ -84,6 +106,7 @@
     },
     platy: {
       tank: "pond",
+      cm: 6,
       level: 3,
       price: 40,
       space: 1,
@@ -98,6 +121,7 @@
     },
     goldfish: {
       tank: "pond",
+      cm: 18,
       level: 4,
       price: 90,
       space: 2,
@@ -113,20 +137,39 @@
     // Amazon
     neon: {
       tank: "amazon",
+      cm: 3.5,
       level: 5,
       price: 30,
-      space: 1,
+      space: 0.5,
       income: 5,
       hunger: 5,
       grow: 16,
       breed: 24,
       move: "school",
+      school: 6,
+      zone: "mid",
+      eats: ["flakes"],
+      likes: ["plant"],
+    },
+    ember: {
+      tank: "amazon",
+      cm: 2,
+      level: 5,
+      price: 12,
+      space: 0.5,
+      income: 2.2,
+      hunger: 5,
+      grow: 9,
+      breed: 16,
+      move: "school",
+      school: 6,
       zone: "mid",
       eats: ["flakes"],
       likes: ["plant"],
     },
     cory: {
       tank: "amazon",
+      cm: 6,
       level: 6,
       price: 70,
       space: 1,
@@ -142,6 +185,7 @@
     },
     angelfish: {
       tank: "amazon",
+      cm: 15,
       level: 7,
       price: 160,
       space: 2,
@@ -156,6 +200,7 @@
     },
     betta: {
       tank: "amazon",
+      cm: 6.5,
       level: 8,
       price: 220,
       space: 1,
@@ -171,6 +216,7 @@
     },
     pleco: {
       tank: "amazon",
+      cm: 13,
       level: 8,
       price: 180,
       space: 2,
@@ -186,6 +232,7 @@
     },
     discus: {
       tank: "amazon",
+      cm: 18,
       level: 9,
       price: 420,
       space: 2,
@@ -201,6 +248,7 @@
     // Coral reef
     chromis: {
       tank: "reef",
+      cm: 8,
       level: 10,
       price: 120,
       space: 1,
@@ -209,12 +257,14 @@
       grow: 20,
       breed: 36,
       move: "school",
+      school: 5,
       zone: "mid",
       eats: ["flakes", "brine"],
       likes: ["coral"],
     },
     clownfish: {
       tank: "reef",
+      cm: 9,
       level: 11,
       price: 300,
       space: 1,
@@ -229,6 +279,7 @@
     },
     shrimp: {
       tank: "reef",
+      cm: 5,
       level: 11,
       price: 200,
       space: 1,
@@ -244,6 +295,7 @@
     },
     gramma: {
       tank: "reef",
+      cm: 7,
       level: 12,
       price: 450,
       space: 1,
@@ -258,6 +310,7 @@
     },
     tang: {
       tank: "reef",
+      cm: 24,
       level: 13,
       price: 900,
       space: 2,
@@ -272,6 +325,7 @@
     },
     moray: {
       tank: "reef",
+      cm: 60,
       level: 14,
       price: 1600,
       space: 3,
@@ -288,6 +342,7 @@
     // Abyss
     lantern: {
       tank: "abyss",
+      cm: 7,
       level: 16,
       price: 900,
       space: 1,
@@ -296,12 +351,14 @@
       grow: 30,
       breed: 48,
       move: "school",
+      school: 5,
       zone: "mid",
       eats: ["krill"],
       likes: ["glow"],
     },
     hatchet: {
       tank: "abyss",
+      cm: 6,
       level: 17,
       price: 1500,
       space: 1,
@@ -316,6 +373,7 @@
     },
     isopod: {
       tank: "abyss",
+      cm: 12,
       level: 17,
       price: 1800,
       space: 2,
@@ -331,6 +389,7 @@
     },
     jelly: {
       tank: "abyss",
+      cm: 12,
       level: 18,
       price: 3500,
       space: 2,
@@ -345,6 +404,7 @@
     },
     angler: {
       tank: "abyss",
+      cm: 20,
       level: 20,
       price: 9000,
       space: 3,
@@ -364,6 +424,8 @@
   const VARIANTS = {
     guppy: ["classic", "cobra", "albino"],
     danio: ["classic", "leopard", "glow"],
+    white_cloud: ["classic", "golden", "ghost"],
+    ember: ["classic", "fire", "golden"],
     snail: ["classic", "golden", "ivory"],
     platy: ["classic", "mickey", "panda"],
     goldfish: ["classic", "calico", "black"],
@@ -399,8 +461,8 @@
   };
 
   /*
-   * Decor. Placed in fixed slots so every layout looks composed.
-   *  size   S fits any slot, M fits M and L slots, L only fits L slots
+   * Decor. Placed freely in the layers below.
+   *  size   S fits every layer; M and L stand in the back or mid layer
    *  tags   matched against species likes/needs
    *  pearls price in pearls instead of coins
    *  bonus  extra income for the whole tank (0.1 = +10%)
@@ -454,23 +516,31 @@
     },
   };
 
-  // Decor slots, the same in every tank, laid out like an aquascape in three layers: tall
-  // plants and wood against the back glass, a midground for hardscape and homes, and a low
-  // foreground for carpets and small stones. x is the anchor (0..1). Back and mid sit behind
-  // the fish, front in front of them. Mid slots were added later, so they come last to keep
-  // older saves on the same slots.
-  const SLOTS = [
-    { x: 0.13, row: "back", size: "L" },
-    { x: 0.37, row: "back", size: "M" },
-    { x: 0.58, row: "back", size: "M" },
-    { x: 0.78, row: "back", size: "L" },
-    { x: 0.05, row: "front", size: "S" },
-    { x: 0.27, row: "front", size: "S" },
-    { x: 0.5, row: "front", size: "S" },
-    { x: 0.72, row: "front", size: "S" },
-    { x: 0.25, row: "mid", size: "L" },
-    { x: 0.47, row: "mid", size: "M" },
-    { x: 0.66, row: "mid", size: "L" },
+  /*
+   * Decor stands freely on the sand in three depth layers, like a real aquascape: tall plants
+   * and wood against the back glass, a midground for hardscape and homes, and a low foreground
+   * for carpets and small stones in front of the fish. Each piece keeps its own x (0..1), so a
+   * tank can be planted densely and rearranged at will. sizes lists what fits in a layer.
+   */
+  const LAYERS = {
+    back: { sizes: ["S", "M", "L"] },
+    mid: { sizes: ["S", "M", "L"] },
+    front: { sizes: ["S"] },
+  };
+
+  // Fixed slots used by saves before free placement; only read when migrating them.
+  const LEGACY_SLOTS = [
+    { x: 0.13, row: "back" },
+    { x: 0.37, row: "back" },
+    { x: 0.58, row: "back" },
+    { x: 0.78, row: "back" },
+    { x: 0.05, row: "front" },
+    { x: 0.27, row: "front" },
+    { x: 0.5, row: "front" },
+    { x: 0.72, row: "front" },
+    { x: 0.25, row: "mid" },
+    { x: 0.47, row: "mid" },
+    { x: 0.66, row: "mid" },
   ];
 
   // Per-tank upgrades. Cost of level n is cost[n-1] × tank costMult.
@@ -498,6 +568,7 @@
     autoFeedBelow: 30,
     sellReturn: 0.5,
     decorSellReturn: 0.5,
+    maxDecor: 24,
     variantSellMult: [1, 3, 8],
     stageIncome: [0.3, 0.6, 1],
     stageSell: [0.3, 0.6, 1],
@@ -586,7 +657,8 @@
     VARIANT_ODDS,
     FOODS,
     DECOR,
-    SLOTS,
+    LAYERS,
+    LEGACY_SLOTS,
     UPGRADES,
     RULES,
     EGGS,

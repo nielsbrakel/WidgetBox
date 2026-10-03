@@ -64,7 +64,7 @@
         "feed": "Tap the water to drop {food}",
         "play": "Tap to move the light · {n} want to play",
         "playTired": "Your fish are resting. Try again later.",
-        "place": "Tap a glowing spot",
+        "place": "Pick a layer, then tap where it should stand",
         "clean": "Tap algae on the glass and debris on the sand to clean."
       },
       "chip": {
@@ -91,7 +91,8 @@
         "water": "water",
         "decor": "decor",
         "home": "no {home}",
-        "playful": "Playful +25%"
+        "playful": "Playful +25%",
+        "school": "school of {n}"
       },
       "trait": {
         "cleaner": "Cleaner"
@@ -147,10 +148,12 @@
       "species": {
         "guppy": "Guppy",
         "danio": "Zebra Danio",
+        "white_cloud": "White Cloud Minnow",
         "snail": "Mystery Snail",
         "platy": "Platy",
         "goldfish": "Goldfish",
         "neon": "Neon Tetra",
+        "ember": "Ember Tetra",
         "cory": "Corydoras",
         "angelfish": "Angelfish",
         "betta": "Betta",
@@ -234,7 +237,7 @@
       },
       "shopHint": {
         "fish": "Space used: {used} of {cap}",
-        "decor": "Decor lands in a free spot that fits its size.",
+        "decor": "Decor {n} of {max}. Place it in the back, middle or front.",
         "food": "Food is shared by all tanks."
       },
       "size": {
@@ -354,7 +357,12 @@
         "menu": "Menu"
       },
       "noGoals": "New goals arrive tomorrow",
-      "needMore": "Need {n} more"
+      "needMore": "Need {n} more",
+      "layer": {
+        "back": "Back",
+        "mid": "Middle",
+        "front": "Front"
+      }
     }
   }
 }

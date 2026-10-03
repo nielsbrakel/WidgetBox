@@ -45,10 +45,23 @@ function fish(save, tankId, species, opts = {}) {
   return f;
 }
 
+// Lay out decor the way the old fixed slots did: ids[i] stands where slot i used to be.
 function decor(save, tankId, ids) {
-  save.tanks[tankId].decor = C.SLOTS.map((_, i) =>
-    ids[i] ? { id: `d${++save.nextId}`, d: ids[i] } : null,
+  save.tanks[tankId].decor = C.LEGACY_SLOTS.flatMap((slot, i) =>
+    ids[i] ? [{ id: `d${++save.nextId}`, d: ids[i], at: 0, x: slot.x, row: slot.row }] : [],
   );
+}
+
+// A freely placed aquascape: [id, x, row, daysOld?, bloom?] per piece.
+function scape(save, tankId, pieces, now) {
+  save.tanks[tankId].decor = pieces
+    .map(([d, x, row, days = 10, bloom = false]) => {
+      const item = { id: `d${++save.nextId}`, d, at: now - days * Engine.DAY, x, row };
+      for (let k = 0; bloom && k < 400 && !(Engine.decorGrowth(item, now).bloom > 0.6); k++)
+        item.id = `d${++save.nextId}`;
+      return item;
+    })
+    .filter(Boolean);
 }
 
 function drops(save, tankId, values) {
@@ -118,15 +131,21 @@ function garden(save, tankId, plan, now) {
   unlock(save, tankId);
   save.active = tankId;
   save.level = 30;
-  save.tanks[tankId].decor = C.SLOTS.map((_, i) => {
+  save.tanks[tankId].decor = C.LEGACY_SLOTS.map((slot, i) => {
     const p = plan[i];
     if (!p) return null;
-    const item = { id: `d${++save.nextId}`, d: p.d, at: now - p.days * Engine.DAY };
+    const item = {
+      id: `d${++save.nextId}`,
+      d: p.d,
+      at: now - p.days * Engine.DAY,
+      x: slot.x,
+      row: slot.row,
+    };
     // Pick an id whose flowering window is open right now, so the scenario always shows blooms.
     for (let k = 0; p.bloom && k < 400 && !(Engine.decorGrowth(item, now).bloom > 0.6); k++)
       item.id = `d${++save.nextId}`;
     return item;
-  });
+  }).filter(Boolean);
 }
 
 const SCENARIOS = {
@@ -297,7 +316,9 @@ const SCENARIOS = {
       ],
       now,
     );
+    for (let i = 0; i < 8; i++) fish(s, "pond", "white_cloud", { v: i === 3 ? 1 : 0 });
     for (const sp of ["guppy", "guppy", "platy", "goldfish"]) fish(s, "pond", sp);
+    s.tanks.pond.up.size = 3;
     return s;
   },
   "garden-amazon": (now) => {
@@ -320,7 +341,96 @@ const SCENARIOS = {
       ],
       now,
     );
-    for (const sp of ["neon", "neon", "neon", "angelfish", "cory"]) fish(s, "amazon", sp);
+    for (let i = 0; i < 10; i++) fish(s, "amazon", "ember");
+    for (let i = 0; i < 7; i++) fish(s, "amazon", "neon");
+    for (const sp of ["angelfish", "cory", "cory", "cory"]) fish(s, "amazon", sp);
+    s.tanks.amazon.up.size = 4;
+    return s;
+  },
+  // A densely planted Dutch-style tank: layered stems at the back, wood and stone in the
+  // middle, carpets in front, with schools of tiny fish.
+  "planted-amazon": (now) => {
+    const s = base(now);
+    unlock(s, "amazon");
+    s.active = "amazon";
+    s.level = 30;
+    s.tanks.amazon.up.size = 5;
+    scape(
+      s,
+      "amazon",
+      [
+        ["rotala", 0.06, "back", 10, true],
+        ["sword_plant", 0.16, "back"],
+        ["rotala", 0.26, "back"],
+        ["ludwigia", 0.34, "back", 10, true],
+        ["sword_plant", 0.46, "back", 10, true],
+        ["rotala", 0.56, "back"],
+        ["ludwigia", 0.66, "back"],
+        ["rotala", 0.74, "back", 2],
+        ["root", 0.3, "mid"],
+        ["dragon_stone", 0.55, "mid"],
+        ["java_fern", 0.46, "mid"],
+        ["stump", 0.72, "mid"],
+        ["sword_plant", 0.12, "mid", 1],
+        ["monte_carlo", 0.06, "front"],
+        ["monte_carlo", 0.2, "front"],
+        ["monte_carlo", 0.34, "front"],
+        ["java_fern", 0.44, "front"],
+        ["monte_carlo", 0.55, "front", 1],
+        ["monte_carlo", 0.68, "front"],
+        ["monte_carlo", 0.8, "front", 0.4],
+      ],
+      now,
+    );
+    for (let i = 0; i < 12; i++) fish(s, "amazon", "ember");
+    for (let i = 0; i < 9; i++) fish(s, "amazon", "neon");
+    for (const sp of ["angelfish", "cory", "cory", "cory"]) fish(s, "amazon", sp);
+    return s;
+  },
+  "planted-pond": (now) => {
+    const s = base(now);
+    s.level = 30;
+    s.tanks.pond.up.size = 5;
+    scape(
+      s,
+      "pond",
+      [
+        ["vallisneria", 0.04, "back", 10, true],
+        ["vallisneria", 0.12, "back"],
+        ["vallisneria", 0.2, "back", 3],
+        ["vallisneria", 0.62, "back"],
+        ["vallisneria", 0.7, "back", 10, true],
+        ["vallisneria", 0.78, "back"],
+        ["spider_wood", 0.4, "back"],
+        ["driftwood", 0.62, "mid"],
+        ["seiryu_stone", 0.28, "mid"],
+        ["seiryu_stone", 0.4, "mid"],
+        ["anubias", 0.34, "mid", 10, true],
+        ["moss_ball", 0.5, "mid"],
+        ["hairgrass", 0.05, "front"],
+        ["hairgrass", 0.16, "front"],
+        ["pebbles", 0.27, "front"],
+        ["hairgrass", 0.38, "front"],
+        ["hairgrass", 0.5, "front", 1],
+        ["hairgrass", 0.62, "front"],
+        ["hairgrass", 0.74, "front", 0.4],
+      ],
+      now,
+    );
+    for (let i = 0; i < 10; i++) fish(s, "pond", "white_cloud", { v: i === 3 ? 1 : 0 });
+    for (let i = 0; i < 6; i++) fish(s, "pond", "danio");
+    for (const sp of ["guppy", "guppy", "platy"]) fish(s, "pond", sp);
+    return s;
+  },
+  // Every fish species at each life stage, side by side.
+  "life-stages": (now) => {
+    const s = base(now);
+    unlock(s, "amazon");
+    s.active = "amazon";
+    s.level = 30;
+    s.tanks.amazon.up.size = 5;
+    for (const sp of ["discus", "angelfish", "neon", "ember"])
+      for (const stage of [0, 1, 2]) fish(s, "amazon", sp, { stage });
     return s;
   },
   "gallery-pond": (now) => {

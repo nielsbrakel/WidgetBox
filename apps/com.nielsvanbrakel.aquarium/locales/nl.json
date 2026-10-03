@@ -64,7 +64,7 @@
         "feed": "Tik op het water om {food} te strooien",
         "play": "Tik om het lichtje te verplaatsen · {n} willen spelen",
         "playTired": "Je vissen rusten. Probeer het later nog eens.",
-        "place": "Tik op een oplichtende plek",
+        "place": "Kies een laag en tik waar het moet staan",
         "clean": "Tik op algen op het glas en vuil op de bodem om schoon te maken."
       },
       "chip": {
@@ -91,7 +91,8 @@
         "water": "water",
         "decor": "decor",
         "home": "geen {home}",
-        "playful": "Speels +25%"
+        "playful": "Speels +25%",
+        "school": "school van {n}"
       },
       "trait": {
         "cleaner": "Schoonmaker"
@@ -147,10 +148,12 @@
       "species": {
         "guppy": "Guppy",
         "danio": "Zebravis",
+        "white_cloud": "Chinese danio",
         "snail": "Appelslak",
         "platy": "Platy",
         "goldfish": "Goudvis",
         "neon": "Neontetra",
+        "ember": "Ember tetra",
         "cory": "Pantsermeerval",
         "angelfish": "Maanvis",
         "betta": "Kempvis",
@@ -234,7 +237,7 @@
       },
       "shopHint": {
         "fish": "Ruimte gebruikt: {used} van {cap}",
-        "decor": "Decor komt op een vrije plek die past.",
+        "decor": "Decor {n} van {max}. Zet het achter, in het midden of vooraan.",
         "food": "Voer is gedeeld door alle bakken."
       },
       "size": {
@@ -354,7 +357,12 @@
         "menu": "Menu"
       },
       "noGoals": "Morgen komen er nieuwe doelen",
-      "needMore": "Nog {n} nodig"
+      "needMore": "Nog {n} nodig",
+      "layer": {
+        "back": "Achter",
+        "mid": "Midden",
+        "front": "Voor"
+      }
     }
   }
 }

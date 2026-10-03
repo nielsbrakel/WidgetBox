@@ -23,7 +23,6 @@
   const DAY = 24 * HOUR;
   const TANK_IDS = Object.keys(C.TANKS).sort((a, b) => C.TANKS[a].order - C.TANKS[b].order);
   const STAGE = { FRY: 0, JUVENILE: 1, ADULT: 2 };
-  const SIZE_RANK = { S: 0, M: 1, L: 2 };
   const STEP = 10 * 60000;
 
   // ── Deterministic helpers ──────────────────────────────────────────
@@ -69,7 +68,7 @@
       id,
       unlocked,
       fish: [],
-      decor: C.SLOTS.map(() => null),
+      decor: [],
       up: { size: 0, filter: 0, feeder: 0, chest: 0 },
       drops: [],
       pending: 0,
@@ -112,8 +111,8 @@
     for (const id of TANK_IDS) save.tanks[id] = emptyTank(id, id === "pond", now);
 
     const pond = save.tanks.pond;
-    pond.decor[1] = { id: nextId(save, "d"), d: "vallisneria", at: now };
-    pond.decor[5] = { id: nextId(save, "d"), d: "pebbles" };
+    pond.decor.push({ id: nextId(save, "d"), d: "vallisneria", at: now, x: 0.37, row: "back" });
+    pond.decor.push({ id: nextId(save, "d"), d: "pebbles", at: 0, x: 0.27, row: "front" });
     for (let i = 0; i < 2; i++) addFish(save, pond, "guppy", 0, STAGE.JUVENILE, now);
     // Starters arrive peckish so the feeding lesson has hungry mouths to fill.
     for (const f of pond.fish) f.fed = 45;
@@ -187,16 +186,29 @@
       tank.fish = list(tank.fish).filter((f) => f && species(f.s) && C.SPECIES[f.s].tank === id);
       tank.eggs = list(tank.eggs).filter((e) => e && species(e.s));
       for (const key of ["drops", "algae", "debris", "autoFed"]) tank[key] = list(tank[key]);
-      const decor = C.SLOTS.map((_, i) => list(tank.decor)[i] || null);
-      tank.decor = decor.map((d, i) =>
-        d &&
-        typeof d.d === "string" &&
-        Object.hasOwn(C.DECOR, d.d) &&
-        C.DECOR[d.d].tank === id &&
-        slotFits(i, d.d)
-          ? { ...d, at: Number.isFinite(d.at) ? d.at : 0 }
-          : null,
-      );
+      tank.decor = list(tank.decor)
+        .map((d, i) => {
+          if (!d || typeof d.d !== "string" || !Object.hasOwn(C.DECOR, d.d)) return null;
+          if (C.DECOR[d.d].tank !== id) return null;
+          let { x, row } = d;
+          // Saves from before free placement stored decor by slot index.
+          if (!Object.hasOwn(C.LAYERS, row) || !Number.isFinite(x)) {
+            const slot = C.LEGACY_SLOTS[i];
+            if (!slot) return null;
+            x = slot.x;
+            row = slot.row;
+          }
+          if (!layerFits(row, d.d)) return null;
+          return {
+            id: typeof d.id === "string" ? d.id : nextId(save, "d"),
+            d: d.d,
+            at: Number.isFinite(d.at) ? d.at : 0,
+            x: clamp(x, DECOR_X[0], DECOR_X[1]),
+            row,
+          };
+        })
+        .filter(Boolean)
+        .slice(0, C.RULES.maxDecor);
       tank.waste = clamp(num(tank.waste), 0, 3);
       for (const key of Object.keys(tank.up)) {
         const max = maxUpgrade(key);
@@ -229,13 +241,13 @@
 
   function decorTags(tank) {
     const tags = new Set();
-    for (const slot of tank.decor) if (slot) for (const t of C.DECOR[slot.d].tags) tags.add(t);
+    for (const item of tank.decor) for (const t of C.DECOR[item.d].tags) tags.add(t);
     return tags;
   }
 
   function tankBonus(tank) {
     let bonus = 0;
-    for (const slot of tank.decor) if (slot) bonus += C.DECOR[slot.d].bonus || 0;
+    for (const item of tank.decor) bonus += C.DECOR[item.d].bonus || 0;
     return bonus;
   }
 
@@ -270,6 +282,14 @@
     } else likePts = 8;
     h += likePts;
     reasons.push({ k: "decor", v: likePts });
+    if (sp.school) {
+      // Shoaling fish feel safe in a group and stressed when kept alone.
+      let mates = 0;
+      for (const f of tank.fish) if (f.s === fish.s) mates++;
+      const schoolPts = mates >= sp.school ? 6 : -Math.min(15, (sp.school - mates) * 3);
+      h += schoolPts;
+      reasons.push({ k: "school", v: schoolPts, n: sp.school });
+    }
     if (sp.needs && !tags.has(sp.needs)) {
       h -= 30;
       reasons.push({ k: "home", v: -30 });
@@ -339,9 +359,16 @@
     return Math.round(list[lvl] * C.TANKS[tank.id].costMult);
   }
 
-  function slotFits(slotIndex, decorId) {
-    const slot = C.SLOTS[slotIndex];
-    return !!slot && SIZE_RANK[C.DECOR[decorId].size] <= SIZE_RANK[slot.size];
+  // Where on the sand decor may stand, as a fraction of the tank width.
+  const DECOR_X = [0.03, 0.97];
+
+  function layerFits(row, decorId) {
+    return Object.hasOwn(C.LAYERS, row) && C.LAYERS[row].sizes.includes(C.DECOR[decorId].size);
+  }
+
+  // Layers a piece of decor may stand in, back to front.
+  function decorLayers(decorId) {
+    return Object.keys(C.LAYERS).filter((row) => layerFits(row, decorId));
   }
 
   // Scales coin rewards for chores so late tanks stay worth cleaning.
@@ -811,9 +838,8 @@
       typeof v === "string" && (Object.hasOwn(C.UPGRADES, v) || Object.hasOwn(C.EGGS, v)),
     id: (v) => typeof v === "string" && v.length < 24,
     fish: (v) => typeof v === "string" && v.length < 24,
-    slot: (v) => Number.isInteger(v) && v >= 0 && v < C.SLOTS.length,
-    from: (v) => Number.isInteger(v) && v >= 0 && v < C.SLOTS.length,
-    to: (v) => Number.isInteger(v) && v >= 0 && v < C.SLOTS.length,
+    x: (v) => Number.isFinite(v) && v >= 0 && v <= 1,
+    row: (v) => typeof v === "string" && Object.hasOwn(C.LAYERS, v),
     n: (v) => Number.isInteger(v) && v >= 0 && v <= 1000,
     tz: (v) => Number.isFinite(v),
     sell: (v) => typeof v === "boolean",
@@ -1044,9 +1070,8 @@
       const item = C.DECOR[p.d];
       if (!tank || !item || item.tank !== tank.id) return "invalid";
       if (save.level < item.level) return "level";
-      const slot = p.slot | 0;
-      if (slot < 0 || slot >= C.SLOTS.length || tank.decor[slot]) return "slot";
-      if (!slotFits(slot, p.d)) return "fit";
+      if (tank.decor.length >= C.RULES.maxDecor) return "slot";
+      if (!Number.isFinite(p.x) || !layerFits(p.row, p.d)) return "fit";
       if (item.pearls) {
         if (save.pearls < item.pearls) return "pearls";
         save.pearls -= item.pearls;
@@ -1054,7 +1079,8 @@
         if (save.coins < item.price) return "coins";
         save.coins -= item.price;
       }
-      tank.decor[slot] = { id: nextId(save, "d"), d: p.d, at: now };
+      const x = clamp(p.x, DECOR_X[0], DECOR_X[1]);
+      tank.decor.push({ id: nextId(save, "d"), d: p.d, at: now, x, row: p.row });
       addXp(save, C.RULES.xp.buy, ev);
       progress(save, "buyDecor", 1, now, ev);
       return {};
@@ -1063,24 +1089,23 @@
     moveDecor(save, p) {
       const tank = getTank(save, p.tank);
       if (!tank) return "invalid";
-      const from = p.from | 0;
-      const to = p.to | 0;
-      const a = tank.decor[from];
-      const b = tank.decor[to];
-      if (!a || from === to || to < 0 || to >= C.SLOTS.length) return "invalid";
-      if (!slotFits(to, a.d) || (b && !slotFits(from, b.d))) return "fit";
-      tank.decor[to] = a;
-      tank.decor[from] = b;
+      const i = tank.decor.findIndex((d) => d.id === p.id);
+      if (i < 0 || !Number.isFinite(p.x)) return "invalid";
+      const item = tank.decor[i];
+      if (!layerFits(p.row, item.d)) return "fit";
+      // A moved piece goes to the end of the list, so it is drawn in front within its layer.
+      tank.decor.splice(i, 1);
+      tank.decor.push({ ...item, x: clamp(p.x, DECOR_X[0], DECOR_X[1]), row: p.row });
       return {};
     },
 
     sellDecor(save, p) {
       const tank = getTank(save, p.tank);
       if (!tank) return "invalid";
-      const slot = tank.decor[p.slot | 0];
-      if (!slot) return "gone";
-      const item = C.DECOR[slot.d];
-      tank.decor[p.slot | 0] = null;
+      const i = tank.decor.findIndex((d) => d.id === p.id);
+      if (i < 0) return "gone";
+      const item = C.DECOR[tank.decor[i].d];
+      tank.decor.splice(i, 1);
       if (item.pearls) {
         const pearls = Math.floor(item.pearls * C.RULES.decorSellReturn);
         save.pearls += pearls;
@@ -1225,18 +1250,10 @@
   function decorBlock(save, tank, id) {
     const item = C.DECOR[id];
     if (save.level < item.level) return "level";
-    if (!freeSlots(tank, id).length) return "slot";
+    if (tank.decor.length >= C.RULES.maxDecor) return "slot";
     if (item.pearls ? save.pearls < item.pearls : save.coins < item.price)
       return item.pearls ? "pearls" : "coins";
     return null;
-  }
-
-  function freeSlots(tank, decorId) {
-    const out = [];
-    tank.decor.forEach((d, i) => {
-      if (!d && slotFits(i, decorId)) out.push(i);
-    });
-    return out;
   }
 
   function speciesFor(tankId) {
@@ -1314,8 +1331,8 @@
     coinCap,
     fishSellPrice,
     upgradeCost,
-    slotFits,
-    freeSlots,
+    layerFits,
+    decorLayers,
     eggReady,
     playReady,
     eggPrice,

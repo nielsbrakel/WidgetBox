@@ -294,13 +294,13 @@
       if (ui.sheet) return;
 
       if (ui.mode === "place" || ui.mode === "move") {
-        const slot = scene.slotAt(x, y);
-        if (slot < 0) return ui.toast(ui.t("hint.place"));
-        const p = scene.locate("slot", slot);
+        const row = ui.place.row;
+        const fx = Math.max(0.03, Math.min(0.97, x / scene.W));
         const r =
           ui.mode === "place"
-            ? this.do({ type: "buyDecor", tank, d: ui.place.decor, slot })
-            : this.do({ type: "moveDecor", tank, from: ui.place.from, to: slot });
+            ? this.do({ type: "buyDecor", tank, d: ui.place.decor, x: fx, row })
+            : this.do({ type: "moveDecor", tank, id: ui.place.id, x: fx, row });
+        const p = scene.layerPoint(row, fx);
         if (r.ok) scene.sparkle(p.x, p.y, "#ffffff", 14);
         ui.setMode("look");
         return;
@@ -376,7 +376,7 @@
           scene.hearts(hit.id);
           break;
         case "decor":
-          ui.showCard("decor", hit.slot, hit.x);
+          ui.showCard("decor", hit.id, hit.x);
           break;
         default:
           ui.hideCard();

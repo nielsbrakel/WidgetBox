@@ -5,7 +5,7 @@ type Point = { x: number; y: number };
 
 /*
  * Page object for the Aquarium widget. Every game interaction is a tap: DOM buttons are clicked
- * through the iframe and canvas targets (coins, algae, fish, decor slots) are located through
+ * through the iframe and canvas targets (coins, algae, fish, decor) are located through
  * the widget's debug handle and tapped at their on-screen position.
  */
 export class AquariumPage extends SandboxPage {

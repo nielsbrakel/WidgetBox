@@ -51,8 +51,8 @@ function visit(save, now) {
     for (const d of Object.keys(C.DECOR).filter(
       (k) => C.DECOR[k].tank === id || !C.DECOR[k].tank,
     )) {
-      const slots = E.freeSlots(tank, d);
-      if (slots?.length && C.DECOR[d].price) act({ type: "buyDecor", tank: id, d, slot: slots[0] });
+      if (C.DECOR[d].price)
+        act({ type: "buyDecor", tank: id, d, x: 0.5, row: E.decorLayers(d)[0] });
     }
   }
 }
@@ -72,7 +72,9 @@ function tutorial(save, now) {
   }
   expect(eaten).toBeGreaterThanOrEqual(3);
   expect(act({ type: "scrub", tank: "pond", id: pond.algae[0].id }).ok).toBe(true);
-  expect(act({ type: "buyDecor", tank: "pond", d: "anubias", slot: 4 }).ok).toBe(true);
+  expect(act({ type: "buyDecor", tank: "pond", d: "anubias", x: 0.05, row: "front" }).ok).toBe(
+    true,
+  );
   expect(act({ type: "buyFish", tank: "pond", s: "guppy" }).ok).toBe(true);
 }
 
@@ -140,8 +142,8 @@ describe("aquarium engine", () => {
       [{ type: "buyFish", tank: "reef", s: "clownfish" }, "invalid"],
       [{ type: "unlockTank", tank: "amazon" }, "level"],
       [{ type: "scrub", tank: "pond", id: "a999" }, "gone"],
-      [{ type: "buyDecor", tank: "pond", d: "castle", slot: 0 }, "level"],
-      [{ type: "buyDecor", tank: "pond", d: "vallisneria", slot: 1 }, "slot"],
+      [{ type: "buyDecor", tank: "pond", d: "castle", x: 0.2, row: "back" }, "level"],
+      [{ type: "buyDecor", tank: "pond", d: "vallisneria", x: 0.2, row: "front" }, "fit"],
       [{ type: "eat", tank: "pond", fish: save.tanks.pond.fish[0].id, food: "flakes" }, "noBits"],
       [{ type: "buyEgg", tank: "pond", kind: "golden" }, "level"],
     ];
@@ -220,7 +222,8 @@ describe("aquarium engine", () => {
       { type: "buyFood", food: "toString" },
       { type: "upgrade", tank: "pond", kind: "constructor" },
       { type: "buyFish", tank: "pond", s: "hasOwnProperty" },
-      { type: "buyDecor", tank: "pond", d: "anubias", slot: "4" },
+      { type: "buyDecor", tank: "pond", d: "anubias", x: "0.4", row: "front" },
+      { type: "buyDecor", tank: "pond", d: "anubias", x: 0.4, row: "constructor" },
       { type: "waste", tank: "pond", n: 1e9 },
       { type: "collect", tank: ["pond"] },
       { type: "constructor" },
@@ -251,21 +254,68 @@ describe("aquarium engine", () => {
     expect(out.active).toBe("pond");
     expect(out.tanks.pond.fish).toEqual([]);
     expect(out.tanks.pond.decor[0].d).toBe("castle");
-    expect(out.tanks.pond.decor[1]).toBeNull();
+    expect(out.tanks.pond.decor).toHaveLength(1);
     expect(() => E.simulate(out, T0 + 5 * H)).not.toThrow();
   });
 
-  it("keeps decor of older eight-slot saves and adds empty midground slots", () => {
+  it("moves decor from old slot-based saves onto the free layers", () => {
     const save = E.createSave(T0, 3);
-    save.tanks.pond.decor = save.tanks.pond.decor.slice(0, 8);
+    save.tanks.pond.decor = [null, { id: "d8", d: "vallisneria", at: T0 }, null, null];
     save.tanks.pond.decor[3] = { id: "d9", d: "driftwood", at: T0 };
+    save.tanks.pond.decor[5] = { id: "d10", d: "pebbles" };
     const out = E.migrate(save, T0);
-    expect(out.tanks.pond.decor).toHaveLength(C.SLOTS.length);
-    expect(out.tanks.pond.decor[3].d).toBe("driftwood");
-    expect(out.tanks.pond.decor.slice(8)).toEqual([null, null, null]);
-    const mid = C.SLOTS.map((s, i) => (s.row === "mid" ? i : -1)).filter((i) => i >= 0);
-    expect(mid.some((i) => E.slotFits(i, "spider_wood"))).toBe(true);
-    expect(mid.every((i) => E.slotFits(i, "seiryu_stone"))).toBe(true);
+    expect(out.tanks.pond.decor.map((d) => [d.d, d.x, d.row])).toEqual([
+      ["vallisneria", 0.37, "back"],
+      ["driftwood", 0.78, "back"],
+      ["pebbles", 0.27, "front"],
+    ]);
+    expect(out.tanks.pond.decor[2].at).toBe(0);
+  });
+
+  it("places, moves and sells decor freely within the layers it fits", () => {
+    const save = E.createSave(T0, 3);
+    save.coins = 5000;
+    save.level = 10;
+    const act = (a) => E.apply(save, a, T0);
+    const pond = save.tanks.pond;
+    expect(E.decorLayers("spider_wood")).toEqual(["back", "mid"]);
+    expect(E.decorLayers("hairgrass")).toEqual(["back", "mid", "front"]);
+    expect(
+      act({ type: "buyDecor", tank: "pond", d: "spider_wood", x: 0.5, row: "front" }).error,
+    ).toBe("fit");
+    expect(act({ type: "buyDecor", tank: "pond", d: "spider_wood", x: 1.5, row: "mid" }).ok).toBe(
+      false,
+    );
+    expect(act({ type: "buyDecor", tank: "pond", d: "spider_wood", x: 0.99, row: "mid" }).ok).toBe(
+      true,
+    );
+    const wood = pond.decor.at(-1);
+    expect(wood.x).toBe(0.97);
+    // Plenty of plants fit, up to the per-tank cap.
+    while (act({ type: "buyDecor", tank: "pond", d: "hairgrass", x: 0.3, row: "front" }).ok);
+    expect(pond.decor).toHaveLength(C.RULES.maxDecor);
+    expect(act({ type: "moveDecor", tank: "pond", id: wood.id, x: 0.2, row: "back" }).ok).toBe(
+      true,
+    );
+    expect(pond.decor.at(-1)).toMatchObject({ id: wood.id, x: 0.2, row: "back" });
+    expect(act({ type: "moveDecor", tank: "pond", id: wood.id, x: 0.2, row: "front" }).error).toBe(
+      "fit",
+    );
+    expect(act({ type: "sellDecor", tank: "pond", id: wood.id }).ok).toBe(true);
+    expect(pond.decor.some((d) => d.id === wood.id)).toBe(false);
+  });
+
+  it("makes shoaling fish happier in a proper school", () => {
+    const save = E.createSave(T0, 3);
+    save.coins = 5000;
+    const act = (a) => E.apply(save, a, T0);
+    act({ type: "buyFish", tank: "pond", s: "white_cloud" });
+    const pond = save.tanks.pond;
+    const lonely = E.happiness(pond.fish.at(-1), pond, T0).reasons.find((r) => r.k === "school");
+    expect(lonely.v).toBeLessThan(0);
+    for (let i = 0; i < 5; i++) act({ type: "buyFish", tank: "pond", s: "white_cloud" });
+    const school = E.happiness(pond.fish.at(-1), pond, T0).reasons.find((r) => r.k === "school");
+    expect(school.v).toBeGreaterThan(0);
   });
 
   it("reaches the same save whether time passes in seconds or in one jump", () => {
@@ -306,18 +356,17 @@ describe("living decor", () => {
 
   it("treats decor from older saves as mature and ignores non-living decor", () => {
     const save = E.createSave(T0, 3);
-    delete save.tanks.pond.decor[1].at;
+    delete save.tanks.pond.decor[0].at;
     const out = E.migrate(save, T0);
-    expect(E.decorGrowth(out.tanks.pond.decor[1], T0).g).toBe(1);
+    expect(E.decorGrowth(out.tanks.pond.decor[0], T0).g).toBe(1);
     expect(E.decorGrowth({ id: "d1", d: "pebbles" }, T0)).toBeNull();
   });
 
   it("plants bought today start small", () => {
     const save = E.createSave(T0, 3);
     save.coins = 500;
-    expect(E.apply(save, { type: "buyDecor", tank: "pond", d: "anubias", slot: 4 }, T0).ok).toBe(
-      true,
-    );
-    expect(E.decorGrowth(save.tanks.pond.decor[4], T0).g).toBeLessThan(0.5);
+    const buy = { type: "buyDecor", tank: "pond", d: "anubias", x: 0.4, row: "front" };
+    expect(E.apply(save, buy, T0).ok).toBe(true);
+    expect(E.decorGrowth(save.tanks.pond.decor.at(-1), T0).g).toBeLessThan(0.5);
   });
 });

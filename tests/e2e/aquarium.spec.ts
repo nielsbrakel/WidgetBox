@@ -42,8 +42,11 @@ test.describe("Aquarium widget", () => {
     await aq.ui("sel", "anubias").click();
     await aq.ui("action", "buyDecor:anubias").click();
     await expect(aq.sheet).toBeHidden();
-    await aq.tapThing("slot", 4);
-    await expect.poll(() => aq.state((g) => g.save.tanks.pond.decor[4]?.d)).toBe("anubias");
+    // Small pieces start in the foreground; a tap on the sand places it there.
+    await aq.tapThing("layer", { row: "front", x: 0.2 });
+    await expect
+      .poll(() => aq.state((g) => g.save.tanks.pond.decor.map((d) => `${d.d}:${d.row}`)))
+      .toContain("anubias:front");
 
     await aq.dock("shop").click();
     await aq.ui("sel", "guppy").click();

@@ -277,6 +277,13 @@
         case "cancelPlace":
           this.setMode("look");
           break;
+        case "layer":
+          if (this.place?.rows.includes(arg)) {
+            this.place.row = arg;
+            this.game.scene.setPlacing(this.place);
+            this.renderTray();
+          }
+          break;
         case "action":
           this.sheetAction(arg, el);
           break;
@@ -324,7 +331,7 @@
       this.lastMode = Date.now();
       this.place = mode === "place" || mode === "move" ? opts : null;
       this.game.scene.setMode(mode);
-      if (mode === "place" || mode === "move") this.game.scene.highlightSlots(opts.slots);
+      if (mode === "place" || mode === "move") this.game.scene.setPlacing(opts);
       if (mode === "feed" && !this.food) this.food = this.pickFood();
       this.hideCard();
       document.querySelectorAll(".dock-btn").forEach((b) => {
@@ -378,7 +385,14 @@
         ).length;
         html += `<div class="tray-hint">${esc(ready ? this.t("hint.play", { n: ready }) : this.t("hint.playTired"))}</div>`;
       } else if (this.mode === "place" || this.mode === "move") {
-        html += `<div class="tray-row"><div class="tray-hint">${esc(this.t("hint.place"))}</div><button type="button" class="food-btn" data-ui="cancelPlace">${icon("close")}${esc(this.t("cancel"))}</button></div>`;
+        // Pick the depth layer, then tap where along the sand the piece should stand.
+        html += '<div class="tray-row">';
+        for (const row of Object.keys(C.LAYERS)) {
+          const ok = this.place.rows.includes(row);
+          html += `<button type="button" class="food-btn ${row === this.place.row ? "on" : ""} ${ok ? "" : "empty"}" data-ui="layer" data-arg="${row}" ${ok ? "" : "disabled"}>${esc(this.t(`layer.${row}`))}</button>`;
+        }
+        html += `<button type="button" class="food-btn" data-ui="cancelPlace">${icon("close")}${esc(this.t("cancel"))}</button></div>`;
+        html += `<div class="tray-hint">${esc(this.t("hint.place"))}</div>`;
       }
       tray.innerHTML = html;
       tray.hidden = !html;
@@ -538,13 +552,13 @@
           if (r.k === "playful")
             html += `<span class="tag plus">${esc(this.t("reason.playful"))}</span>`;
           else if (r.v)
-            html += `<span class="tag ${r.v > 0 ? "plus" : "minus"}">${r.v > 0 ? "+" : ""}${r.v} ${esc(this.t(`reason.${r.k}`, { home: this.t(`tag.${info.species.needs}`) }))}</span>`;
+            html += `<span class="tag ${r.v > 0 ? "plus" : "minus"}">${r.v > 0 ? "+" : ""}${r.v} ${esc(this.t(`reason.${r.k}`, { home: this.t(`tag.${info.species.needs}`), n: r.n }))}</span>`;
         }
         if (info.species.cleans) html += `<span class="tag">${esc(this.t("trait.cleaner"))}</span>`;
         html += "</div>";
         html += `<div class="row"><button type="button" class="btn danger" data-ui="cardAction" data-arg="sellFish">${esc(this.t("sell"))} ${icon("coin")}${fmt(info.sell)}</button></div>`;
       } else if (card.kind === "decor") {
-        const slot = save.tanks[save.active].decor[card.id];
+        const slot = save.tanks[save.active].decor.find((d) => d.id === card.id);
         if (!slot) return this.hideCard();
         const item = C.DECOR[slot.d];
         html += `<div class="card-title">${esc(this.t(`decor.${slot.d}`))}</div>`;
@@ -597,20 +611,18 @@
         this.hideCard();
       } else if (action === "sellDecor") {
         if (!this.confirmed(el, `selld:${card.id}`)) return;
-        this.game.do({ type: "sellDecor", tank, slot: card.id });
+        this.game.do({ type: "sellDecor", tank, id: card.id });
         this.hideCard();
       } else if (action === "moveDecor") {
         const save = this.game.save;
-        const decor = save.tanks[tank].decor;
-        const item = decor[card.id];
-        const slots = C.SLOTS.map((_, i) => i).filter(
-          (i) =>
-            i !== card.id &&
-            E.slotFits(i, item.d) &&
-            (!decor[i] || E.slotFits(card.id, decor[i].d)),
-        );
-        if (!slots.length) return this.toast(this.t("err.fit"), "err");
-        this.setMode("move", { from: card.id, slots });
+        const item = save.tanks[tank].decor.find((d) => d.id === card.id);
+        if (!item) return this.hideCard();
+        this.setMode("move", {
+          id: item.id,
+          d: item.d,
+          rows: E.decorLayers(item.d),
+          row: item.row,
+        });
       } else if (action === "sellEggs") {
         const r = this.game.do({ type: "hatch", tank, id: card.id, sell: true });
         if (r.ok) this.toast(this.t("soldFor", { n: r.result.soldFor }), "gold");
@@ -760,7 +772,7 @@
           name = this.t(`decor.${it.id}`);
           price = this.priceTag(item.price, item.pearls, save);
           if (locked) lock = `${icon("lock")}${item.level}`;
-          if (tank.decor.some((d) => d && d.d === it.id)) owned = "✓";
+          if (tank.decor.some((d) => d.d === it.id)) owned = "✓";
         } else {
           const food = C.FOODS[it.id];
           const locked = save.level < food.level;
@@ -772,7 +784,14 @@
         }
         body += `<button type="button" class="card-item ${sh.sel === it.id ? "sel" : ""} ${lock ? "locked" : ""}" data-ui="sel" data-arg="${it.id}">${owned ? `<span class="owned">${owned}</span>` : ""}${lock ? `<span class="lock">${lock}</span>` : ""}<img alt="" src="${img}" style="max-height:${size}px"><span class="name">${esc(name)}</span>${price}</button>`;
       }
-      let foot = `<div class="foot-info"><span class="muted">${esc(this.t(`shopHint.${sh.tab}`, { used: E.usedSpace(tank), cap: E.capacity(tank) }))}</span></div>`;
+      let foot = `<div class="foot-info"><span class="muted">${esc(
+        this.t(`shopHint.${sh.tab}`, {
+          used: E.usedSpace(tank),
+          cap: E.capacity(tank),
+          n: tank.decor.length,
+          max: C.RULES.maxDecor,
+        }),
+      )}</span></div>`;
       if (sh.sel) foot = this.shopDetail(sh.tab, sh.sel);
       return { body, cols: L.cols, rowH: L.itemH, pages, foot };
     }
@@ -1027,11 +1046,19 @@
           this.closeSheet();
         }
       } else if (kind === "buyDecor") {
-        const slots = E.freeSlots(save.tanks[tank], id);
         const block = E.decorBlock(save, save.tanks[tank], id);
         if (block) return this.showError(block, C.DECOR[id].level);
         this.closeSheet();
-        this.setMode("place", { decor: id, slots });
+        const rows = E.decorLayers(id);
+        const item = C.DECOR[id];
+        // Carpets and small stones start in the foreground, plants at the back, hardscape mid.
+        const want = item.size === "S" ? "front" : item.tags.includes("plant") ? "back" : "mid";
+        this.setMode("place", {
+          decor: id,
+          d: id,
+          rows,
+          row: rows.includes(want) ? want : rows[0],
+        });
       } else if (kind === "buyFood") {
         const r = this.game.do({ type: "buyFood", food: id });
         if (r.ok) this.renderSheet();

@@ -14,8 +14,10 @@
   const C = root.AquaCatalog;
   const E = root.AquaEngine;
   const TAU = Math.PI * 2;
-  const STAGE_SCALE = [0.58, 0.8, 1];
-  const MIN_FISH_PX = 20;
+  // Fry, juvenile and adult size relative to the adult.
+  const STAGE_SCALE = [0.45, 0.72, 1];
+  // Smallest fish in art pixels, so even fry keep an eye and a tail.
+  const MIN_FISH_ART = 5;
   const ZONES = { top: [0.1, 0.38], mid: [0.22, 0.62], low: [0.5, 0.74] };
   const BOTTOM_MOVERS = { crawl: true, bottom: true };
 
@@ -35,11 +37,13 @@
   // edges, which gives the high-resolution pixel-art look.
   const PIXEL_ROWS = 110;
   // Where each decor layer stands on the sand (0 waterline .. 1 front glass) and how big it is.
+  // spread staggers pieces within a layer so a densely planted tank doesn't stand in a line.
   const ROWS = {
-    back: { y: 0.1, scale: 1.1 },
-    mid: { y: 0.45, scale: 1.12 },
-    front: { y: 0.8, scale: 1 },
+    back: { y: 0.1, scale: 1.1, spread: 0.12 },
+    mid: { y: 0.45, scale: 1.12, spread: 0.18 },
+    front: { y: 0.8, scale: 1, spread: 0.14 },
   };
+  const LAYER_ORDER = ["back", "mid", "front"];
   // Colour levels per channel after ordered dithering; fewer levels look more retro.
   const COLOR_LEVELS = 12;
   const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map((v) => v / 16 - 0.5);
@@ -73,7 +77,7 @@
       this.debris = [];
       this.eggs = [];
       this.decor = [];
-      this.slotHighlight = null;
+      this.placing = null;
       this.toy = null;
       this.pointer = null;
       this.tankInfo = null;
@@ -116,6 +120,8 @@
         this.sizeAgent(a);
         if (a.trail) a.trail = null;
       }
+      // Homes hold positions in pixels, so they follow the new size.
+      this.assignHomes();
     }
 
     get sandY() {
@@ -131,21 +137,41 @@
       return Math.min(this.W, (this.H * 4) / 3) * 0.12;
     }
 
-    slotPos(i) {
-      const slot = C.SLOTS[i];
+    // Where a piece of decor stands: its own x, its layer's depth plus a small stagger.
+    decorPos(d) {
       const depth = this.H - this.sandY;
-      // Three depth layers on the sand. Front items stand a little up the sand so feet, bases
-      // and lids stay inside the frame.
-      const row = ROWS[slot.row];
-      return { x: slot.x * this.W, y: this.sandY + depth * row.y, scale: this.s * row.scale };
+      const row = ROWS[d.row] || ROWS.back;
+      const k = (E.hash(d.id) % 1000) / 1000 - 0.5;
+      return {
+        x: d.x * this.W,
+        y: this.sandY + depth * (row.y + k * row.spread),
+        scale: this.s * row.scale * (1 + k * 0.08),
+      };
     }
 
-    slotBox(i, size) {
-      const p = this.slotPos(i);
-      const box = A.DECOR_BOX[size || C.SLOTS[i].size];
+    layerPoint(row, x) {
+      const r = ROWS[row] || ROWS.back;
+      return {
+        x: x * this.W,
+        y: this.sandY + (this.H - this.sandY) * r.y,
+        scale: this.s * r.scale,
+      };
+    }
+
+    decorBox(d) {
+      const p = this.decorPos(d);
+      const box = A.DECOR_BOX[C.DECOR[d.d].size];
       const w = box.w * p.scale;
       const h = box.h * p.scale;
       return { x: p.x - w / 2, y: p.y - h, w, h };
+    }
+
+    // Decor of one layer in drawing order, back to front.
+    layerDecor(row) {
+      return this.decor
+        .filter((d) => d.row === row)
+        .map((d) => ({ d, p: this.decorPos(d) }))
+        .sort((a, b) => a.p.y - b.p.y);
     }
 
     // ── State sync ───────────────────────────────────────────────────
@@ -169,9 +195,7 @@
         this.motes = [];
       }
       this.tankInfo = E.tankInfo(save, tankId, now);
-      this.decor = tank.decor.map((d) =>
-        d ? { id: d.id, d: d.d, look: E.decorGrowth(d, now) } : null,
-      );
+      this.decor = tank.decor.map((d) => ({ ...d, look: E.decorGrowth(d, now) }));
 
       const seen = new Set();
       tank.fish.forEach((f, index) => {
@@ -250,13 +274,13 @@
     }
 
     sizeAgent(a) {
-      // Small species are drawn relatively larger than in real life, with a floor in CSS
-      // pixels, so every fish keeps a readable shape on a tiny dashboard widget.
-      const adult = Math.max(MIN_FISH_PX, this.unit * (0.3 + 0.75 * a.art.len));
-      a.L = Math.max(
-        MIN_FISH_PX * 0.6,
-        adult * STAGE_SCALE[a.stage] * (0.94 + rnd01(a.id, "size") * 0.12) * a.z,
-      );
+      // Sizes follow real adult lengths, in art pixels so a fish looks the same on any widget:
+      // a 2 cm ember tetra is about 6 pixels long, a 24 cm tang about 24. The curve is
+      // flattened a little so nano fish stay readable and big fish don't crowd the tank.
+      const cm = a.sp.cm || 6;
+      const art = (4 + 1.15 * cm ** 0.85) * STAGE_SCALE[a.stage];
+      const jitter = 0.94 + rnd01(a.id, "size") * 0.12;
+      a.L = Math.max(MIN_FISH_ART, art * jitter * a.z) / this.dpr;
       if (a.move === "eel") a.L = this.unit * 2.4 * STAGE_SCALE[a.stage];
     }
 
@@ -266,20 +290,19 @@
         a.home = null;
         const wants = a.sp.needs || (a.sp.likes || []).find((t) => t === "cave");
         if (!wants) continue;
-        for (let i = 0; i < this.decor.length; i++) {
-          const d = this.decor[i];
-          if (!d || C.SLOTS[i].row === "front") continue;
+        for (const d of this.decor) {
+          if (d.row === "front") continue;
           const tags = C.DECOR[d.d].tags;
           if (!tags.includes(wants)) continue;
-          const p = this.slotPos(i);
+          const p = this.decorPos(d);
           const hole = A.decorHole(d.d, p.x, p.y, p.scale);
           if (wants === "anemone") {
-            a.home = { slot: i, kind: "anemone", x: p.x, y: p.y - 34 * p.scale, s: p.scale };
+            a.home = { slot: d.id, kind: "anemone", x: p.x, y: p.y - 34 * p.scale, s: p.scale };
             break;
           }
           if (hole) {
             a.home = {
-              slot: i,
+              slot: d.id,
               kind: "hole",
               decor: d.d,
               hole,
@@ -298,11 +321,12 @@
     setMode(mode) {
       this.mode = mode;
       if (mode !== "play") this.toy = null;
-      if (mode !== "place" && mode !== "move") this.slotHighlight = null;
+      if (mode !== "place" && mode !== "move") this.placing = null;
     }
 
-    highlightSlots(slots) {
-      this.slotHighlight = slots;
+    // Place or move mode: which piece, and the layer it will stand in.
+    setPlacing(opts) {
+      this.placing = opts ? { d: opts.d, id: opts.id || null, row: opts.row } : null;
     }
 
     setPointer(p) {
@@ -371,32 +395,15 @@
         consider("fish", a.id, p.x, p.y, Math.max(pad, a.L * 0.6));
       }
       if (best) return best;
-      for (let i = this.decor.length - 1; i >= 0; i--) {
-        const d = this.decor[i];
-        if (!d) continue;
-        const b = this.slotBox(i, C.DECOR[d.d].size);
-        if (x >= b.x && x <= b.x + b.w && y >= b.y && y <= b.y + b.h)
-          return { type: "decor", id: d.id, slot: i, x: b.x + b.w / 2, y: b.y };
-      }
-      return { type: "water", x, y };
-    }
-
-    slotAt(x, y) {
-      if (!this.slotHighlight) return -1;
-      let best = -1;
-      let bestD = Infinity;
-      for (const i of this.slotHighlight) {
-        const b = this.slotBox(i);
-        const cx = b.x + b.w / 2;
-        const cy = b.y + b.h / 2;
-        const inside = x >= b.x - 8 && x <= b.x + b.w + 8 && y >= b.y - 8 && y <= b.y + b.h + 8;
-        const d = dist(x, y, cx, cy);
-        if (inside && d < bestD) {
-          best = i;
-          bestD = d;
+      for (const row of [...LAYER_ORDER].reverse()) {
+        const list = this.layerDecor(row);
+        for (let i = list.length - 1; i >= 0; i--) {
+          const b = this.decorBox(list[i].d);
+          if (x >= b.x && x <= b.x + b.w && y >= b.y && y <= b.y + b.h)
+            return { type: "decor", id: list[i].d.id, x: b.x + b.w / 2, y: b.y };
         }
       }
-      return best;
+      return { type: "water", x, y };
     }
 
     locate(type, id) {
@@ -420,10 +427,7 @@
         const a = this.agents.get(id) || this.agents.values().next().value;
         return a ? this.agentCenter(a) : null;
       }
-      if (type === "slot") {
-        const b = this.slotBox(id);
-        return { x: b.x + b.w / 2, y: b.y + b.h / 2 };
-      }
+      if (type === "layer") return this.layerPoint(id.row, id.x);
       return null;
     }
 
@@ -640,13 +644,45 @@
           this.hooks.onPlay(a.id);
         }
       } else if (a.move === "school") {
+        // Shoaling: the lowest-index fish leads and wanders; the others steer towards the
+        // middle of the group and the leader, match the group's heading and keep a body
+        // length apart, so the school moves as one tight, shifting cloud.
         const leader = this.schoolLeader(a);
         if (leader && leader !== a) {
-          const i = a.index % 6;
-          const back = (1 + (i % 3)) * a.L * 1.1;
-          tx = leader.x - leader.face * back + Math.sin(this.t * 1.3 + i) * a.L * 0.3;
-          ty = leader.y + (((i * 7) % 5) - 2) * a.L * 0.55 + Math.cos(this.t + i) * a.L * 0.2;
-          speed = base * (dist(a.x, a.y, tx, ty) > a.L * 3 ? 1.6 : 1.05);
+          let n = 0;
+          let cx = 0;
+          let cy = 0;
+          let vx = 0;
+          let vy = 0;
+          let sx = 0;
+          let sy = 0;
+          const room = a.L * 1.3;
+          for (const b of this.agents.values()) {
+            if (b === a || b.s !== a.s || b.leaving) continue;
+            n++;
+            cx += b.x;
+            cy += b.y;
+            vx += b.vx;
+            vy += b.vy;
+            const d = dist(a.x, a.y, b.x, b.y);
+            if (d < room && d > 0.01) {
+              sx += ((a.x - b.x) / d) * (room - d);
+              sy += ((a.y - b.y) / d) * (room - d);
+            }
+          }
+          cx /= n;
+          cy /= n;
+          vx /= n;
+          vy /= n;
+          const wobble = Math.sin(this.t * 0.9 + a.index * 1.7) * a.L * 0.6;
+          tx = (cx + leader.x) / 2 + vx * 0.5 + sx * 1.6 - leader.face * a.L * 0.8;
+          ty = (cy + leader.y) / 2 + vy * 0.3 + sy * 1.6 + wobble * 0.5;
+          const far = dist(a.x, a.y, tx, ty);
+          speed = base * (far > a.L * 4 ? 1.7 : far > a.L * 1.5 ? 1.2 : 0.9);
+          a.pause = 0;
+          a.timer = 5;
+        } else if (leader === a) {
+          speed = base * 0.75;
         }
       }
 
@@ -936,9 +972,8 @@
         });
       }
       // Decor that bubbles.
-      this.decor.forEach((d, i) => {
-        if (!d) return;
-        const p = this.slotPos(i);
+      this.decor.forEach((d) => {
+        const p = this.decorPos(d);
         if (
           (d.d === "chest" || d.d === "golden_chest") &&
           Math.sin(this.t * 0.35) > 0.92 &&
@@ -1046,6 +1081,7 @@
         effort: a.effort,
         mouth: a.mouth,
         dpr: this.dpr,
+        stage: a.stage,
       });
       ctx.restore();
     }
@@ -1133,15 +1169,15 @@
       // veil of water between the layers gives the scape depth.
       for (const row of ["back", "mid"]) {
         this.crisp((c) => {
-          this.decor.forEach((d, i) => {
-            if (!d || C.SLOTS[i].row !== row) return;
-            const p = this.slotPos(i);
+          for (const { d, p } of this.layerDecor(row)) {
+            if (this.placing?.id === d.id) c.globalAlpha = 0.35;
             A.drawDecor(c, d.d, p.x, p.y, p.scale, t, "back", d.look);
-            const list = homed.get(i);
+            const list = homed.get(d.id);
             if (list) for (const a of list) this.drawHomed(c, a);
             A.drawDecor(c, d.d, p.x, p.y, p.scale, t, "front", d.look);
             if (list) for (const a of list) this.drawEelNeck(c, a);
-          });
+            c.globalAlpha = 1;
+          }
         });
         if (row === "back") {
           ctx.fillStyle = biome.haze;
@@ -1167,11 +1203,11 @@
       });
 
       this.crisp((c) => {
-        this.decor.forEach((d, i) => {
-          if (!d || C.SLOTS[i].row !== "front") return;
-          const p = this.slotPos(i);
+        for (const { d, p } of this.layerDecor("front")) {
+          if (this.placing?.id === d.id) c.globalAlpha = 0.35;
           A.drawDecor(c, d.d, p.x, p.y, p.scale, t, "all", d.look);
-        });
+          c.globalAlpha = 1;
+        }
       });
 
       for (const b of this.bubbles) A.drawBubble(ctx, b.x, b.y, b.r);
@@ -1188,11 +1224,10 @@
       if (biome.dark || light < 0.9) {
         ctx.save();
         ctx.globalCompositeOperation = "lighter";
-        this.decor.forEach((d, i) => {
-          if (!d) return;
-          const p = this.slotPos(i);
+        for (const d of this.decor) {
+          const p = this.decorPos(d);
           A.drawDecorGlow(ctx, d.d, p.x, p.y, p.scale, t);
-        });
+        }
         for (const a of agents) {
           if (a.alpha <= 0 || a.move === "eel") continue;
           ctx.save();
@@ -1236,7 +1271,7 @@
       ctx.fillStyle = this.glass.g;
       ctx.fillRect(0, 0, W * 0.75, H * 0.9);
 
-      if (this.slotHighlight) this.drawSlots(ctx);
+      if (this.placing) this.drawPlacing(ctx);
       this.drawFx(ctx);
       if (this.pointer) this.drawPointer(ctx);
       this.present();
@@ -1287,27 +1322,25 @@
       out.drawImage(this.lo, 0, 0, w * this.dev, h * this.dev);
     }
 
-    drawSlots(ctx) {
+    // Place and move mode: a glowing guide along the chosen layer of sand.
+    drawPlacing(ctx) {
       const pulse = 0.5 + 0.5 * Math.sin(this.t * 4);
-      for (const i of this.slotHighlight) {
-        const b = this.slotBox(i);
-        ctx.save();
-        ctx.setLineDash([5, 4]);
-        ctx.lineDashOffset = -this.t * 12;
-        ctx.strokeStyle = `rgba(255,255,255,${0.55 + 0.4 * pulse})`;
-        ctx.fillStyle = `rgba(120,220,255,${0.12 + 0.1 * pulse})`;
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        if (ctx.roundRect) ctx.roundRect(b.x, b.y, b.w, b.h, 8);
-        else ctx.rect(b.x, b.y, b.w, b.h);
-        ctx.fill();
-        ctx.stroke();
-        ctx.restore();
-        ctx.fillStyle = "rgba(255,255,255,0.9)";
-        ctx.font = `700 ${Math.round(14 * this.s)}px sans-serif`;
-        ctx.textAlign = "center";
-        ctx.fillText("+", b.x + b.w / 2, b.y + b.h / 2 + 5);
-      }
+      const depth = this.H - this.sandY;
+      const row = ROWS[this.placing.row] || ROWS.back;
+      const y = this.sandY + depth * row.y;
+      const half = Math.max(3, depth * row.spread * 0.6);
+      ctx.save();
+      ctx.fillStyle = `rgba(150,235,255,${0.3 + 0.2 * pulse})`;
+      ctx.fillRect(0, y - half, this.W, half * 2);
+      ctx.setLineDash([5, 4]);
+      ctx.lineDashOffset = -this.t * 12;
+      ctx.strokeStyle = `rgba(255,255,255,${0.55 + 0.4 * pulse})`;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(this.W, y);
+      ctx.stroke();
+      ctx.restore();
     }
 
     drawPointer(ctx) {

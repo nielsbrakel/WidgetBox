@@ -323,6 +323,22 @@
         { body: "#ff7ac0", belly: "#ffd6ec", fin: "#ff9ccf", accent: "#c4007a", glow: "#ff7ac0" },
       ],
     },
+    white_cloud: {
+      len: 0.5,
+      top: 0.12,
+      belly: 0.12,
+      nose: 0.65,
+      tail: "fork",
+      tailSize: 0.4,
+      dorsal: "small",
+      anal: "small",
+      pattern: "line",
+      pal: [
+        { body: "#7f8458", belly: "#e6dcc0", fin: "#e0503a", accent: "#f2d24a" },
+        { body: "#e2c05a", belly: "#fff2c4", fin: "#ff7a4a", accent: "#fff6cc" },
+        { body: "#d8d2c8", belly: "#f6f2ea", fin: "#f0b0a0", accent: "#ffffff" },
+      ],
+    },
     platy: {
       len: 0.6,
       top: 0.2,
@@ -348,6 +364,13 @@
       tailSize: 0.5,
       dorsal: "tall",
       anal: "small",
+      young: {
+        body: "#8a7444",
+        belly: "#c8b07a",
+        fin: "#9a8456",
+        accent: "#6a5630",
+        tailFin: "#9a8456",
+      },
       pattern: "scales",
       pal: [
         { body: "#ff8a1c", belly: "#ffc874", fin: "#ffa640", accent: "#e06a08" },
@@ -397,6 +420,22 @@
           accent2: "#7fe9ff",
           glow: "#bff6ff",
         },
+      ],
+    },
+    ember: {
+      len: 0.4,
+      top: 0.14,
+      belly: 0.14,
+      nose: 0.55,
+      tail: "fork",
+      tailSize: 0.38,
+      dorsal: "small",
+      anal: "small",
+      pattern: "none",
+      pal: [
+        { body: "#ff5418", belly: "#ff8a4c", fin: "#ff6a30", accent: "#c43a10" },
+        { body: "#ff3a2a", belly: "#ff8a6a", fin: "#ff5a3a", accent: "#a01a10" },
+        { body: "#ffb03a", belly: "#ffd890", fin: "#ffc060", accent: "#d08010" },
       ],
     },
     cory: {
@@ -482,6 +521,7 @@
       tailSize: 0.3,
       dorsal: "fringe",
       anal: "fringe",
+      young: { body: "#8a6a48", belly: "#b89870", fin: "#8a6a48", accent: "#5a4028" },
       pattern: "wavy",
       pal: [
         { body: "#c8572c", belly: "#e07a46", fin: "#b5482a", accent: "#3fc7dc" },
@@ -566,6 +606,13 @@
       tailSize: 0.42,
       dorsal: "long",
       anal: "long",
+      young: {
+        body: "#ffd42a",
+        belly: "#ffe680",
+        fin: "#ffcc1a",
+        accent: "#3a8ad8",
+        tailFin: "#ffcc1a",
+      },
       pattern: "tang",
       pal: [
         {
@@ -757,6 +804,10 @@
         }
         break;
       }
+      case "line":
+        ctx.fillStyle = pal.accent;
+        ctx.fillRect(-L * 0.42, -top * 0.22, L * 0.85, Math.max(artPx, top * 0.24));
+        break;
       case "neon": {
         ctx.fillStyle = pal.accent2;
         ctx.beginPath();
@@ -997,12 +1048,12 @@
   // Pre-rendered static body (shape, gradient, pattern, eye) for one species/variant/size.
   const spriteCache = new Map();
 
-  function bodySprite(id, variant, L, dpr) {
-    const key = `${id}|${variant}|${Math.round(L * 2)}|${dpr}`;
+  function bodySprite(id, variant, L, dpr, stage) {
+    const key = `${id}|${variant}|${Math.round(L * 2)}|${dpr}|${stage ?? 2}`;
     let sprite = spriteCache.get(key);
     if (sprite) return sprite;
     const def = FISH[id];
-    const pal = def.pal[variant] || def.pal[0];
+    const pal = stagePalette(def, def.pal[variant] || def.pal[0], stage);
     const top = def.top * L;
     const bot = def.belly * L;
     const pad = Math.ceil(L * 0.1) + 2;
@@ -1243,10 +1294,173 @@
    * Draw a fish of length L centred at the origin, facing +x.
    * o.phase drives tail and fin motion, o.effort 0..1 scales the beat amplitude.
    */
+  /*
+   * Life stages. Fry are pale and see-through with big eyes; juveniles are halfway to the
+   * adult colours. Species with a distinct juvenile dress (def.young) wear it while young,
+   * such as the yellow juvenile blue tang or bronze goldfish fry.
+   */
+  const FRY_TINT = "#d9d6c4";
+
+  function stagePalette(def, pal, stage) {
+    if (stage == null || stage >= 2) return pal;
+    const young = def.young || null;
+    const k = stage === 1 ? 0.45 : 0;
+    const out = {};
+    for (const key of Object.keys(pal)) {
+      const v = pal[key];
+      if (typeof v !== "string" || v[0] !== "#") {
+        out[key] = v;
+        continue;
+      }
+      const base = young?.[key] || mix(v, FRY_TINT, stage === 0 ? 0.55 : 0.25);
+      out[key] = young ? mix(base, v, k) : base;
+    }
+    return out;
+  }
+
+  /*
+   * Fish only a few art pixels long are drawn pixel by pixel, like a hand-made sprite: a
+   * profile of the body, the tail, the one marking that identifies the species and a single
+   * eye pixel. Shapes smoothed at that size turn into blobs.
+   */
+  const TINY_FISH = 15;
+
+  function drawTinyFish(ctx, def, pal, L, o) {
+    const p = artPx;
+    const n = Math.max(4, Math.round(L / p));
+    const H = Math.max(2, Math.round(n * (def.top + def.belly) * 0.95));
+    const mid = Math.round(H * (def.top / (def.top + def.belly)));
+    const tailN = Math.max(2, Math.round(n * 0.25));
+    const x0 = -n / 2;
+    const flick = Math.sin(o.phase) > 0.35 ? 1 : Math.sin(o.phase) < -0.35 ? -1 : 0;
+    const px = (i, j, c) => {
+      ctx.fillStyle = c;
+      ctx.fillRect((x0 + i) * p, (j - mid) * p, p, p);
+    };
+    // Tail: a fork or fan that opens away from the body and flicks with the beat.
+    const tailCol = rgba(pal.tailFin || pal.fin, 0.75);
+    for (let i = 0; i < tailN; i++) {
+      const spread = Math.round(((tailN - i) / tailN) * H * 0.4 * Math.max(0.8, def.tailSize * 2));
+      const dy = i === 0 ? flick : 0;
+      for (let j = -spread; j <= spread; j++) {
+        if (def.tail === "fork" || def.tail === "lunate")
+          if (Math.abs(j) < spread - 1 && i === 0 && spread > 1) continue;
+        px(i, mid + j + dy, tailCol);
+      }
+    }
+    // Body profile: blunt at the tail root, full at the shoulder, tapering to the nose.
+    const bodyN = n - tailN;
+    const cols = [];
+    for (let i = 0; i < bodyN; i++) {
+      const t = (i + 0.5) / bodyN;
+      const prof =
+        t < 0.62
+          ? 0.45 + 0.55 * Math.sin((t / 0.62) * (Math.PI / 2))
+          : Math.sqrt(1 - ((t - 0.62) / 0.42) ** 2);
+      const up = Math.max(1, Math.round(def.top * n * 0.95 * prof));
+      const dn = Math.max(1, Math.round(def.belly * n * 0.95 * prof));
+      cols.push([up, dn]);
+      for (let j = -up; j < dn; j++) {
+        const c =
+          j < -up + 1
+            ? shade(pal.body, -0.25)
+            : j < 0
+              ? pal.body
+              : j < dn - 1
+                ? pal.belly
+                : shade(pal.belly, -0.15);
+        px(tailN + i, mid + j, c);
+      }
+    }
+    // Dorsal fin: one or two pixels above the back.
+    if (def.dorsal && def.dorsal !== "none" && bodyN > 5) {
+      const di = Math.round(bodyN * 0.42);
+      const tall = def.dorsal === "tall" || def.dorsal === "sail" ? 2 : 1;
+      for (let k = 0; k < tall; k++) px(tailN + di - k, mid - cols[di][0] - 1 - k, pal.fin);
+      px(tailN + di - 1, mid - cols[di - 1][0] - 1, pal.fin);
+    }
+    if ((def.anal === "tall" || def.anal === "long") && bodyN > 5) {
+      const ai = Math.round(bodyN * 0.35);
+      px(tailN + ai, mid + cols[ai][1], pal.fin);
+      px(tailN + ai - 1, mid + cols[ai - 1][1] + 1, pal.fin);
+    }
+    // Species marking.
+    const run = (j, from, to, c) => {
+      for (let i = Math.floor(bodyN * from); i < Math.ceil(bodyN * to); i++)
+        if (j >= -cols[i][0] && j < cols[i][1]) px(tailN + i, mid + j, c);
+    };
+    const bar = (t, c) => {
+      const i = Math.min(bodyN - 1, Math.round(bodyN * t));
+      for (let j = -cols[i][0]; j < cols[i][1]; j++) px(tailN + i, mid + j, c);
+    };
+    switch (pal.pattern || def.pattern) {
+      case "neon":
+        run(-1, 0.05, 0.92, pal.accent);
+        run(0, 0, 0.5, pal.accent2);
+        run(1, 0, 0.5, pal.accent2);
+        break;
+      case "stripesH":
+      case "zebra":
+        run(-1, 0, 0.85, pal.accent);
+        if (H > 3) run(1, 0, 0.75, pal.accent);
+        break;
+      case "line":
+        run(-1, 0, 0.9, pal.accent);
+        break;
+      case "spots":
+      case "pepper":
+        for (let i = 1; i < bodyN - 1; i += 2)
+          px(tailN + i, mid - (i % 3 === 0 ? 1 : 0), pal.accent);
+        break;
+      case "mickey":
+        px(tailN, mid, pal.accent);
+        px(tailN + 1, mid - 1, pal.accent);
+        break;
+      case "silver":
+        run(-1, 0.05, 0.9, "#f4f8ff");
+        break;
+      case "clown":
+      case "snowflake":
+        bar(0.72, "#ffffff");
+        bar(0.38, "#ffffff");
+        break;
+      case "bars":
+        bar(0.3, pal.accent);
+        bar(0.6, pal.accent);
+        break;
+      case "split":
+        for (let i = 0; i < Math.round(bodyN * 0.5); i++)
+          for (let j = -cols[i][0]; j < cols[i][1]; j++) px(tailN + i, mid + j, pal.accent);
+        break;
+      case "tang":
+        run(-1, 0.1, 0.7, pal.accent);
+        break;
+      case "photophores":
+        for (let i = 1; i < bodyN - 1; i += 2)
+          px(tailN + i, mid + cols[i][1] - 1, pal.glow || pal.accent);
+        break;
+      default:
+        break;
+    }
+    // Eye: one dark pixel with a pale ring when there is room.
+    const ei = tailN + bodyN - Math.max(2, Math.round(bodyN * 0.18));
+    const ej = mid - Math.max(0, Math.round(cols[bodyN - 2][0] * 0.45));
+    if (n >= 10) px(ei - 1, ej, mix(pal.body, "#ffffff", 0.5));
+    px(ei, ej, o.stage === 0 ? "#05060a" : "#0b0c10");
+    if (o.stage === 0 && n >= 7) px(ei, ej - 1, "#05060a");
+  }
+
   function drawFish(ctx, id, variant, L, o) {
     if (SPECIAL[id]) return SPECIAL_DRAW[id](ctx, variant, L, o);
     const def = FISH[id];
-    const pal = def.pal[variant] || def.pal[0];
+    const pal = stagePalette(def, def.pal[variant] || def.pal[0], o.stage);
+    if (L / artPx < TINY_FISH) {
+      ctx.save();
+      if (o.stage === 0) ctx.globalAlpha *= 0.8;
+      drawTinyFish(ctx, def, pal, L, o);
+      ctx.restore();
+      return;
+    }
     const top = def.top * L;
     const bot = def.belly * L;
     const wave = Math.sin(o.phase) * L * (0.035 + 0.05 * o.effort);
@@ -1279,7 +1493,7 @@
     drawTail(ctx, def.tail, def.tailSize, Math.min(top, bot), pal, wave * 0.6, L);
     ctx.restore();
 
-    const sprite = bodySprite(id, variant, L, o.dpr || 1);
+    const sprite = bodySprite(id, variant, L, o.dpr || 1, o.stage);
     ctx.drawImage(sprite.canvas, -sprite.ox, -sprite.oy, sprite.w, sprite.h);
 
     // Pectoral fin flutters in front of the body.
@@ -2049,7 +2263,7 @@
       // Dwarf hairgrass spreads by runners from a few tufts into a dense lawn.
       const rnd = prng(51 + look.seed);
       const w = (16 + 34 * look.g) * s;
-      const n = 10 + Math.round(look.g * 34);
+      const n = 8 + Math.round(look.g * 20);
       const cols = ["#4f9e3c", "#6cbb4a", "#3d8030", "#86cc5a"];
       ctx.lineWidth = artPx;
       for (let i = 0; i < n; i++) {
