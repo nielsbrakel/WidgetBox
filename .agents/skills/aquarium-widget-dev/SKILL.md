@@ -20,7 +20,7 @@ apps/com.nielsvanbrakel.widgetbox-games/widgets/aquarium/
   public/ui.js           HUD, dock, tray, cards, sheets, i18n (AquaUI)
   public/main.js         Game: Homey wiring, optimistic actions, sync, tap routing
 apps/sandbox/src/lib/mocks/aquariumMocks.js   real engine against localStorage, named scenarios
-tests/unit/aquarium-*.test.mjs                Vitest: engine, api, pacing bot
+widgets/aquarium/*.test.js (in the games app)  Vitest: engine, api, pacing bot
 tests/e2e/aquarium.spec.ts, tests/pages/AquariumPage.ts   Playwright in the sandbox
 ```
 
@@ -39,5 +39,5 @@ Scripts load in this order: catalog, engine, art, scene, ui, main. There is no b
 
 1. Run the sandbox: `pnpm --filter sandbox dev`, pick **Aquarium**, then pick a scenario (fresh, pond day 2, Amazon, reef, abyss at night, eggs, full tank, away 3 days, rich, and art galleries per tank).
 2. In the widget frame, `window.__aquarium` is the running game (`.save`, `.scene`, `.ui`, `.do(action)`). `__aquarium.scene.locate(kind, id)` returns tap coordinates for coins, algae, eggs, fish and slots.
-3. After rule or balance changes, run `node`-based unit tests with Vitest (`tests/unit`). The pacing test runs a 90-day bot and fails if progression gets much faster or slower.
+3. After rule or balance changes, run `node`-based unit tests with Vitest (`pnpm test` from the repo root). The pacing test runs a 90-day bot and fails if progression gets much faster or slower.
 4. Run `tests/e2e/aquarium.spec.ts` for UI flows.

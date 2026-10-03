@@ -1,0 +1,657 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+    /* Defined on body: Homey sets its theme variables on body, so they resolve per theme there. */
+    body {
+      --accent: var(--homey-color-blue-600, #0080d9);
+      --on-accent: var(--homey-color-white, #fff);
+      --surface: var(--homey-color-mono-050, #f2f2f2);
+      --text: var(--homey-text-color, #333);
+      --text-light: var(--homey-text-color-light, #808080);
+      --success: var(--homey-text-color-success, var(--homey-color-green-600, #20a36c));
+      --danger: var(--homey-text-color-danger, var(--homey-color-red-600, #d93229));
+      --line: var(--homey-line-light, 1px solid rgba(0, 0, 0, 0.05));
+    }
+
+    .homey-dark-mode {
+      --surface: rgba(255, 255, 255, 0.08);
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: transparent;
+    }
+
+    body {
+      font-family: var(
+        --homey-font-family,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        sans-serif
+      );
+      color: var(--text);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .item {
+      position: relative;
+      padding: var(--homey-su-3, 12px) var(--homey-su-4, 16px);
+      border-bottom: var(--line);
+    }
+
+    .item:last-child {
+      border-bottom: none;
+    }
+
+    .list:not(:last-child) .item:last-child {
+      border-bottom: var(--line);
+    }
+
+    .item.is-new {
+      animation: fade-in 0.25s ease-out;
+    }
+
+    .item.running::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: var(--accent);
+      opacity: 0.07;
+      pointer-events: none;
+    }
+
+    .row {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: var(--homey-su-3, 12px);
+    }
+
+    .time {
+      flex: 1;
+      min-width: 0;
+      font-size: clamp(30px, 9vw, 56px);
+      font-weight: 300;
+      line-height: 1.1;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .time-fraction {
+      font-size: 0.55em;
+      color: var(--text-light);
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: var(--homey-su-2, 8px);
+      flex-shrink: 0;
+    }
+
+    .narrow .row {
+      flex-direction: column;
+      gap: var(--homey-su-2, 8px);
+    }
+
+    .narrow .time {
+      text-align: center;
+      font-size: clamp(28px, 17vw, 56px);
+    }
+
+    button {
+      font: inherit;
+      color: inherit;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    button:disabled {
+      opacity: 0.35;
+      cursor: default;
+    }
+
+    button:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: var(--surface);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: var(--on-accent);
+    }
+
+    .btn-ghost {
+      width: 44px;
+      height: 44px;
+      background: transparent;
+      color: var(--text-light);
+    }
+
+    .icon {
+      width: 24px;
+      height: 24px;
+      fill: currentColor;
+      pointer-events: none;
+    }
+
+    .btn-ghost .icon {
+      width: 20px;
+      height: 20px;
+    }
+
+    .laps {
+      list-style: none;
+      margin: var(--homey-su-2, 8px) 0 0;
+      padding: 0;
+      font-size: var(--homey-font-size-small, 14px);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .lap {
+      display: flex;
+      gap: var(--homey-su-2, 8px);
+      padding: 2px 0;
+      color: var(--text-light);
+    }
+
+    .lap-number {
+      flex: 1;
+      font-weight: var(--homey-font-weight-medium, 500);
+    }
+
+    .lap-split {
+      color: var(--text);
+    }
+
+    .lap.fastest .lap-split {
+      color: var(--success);
+    }
+
+    .lap.slowest .lap-split {
+      color: var(--danger);
+    }
+
+    .narrow .lap-total {
+      display: none;
+    }
+
+    .add {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--homey-su-1, 4px);
+      min-height: 44px;
+      margin: var(--homey-su-2, 8px) auto;
+      padding: 0 var(--homey-su-4, 16px);
+      border-radius: 22px;
+      background: transparent;
+      color: var(--accent);
+      font-weight: var(--homey-font-weight-bold, 700);
+      font-size: var(--homey-font-size-small, 14px);
+    }
+
+    .homey-dark-mode .add {
+      color: var(--homey-color-blue-400, #1a9eff);
+    }
+
+    @keyframes fade-in {
+      from {
+        opacity: 0;
+        transform: translateY(-6px);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .item.is-new {
+        animation: none;
+      }
+    }
+    </style>
+  </head>
+
+  <body class="homey-widget-full">
+    <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+      <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></symbol>
+      <symbol id="i-pause" viewBox="0 0 24 24"><path d="M6 4h4v16H6zm8 0h4v16h-4z" /></symbol>
+      <symbol id="i-reset" viewBox="0 0 24 24">
+        <path d="M12 5V1L7 6l5 5V7a6 6 0 1 1-6 6H4a8 8 0 1 0 8-8z" />
+      </symbol>
+      <symbol id="i-lap" viewBox="0 0 24 24">
+        <path d="M14.4 6 14 4H5v17h2v-7h5.6l.4 2h7V6z" />
+      </symbol>
+      <symbol id="i-close" viewBox="0 0 24 24">
+        <path
+          d="M19 6.4 17.6 5 12 10.6 6.4 5 5 6.4l5.6 5.6L5 17.6 6.4 19l5.6-5.6 5.6 5.6 1.4-1.4-5.6-5.6z"
+        />
+      </symbol>
+      <symbol id="i-add" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z" /></symbol>
+    </svg>
+
+    <div id="app"></div>
+
+    <script>
+    const MAX_LAPS = 99;
+    const VISIBLE_LAPS = 3;
+    const SAVE_DELAY_MS = 300;
+    const NARROW_WIDTH = 340;
+    const HUNDREDTHS_TICK_MS = 50;
+
+    const app = document.getElementById("app");
+
+    let homey = null;
+    let widgetId = null;
+    let settings = {};
+    let config = {};
+    let stopwatches = [];
+    let clockOffsetMs = 0;
+    let saveTimeout = null;
+    let writesInFlight = 0;
+    let lastSyncedJson = "";
+    let tickTimeout = null;
+    let lastHeight = 0;
+    let timeNodes = new Map();
+
+    // --- Helpers ---
+
+    /** Translates a key; `{name}` placeholders are filled in here so it works with any runtime. */
+    const t = (key, tokens = {}) =>
+      homey
+        .__(`widgets.stopwatch.${key}`)
+        .replace(/\{(\w+)\}/g, (match, name) => String(tokens[name] ?? match));
+    const now = () => Date.now() + clockOffsetMs;
+    const pad = (n) => String(n).padStart(2, "0");
+    const createId = () =>
+      crypto.randomUUID?.() ??
+      `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 10)}`;
+
+    const icon = (name) => `<svg class="icon" aria-hidden="true"><use href="#i-${name}"/></svg>`;
+
+    const button = ({ action, iconName, label, variant = "", disabled = false }) =>
+      `<button type="button" class="btn ${variant}" data-action="${action}" aria-label="${label}"${
+        disabled ? " disabled" : ""
+      }>${icon(iconName)}</button>`;
+
+    const elapsedOf = (sw) =>
+      sw.elapsedMs + (sw.startedAt === null ? 0 : Math.max(0, now() - sw.startedAt));
+
+    const formatParts = (ms) => {
+      const totalSeconds = Math.floor(ms / 1000);
+      const h = Math.floor(totalSeconds / 3600);
+      const m = Math.floor((totalSeconds % 3600) / 60);
+      const s = totalSeconds % 60;
+      const main = h > 0 ? `${h}:${pad(m)}:${pad(s)}` : `${pad(m)}:${pad(s)}`;
+      return { main, fraction: `.${pad(Math.floor((ms % 1000) / 10))}` };
+    };
+
+    const formatText = (ms) => {
+      const { main, fraction } = formatParts(ms);
+      return config.showMilliseconds ? `${main}${fraction}` : main;
+    };
+
+    // --- Settings ---
+
+    const readConfig = () => {
+      const maxCount = Math.min(10, Math.max(1, Number(settings.maxStopwatches) || 3));
+      config = {
+        showMilliseconds: settings.showMilliseconds !== false,
+        showLaps: settings.showLaps === true,
+        allowAdding: settings.allowAddingStopwatches !== false,
+        initialCount: Math.min(10, Math.max(1, Number(settings.initialStopwatches) || 1)),
+        maxCount,
+      };
+    };
+
+    const createStopwatch = () => ({
+      id: createId(),
+      elapsedMs: 0,
+      startedAt: null,
+      laps: [],
+      isNew: true,
+    });
+
+    const isUntouched = (sw) => sw.startedAt === null && sw.elapsedMs === 0;
+
+    /**
+     * Makes the number of stopwatches match the settings. Returns true when it changed anything.
+     * With adding disabled the count is fixed to the configured number; untouched stopwatches
+     * are removed from the end first so nothing that holds a time is lost.
+     */
+    const reconcileCount = () => {
+      const before = stopwatches.length;
+      const target = config.allowAdding
+        ? Math.max(1, Math.min(before || config.initialCount, config.maxCount))
+        : config.initialCount;
+
+      while (stopwatches.length < target) stopwatches.push(createStopwatch());
+      if (!config.allowAdding) {
+        while (stopwatches.length > target && isUntouched(stopwatches.at(-1))) {
+          stopwatches.pop();
+        }
+      }
+      return stopwatches.length !== before;
+    };
+
+    // --- Persistence & sync (Homey is the source of truth) ---
+
+    const statePath = () => `/state?widgetId=${encodeURIComponent(widgetId)}`;
+
+    /** Canonical form of the items, as stored on Homey: same fields, order and rounding. */
+    const canonical = (items) =>
+      items.map(({ id, elapsedMs, startedAt, laps }) => ({
+        id,
+        elapsedMs: Math.round(elapsedMs),
+        startedAt,
+        laps: laps.map(Math.round),
+      }));
+
+    const serialize = () => canonical(stopwatches);
+
+    const updateClockOffset = (state) => {
+      if (typeof state?.serverNow === "number") clockOffsetMs = state.serverNow - Date.now();
+    };
+
+    /** Replaces local state with a state from Homey. Returns true when the view must update. */
+    const applyState = (state) => {
+      updateClockOffset(state);
+      if (!Array.isArray(state?.items)) return false;
+      const json = JSON.stringify(canonical(state.items));
+      if (json === lastSyncedJson) return false;
+      lastSyncedJson = json;
+      stopwatches = state.items.map((item) => ({ ...item, isNew: false }));
+      return true;
+    };
+
+    const isSaving = () => saveTimeout !== null || writesInFlight > 0;
+
+    const flushSave = async () => {
+      if (saveTimeout === null) return;
+      clearTimeout(saveTimeout);
+      saveTimeout = null;
+
+      const items = serialize();
+      lastSyncedJson = JSON.stringify(items);
+      writesInFlight += 1;
+      try {
+        updateClockOffset(await homey.api("PUT", statePath(), { items }));
+      } catch (err) {
+        console.error("Failed to save stopwatch state", err);
+      } finally {
+        writesInFlight -= 1;
+      }
+    };
+
+    const saveSoon = () => {
+      clearTimeout(saveTimeout);
+      saveTimeout = setTimeout(flushSave, SAVE_DELAY_MS);
+    };
+
+    const loadState = async () => {
+      try {
+        return await homey.api("GET", statePath());
+      } catch (err) {
+        console.error("Failed to load stopwatch state", err);
+        return null;
+      }
+    };
+
+    const refreshFromHomey = async () => {
+      const state = await loadState();
+      if (!isSaving() && applyState(state)) render();
+      scheduleTick();
+    };
+
+    const onRemoteState = (payload) => {
+      if (payload?.widgetId !== widgetId || isSaving()) return;
+      if (applyState(payload.state)) render();
+      scheduleTick();
+    };
+
+    // --- Actions ---
+
+    const findStopwatch = (id) => stopwatches.find((sw) => sw.id === id);
+
+    const actions = {
+      toggle(sw) {
+        if (sw.startedAt === null) {
+          sw.startedAt = now();
+        } else {
+          sw.elapsedMs = elapsedOf(sw);
+          sw.startedAt = null;
+        }
+      },
+      reset(sw) {
+        Object.assign(sw, { elapsedMs: 0, startedAt: null, laps: [] });
+      },
+      lap(sw) {
+        if (sw.startedAt !== null && sw.laps.length < MAX_LAPS) sw.laps.push(elapsedOf(sw));
+      },
+      remove(sw) {
+        stopwatches = stopwatches.filter((other) => other !== sw);
+      },
+      add() {
+        if (stopwatches.length < config.maxCount) stopwatches.push(createStopwatch());
+      },
+    };
+
+    const onClick = (event) => {
+      const target = event.target.closest("button[data-action]");
+      if (!target || target.disabled) return;
+      homey.hapticFeedback?.();
+
+      const { action } = target.dataset;
+      const sw = findStopwatch(target.closest("[data-id]")?.dataset.id);
+      if (!actions[action] || (action !== "add" && !sw)) return;
+      actions[action](sw);
+      render();
+      scheduleTick();
+      saveSoon();
+    };
+
+    // --- Rendering ---
+
+    const canEditList = () => config.allowAdding && stopwatches.length > 1;
+
+    const renderLaps = (sw) => {
+      if (!config.showLaps || sw.laps.length === 0) return "";
+
+      const splits = sw.laps.map((total, i) => total - (i > 0 ? sw.laps[i - 1] : 0));
+      const markBest = splits.length >= 3;
+      const fastest = Math.min(...splits);
+      const slowest = Math.max(...splits);
+
+      const rows = [];
+      for (let i = splits.length - 1; i >= Math.max(0, splits.length - VISIBLE_LAPS); i--) {
+        const mark =
+          markBest && splits[i] === fastest
+            ? " fastest"
+            : markBest && splits[i] === slowest
+              ? " slowest"
+              : "";
+        rows.push(`<li class="lap${mark}">
+            <span class="lap-number">${t("lapNumber", { number: i + 1 })}</span>
+            <span class="lap-split">${formatText(splits[i])}</span>
+            <span class="lap-total">${formatText(sw.laps[i])}</span>
+          </li>`);
+      }
+      return `<ol class="laps" aria-label="${t("laps")}">${rows.join("")}</ol>`;
+    };
+
+    const renderSecondary = (sw) => {
+      const running = sw.startedAt !== null;
+      if (running && config.showLaps) {
+        return button({
+          action: "lap",
+          iconName: "lap",
+          label: t("lap"),
+          disabled: sw.laps.length >= MAX_LAPS,
+        });
+      }
+      return button({
+        action: "reset",
+        iconName: "reset",
+        label: t("reset"),
+        disabled: isUntouched(sw),
+      });
+    };
+
+    const renderStopwatch = (sw, index) => {
+      const running = sw.startedAt !== null;
+      const classes = ["item", running && "running", sw.isNew && "is-new"].filter(Boolean);
+      sw.isNew = false;
+
+      const primary = button({
+        action: "toggle",
+        iconName: running ? "pause" : "play",
+        label: running ? t("pause") : t("start"),
+        variant: "btn-primary",
+      });
+      const remove = canEditList()
+        ? button({
+            action: "remove",
+            iconName: "close",
+            label: t("remove"),
+            variant: "btn-ghost",
+          })
+        : "";
+      const name = stopwatches.length > 1 ? t("nameNumbered", { number: index + 1 }) : t("name");
+
+      return `<section class="${classes.join(" ")}" data-id="${sw.id}" aria-label="${name}">
+          <div class="row">
+            <div class="time" role="timer"><span class="time-main"></span><span class="time-fraction"></span></div>
+            <div class="actions">${renderSecondary(sw)}${primary}${remove}</div>
+          </div>
+          ${renderLaps(sw)}
+        </section>`;
+    };
+
+    const render = () => {
+      const canAdd = config.allowAdding && stopwatches.length < config.maxCount;
+      const addButton = canAdd
+        ? `<button type="button" class="add" data-action="add">${icon("add")}${t("addStopwatch")}</button>`
+        : "";
+      app.innerHTML = `<div class="list">${stopwatches.map(renderStopwatch).join("")}</div>${addButton}`;
+
+      timeNodes = new Map(
+        [...app.querySelectorAll("[data-id]")].map((el) => [
+          el.dataset.id,
+          {
+            main: el.querySelector(".time-main"),
+            fraction: el.querySelector(".time-fraction"),
+          },
+        ]),
+      );
+      updateTimes();
+    };
+
+    const updateTimes = () => {
+      for (const sw of stopwatches) {
+        const nodes = timeNodes.get(sw.id);
+        if (!nodes) continue;
+        const { main, fraction } = formatParts(elapsedOf(sw));
+        if (nodes.main.textContent !== main) nodes.main.textContent = main;
+        const shownFraction = config.showMilliseconds ? fraction : "";
+        if (nodes.fraction.textContent !== shownFraction)
+          nodes.fraction.textContent = shownFraction;
+      }
+    };
+
+    // --- Ticking: only while something runs and the widget is visible ---
+
+    const nextTickDelay = (running) => {
+      if (config.showMilliseconds) return HUNDREDTHS_TICK_MS;
+      const untilNextSecond = running.map((sw) => 1000 - (elapsedOf(sw) % 1000));
+      return Math.min(...untilNextSecond) + 5;
+    };
+
+    const scheduleTick = () => {
+      clearTimeout(tickTimeout);
+      tickTimeout = null;
+      const running = stopwatches.filter((sw) => sw.startedAt !== null);
+      if (document.hidden || running.length === 0) return;
+
+      tickTimeout = setTimeout(() => {
+        updateTimes();
+        scheduleTick();
+      }, nextTickDelay(running));
+    };
+
+    const onVisibilityChange = () => {
+      if (document.hidden) {
+        clearTimeout(tickTimeout);
+        flushSave();
+        return;
+      }
+      updateTimes();
+      refreshFromHomey();
+    };
+
+    // --- Layout ---
+
+    const observeSize = () => {
+      new ResizeObserver(() => {
+        document.body.classList.toggle("narrow", app.clientWidth < NARROW_WIDTH);
+        const height = Math.ceil(app.getBoundingClientRect().height);
+        if (height !== lastHeight) {
+          lastHeight = height;
+          homey.setHeight(height);
+        }
+      }).observe(app);
+    };
+
+    // --- Init ---
+
+    window.onHomeyReady = async (Homey) => {
+      homey = Homey;
+      widgetId = await homey.getWidgetInstanceId();
+      settings = { ...homey.getSettings() };
+      readConfig();
+
+      applyState(await loadState());
+      const created = reconcileCount();
+
+      document.body.classList.toggle("narrow", app.clientWidth < NARROW_WIDTH);
+      render();
+      scheduleTick();
+      if (created) saveSoon();
+
+      app.addEventListener("click", onClick);
+      document.addEventListener("visibilitychange", onVisibilityChange);
+      window.addEventListener("pagehide", flushSave);
+
+      homey.on("stopwatch:state", onRemoteState);
+      homey.on("settings.set", (key, value) => {
+        settings[key] = value;
+        readConfig();
+        if (reconcileCount()) saveSoon();
+        render();
+        scheduleTick();
+      });
+
+      lastHeight = Math.ceil(app.getBoundingClientRect().height);
+      homey.ready({ height: lastHeight });
+      observeSize();
+    };
+    </script>
+  </body>
+</html>

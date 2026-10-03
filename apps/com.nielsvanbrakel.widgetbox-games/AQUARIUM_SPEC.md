@@ -132,7 +132,7 @@ Tank = {
 
 **Progression.** XP comes from every chore and purchase. Level `n` needs `25·n^1.9` XP and unlocks species, decor, foods and tanks. A 5-step tutorial (collect, feed ×3, scrub, buy decor, buy fish) runs before daily goals start. There are 21 achievements and pearls for Fishdex discoveries (1 per species, 3 per rare colour).
 
-**Pacing (from the bot in `tests/unit/aquarium-bot.mjs`, 3 visits a day).** The Amazon opens around day 5, the reef around day 18, the abyss around day 30, and level 30 arrives around day 45. A 1-visit-a-day player reaches the abyss around day 55. The rare hunt runs past day 60. `tests/unit/aquarium-engine.test.mjs` guards these bounds.
+**Pacing (from the bot in `widgets/aquarium/engine.test.js`, 3 visits a day).** The Amazon opens around day 5, the reef around day 18, the abyss around day 30, and level 30 arrives around day 45. A 1-visit-a-day player reaches the abyss around day 55. The rare hunt runs past day 60. The pacing test guards these bounds.
 
 ## 7. Rendering
 
@@ -156,8 +156,8 @@ Everything is drawn with Canvas 2D, procedurally, so it stays sharp at any DPR a
 
 ## 9. Testing
 
-- `tests/unit/aquarium-engine.test.mjs` covers the starter save, tutorial, determinism, idle catch-up caps, failed actions leaving the save untouched, migration, eggs and long-term pacing.
-- `tests/unit/aquarium-api.test.mjs` covers the persistence policy, legacy gift, batching limits and reset.
+- `widgets/aquarium/engine.test.js` covers the starter save, tutorial, determinism, idle catch-up caps, failed actions leaving the save untouched, migration, eggs and long-term pacing.
+- `widgets/aquarium/api.test.js` covers the persistence policy, legacy gift, batching limits and reset.
 - `tests/e2e/aquarium.spec.ts` (with `tests/pages/AquariumPage.ts`) plays the tutorial with taps in the sandbox, plus sheets, the fish card, tank travel, the welcome back and the eel cave cycle.
 
 ## 10. Backlog

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<?xml-stylesheet href="theme.css" type="text/css" ?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <title>Header widget preview</title>
+  <!-- Wide, short card: a bold section title -->
+  <rect class="card" x="112" y="422" width="800" height="180" rx="56" />
+  <rect class="ink" x="176" y="482" width="320" height="60" rx="30" />
+  <rect class="ph" x="520" y="496" width="140" height="32" rx="16" />
+</svg>

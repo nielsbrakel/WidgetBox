@@ -1,386 +1,373 @@
-<!DOCTYPE html>
-<html>
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../../_shared/shared-styles.css">
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
-        /* Base Styles */
-        html,
-        body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            background: transparent;
-            overflow: visible;
-        }
+    html,
+    body {
+      margin: 0;
+      background: transparent;
+      overflow: hidden;
+    }
 
-        /* Outer Wrapper */
-        .widget-spacing-wrapper {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            box-sizing: border-box;
-        }
+    body {
+      font-family: var(--homey-font-family, system-ui, sans-serif);
+      color: var(--homey-text-color, #333);
+    }
 
-        /* Card Container */
-        .widget-card {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            height: auto;
-            background: var(--homey-background-color);
-            border-radius: var(--homey-border-radius, 12px);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
-            padding: 16px;
-            box-sizing: border-box;
-        }
+    :where(#app) {
+      box-sizing: border-box;
+      padding: var(--homey-su-3, 12px) var(--homey-su-4, 16px);
+      --accent: var(--homey-text-color, #333);
+      --unit: 10px;
+      --fit: 1;
+      --dot: 1.2em;
+      --dot-gap: 0.5em;
+      --column-length: calc(4 * var(--dot) + 3 * var(--dot-gap));
+      display: flex;
+      justify-content: center;
+    }
 
-        .bg-transparent .widget-card {
-            background: transparent;
-            box-shadow: none;
-        }
+    .align-left {
+      justify-content: flex-start;
+    }
 
-        .no-card {
-            background: transparent !important;
-            box-shadow: none !important;
-            padding: 8px !important;
-        }
+    .align-right {
+      justify-content: flex-end;
+    }
 
-        /* Alignment */
-        .align-h-left .widget-card {
-            align-items: flex-start;
-        }
+    .size-xsmall {
+      --unit: 6px;
+    }
 
-        .align-h-center .widget-card {
-            align-items: center;
-        }
+    .size-small {
+      --unit: 8px;
+    }
 
-        .align-h-right .widget-card {
-            align-items: flex-end;
-        }
+    .size-large {
+      --unit: 14px;
+    }
 
-        /* Binary Clock Container - VERTICAL (default) */
-        .binary-clock {
-            display: flex;
-            gap: 2em;
-            align-items: flex-end;
-            justify-content: center;
-            line-height: 1;
-            padding: 0.4em;
-        }
+    .size-xlarge {
+      --unit: 18px;
+    }
 
-        /* PM group aligns to top in vertical mode */
-        .group-ampm {
-            align-self: flex-start;
-        }
+    .color-blue {
+      --accent: var(--homey-color-blue-500, #0099ff);
+    }
 
-        /* Size Classes */
-        .size-xsmall .binary-clock {
-            font-size: 4px;
-        }
+    .color-green {
+      --accent: var(--homey-color-green-500, #26c281);
+    }
 
-        .size-small .binary-clock {
-            font-size: 6px;
-        }
+    .color-orange {
+      --accent: var(--homey-color-orange-500, #ff9500);
+    }
 
-        .size-medium .binary-clock {
-            font-size: 10px;
-        }
+    .color-red {
+      --accent: var(--homey-color-red-500, #ff3b30);
+    }
 
-        .size-large .binary-clock {
-            font-size: 14px;
-        }
+    .color-purple {
+      --accent: var(--homey-color-purple-500, #a855f7);
+    }
 
-        .size-xlarge .binary-clock {
-            font-size: 18px;
-        }
+    .binary-clock {
+      display: flex;
+      align-items: flex-end;
+      gap: 1.6em;
+      font-size: calc(var(--unit) * var(--fit));
+      line-height: 1;
+    }
 
-        /* Time Group (H, M, S, AM/PM) - VERTICAL */
-        .time-group {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.5em;
-        }
+    .time-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.6em;
+    }
 
-        .label {
-            font-size: 1.2em;
-            font-weight: 600;
-            color: var(--homey-text-color-light, #999);
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-        }
+    .label {
+      font-size: max(11px, 1.2em);
+      font-weight: 700;
+      opacity: 0.6;
+    }
 
-        .digits {
-            display: flex;
-            gap: 0.8em;
-        }
+    .hide-labels .label {
+      display: none;
+    }
 
-        .column {
-            display: flex;
-            flex-direction: column-reverse;
-            gap: 0.5em;
-        }
+    .digits {
+      display: flex;
+      gap: 0.8em;
+    }
 
-        /* Dots */
-        .dot {
-            width: 1.2em;
-            height: 1.2em;
-            border-radius: 50%;
-            background-color: rgba(0, 0, 0, 0.25);
-            transition: all 0.2s ease;
-        }
+    .column {
+      display: flex;
+      flex-direction: column-reverse;
+      gap: var(--dot-gap);
+      min-height: var(--column-length);
+    }
 
-        .dot.active {
-            background-color: var(--active-color, var(--homey-color-orange-500, #ff9800));
-            box-shadow: 0 0 0.6em var(--active-color, var(--homey-color-orange-500, #ff9800));
-        }
+    .dot {
+      width: var(--dot);
+      height: var(--dot);
+      border-radius: 50%;
+      background-color: currentColor;
+      opacity: 0.15;
+      transition:
+        background-color 0.2s ease,
+        opacity 0.2s ease;
+    }
 
-        /* Dark Mode */
-        @media (prefers-color-scheme: dark) {
-            .dot {
-                background-color: rgba(255, 255, 255, 0.2);
-            }
-        }
+    .dot.active {
+      background-color: var(--accent);
+      opacity: 1;
+    }
 
-        /* Color Themes */
-        .color-default {
-            --active-color: var(--homey-text-color, #333);
-        }
+    .period {
+      font-size: max(11px, 1.4em);
+      font-weight: 700;
+      color: var(--accent);
+    }
 
-        .color-blue {
-            --active-color: var(--homey-color-blue-500, #2196f3);
-        }
+    /* Horizontal: one row per unit, most significant bit on the left. */
+    .layout-horizontal .binary-clock {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.8em;
+    }
 
-        .color-green {
-            --active-color: var(--homey-color-green-500, #4caf50);
-        }
+    .layout-horizontal .time-group {
+      flex-direction: row;
+      gap: 0.8em;
+    }
 
-        .color-orange {
-            --active-color: var(--homey-color-orange-500, #ff9800);
-        }
+    .layout-horizontal .digits {
+      gap: 1.2em;
+    }
 
-        .color-red {
-            --active-color: var(--homey-color-red-500, #f44336);
-        }
+    .layout-horizontal .label {
+      min-width: 1.6em;
+      text-align: end;
+    }
 
-        .color-purple {
-            --active-color: #9c27b0;
-        }
+    .layout-horizontal .column {
+      flex-direction: row-reverse;
+      min-height: 0;
+      min-width: var(--column-length);
+    }
 
-        @media (prefers-color-scheme: dark) {
-            .color-default {
-                --active-color: #fff;
-            }
-        }
-
-        /* Hide Options */
-        .hide-seconds .group-s {
-            display: none;
-        }
-
-        .hide-labels .label {
-            display: none;
-        }
-
-        .hide-ampm .group-ampm {
-            display: none;
-        }
-
-        /* ========================== */
-        /* HORIZONTAL LAYOUT          */
-        /* ========================== */
-        .layout-horizontal .binary-clock {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 0.6em;
-            padding: 0.3em;
-        }
-
-        .layout-horizontal .time-group {
-            flex-direction: row;
-            align-items: center;
-            gap: 0.8em;
-        }
-
-        .layout-horizontal .group-ampm {
-            align-self: flex-start;
-        }
-
-        .layout-horizontal .label {
-            width: 2em;
-            text-align: right;
-        }
-
-        .layout-horizontal .digits {
-            flex-direction: row;
-        }
-
-        .layout-horizontal .column {
-            flex-direction: row;
-            gap: 0.5em;
-        }
+    @media (prefers-reduced-motion: reduce) {
+      .dot {
+        transition: none;
+      }
+    }
     </style>
-</head>
+  </head>
 
-<body>
-    <div class="widget-spacing-wrapper" id="app-container">
-        <div class="widget-card" id="widget-card">
-            <div class="binary-clock" id="clock"></div>
-        </div>
+  <body class="homey-widget-full">
+    <div id="app">
+      <div class="binary-clock" id="clock" role="img"></div>
     </div>
 
     <script>
-        let currentSettings = {};
+    const WIDGET_ID = "binary-clock";
+    const SECOND = 1000;
+    const MINUTE = 60 * SECOND;
 
-        function calculateTotalHeight() {
-            return document.getElementById('app-container').offsetHeight;
+    const app = document.getElementById("app");
+    const clock = document.getElementById("clock");
+
+    let settings = {};
+    let locale = "en";
+    const labels = { hours: "H", minutes: "M", seconds: "S", am: "AM", pm: "PM" };
+    let columns = [];
+    let periodElement = null;
+    let renderedMinute = -1;
+
+    const pad = (value) => String(value).padStart(2, "0");
+
+    function createColumn(bits) {
+      const element = document.createElement("div");
+      element.className = "column";
+      const dots = [];
+      for (let bit = 0; bit < bits; bit += 1) {
+        const dot = document.createElement("div");
+        dot.className = "dot";
+        dots.push(dot);
+        element.appendChild(dot);
+      }
+      return { element, dots, value: -1 };
+    }
+
+    function createGroup(label, unit, bitsPerColumn) {
+      const group = document.createElement("div");
+      group.className = "time-group";
+      const labelElement = document.createElement("div");
+      labelElement.className = "label";
+      labelElement.textContent = label;
+      const digits = document.createElement("div");
+      digits.className = "digits";
+      bitsPerColumn.forEach((bits, position) => {
+        const column = createColumn(bits);
+        column.unit = unit;
+        column.position = position;
+        columns.push(column);
+        digits.appendChild(column.element);
+      });
+      group.append(labelElement, digits);
+      return group;
+    }
+
+    function buildClock() {
+      columns = [];
+      const groups = [
+        createGroup(labels.hours, "hours", [2, 4]),
+        createGroup(labels.minutes, "minutes", [3, 4]),
+      ];
+      if (settings.showSeconds) groups.push(createGroup(labels.seconds, "seconds", [3, 4]));
+
+      periodElement = null;
+      if (settings.clockFormat === "12") {
+        const group = document.createElement("div");
+        group.className = "time-group";
+        periodElement = document.createElement("div");
+        periodElement.className = "period";
+        group.appendChild(periodElement);
+        groups.push(group);
+      }
+      clock.replaceChildren(...groups);
+      renderedMinute = -1;
+    }
+
+    function setColumn(column, value) {
+      if (column.value === value) return;
+      column.value = value;
+      column.dots.forEach((dot, bit) => {
+        dot.classList.toggle("active", (value & (1 << bit)) !== 0);
+      });
+    }
+
+    function render() {
+      const now = new Date();
+      const hours = now.getHours();
+      const is12Hour = settings.clockFormat === "12";
+      const digits = {
+        hours: pad(is12Hour ? hours % 12 || 12 : hours),
+        minutes: pad(now.getMinutes()),
+        seconds: pad(now.getSeconds()),
+      };
+
+      for (const column of columns) {
+        setColumn(column, Number(digits[column.unit][column.position]));
+      }
+
+      if (now.getMinutes() === renderedMinute) return;
+      renderedMinute = now.getMinutes();
+      if (periodElement) periodElement.textContent = hours < 12 ? labels.am : labels.pm;
+      clock.setAttribute(
+        "aria-label",
+        now.toLocaleTimeString(locale, { hour: "numeric", minute: "2-digit", hour12: is12Hour }),
+      );
+    }
+
+    /** Width available to the clock: the #app box minus its padding. */
+    function contentWidth(element) {
+      const style = getComputedStyle(element);
+      return element.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+    }
+
+    /** Shrinks the clock (never grows it) so it fits the widget width. */
+    function fitToWidth() {
+      const available = contentWidth(app);
+      let fit = 1;
+      app.style.setProperty("--fit", "1");
+      // Labels have a minimum font size, so scaling is not linear: refine a few times.
+      for (let pass = 0; pass < 3 && clock.scrollWidth > available; pass += 1) {
+        fit = Math.floor(fit * (available / clock.scrollWidth) * 1000) / 1000;
+        app.style.setProperty("--fit", String(fit));
+      }
+    }
+
+    function applySettings() {
+      app.className = [
+        `size-${settings.size || "medium"}`,
+        `color-${settings.color || "orange"}`,
+        `align-${settings.horizontalAlignment || "center"}`,
+        settings.orientation === "vertical" ? "layout-vertical" : "layout-horizontal",
+        settings.showLabels === false ? "hide-labels" : "",
+      ].join(" ");
+      buildClock();
+      render();
+      fitToWidth();
+    }
+
+    function translate(Homey, key, fallback) {
+      const value = Homey.__(`widgets.${WIDGET_ID}.${key}`);
+      return value && value !== key ? value : fallback;
+    }
+
+    function createHeightReporter(Homey) {
+      let reportedHeight = null;
+      return () => {
+        const height = Math.ceil(document.body.getBoundingClientRect().height);
+        if (height === reportedHeight) return;
+        if (reportedHeight === null) Homey.ready({ height });
+        else Homey.setHeight(height);
+        reportedHeight = height;
+      };
+    }
+
+    /** Runs `tick` on every second or minute boundary and pauses while the page is hidden. */
+    function createTicker(tick, getInterval) {
+      let timer = null;
+      const stop = () => clearTimeout(timer);
+      const run = () => {
+        tick();
+        const interval = getInterval();
+        timer = setTimeout(run, interval - (Date.now() % interval) + 20);
+      };
+      const start = () => {
+        stop();
+        run();
+      };
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden) stop();
+        else start();
+      });
+      return { start };
+    }
+
+    window.onHomeyReady = (Homey) => {
+      settings = Homey.getSettings();
+      locale = translate(Homey, "language", navigator.language || "en");
+      document.documentElement.lang = locale;
+      for (const key of Object.keys(labels)) labels[key] = translate(Homey, key, labels[key]);
+
+      const reportHeight = createHeightReporter(Homey);
+      const ticker = createTicker(render, () => (settings.showSeconds ? SECOND : MINUTE));
+
+      applySettings();
+      ticker.start();
+      reportHeight();
+
+      let observedWidth = app.clientWidth;
+      new ResizeObserver(() => {
+        if (app.clientWidth !== observedWidth) {
+          observedWidth = app.clientWidth;
+          fitToWidth();
         }
+        reportHeight();
+      }).observe(app);
 
-        function createGrid() {
-            const clock = document.getElementById('clock');
-            clock.innerHTML = '';
-            const is12Hour = currentSettings.clockFormat === '12';
-
-            const createGroup = (label, cols, className = '') => {
-                const group = document.createElement('div');
-                group.className = `time-group group-${label.toLowerCase()} ${className}`.trim();
-
-                const labelEl = document.createElement('div');
-                labelEl.className = 'label';
-                labelEl.textContent = label;
-                group.appendChild(labelEl);
-
-                const digits = document.createElement('div');
-                digits.className = 'digits';
-
-                cols.forEach((bits, idx) => {
-                    const colDiv = document.createElement('div');
-                    colDiv.className = 'column';
-                    colDiv.id = `${label.toLowerCase()}${idx + 1}`;
-
-                    for (let b = 0; b < bits; b++) {
-                        const dot = document.createElement('div');
-                        dot.className = 'dot';
-                        dot.dataset.bit = b;
-                        colDiv.appendChild(dot);
-                    }
-                    digits.appendChild(colDiv);
-                });
-
-                group.appendChild(digits);
-                return group;
-            };
-
-            clock.appendChild(createGroup('H', [2, 4]));
-            clock.appendChild(createGroup('M', [3, 4]));
-            clock.appendChild(createGroup('S', [3, 4]));
-
-            // AM/PM indicator - single dot (PM = active)
-            // Always append after seconds, CSS handles alignment
-            if (is12Hour) {
-                clock.appendChild(createGroup('PM', [1], 'group-ampm'));
-            }
-        }
-
-        function updateClock() {
-            const now = new Date();
-            const rawHours = now.getHours();
-            let h = rawHours;
-            const m = now.getMinutes();
-            const s = now.getSeconds();
-            const is12Hour = currentSettings.clockFormat === '12';
-
-            if (is12Hour) {
-                h = rawHours % 12 || 12;
-            }
-
-            const updateCol = (id, val) => {
-                const col = document.getElementById(id);
-                if (!col) return;
-                Array.from(col.children).forEach(dot => {
-                    const bit = parseInt(dot.dataset.bit);
-                    dot.classList.toggle('active', (val & (1 << bit)) !== 0);
-                });
-            };
-
-            const d = (val, pos) => parseInt(String(val).padStart(2, '0')[pos]);
-
-            updateCol('h1', d(h, 0));
-            updateCol('h2', d(h, 1));
-            updateCol('m1', d(m, 0));
-            updateCol('m2', d(m, 1));
-            updateCol('s1', d(s, 0));
-            updateCol('s2', d(s, 1));
-
-            // AM/PM: PM = 1 (active), AM = 0 (inactive)
-            if (is12Hour) {
-                updateCol('pm1', rawHours >= 12 ? 1 : 0);
-            }
-        }
-
-        function updateStyles() {
-            const card = document.getElementById('widget-card');
-            const wrapper = document.getElementById('app-container');
-
-            card.className = 'widget-card';
-            card.classList.add(`color-${currentSettings.color || 'orange'}`);
-            card.classList.add(`size-${currentSettings.size || 'medium'}`);
-
-            if (!currentSettings.showSeconds) card.classList.add('hide-seconds');
-            if (!currentSettings.showLabels) card.classList.add('hide-labels');
-
-            // Card background is handled by widget compose transparent setting
-
-            // Orientation (default to horizontal)
-            if (currentSettings.orientation === 'vertical') {
-                document.body.classList.remove('layout-horizontal');
-            } else {
-                document.body.classList.add('layout-horizontal');
-            }
-
-            wrapper.className = 'widget-spacing-wrapper';
-            wrapper.classList.add(`align-h-${currentSettings.horizontalAlignment || 'center'}`);
-        }
-
-        function onHomeyReady(Homey) {
-            currentSettings = Homey.getSettings();
-            createGrid();
-            updateStyles();
-            updateClock();
-
-            Homey.on('settings.set', (key, value) => {
-                currentSettings[key] = value;
-                // Recreate grid if format changes (to add/remove AM/PM)
-                if (key === 'clockFormat' || key === 'orientation') {
-                    createGrid();
-                }
-                updateStyles();
-                updateClock();
-                requestAnimationFrame(() => {
-                    Homey.setHeight(calculateTotalHeight());
-                });
-            });
-
-            setInterval(updateClock, 1000);
-
-            const updateHeight = () => {
-                Homey.ready({ height: calculateTotalHeight() });
-                if (Homey.setHeight) Homey.setHeight(calculateTotalHeight());
-            };
-
-            const ro = new ResizeObserver(updateHeight);
-            ro.observe(document.body);
-
-            setTimeout(updateHeight, 0);
-        }
+      Homey.on("settings.set", (key, value) => {
+        settings[key] = value;
+        applySettings();
+        ticker.start();
+      });
+    };
     </script>
-</body>
-
+  </body>
 </html>

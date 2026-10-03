@@ -1,13 +1,13 @@
-import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import registry from './registry.json';
-import MockHomey from './lib/MockHomey';
-import { setIframeTheme } from './lib/homeyStyles';
-import { DEFAULT_SCENARIO } from './lib/scenarios';
-import Sidebar from './components/Sidebar';
-import Toolbar from './components/Toolbar';
-import WidgetPreview from './components/WidgetPreview';
-import SettingsPanel from './components/SettingsPanel';
-import './index.css';
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import SettingsPanel from "./components/SettingsPanel";
+import Sidebar from "./components/Sidebar";
+import Toolbar from "./components/Toolbar";
+import WidgetPreview from "./components/WidgetPreview";
+import { setIframeTheme } from "./lib/homeyStyles";
+import MockHomey from "./lib/MockHomey";
+import { DEFAULT_SCENARIO } from "./lib/scenarios";
+import registry from "./registry.json";
+import "./index.css";
 
 function App() {
   const [selectedWidget, setSelectedWidget] = useState(null);
@@ -16,18 +16,23 @@ function App() {
   const [widgetHeight, setWidgetHeight] = useState(160);
   const [previewWidth, setPreviewWidth] = useState(480);
   const [settingsValues, setSettingsValues] = useState({});
+  // Latest values for async callbacks (iframe load awaits the locale fetch).
+  const settingsRef = useRef(settingsValues);
+  settingsRef.current = settingsValues;
+  const mockRef = useRef(null);
   const [key, setKey] = useState(0);
-  const [theme, setTheme] = useState(localStorage.getItem('sandbox-theme') || 'dark');
+  const [theme, setTheme] = useState(localStorage.getItem("sandbox-theme") || "dark");
   const [activeScenario, setActiveScenario] = useState(DEFAULT_SCENARIO);
 
   // Group widgets by app for sidebar
-  const groupedWidgets = useMemo(() =>
-    registry.reduce((acc, widget) => {
-      if (!acc[widget.app]) acc[widget.app] = [];
-      acc[widget.app].push(widget);
-      return acc;
-    }, {}),
-    []
+  const groupedWidgets = useMemo(
+    () =>
+      registry.reduce((acc, widget) => {
+        if (!acc[widget.app]) acc[widget.app] = [];
+        acc[widget.app].push(widget);
+        return acc;
+      }, {}),
+    [],
   );
 
   // Update mock instance when scenario changes
@@ -37,18 +42,26 @@ function App() {
     }
   }, [activeScenario, mockHomeyInstance]);
 
-  // Reset scenario when widget changes
-  useEffect(() => {
+  const selectWidget = useCallback((widget) => {
+    setSelectedWidget(widget);
+    const defaults = {};
+    widget.settings.forEach((s) => {
+      defaults[s.id] = s.value;
+    });
+    setSettingsValues(defaults);
+    setKey((prev) => prev + 1);
+    setWidgetHeight(widget.height || 160);
     setActiveScenario(DEFAULT_SCENARIO);
-  }, [selectedWidget]);
+  }, []);
 
-  // Handle URL routing
+  // Handle URL routing (once, on mount)
+  // biome-ignore lint/correctness/useExhaustiveDependencies: initial selection must only run on mount
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const widgetId = params.get('widget');
+    const widgetId = params.get("widget");
 
     if (widgetId) {
-      const widget = registry.find(w => w.id === widgetId);
+      const widget = registry.find((w) => w.id === widgetId);
       if (widget) {
         selectWidget(widget);
         return;
@@ -65,38 +78,27 @@ function App() {
   useEffect(() => {
     if (selectedWidget) {
       const url = new URL(window.location);
-      url.searchParams.set('widget', selectedWidget.id);
-      window.history.pushState({}, '', url);
+      url.searchParams.set("widget", selectedWidget.id);
+      window.history.pushState({}, "", url);
     }
   }, [selectedWidget]);
 
   // Theme effect
   useEffect(() => {
     document.body.dataset.theme = theme;
-    localStorage.setItem('sandbox-theme', theme);
+    localStorage.setItem("sandbox-theme", theme);
 
     if (iframeRef.current?.contentDocument) {
       setIframeTheme(iframeRef.current.contentDocument, theme);
     }
   }, [theme]);
 
-  const selectWidget = useCallback((widget) => {
-    setSelectedWidget(widget);
-    const defaults = {};
-    widget.settings.forEach(s => {
-      defaults[s.id] = s.value;
-    });
-    setSettingsValues(defaults);
-    setKey(prev => prev + 1);
-    setWidgetHeight(widget.height || 160);
-  }, []);
-
   const reloadWidget = useCallback(() => {
-    setKey(prev => prev + 1);
+    setKey((prev) => prev + 1);
   }, []);
 
   const toggleTheme = useCallback(() => {
-    setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
   }, []);
 
   const handleIframeLoad = useCallback(async () => {
@@ -114,7 +116,7 @@ function App() {
         const res = await fetch(selectedWidget.locales.en);
         localeData = await res.json();
       } catch (err) {
-        console.error('[App] Failed to load locale', err);
+        console.error("[App] Failed to load locale", err);
       }
     }
 
@@ -127,7 +129,8 @@ function App() {
       mock.setLocaleData(localeData);
     }
 
-    mock.settings = { ...settingsValues };
+    mock.settings = { ...settingsRef.current };
+    mockRef.current = mock;
     setMockHomeyInstance(mock);
 
     if (mock.setScenario) {
@@ -137,24 +140,23 @@ function App() {
     win.Homey = mock;
 
     // Inject iOS simulation flag for debug scenarios
-    win.__SIMULATE_IOS__ = activeScenario === 'ios';
+    win.__SIMULATE_IOS__ = activeScenario === "ios";
 
-    if (typeof win.onHomeyReady === 'function') {
+    if (typeof win.onHomeyReady === "function") {
       try {
         win.onHomeyReady(mock);
       } catch (err) {
-        console.error('Error calling onHomeyReady:', err);
+        console.error("Error calling onHomeyReady:", err);
       }
     }
-  }, [theme, selectedWidget, settingsValues, activeScenario]);
+  }, [theme, selectedWidget, activeScenario]);
 
   const updateSetting = useCallback((id, value) => {
-    const newSettings = { ...settingsValues, [id]: value };
+    const newSettings = { ...settingsRef.current, [id]: value };
+    settingsRef.current = newSettings;
     setSettingsValues(newSettings);
-    if (mockHomeyInstance) {
-      mockHomeyInstance.updateSettings({ ...newSettings });
-    }
-  }, [settingsValues, mockHomeyInstance]);
+    mockRef.current?.updateSettings({ ...newSettings });
+  }, []);
 
   return (
     <div className="app-container">

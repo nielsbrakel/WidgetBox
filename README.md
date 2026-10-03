@@ -1,77 +1,90 @@
 # WidgetBox
 
-**Premium dashboard widgets for Homey Pro.**
+**Dashboard widgets for Homey Pro.**
 
-WidgetBox is a collection of beautifully crafted, highly customizable widgets that extend the Homey dashboard beyond its built-in capabilities. Every widget is designed to feel native to Homey — respecting its design language, light/dark mode, and spacing conventions — while adding functionality that the default dashboard doesn't offer.
-
-Whether you want a stylish clock face, a live precipitation forecast, an interactive weather map, or handy utilities like timers and stopwatches, WidgetBox has you covered.
+WidgetBox is a small family of widgets made to feel at home on the Homey dashboard. Every widget uses Homey's own colors, fonts and spacing, follows light and dark mode, and adds something the built-in dashboard does not offer.
 
 ## Apps
 
-WidgetBox is organized as a monorepo with separate Homey apps, each focused on a specific category of widgets:
+The widgets are grouped into five Homey apps by theme. Grouping keeps the number of installed apps (and the storage they take on a Homey) low, while each app stays focused on one concept as the App Store guidelines ask. Every app is released on its own, with its own version number.
 
-| App | Widgets | Description |
-|-----|---------|-------------|
-| **WidgetBox Clocks** | Analog Clock, Digital Clock, Flip Clock, Binary Clock, Word Clock Grid, Word Clock Sentence, Date | Seven distinct clock and date styles with size, color, alignment, and format options |
-| **WidgetBox Buienradar** | Five-Day Radar, Location Zoom Map, Precipitation Forecast | Dutch precipitation data from Buienradar with charts, animated maps, and customizable locations |
-| **WidgetBox Windy** | Windy | Interactive Windy.com weather map with overlays for wind, temperature, rain, clouds, and pressure |
-| **WidgetBox Utilities** | Stopwatch, Timer | Dashboard timing tools with multi-instance support |
-| **WidgetBox Layout** | Spacer | Dashboard layout control and spacing tools |
-| **WidgetBox YouTube** | YouTube | Embed YouTube videos, livestreams, and playlists directly on your dashboard |
+| App | ID | Widgets |
+|-----|----|---------|
+| **WidgetBox Clocks & Timers** | `com.nielsvanbrakel.widgetbox-clocks` | Analog, digital, flip and binary clocks, two word clocks (grid and sentence), stopwatch, timer |
+| **WidgetBox Weather** | `com.nielsvanbrakel.widgetbox-weather` | 2-hour rain graph, rain radar, 5-day radar, weather forecast and weather station (Buienradar data, Netherlands and Belgium), interactive weather map (Windy) |
+| **WidgetBox Layout** | `com.nielsvanbrakel.widgetbox-layout` | Header, separator, spacer |
+| **WidgetBox Video** | `com.nielsvanbrakel.widgetbox-video` | Video player for YouTube videos, livestreams and playlists |
+| **WidgetBox Games** | `com.nielsvanbrakel.widgetbox-games` | Aquarium, a cozy idle game (being rebuilt, not released yet) |
 
-## Monorepo Structure
+## Monorepo structure
 
 ```
 WidgetBox/
 ├── apps/
 │   ├── com.nielsvanbrakel.widgetbox-clocks/
-│   ├── com.nielsvanbrakel.widgetbox-buienradar/
-│   ├── com.nielsvanbrakel.widgetbox-windy/
-│   ├── com.nielsvanbrakel.widgetbox-utilities/
-│   ├── com.nielsvanbrakel.widgetbox-youtube/
-│   └── com.nielsvanbrakel.widgetbox-layout/
-├── packages/                # Shared packages (if any)
+│   ├── com.nielsvanbrakel.widgetbox-weather/
+│   ├── com.nielsvanbrakel.widgetbox-layout/
+│   ├── com.nielsvanbrakel.widgetbox-video/
+│   ├── com.nielsvanbrakel.widgetbox-games/
+│   └── sandbox/             # Local preview of every widget with a mocked Homey API
+├── tests/                   # Playwright end-to-end tests against the sandbox
 ├── turbo.json               # Turborepo task definitions
 ├── pnpm-workspace.yaml      # pnpm workspace configuration
-└── biome.json               # Code formatting & linting
+└── biome.json               # Linting and formatting
 ```
 
-Each app is a standalone Homey app that can be developed, validated, and published independently. The monorepo uses [Turborepo](https://turborepo.dev/) with [pnpm](https://pnpm.io/) workspaces.
+Each app is a standalone Homey app that can be developed, validated and published on its own. The monorepo uses [Turborepo](https://turborepo.dev/) with [pnpm](https://pnpm.io/) workspaces.
 
 ## Development
 
 ### Prerequisites
 
-- **Node.js** v18+
-- **pnpm** (`npm install -g pnpm`)
-- **Homey CLI** (`pnpm add -g homey`)
+- **Node.js** 26 (see `.nvmrc`)
+- **pnpm** (version pinned in `package.json`, `corepack enable` picks it up)
+- **Homey CLI** (installed as a dev dependency, run it with `pnpm exec homey`)
 
-### Running an app
+### Common commands
 
 ```bash
-# Navigate to the app directory and run in dev mode
+pnpm install
+pnpm sandbox       # Preview all widgets in the browser
+pnpm lint          # Biome
+pnpm test          # Unit tests (Vitest)
+pnpm test:e2e      # End-to-end tests (Playwright)
+pnpm validate      # homey app validate --level publish for every app
+```
+
+### Running an app on a Homey
+
+```bash
 cd apps/com.nielsvanbrakel.widgetbox-clocks
 homey app run
 ```
 
-> **Note:** Only one app can run in dev mode at a time (port 9229 conflict). Use `homey app install` to deploy multiple apps simultaneously.
+> **Note:** Only one app can run in dev mode at a time. Use `homey app install` to put several apps on a Homey at once.
 
 ### Publishing
 
-```bash
-# Validate before publishing
-homey app validate --level publish
+Apps are versioned and published independently. Publish one app at a time from its own folder:
 
-# Publish to the Homey App Store
+```bash
+cd apps/com.nielsvanbrakel.widgetbox-weather
+homey app validate --level publish
 homey app publish
 ```
 
+The CLI asks whether to bump the version and what is new, and updates `app.json`, `.homeycompose/app.json`, `package.json` and `.homeychangelog.json` for you.
+
+## Store assets
+
+Each app has its own line icon (`assets/icon.svg`, 960×960, transparent), store images (`assets/images/{small,large,xlarge}.jpg`, 250×175 / 500×350 / 1000×700) showing the app's widgets on a dashboard, a `README.txt` with a Dutch `README.nl.txt`, and a brand color with enough contrast for a white icon.
+
 ## Philosophy
 
-WidgetBox widgets are built on three principles:
+1. **Native feel.** Widgets use Homey's design tokens and respect light and dark mode, so they look like they belong on the dashboard.
+2. **Customizable, not complicated.** Meaningful settings (size, color, alignment, format) with sensible defaults.
+3. **Small and purposeful.** Every widget should solve a real dashboard need, and every app should stay light on a Homey's storage.
 
-1. **Native feel** — Every widget uses Homey's design tokens (colors, fonts, spacing) and respects light/dark mode automatically. Widgets should look and feel like they belong on the Homey dashboard.
+## License
 
-2. **Customizable, not complicated** — Widgets offer meaningful settings (size, color, alignment, format) without overwhelming the user. Sensible defaults mean widgets look great out of the box.
-
-3. **Quality over quantity** — Each widget is polished and purposeful. No filler widgets — every addition should solve a real dashboard need.
+[MIT](LICENSE) © 2026 Niels van Brakel

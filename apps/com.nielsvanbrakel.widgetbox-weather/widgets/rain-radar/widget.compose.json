@@ -1,0 +1,13 @@
+{
+  "name": {
+    "en": "Rain radar",
+    "nl": "Regenradar"
+  },
+  "description": {
+    "en": "Current rain radar map of the Netherlands and Belgium",
+    "nl": "Actuele regenradarkaart van Nederland en België"
+  },
+  "height": "100%",
+  "transparent": false,
+  "settings": []
+}

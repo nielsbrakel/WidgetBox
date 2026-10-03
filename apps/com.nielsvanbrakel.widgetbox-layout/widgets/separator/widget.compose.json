@@ -11,62 +11,6 @@
   "transparent": true,
   "settings": [
     {
-      "id": "color",
-      "type": "dropdown",
-      "label": {
-        "en": "Color",
-        "nl": "Kleur"
-      },
-      "value": "default",
-      "values": [
-        { "id": "default", "label": { "en": "Default", "nl": "Standaard" } },
-        { "id": "blue", "label": { "en": "Blue", "nl": "Blauw" } },
-        { "id": "green", "label": { "en": "Green", "nl": "Groen" } },
-        { "id": "orange", "label": { "en": "Orange", "nl": "Oranje" } },
-        { "id": "red", "label": { "en": "Red", "nl": "Rood" } },
-        { "id": "purple", "label": { "en": "Purple", "nl": "Paars" } }
-      ]
-    },
-    {
-      "id": "thickness",
-      "type": "dropdown",
-      "label": {
-        "en": "Thickness",
-        "nl": "Dikte"
-      },
-      "value": "1",
-      "values": [
-        {
-          "id": "1",
-          "label": {
-            "en": "1px — Thin",
-            "nl": "1px — Dun"
-          }
-        },
-        {
-          "id": "2",
-          "label": {
-            "en": "2px",
-            "nl": "2px"
-          }
-        },
-        {
-          "id": "3",
-          "label": {
-            "en": "3px",
-            "nl": "3px"
-          }
-        },
-        {
-          "id": "4",
-          "label": {
-            "en": "4px — Thick",
-            "nl": "4px — Dik"
-          }
-        }
-      ]
-    },
-    {
       "id": "style",
       "type": "dropdown",
       "label": {
@@ -99,6 +43,98 @@
       ]
     },
     {
+      "id": "thickness",
+      "type": "dropdown",
+      "label": {
+        "en": "Thickness",
+        "nl": "Dikte"
+      },
+      "value": "1",
+      "values": [
+        {
+          "id": "1",
+          "label": {
+            "en": "1 px (thin)",
+            "nl": "1 px (dun)"
+          }
+        },
+        {
+          "id": "2",
+          "label": {
+            "en": "2 px",
+            "nl": "2 px"
+          }
+        },
+        {
+          "id": "3",
+          "label": {
+            "en": "3 px",
+            "nl": "3 px"
+          }
+        },
+        {
+          "id": "4",
+          "label": {
+            "en": "4 px (thick)",
+            "nl": "4 px (dik)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "color",
+      "type": "dropdown",
+      "label": {
+        "en": "Color",
+        "nl": "Kleur"
+      },
+      "value": "default",
+      "values": [
+        {
+          "id": "default",
+          "label": {
+            "en": "Default",
+            "nl": "Standaard"
+          }
+        },
+        {
+          "id": "blue",
+          "label": {
+            "en": "Blue",
+            "nl": "Blauw"
+          }
+        },
+        {
+          "id": "green",
+          "label": {
+            "en": "Green",
+            "nl": "Groen"
+          }
+        },
+        {
+          "id": "orange",
+          "label": {
+            "en": "Orange",
+            "nl": "Oranje"
+          }
+        },
+        {
+          "id": "red",
+          "label": {
+            "en": "Red",
+            "nl": "Rood"
+          }
+        },
+        {
+          "id": "purple",
+          "label": {
+            "en": "Purple",
+            "nl": "Paars"
+          }
+        }
+      ]
+    },
+    {
       "id": "margin",
       "type": "number",
       "label": {
@@ -106,8 +142,8 @@
         "nl": "Zijmarge (pixels)"
       },
       "hint": {
-        "en": "Horizontal space on each side of the line.",
-        "nl": "Horizontale ruimte aan elke kant van de lijn."
+        "en": "Empty space on the left and right of the line, from 0 to 200 pixels.",
+        "nl": "Lege ruimte links en rechts van de lijn, van 0 tot 200 pixels."
       },
       "min": 0,
       "max": 200,

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<?xml-stylesheet href="theme.css" type="text/css" ?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <title>Spacer widget preview</title>
+  <!-- Card with a dashed empty area and a height indicator -->
+  <rect class="card" x="112" y="362" width="800" height="300" rx="64" />
+  <rect
+    class="s-mid"
+    x="148"
+    y="398"
+    width="728"
+    height="228"
+    rx="36"
+    stroke-width="8"
+    stroke-dasharray="24 20"
+  />
+  <g class="s-mid" stroke-width="10">
+    <line x1="512" y1="440" x2="512" y2="584" />
+    <polyline points="486,464 512,438 538,464" />
+    <polyline points="486,560 512,586 538,560" />
+  </g>
+</svg>

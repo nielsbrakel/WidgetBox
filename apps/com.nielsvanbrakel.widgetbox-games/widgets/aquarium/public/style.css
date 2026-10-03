@@ -1027,10 +1027,6 @@ button {
     visibility 0s 0.4s;
 }
 
-#app:not(.is-loading) .spinner {
-  animation: none;
-}
-
 .spinner {
   width: 28px;
   height: 28px;
@@ -1038,6 +1034,10 @@ button {
   border: 3px solid rgba(255, 255, 255, 0.25);
   border-top-color: #fff;
   animation: spin 0.8s linear infinite;
+}
+
+#app:not(.is-loading) .spinner {
+  animation: none;
 }
 
 @keyframes spin {

@@ -1,72 +1,94 @@
-<!DOCTYPE html>
-<html>
-
-<head>
-  <meta charset="UTF-8">
-  <style>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
 
+    html,
+    body {
+      height: 100%;
+    }
+
     body {
       display: flex;
       align-items: center;
-      height: 100%;
       overflow: hidden;
-      font-family: var(--homey-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+      font-family: var(--homey-font-family, system-ui, sans-serif);
     }
 
     .header-text {
-      width: 100%;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
       color: var(--homey-text-color, #333);
     }
-  </style>
-</head>
+    </style>
+  </head>
 
-<body>
-  <div class="header-text" id="header"></div>
+  <body>
+    <h2 class="header-text" id="header">Section</h2>
 
-  <script type="text/javascript">
-    const SIZE_MAP = { xsmall: '12px', small: '14px', medium: '18px', large: '24px', xlarge: '32px' };
-    const HEIGHT_MAP = { xsmall: 24, small: 32, medium: 40, large: 48, xlarge: 56 };
-    const WEIGHT_MAP = { thin: '300', normal: 'normal', bold: 'bold' };
-    const VALID_ALIGNS = ['left', 'center', 'right'];
+    <script type="text/javascript">
+    const SIZES = {
+      xsmall: { font: "small", fallback: "14px", height: 24 },
+      small: { font: "default", fallback: "17px", height: 32 },
+      medium: { font: "large", fallback: "20px", height: 40 },
+      large: { font: "xlarge", fallback: "24px", height: 48 },
+      xlarge: { font: "xxlarge", fallback: "32px", height: 56 },
+    };
+    const LINE_HEIGHTS = { small: 20, default: 24, large: 28, xlarge: 32, xxlarge: 40 };
+    const WEIGHT_MAP = { thin: "300", normal: "normal", bold: "bold" };
+    const VALID_ALIGNS = ["left", "center", "right"];
     const COLOR_MAP = {
-      default: '',
-      blue: '#3B82F6',
-      green: '#22C55E',
-      orange: '#F97316',
-      red: '#EF4444',
-      purple: '#A855F7',
+      default: "",
+      blue: "var(--homey-color-blue-500, #0099ff)",
+      green: "var(--homey-color-green-500, #26c281)",
+      orange: "var(--homey-color-orange-500, #ff9500)",
+      red: "var(--homey-color-red-500, #ff3b30)",
+      purple: "var(--homey-color-purple-500, #a855f7)",
     };
 
+    function getSize(settings) {
+      return SIZES[settings.size] || SIZES.medium;
+    }
+
     function render(settings) {
-      const el = document.getElementById('header');
-      el.textContent = settings.text || '';
-      el.style.fontSize = SIZE_MAP[settings.size] || SIZE_MAP.medium;
-      el.style.fontWeight = WEIGHT_MAP[settings.fontWeight] || 'bold';
-      el.style.textAlign = VALID_ALIGNS.includes(settings.horizontalAlignment) ? settings.horizontalAlignment : 'left';
-      el.style.color = COLOR_MAP[settings.color] || '';
+      const el = document.getElementById("header");
+      const size = getSize(settings);
+      el.textContent = settings.text || "";
+      el.style.fontSize = `var(--homey-font-size-${size.font}, ${size.fallback})`;
+      el.style.lineHeight = `var(--homey-line-height-${size.font}, ${LINE_HEIGHTS[size.font]}px)`;
+      el.style.fontWeight = WEIGHT_MAP[settings.fontWeight] || "bold";
+      el.style.textAlign = VALID_ALIGNS.includes(settings.horizontalAlignment)
+        ? settings.horizontalAlignment
+        : "left";
+      el.style.color = COLOR_MAP[settings.color] || "";
     }
 
-    function getHeight(settings) {
-      return HEIGHT_MAP[settings.size] || HEIGHT_MAP.medium;
-    }
-
-    function onHomeyReady(Homey) {
+    window.onHomeyReady = (Homey) => {
       const settings = Homey.getSettings();
+      let height = getSize(settings).height;
       render(settings);
-      Homey.ready({ height: getHeight(settings) });
+      Homey.ready({ height });
 
-      Homey.on('settings.set', (key, value) => {
+      Homey.on("settings.set", (key, value) => {
         settings[key] = value;
         render(settings);
-        Homey.setHeight(getHeight(settings));
+        const nextHeight = getSize(settings).height;
+        if (nextHeight !== height) {
+          height = nextHeight;
+          Homey.setHeight(height);
+        }
       });
-    }
-  </script>
-</body>
-
+    };
+    </script>
+  </body>
 </html>

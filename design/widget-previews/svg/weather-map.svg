@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<?xml-stylesheet href="theme.css" type="text/css" ?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <title>Weather map widget preview</title>
+  <!-- 16:9 card: full-bleed map with flowing wind streamlines -->
+  <defs>
+    <clipPath id="map"><rect x="112" y="287" width="800" height="450" rx="64" /></clipPath>
+  </defs>
+  <rect class="card" x="112" y="287" width="800" height="450" rx="64" />
+  <g clip-path="url(#map)">
+    <rect class="ph" x="112" y="287" width="800" height="450" />
+    <path
+      class="land"
+      d="M112 520 C190 480 240 540 320 500 C400 460 430 380 520 400 C600 420 640 500 720 470 C800 440 850 380 912 400 L912 737 L112 737 Z"
+    />
+    <g class="s-accent" stroke-width="12">
+      <path d="M160 360 C260 330 340 380 440 350 C520 326 580 340 640 360" />
+      <path d="M220 440 C320 410 400 460 500 430 C600 400 680 430 780 400" />
+      <path d="M300 560 C400 530 470 580 570 550 C660 524 720 550 820 520" />
+    </g>
+    <g class="s-mid" stroke-width="10">
+      <path d="M560 320 C640 300 720 330 800 310" />
+      <path d="M150 620 C240 590 300 640 400 610" />
+      <path d="M520 660 C600 640 680 670 780 640" />
+    </g>
+  </g>
+</svg>

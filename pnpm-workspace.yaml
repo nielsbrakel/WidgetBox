@@ -1,3 +1,10 @@
 packages:
   - "apps/*"
-  - "packages/*"
+
+# Native build scripts pulled in by the Homey CLI are not needed
+# (sharp ships prebuilt binaries; ssh2/protobufjs/cpu-features are optional).
+allowBuilds:
+  cpu-features: false
+  protobufjs: false
+  sharp: false
+  ssh2: false

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<?xml-stylesheet href="theme.css" type="text/css" ?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <title>Forecast widget preview</title>
+  <!-- Tall card: five day rows with weather icon and temperature range bar -->
+  <defs>
+    <linearGradient id="range" x1="566" y1="0" x2="790" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0080ff" />
+      <stop offset="1" stop-color="#ffa51f" />
+    </linearGradient>
+  </defs>
+  <rect class="card" x="112" y="252" width="800" height="520" rx="64" />
+  <g class="ph">
+    <rect x="168" y="358" width="688" height="4" rx="2" />
+    <rect x="168" y="446" width="688" height="4" rx="2" />
+    <rect x="168" y="534" width="688" height="4" rx="2" />
+    <rect x="168" y="622" width="688" height="4" rx="2" />
+  </g>
+  <g class="mid">
+    <rect x="168" y="301" width="110" height="26" rx="13" />
+    <rect x="168" y="389" width="150" height="26" rx="13" />
+    <rect x="168" y="477" width="130" height="26" rx="13" />
+    <rect x="168" y="565" width="120" height="26" rx="13" />
+    <rect x="168" y="653" width="140" height="26" rx="13" />
+    <rect x="502" y="304" width="40" height="20" rx="10" />
+    <rect x="502" y="392" width="40" height="20" rx="10" />
+    <rect x="502" y="480" width="40" height="20" rx="10" />
+    <rect x="502" y="568" width="40" height="20" rx="10" />
+    <rect x="502" y="656" width="40" height="20" rx="10" />
+    <rect x="806" y="304" width="50" height="20" rx="10" />
+    <rect x="806" y="392" width="50" height="20" rx="10" />
+    <rect x="806" y="480" width="50" height="20" rx="10" />
+    <rect x="806" y="568" width="50" height="20" rx="10" />
+    <rect x="806" y="656" width="50" height="20" rx="10" />
+  </g>
+  <circle class="warm" cx="420" cy="314" r="24" />
+  <circle class="warm" cx="420" cy="402" r="24" />
+  <circle class="mid" cx="420" cy="490" r="24" />
+  <circle class="accent" cx="420" cy="578" r="24" />
+  <circle class="warm" cx="420" cy="666" r="24" />
+  <g class="ph">
+    <rect x="566" y="307" width="224" height="14" rx="7" />
+    <rect x="566" y="395" width="224" height="14" rx="7" />
+    <rect x="566" y="483" width="224" height="14" rx="7" />
+    <rect x="566" y="571" width="224" height="14" rx="7" />
+    <rect x="566" y="659" width="224" height="14" rx="7" />
+  </g>
+  <g fill="url(#range)">
+    <rect x="590" y="307" width="90" height="14" rx="7" />
+    <rect x="620" y="395" width="120" height="14" rx="7" />
+    <rect x="600" y="483" width="100" height="14" rx="7" />
+    <rect x="650" y="571" width="130" height="14" rx="7" />
+    <rect x="630" y="659" width="110" height="14" rx="7" />
+  </g>
+</svg>

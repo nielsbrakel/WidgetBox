@@ -127,7 +127,7 @@
     }
 
     applyServer(res) {
-      if (!res || !res.save) return;
+      if (!res?.save) return;
       const mid = res.t0 ? (res.t0 + Date.now()) / 2 : Date.now();
       this.offset = res.now - mid;
       const save = res.save;

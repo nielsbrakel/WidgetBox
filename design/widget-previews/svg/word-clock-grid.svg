@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<?xml-stylesheet href="theme.css" type="text/css" ?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <title>Word clock grid widget preview</title>
+  <!-- Square card: 11 x 10 letter grid as dots, the words of the time lit up -->
+  <defs>
+    <pattern id="letters" x="226" y="252" width="52" height="52" patternUnits="userSpaceOnUse">
+      <circle class="mid" cx="26" cy="26" r="10" />
+    </pattern>
+  </defs>
+  <rect class="card" x="172" y="172" width="680" height="680" rx="64" />
+  <rect x="226" y="252" width="572" height="520" fill="url(#letters)" />
+  <g class="accent">
+    <circle cx="252" cy="278" r="13" />
+    <circle cx="304" cy="278" r="13" />
+    <circle cx="408" cy="278" r="13" />
+    <circle cx="460" cy="278" r="13" />
+    <circle cx="408" cy="330" r="13" />
+    <circle cx="460" cy="330" r="13" />
+    <circle cx="512" cy="330" r="13" />
+    <circle cx="564" cy="330" r="13" />
+    <circle cx="616" cy="330" r="13" />
+    <circle cx="668" cy="330" r="13" />
+    <circle cx="720" cy="330" r="13" />
+    <circle cx="252" cy="434" r="13" />
+    <circle cx="304" cy="434" r="13" />
+    <circle cx="356" cy="434" r="13" />
+    <circle cx="408" cy="434" r="13" />
+    <circle cx="252" cy="694" r="13" />
+    <circle cx="304" cy="694" r="13" />
+    <circle cx="356" cy="694" r="13" />
+  </g>
+</svg>

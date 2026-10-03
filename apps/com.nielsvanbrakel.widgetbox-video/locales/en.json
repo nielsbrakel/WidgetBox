@@ -1,0 +1,14 @@
+{
+  "widgets": {
+    "youtube": {
+      "emptyTitle": "No video yet",
+      "emptyMessage": "Add a YouTube link or video ID in the widget settings.",
+      "invalidTitle": "Link not recognized",
+      "invalidMessage": "Use a link to a YouTube video or playlist, or an 11-character video ID.",
+      "iosTitle": "Video is not available on iPhone and iPad",
+      "iosMessage": "The Homey app cannot play embedded YouTube videos on iOS yet. This widget works on Android and in the web dashboard.",
+      "play": "Play video",
+      "playerTitle": "YouTube video player"
+    }
+  }
+}

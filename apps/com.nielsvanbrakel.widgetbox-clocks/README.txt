@@ -1,17 +1,3 @@
-WidgetBox adds clean, native-looking widgets to your Homey dashboard. Designed to fit perfectly with Homey's style, these widgets help you customize your dashboard just the way you like it.
+WidgetBox is a small family of widgets made to feel at home on your Homey dashboard. This one is all about time: pick a clock that suits the room, from a calm analog face or a retro flip clock to a word clock that spells out the time in a full sentence.
 
-WidgetBox Clocks gives you multiple ways to display time and date on your dashboard.
-
-The Analog Clock offers a traditional clock face with five distinct styles: minimal, modern with markers, classic with numbers, a numberless classic, and a Swiss Railway design. You can choose the color of the second hand and optionally show the date.
-
-The Digital Clock displays time in a clean format. Pick between 12-hour and 24-hour notation, choose from nine different date formats, and adjust the font weight to match your dashboard style.
-
-The Flip Clock brings retro charm with an animated flip-card display. Watch the numbers flip just like a real mechanical clock, with optional seconds and colons.
-
-The Binary Clock shows the time encoded in binary. Choose between horizontal and vertical orientations, toggle time labels, and pick your favorite accent color.
-
-The Word Clock Grid displays time by lighting up letters in a matrix to spell out the current time. The Word Clock Sentence does the same in a flowing, natural language format.
-
-The Date widget lets you display today's date in any format you prefer, from short and compact to long and descriptive, with customizable font weight and color.
-
-All clock and date widgets support five size options from extra small to extra large, horizontal alignment, and color customization, so they fit well into any dashboard layout.
+When you need to count minutes instead of hours, a stopwatch and timer sit right next to your other widgets, handy while cooking, doing the laundry or keeping an eye on screen time. Every widget follows Homey's light and dark mode and can be sized and colored to blend in with the rest of your dashboard.

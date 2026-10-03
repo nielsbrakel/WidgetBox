@@ -1,10 +1,63 @@
 {
-    "widgets": {
-        "analog-clock": {},
-        "binary-clock": {},
-        "digital-clock": {},
-        "flip-clock": {},
-        "word-clock-grid": {},
-        "word-clock-sentence": {}
+  "widgets": {
+    "analog-clock": {
+      "language": "en"
+    },
+    "binary-clock": {
+      "language": "en",
+      "hours": "H",
+      "minutes": "M",
+      "seconds": "S",
+      "am": "AM",
+      "pm": "PM"
+    },
+    "digital-clock": {
+      "language": "en",
+      "am": "AM",
+      "pm": "PM"
+    },
+    "flip-clock": {
+      "language": "en",
+      "am": "AM",
+      "pm": "PM"
+    },
+    "word-clock-grid": {
+      "language": "en"
+    },
+    "word-clock-sentence": {
+      "language": "en"
+    },
+    "stopwatch": {
+      "name": "Stopwatch",
+      "nameNumbered": "Stopwatch {number}",
+      "start": "Start",
+      "pause": "Pause",
+      "reset": "Reset",
+      "lap": "Lap",
+      "lapNumber": "Lap {number}",
+      "laps": "Lap times",
+      "remove": "Remove stopwatch",
+      "addStopwatch": "Add stopwatch"
+    },
+    "timer": {
+      "name": "Timer",
+      "nameNumbered": "Timer {number}",
+      "hours": "Hours",
+      "minutes": "Minutes",
+      "seconds": "Seconds",
+      "hoursShort": "hr",
+      "minutesShort": "min",
+      "secondsShort": "sec",
+      "increase": "More {unit}",
+      "decrease": "Fewer {unit}",
+      "start": "Start",
+      "pause": "Pause",
+      "reset": "Reset",
+      "restart": "Start again",
+      "done": "Done",
+      "timeUp": "Time's up",
+      "remove": "Remove timer",
+      "addTimer": "Add timer"
     }
+  }
 }

@@ -253,7 +253,7 @@
             break;
           }
         }
-        if (a.move === "eel" && (!a.home || a.home.kind !== "hole")) a.home = null;
+        if (a.move === "eel" && a.home?.kind !== "hole") a.home = null;
       }
     }
 
@@ -744,7 +744,7 @@
       }
 
       // Swim along route waypoints with a serpentine sway.
-      if (!a.route || !a.route.length) a.route = this.eelRoute(a);
+      if (!a.route?.length) a.route = this.eelRoute(a);
       const wp = a.route[0];
       const dx = wp.x - a.x;
       const dy = wp.y - a.y;

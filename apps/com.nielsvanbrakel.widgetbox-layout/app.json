@@ -12,23 +12,49 @@
     "nl": "WidgetBox Lay-out"
   },
   "description": {
-    "en": "Tools to organize your dashboard layout",
-    "nl": "Hulpmiddelen om je dashboard te organiseren"
+    "en": "Bring calm and structure to your dashboard",
+    "nl": "Breng rust en structuur in je dashboard"
   },
   "category": [
     "tools"
   ],
+  "tags": {
+    "en": [
+      "layout",
+      "header",
+      "title",
+      "separator",
+      "divider",
+      "spacer",
+      "spacing",
+      "organize",
+      "dashboard",
+      "widget"
+    ],
+    "nl": [
+      "lay-out",
+      "indeling",
+      "koptekst",
+      "titel",
+      "scheidingslijn",
+      "scheiding",
+      "witruimte",
+      "ordenen",
+      "dashboard",
+      "widget"
+    ]
+  },
+  "brandColor": "#546E7A",
   "permissions": [],
   "images": {
-    "small": "/assets/images/small.png",
-    "large": "/assets/images/large.png",
-    "xlarge": "/assets/images/xlarge.png"
+    "small": "/assets/images/small.jpg",
+    "large": "/assets/images/large.jpg",
+    "xlarge": "/assets/images/xlarge.jpg"
   },
   "author": {
     "name": "Niels van Brakel",
     "email": "info@nielsvanbrakel.com"
   },
-  "brandColor": "#9E9E9E",
   "bugs": {
     "url": "https://github.com/nielsbrakel/WidgetBox/issues"
   },
@@ -37,37 +63,6 @@
   "support": "mailto:info@nielsvanbrakel.com",
   "homeyCommunityTopicId": 152111,
   "widgets": {
-    "divider": {
-      "name": {
-        "en": "Divider",
-        "nl": "Scheiding"
-      },
-      "description": {
-        "en": "Add empty space between widgets",
-        "nl": "Voeg lege ruimte toe tussen widgets"
-      },
-      "height": 32,
-      "transparent": true,
-      "settings": [
-        {
-          "id": "height",
-          "type": "number",
-          "label": {
-            "en": "Height (pixels)",
-            "nl": "Hoogte (pixels)"
-          },
-          "hint": {
-            "en": "Homey uses an 8 pixel grid, so multiples of 8 (8, 16, 24, 32, ...) will align best.",
-            "nl": "Homey gebruikt een raster van 8 pixels, dus veelvouden van 8 (8, 16, 24, 32, ...) passen het beste."
-          },
-          "min": 0,
-          "max": 1000,
-          "step": 1,
-          "value": 32
-        }
-      ],
-      "id": "divider"
-    },
     "header": {
       "name": {
         "en": "Header",
@@ -77,7 +72,6 @@
         "en": "A section title to organize your dashboard",
         "nl": "Een sectietitel om je dashboard te organiseren"
       },
-      "height": 40,
       "transparent": true,
       "settings": [
         {
@@ -87,7 +81,11 @@
             "en": "Text",
             "nl": "Tekst"
           },
-          "value": "Section"
+          "value": "Section",
+          "hint": {
+            "en": "The section title, for example Living room. Long titles end with an ellipsis.",
+            "nl": "De sectietitel, bijvoorbeeld Woonkamer. Lange titels worden afgekapt met een beletselteken."
+          }
         },
         {
           "id": "size",
@@ -102,7 +100,7 @@
               "id": "xsmall",
               "label": {
                 "en": "Extra Small",
-                "nl": "Extra Klein"
+                "nl": "Extra klein"
               }
             },
             {
@@ -130,7 +128,7 @@
               "id": "xlarge",
               "label": {
                 "en": "Extra Large",
-                "nl": "Extra Groot"
+                "nl": "Extra groot"
               }
             }
           ]
@@ -172,7 +170,7 @@
           "type": "dropdown",
           "label": {
             "en": "Horizontal Alignment",
-            "nl": "Horizontale Uitlijning"
+            "nl": "Horizontale uitlijning"
           },
           "value": "left",
           "values": [
@@ -268,6 +266,77 @@
       "transparent": true,
       "settings": [
         {
+          "id": "style",
+          "type": "dropdown",
+          "label": {
+            "en": "Style",
+            "nl": "Stijl"
+          },
+          "value": "solid",
+          "values": [
+            {
+              "id": "solid",
+              "label": {
+                "en": "Solid",
+                "nl": "Doorgetrokken"
+              }
+            },
+            {
+              "id": "dashed",
+              "label": {
+                "en": "Dashed",
+                "nl": "Gestreept"
+              }
+            },
+            {
+              "id": "dotted",
+              "label": {
+                "en": "Dotted",
+                "nl": "Gestippeld"
+              }
+            }
+          ]
+        },
+        {
+          "id": "thickness",
+          "type": "dropdown",
+          "label": {
+            "en": "Thickness",
+            "nl": "Dikte"
+          },
+          "value": "1",
+          "values": [
+            {
+              "id": "1",
+              "label": {
+                "en": "1 px (thin)",
+                "nl": "1 px (dun)"
+              }
+            },
+            {
+              "id": "2",
+              "label": {
+                "en": "2 px",
+                "nl": "2 px"
+              }
+            },
+            {
+              "id": "3",
+              "label": {
+                "en": "3 px",
+                "nl": "3 px"
+              }
+            },
+            {
+              "id": "4",
+              "label": {
+                "en": "4 px (thick)",
+                "nl": "4 px (dik)"
+              }
+            }
+          ]
+        },
+        {
           "id": "color",
           "type": "dropdown",
           "label": {
@@ -321,77 +390,6 @@
           ]
         },
         {
-          "id": "thickness",
-          "type": "dropdown",
-          "label": {
-            "en": "Thickness",
-            "nl": "Dikte"
-          },
-          "value": "1",
-          "values": [
-            {
-              "id": "1",
-              "label": {
-                "en": "1px — Thin",
-                "nl": "1px — Dun"
-              }
-            },
-            {
-              "id": "2",
-              "label": {
-                "en": "2px",
-                "nl": "2px"
-              }
-            },
-            {
-              "id": "3",
-              "label": {
-                "en": "3px",
-                "nl": "3px"
-              }
-            },
-            {
-              "id": "4",
-              "label": {
-                "en": "4px — Thick",
-                "nl": "4px — Dik"
-              }
-            }
-          ]
-        },
-        {
-          "id": "style",
-          "type": "dropdown",
-          "label": {
-            "en": "Style",
-            "nl": "Stijl"
-          },
-          "value": "solid",
-          "values": [
-            {
-              "id": "solid",
-              "label": {
-                "en": "Solid",
-                "nl": "Doorgetrokken"
-              }
-            },
-            {
-              "id": "dashed",
-              "label": {
-                "en": "Dashed",
-                "nl": "Gestreept"
-              }
-            },
-            {
-              "id": "dotted",
-              "label": {
-                "en": "Dotted",
-                "nl": "Gestippeld"
-              }
-            }
-          ]
-        },
-        {
           "id": "margin",
           "type": "number",
           "label": {
@@ -399,8 +397,8 @@
             "nl": "Zijmarge (pixels)"
           },
           "hint": {
-            "en": "Horizontal space on each side of the line.",
-            "nl": "Horizontale ruimte aan elke kant van de lijn."
+            "en": "Empty space on the left and right of the line, from 0 to 200 pixels.",
+            "nl": "Lege ruimte links en rechts van de lijn, van 0 tot 200 pixels."
           },
           "min": 0,
           "max": 200,
@@ -409,6 +407,36 @@
         }
       ],
       "id": "separator"
+    },
+    "spacer": {
+      "name": {
+        "en": "Spacer",
+        "nl": "Ruimte"
+      },
+      "description": {
+        "en": "Invisible empty space between widgets",
+        "nl": "Onzichtbare lege ruimte tussen widgets"
+      },
+      "transparent": true,
+      "settings": [
+        {
+          "id": "height",
+          "type": "number",
+          "label": {
+            "en": "Height (pixels)",
+            "nl": "Hoogte (pixels)"
+          },
+          "hint": {
+            "en": "Height of the empty space, from 8 to 200 pixels. Multiples of 8 (8, 16, 24, 32, ...) line up best with Homey's grid.",
+            "nl": "Hoogte van de lege ruimte, van 8 tot 200 pixels. Veelvouden van 8 (8, 16, 24, 32, ...) sluiten het beste aan op het raster van Homey."
+          },
+          "min": 8,
+          "max": 200,
+          "step": 1,
+          "value": 32
+        }
+      ],
+      "id": "spacer"
     }
   }
 }

@@ -1,0 +1,115 @@
+{
+  "name": {
+    "en": "Weather station",
+    "nl": "Weerstation"
+  },
+  "description": {
+    "en": "Current measurements of the nearest weather station",
+    "nl": "Actuele metingen van het dichtstbijzijnde weerstation"
+  },
+  "api": {
+    "getData": {
+      "method": "GET",
+      "path": "/"
+    }
+  },
+  "transparent": false,
+  "settings": [
+    {
+      "id": "latitude",
+      "type": "text",
+      "label": {
+        "en": "Latitude",
+        "nl": "Breedtegraad"
+      },
+      "value": "",
+      "hint": {
+        "en": "Leave empty to use the location of your Homey. Example: 52.09",
+        "nl": "Laat leeg om de locatie van je Homey te gebruiken. Bijvoorbeeld: 52,09"
+      }
+    },
+    {
+      "id": "longitude",
+      "type": "text",
+      "label": {
+        "en": "Longitude",
+        "nl": "Lengtegraad"
+      },
+      "value": "",
+      "hint": {
+        "en": "Leave empty to use the location of your Homey. Example: 5.12",
+        "nl": "Laat leeg om de locatie van je Homey te gebruiken. Bijvoorbeeld: 5,12"
+      }
+    },
+    {
+      "id": "stationId",
+      "type": "text",
+      "label": {
+        "en": "Station ID",
+        "nl": "Station-ID"
+      },
+      "value": "",
+      "hint": {
+        "en": "Optional. Leave empty to use the station nearest to the location, or enter a Buienradar station ID such as 6260 (De Bilt).",
+        "nl": "Optioneel. Laat leeg om het station het dichtst bij de locatie te gebruiken, of vul een Buienradar station-ID in, zoals 6260 (De Bilt)."
+      }
+    },
+    {
+      "id": "style",
+      "type": "dropdown",
+      "label": {
+        "en": "Layout",
+        "nl": "Indeling"
+      },
+      "value": "default",
+      "values": [
+        {
+          "id": "default",
+          "label": {
+            "en": "Default",
+            "nl": "Standaard"
+          }
+        },
+        {
+          "id": "compact",
+          "label": {
+            "en": "Compact",
+            "nl": "Compact"
+          }
+        }
+      ]
+    },
+    {
+      "id": "horizontalAlignment",
+      "type": "dropdown",
+      "label": {
+        "en": "Horizontal alignment",
+        "nl": "Horizontale uitlijning"
+      },
+      "value": "left",
+      "values": [
+        {
+          "id": "left",
+          "label": {
+            "en": "Left",
+            "nl": "Links"
+          }
+        },
+        {
+          "id": "center",
+          "label": {
+            "en": "Center",
+            "nl": "Midden"
+          }
+        },
+        {
+          "id": "right",
+          "label": {
+            "en": "Right",
+            "nl": "Rechts"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,355 +1,303 @@
-<!DOCTYPE html>
-<html>
-
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="../../_shared/shared-styles.css">
-  <style>
-    /* Widget Specific Styles */
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
     html,
     body {
       margin: 0;
-      padding: 0;
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      background-color: transparent;
+      background: transparent;
       overflow: hidden;
     }
 
-    /* Outer Wrapper for Spacing */
-    .widget-spacing-wrapper {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      width: 100%;
-      box-sizing: border-box;
-      transition: none;
+    body {
+      font-family: var(--homey-font-family, system-ui, sans-serif);
+      color: var(--homey-text-color, #333);
     }
 
-    /* Inner Card for Background/Border */
-    .widget-card {
+    :where(#app) {
+      box-sizing: border-box;
+      padding: var(--homey-su-3, 12px) var(--homey-su-4, 16px);
+      --accent: var(--homey-text-color, #333);
+      --time-size: 42px;
+      --date-size: 16px;
+      --time-weight: normal;
+      --fit: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
       text-align: center;
-      width: 100%;
-      /* Card should take available width inside padding */
-      height: auto;
-      /* Dynamic height */
-      background: var(--homey-background-color);
-      border-radius: var(--homey-border-radius, 12px);
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
-      padding: 16px;
-      /* Internal padding for text breathing room */
-      box-sizing: border-box;
     }
 
-    .bg-transparent .widget-card {
-      background: transparent;
-      box-shadow: none;
-    }
-
-    /* Alignment (Applied to Spacer) */
-    .align-h-left {
+    .align-left {
       align-items: flex-start;
       text-align: left;
     }
 
-    .align-h-center {
-      align-items: center;
-      text-align: center;
-    }
-
-    .align-h-right {
+    .align-right {
       align-items: flex-end;
       text-align: right;
     }
 
-    .align-v-top {
-      justify-content: flex-start;
+    .size-xsmall {
+      --time-size: 20px;
+      --date-size: 12px;
     }
 
-    .align-v-center {
-      justify-content: center;
+    .size-small {
+      --time-size: 28px;
+      --date-size: 14px;
     }
 
-    .align-v-bottom {
-      justify-content: flex-end;
+    .size-large {
+      --time-size: 56px;
+      --date-size: 20px;
     }
 
-
-    /* Typography Sizes (Applied to Card) */
-    .size-xsmall .time {
-      font-size: 16px;
+    .size-xlarge {
+      --time-size: 72px;
+      --date-size: 24px;
     }
 
-    .size-xsmall .date {
-      font-size: 8px;
-      margin-top: 1px;
+    .weight-thin {
+      --time-weight: 300;
     }
 
-    .size-small .time {
-      font-size: 24px;
+    .weight-bold {
+      --time-weight: bold;
     }
 
-    .size-small .date {
-      font-size: 10px;
-      margin-top: 2px;
+    .color-blue {
+      --accent: var(--homey-color-blue-500, #0099ff);
     }
 
-    .size-medium .time {
-      font-size: 42px;
+    .color-green {
+      --accent: var(--homey-color-green-500, #26c281);
     }
 
-    .size-medium .date {
-      font-size: 14px;
-      margin-top: 4px;
+    .color-orange {
+      --accent: var(--homey-color-orange-500, #ff9500);
     }
 
-    .size-large .time {
-      font-size: 56px;
+    .color-red {
+      --accent: var(--homey-color-red-500, #ff3b30);
     }
 
-    .size-large .date {
-      font-size: 18px;
-      margin-top: 6px;
+    .color-purple {
+      --accent: var(--homey-color-purple-500, #a855f7);
     }
 
-    .size-xlarge .time {
-      font-size: 72px;
-    }
-
-    .size-xlarge .date {
-      font-size: 24px;
-      margin-top: 8px;
-    }
-
-    /* Font Weights */
-    .weight-thin .time {
-      font-weight: 100;
-    }
-
-    .weight-normal .time {
-      font-weight: 300;
-    }
-
-    .weight-bold .time {
-      font-weight: 600;
-    }
-
-    .weight-thin .date {
-      font-weight: 200;
-    }
-
-    .weight-normal .date {
-      font-weight: 300;
-    }
-
-    .weight-bold .date {
-      font-weight: 500;
-    }
-
-    /* Colors */
-    .color-default {
-      color: var(--homey-text-color);
-    }
-
-    /* Time Elements */
     .time {
-      line-height: 1;
+      font-size: calc(var(--time-size) * var(--fit));
+      font-weight: var(--time-weight);
+      line-height: 1.1;
+      color: var(--accent);
       white-space: nowrap;
-      font-feature-settings: "tnum";
       font-variant-numeric: tabular-nums;
-      letter-spacing: -1px;
-      /* Tighter tracking for large numbers */
-    }
-
-    .date {
-      opacity: 0.6;
-      line-height: 1.2;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
     }
 
     .seconds {
       font-size: 0.5em;
-      opacity: 0.6;
-      font-weight: 300;
+      opacity: 0.7;
     }
 
     .period {
+      margin-left: 0.25em;
       font-size: 0.4em;
-      margin-left: 0.2em;
-      opacity: 0.5;
-      vertical-align: top;
-      font-weight: 400;
+      opacity: 0.7;
     }
 
-    .no-card {
-      background: transparent !important;
-      box-shadow: none !important;
-      padding: 0 !important;
+    .seconds:empty,
+    .period:empty {
+      display: none;
     }
-  </style>
-</head>
 
-<body>
-  <div class="widget-spacing-wrapper" id="app-container">
-    <div class="widget-card" id="widget-card">
-      <div class="time" id="time"></div>
-      <div class="date" id="date"></div>
+    .date {
+      max-width: 100%;
+      margin-top: 0.25em;
+      font-size: var(--date-size);
+      line-height: 1.25;
+      opacity: 0.7;
+      text-wrap: balance;
+    }
+
+    .date[hidden] {
+      display: none;
+    }
+    </style>
+  </head>
+
+  <body class="homey-widget-full">
+    <div id="app">
+      <div class="time" id="time" role="timer" aria-live="off">
+        <span id="hours-minutes"></span><span class="seconds" id="seconds"></span
+        ><span class="period" id="period"></span>
+      </div>
+      <div class="date" id="date" hidden></div>
     </div>
-  </div>
 
-  <script>
-    let currentSettings = {};
+    <script>
+    const WIDGET_ID = "digital-clock";
+    const SECOND = 1000;
+    const MINUTE = 60 * SECOND;
 
-    function updateTime() {
-      const now = new Date();
-      const timeElement = document.getElementById('time');
-      const dateElement = document.getElementById('date');
+    const app = document.getElementById("app");
+    const timeElement = document.getElementById("time");
+    const hoursMinutesElement = document.getElementById("hours-minutes");
+    const secondsElement = document.getElementById("seconds");
+    const periodElement = document.getElementById("period");
+    const dateElement = document.getElementById("date");
 
-      // 1. Time Formatting
-      const is24h = currentSettings.clockFormat !== '12';
-      let hours = now.getHours();
-      let minutes = now.getMinutes();
-      let seconds = now.getSeconds();
-      let period = '';
+    const DATE_FORMATS = {
+      long: { day: "numeric", month: "long", year: "numeric" },
+      short: { day: "numeric", month: "short", year: "numeric" },
+      "weekday-long": { weekday: "long", day: "numeric", month: "long" },
+      "weekday-short": { weekday: "short", day: "numeric", month: "short" },
+      "weekday-only": { weekday: "long" },
+      "day-month": { day: "numeric", month: "long" },
+    };
 
-      if (!is24h) {
-        period = hours >= 12 ? 'PM' : 'AM';
-        hours = hours % 12;
-        hours = hours ? hours : 12; // the hour '0' should be '12'
-      }
+    let settings = {};
+    let locale = "en";
+    let periodLabels = { am: "AM", pm: "PM" };
+    let renderedDateKey = "";
+    let renderedTimeLength = 0;
 
-      const pad = (num) => num.toString().padStart(2, '0');
-
-      let timeHtml = `${pad(hours)}<span class="colon">:</span>${pad(minutes)}`;
-
-      if (currentSettings.showSeconds) {
-        timeHtml += `<span class="seconds">:${pad(seconds)}</span>`;
-      }
-
-      if (period) {
-        timeHtml += `<span class="period">${pad(period)}</span>`;
-      }
-
-      timeElement.innerHTML = timeHtml;
-
-      // 2. Date Formatting
-      if (currentSettings.showDate) {
-        dateElement.style.display = 'block';
-        dateElement.innerText = formatDate(now);
-      } else {
-        dateElement.style.display = 'none';
-      }
-    }
+    const pad = (value) => String(value).padStart(2, "0");
 
     function formatDate(date) {
-      const format = currentSettings.dateFormat || 'weekday-short';
-      const options = {};
+      const day = pad(date.getDate());
+      const month = pad(date.getMonth() + 1);
+      const year = date.getFullYear();
+      const format = settings.dateFormat || "weekday-short";
+      if (format === "dmy") return `${day}/${month}/${year}`;
+      if (format === "mdy") return `${month}/${day}/${year}`;
+      if (format === "ymd") return `${year}-${month}-${day}`;
+      const text = date.toLocaleDateString(
+        locale,
+        DATE_FORMATS[format] ?? DATE_FORMATS["weekday-short"],
+      );
+      return text.charAt(0).toLocaleUpperCase(locale) + text.slice(1);
+    }
 
-      switch (format) {
-        case 'dmy':
-          return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
-        case 'mdy':
-          return `${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getDate().toString().padStart(2, '0')}/${date.getFullYear()}`;
-        case 'ymd':
-          return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
-        case 'short':
-          options.month = 'short'; options.day = 'numeric'; options.year = 'numeric';
-          break;
-        case 'long':
-          options.month = 'long'; options.day = 'numeric'; options.year = 'numeric';
-          break;
-        case 'weekday-short':
-          options.weekday = 'short'; options.month = 'short'; options.day = 'numeric';
-          break;
-        case 'weekday-long':
-          options.weekday = 'long'; options.month = 'long'; options.day = 'numeric';
-          break;
-        case 'weekday-only':
-          options.weekday = 'long';
-          break;
-        case 'day-month':
-          options.day = 'numeric'; options.month = 'long';
-          break;
-        default:
-          options.weekday = 'short'; options.month = 'short'; options.day = 'numeric';
+    function renderDate(now) {
+      dateElement.hidden = !settings.showDate;
+      if (!settings.showDate) return;
+      const key = `${now.toDateString()}:${settings.dateFormat}`;
+      if (key === renderedDateKey) return;
+      renderedDateKey = key;
+      dateElement.textContent = formatDate(now);
+    }
+
+    function render() {
+      const now = new Date();
+      const hours = now.getHours();
+      const is12Hour = settings.clockFormat === "12";
+      const displayHours = is12Hour ? String(hours % 12 || 12) : pad(hours);
+      const hoursMinutes = `${displayHours}:${pad(now.getMinutes())}`;
+
+      hoursMinutesElement.textContent = hoursMinutes;
+      secondsElement.textContent = settings.showSeconds ? `:${pad(now.getSeconds())}` : "";
+      periodElement.textContent = is12Hour ? periodLabels[hours < 12 ? "am" : "pm"] : "";
+      renderDate(now);
+
+      if (hoursMinutes.length !== renderedTimeLength) {
+        renderedTimeLength = hoursMinutes.length;
+        fitToWidth();
       }
-
-      return date.toLocaleDateString(undefined, options);
     }
 
-
-
-    function updateStyles(Homey) {
-      const appContainer = document.getElementById('app-container');
-      const widgetCard = document.getElementById('widget-card');
-
-      // Styles applied to Card (sizes, colors, weights)
-      widgetCard.className = 'widget-card'; // Reset
-      const size = currentSettings.size || 'medium';
-      widgetCard.classList.add(`size-${size}`);
-      widgetCard.classList.add(`color-default`);
-      widgetCard.classList.add(`weight-${currentSettings.fontWeight || 'normal'}`);
-
-
-
-      // Alignment applied to Wrapper
-      appContainer.className = 'widget-spacing-wrapper';
-      widgetCard.classList.add(`align-h-${currentSettings.horizontalAlignment || 'center'}`);
-
-
-
-
-      // Card background is handled by widget compose transparent setting
+    /** Width available to the clock: the #app box minus its padding. */
+    function contentWidth(element) {
+      const style = getComputedStyle(element);
+      return element.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
     }
 
-    function calculateTotalHeight() {
-      // Use offsetHeight of the container to get actual content size
-      const appContainer = document.getElementById('app-container');
-      return appContainer.offsetHeight;
+    /** Shrinks the time (never grows it) so it fits the widget width without clipping. */
+    function fitToWidth() {
+      app.style.setProperty("--fit", "1");
+      const available = contentWidth(app);
+      const natural = timeElement.scrollWidth;
+      const fit = natural > available ? available / natural : 1;
+      app.style.setProperty("--fit", fit.toFixed(3));
     }
 
-    function onHomeyReady(Homey) {
-      currentSettings = Homey.getSettings();
+    function applySettings() {
+      app.className = [
+        `size-${settings.size || "medium"}`,
+        `weight-${settings.fontWeight || "normal"}`,
+        `color-${settings.color || "default"}`,
+        `align-${settings.horizontalAlignment || "center"}`,
+      ].join(" ");
+      renderedDateKey = "";
+      renderedTimeLength = 0;
+    }
 
-      Homey.on('settings.set', (key, value) => {
-        currentSettings[key] = value;
-        updateStyles(Homey);
-        updateTime();
-        // ResizeObserver will handle height
-      });
+    function translate(Homey, key, fallback) {
+      const value = Homey.__(`widgets.${WIDGET_ID}.${key}`);
+      return value && value !== key ? value : fallback;
+    }
 
-      updateStyles(null);
-      updateTime();
-
-      setInterval(updateTime, 1000);
-
-      // Dynamic Height
-      const updateHeight = () => {
-        if (Homey) {
-          Homey.ready({ height: calculateTotalHeight() });
-          if (Homey.setHeight) {
-            Homey.setHeight(calculateTotalHeight());
-          }
-        }
+    function createHeightReporter(Homey) {
+      let reportedHeight = null;
+      return () => {
+        const height = Math.ceil(document.body.getBoundingClientRect().height);
+        if (height === reportedHeight) return;
+        if (reportedHeight === null) Homey.ready({ height });
+        else Homey.setHeight(height);
+        reportedHeight = height;
       };
-
-      const resizeObserver = new ResizeObserver(() => {
-        updateHeight();
-      });
-      resizeObserver.observe(document.body);
-
-      setTimeout(updateHeight, 0);
     }
-  </script>
-</body>
 
+    /** Runs `tick` on every second or minute boundary and pauses while the page is hidden. */
+    function createTicker(tick, getInterval) {
+      let timer = null;
+      const stop = () => clearTimeout(timer);
+      const run = () => {
+        tick();
+        const interval = getInterval();
+        timer = setTimeout(run, interval - (Date.now() % interval) + 20);
+      };
+      const start = () => {
+        stop();
+        run();
+      };
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden) stop();
+        else start();
+      });
+      return { start };
+    }
+
+    window.onHomeyReady = (Homey) => {
+      settings = Homey.getSettings();
+      locale = translate(Homey, "language", navigator.language || "en");
+      periodLabels = { am: translate(Homey, "am", "AM"), pm: translate(Homey, "pm", "PM") };
+      document.documentElement.lang = locale;
+
+      const reportHeight = createHeightReporter(Homey);
+      const ticker = createTicker(render, () => (settings.showSeconds ? SECOND : MINUTE));
+
+      applySettings();
+      ticker.start();
+      reportHeight();
+
+      let observedWidth = app.clientWidth;
+      new ResizeObserver(() => {
+        if (app.clientWidth !== observedWidth) {
+          observedWidth = app.clientWidth;
+          fitToWidth();
+        }
+        reportHeight();
+      }).observe(app);
+
+      Homey.on("settings.set", (key, value) => {
+        settings[key] = value;
+        applySettings();
+        ticker.start();
+      });
+    };
+    </script>
+  </body>
 </html>

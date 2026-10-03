@@ -1,0 +1,29 @@
+{
+  "name": {
+    "en": "Spacer",
+    "nl": "Ruimte"
+  },
+  "description": {
+    "en": "Invisible empty space between widgets",
+    "nl": "Onzichtbare lege ruimte tussen widgets"
+  },
+  "transparent": true,
+  "settings": [
+    {
+      "id": "height",
+      "type": "number",
+      "label": {
+        "en": "Height (pixels)",
+        "nl": "Hoogte (pixels)"
+      },
+      "hint": {
+        "en": "Height of the empty space, from 8 to 200 pixels. Multiples of 8 (8, 16, 24, 32, ...) line up best with Homey's grid.",
+        "nl": "Hoogte van de lege ruimte, van 8 tot 200 pixels. Veelvouden van 8 (8, 16, 24, 32, ...) sluiten het beste aan op het raster van Homey."
+      },
+      "min": 8,
+      "max": 200,
+      "step": 1,
+      "value": 32
+    }
+  ]
+}

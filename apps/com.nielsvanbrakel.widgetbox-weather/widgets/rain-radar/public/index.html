@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
+      --text: var(--homey-text-color, #333);
+      margin: 0;
+      overflow: hidden;
+      background: transparent;
+      color: var(--text);
+      font-family: var(--homey-font-family, system-ui, sans-serif);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .widget {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .radar {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .chip {
+      position: absolute;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.55);
+      color: #fff;
+      font-size: 11px;
+      line-height: 16px;
+    }
+
+    .credit {
+      right: 6px;
+      bottom: 6px;
+      border: 0;
+      font-family: inherit;
+      cursor: pointer;
+    }
+
+    .credit::after {
+      content: "";
+      position: absolute;
+      inset: -12px -6px -6px -12px;
+    }
+
+    .offline {
+      top: 6px;
+      right: 6px;
+    }
+
+    .message {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      text-align: center;
+      font-size: var(--homey-font-size-small, 14px);
+      opacity: 0.8;
+    }
+
+    [hidden] {
+      display: none;
+    }
+    </style>
+  </head>
+
+  <body class="homey-widget-full">
+    <div class="widget">
+      <img class="radar" id="radar" alt="" hidden>
+      <div class="message" id="message" role="status"></div>
+      <span class="chip offline" id="offline" hidden></span>
+      <button class="chip credit" id="credit" type="button">Buienradar.nl</button>
+    </div>
+
+    <script>
+    const IMAGE_URL = "https://image.buienradar.nl/2.0/image/single/RadarMapRainNL";
+    const REFRESH_MS = 5 * 60 * 1000;
+    const SIZES = [256, 512, 768];
+
+    const $ = (id) => document.getElementById(id);
+
+    /** Smallest image size that is sharp at the current width and pixel density. */
+    function imageSize() {
+      const pixels = document.body.clientWidth * (window.devicePixelRatio || 1);
+      return SIZES.find((size) => size >= pixels) ?? SIZES[SIZES.length - 1];
+    }
+
+    /** The URL only changes once per refresh period, so the browser cache can be used. */
+    function imageUrl(now = Date.now()) {
+      const size = String(imageSize());
+      const params = new URLSearchParams({
+        width: size,
+        height: size,
+        renderBackground: "True",
+        renderBranding: "True",
+        renderText: "True",
+        t: String(Math.floor(now / REFRESH_MS)),
+      });
+      return `${IMAGE_URL}?${params}`;
+    }
+
+    function onHomeyReady(Homey) {
+      const state = { lastLoad: 0, lastAttempt: 0, timer: null };
+      const translated = Homey.__("language");
+      const language = /^[a-z]{2}$/.test(translated) ? translated : navigator.language;
+
+      function t(key, tokens = {}) {
+        const text = Homey.__(key) ?? key;
+        return text.replace(/\{(\w+)\}/g, (_, name) => tokens[name] ?? "");
+      }
+
+      function formatClock(time) {
+        return new Date(time).toLocaleTimeString(language, {
+          hour: "2-digit",
+          minute: "2-digit",
+          hourCycle: "h23",
+        });
+      }
+
+      /** Loads the next image off-screen and only swaps it in when it loaded successfully. */
+      function refresh() {
+        clearTimeout(state.timer);
+        state.lastAttempt = Date.now();
+        const next = new Image();
+        next.onload = () => {
+          next.id = "radar";
+          next.className = "radar";
+          next.alt = t("widgets.rain-radar.alt");
+          $("radar").replaceWith(next);
+          $("message").hidden = true;
+          $("offline").hidden = true;
+          state.lastLoad = Date.now();
+          schedule();
+        };
+        next.onerror = () => {
+          if (state.lastLoad) {
+            $("offline").textContent = t("common.offline", { time: formatClock(state.lastLoad) });
+            $("offline").hidden = false;
+          } else {
+            $("message").textContent = `${t("common.errorTitle")}. ${t("common.errorRetry")}.`;
+          }
+          schedule();
+        };
+        next.src = imageUrl();
+      }
+
+      function schedule() {
+        clearTimeout(state.timer);
+        if (document.visibilityState === "hidden") return;
+        state.timer = setTimeout(refresh, Math.max(state.lastAttempt + REFRESH_MS - Date.now(), 0));
+      }
+
+      $("credit").addEventListener("click", () => Homey.popup("https://www.buienradar.nl"));
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "hidden") clearTimeout(state.timer);
+        else schedule();
+      });
+
+      document.documentElement.lang = language;
+      $("message").textContent = t("common.loading");
+      Homey.ready();
+      refresh();
+    }
+
+    window.onHomeyReady = onHomeyReady;
+    </script>
+  </body>
+</html>

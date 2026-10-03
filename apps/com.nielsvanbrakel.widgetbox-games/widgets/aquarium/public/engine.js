@@ -825,7 +825,7 @@
     for (const key of Object.keys(action)) {
       if (key === "type" || action[key] == null) continue;
       const check = PARAM_CHECKS[key];
-      if (!check || !check(action[key])) return false;
+      if (!check?.(action[key])) return false;
     }
     return true;
   }

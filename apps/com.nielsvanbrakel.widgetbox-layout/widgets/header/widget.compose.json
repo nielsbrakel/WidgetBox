@@ -7,7 +7,6 @@
     "en": "A section title to organize your dashboard",
     "nl": "Een sectietitel om je dashboard te organiseren"
   },
-  "height": 40,
   "transparent": true,
   "settings": [
     {
@@ -17,7 +16,11 @@
         "en": "Text",
         "nl": "Tekst"
       },
-      "value": "Section"
+      "value": "Section",
+      "hint": {
+        "en": "The section title, for example Living room. Long titles end with an ellipsis.",
+        "nl": "De sectietitel, bijvoorbeeld Woonkamer. Lange titels worden afgekapt met een beletselteken."
+      }
     },
     {
       "id": "size",
@@ -32,7 +35,7 @@
           "id": "xsmall",
           "label": {
             "en": "Extra Small",
-            "nl": "Extra Klein"
+            "nl": "Extra klein"
           }
         },
         {
@@ -60,7 +63,7 @@
           "id": "xlarge",
           "label": {
             "en": "Extra Large",
-            "nl": "Extra Groot"
+            "nl": "Extra groot"
           }
         }
       ]
@@ -102,7 +105,7 @@
       "type": "dropdown",
       "label": {
         "en": "Horizontal Alignment",
-        "nl": "Horizontale Uitlijning"
+        "nl": "Horizontale uitlijning"
       },
       "value": "left",
       "values": [
@@ -138,12 +141,48 @@
       },
       "value": "default",
       "values": [
-        { "id": "default", "label": { "en": "Default", "nl": "Standaard" } },
-        { "id": "blue", "label": { "en": "Blue", "nl": "Blauw" } },
-        { "id": "green", "label": { "en": "Green", "nl": "Groen" } },
-        { "id": "orange", "label": { "en": "Orange", "nl": "Oranje" } },
-        { "id": "red", "label": { "en": "Red", "nl": "Rood" } },
-        { "id": "purple", "label": { "en": "Purple", "nl": "Paars" } }
+        {
+          "id": "default",
+          "label": {
+            "en": "Default",
+            "nl": "Standaard"
+          }
+        },
+        {
+          "id": "blue",
+          "label": {
+            "en": "Blue",
+            "nl": "Blauw"
+          }
+        },
+        {
+          "id": "green",
+          "label": {
+            "en": "Green",
+            "nl": "Groen"
+          }
+        },
+        {
+          "id": "orange",
+          "label": {
+            "en": "Orange",
+            "nl": "Oranje"
+          }
+        },
+        {
+          "id": "red",
+          "label": {
+            "en": "Red",
+            "nl": "Rood"
+          }
+        },
+        {
+          "id": "purple",
+          "label": {
+            "en": "Purple",
+            "nl": "Paars"
+          }
+        }
       ]
     }
   ]
