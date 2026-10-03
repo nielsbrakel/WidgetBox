@@ -18,7 +18,7 @@ function forecast(count) {
   };
 }
 
-describe("forecast widget", () => {
+describe("daily-forecast widget", () => {
   beforeEach(() => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-10-02T07:00:00Z"));
@@ -26,7 +26,7 @@ describe("forecast widget", () => {
   afterEach(() => vi.useRealTimers());
 
   async function load(options = {}) {
-    const widget = loadWidget("forecast", {
+    const widget = loadWidget("daily-forecast", {
       api: vi.fn().mockResolvedValue(forecast(5)),
       ...options,
     });
@@ -68,7 +68,7 @@ describe("forecast widget", () => {
   });
 
   it("shows skeleton rows before the data arrives and calls ready once", async () => {
-    const { document, Homey } = loadWidget("forecast", { api: () => new Promise(() => {}) });
+    const { document, Homey } = loadWidget("daily-forecast", { api: () => new Promise(() => {}) });
     expect(document.querySelectorAll(".day")).toHaveLength(5);
     expect(document.querySelector("#days").classList.contains("skeleton")).toBe(true);
     expect(Homey.ready).toHaveBeenCalledTimes(1);

@@ -23,17 +23,17 @@ test.describe("Clocks App", () => {
     test("should toggle second hand", async () => {
       await expect(clocks.secondHand).toBeVisible();
 
-      await clocks.setSettingCheckbox("Show Second Hand", false);
+      await clocks.setSettingCheckbox("Show second hand", false);
       await expect(clocks.secondHand).toBeHidden();
 
-      await clocks.setSettingCheckbox("Show Second Hand", true);
+      await clocks.setSettingCheckbox("Show second hand", true);
       await expect(clocks.secondHand).toBeVisible();
     });
 
     test("should toggle the date", async () => {
       await expect(clocks.dateGroup).toBeHidden();
 
-      await clocks.setSettingCheckbox("Show Date", true);
+      await clocks.setSettingCheckbox("Show date", true);
       await expect(clocks.dateGroup).toBeVisible();
       await expect(clocks.dateGroup).toHaveText(String(new Date().getDate()));
     });
@@ -60,7 +60,7 @@ test.describe("Clocks App", () => {
       await clocks.goto();
       await clocks.selectWidget("Analog Clock");
       await clocks.verifyAnalogLoaded();
-      await clocks.setSettingCheckbox("Show Second Hand", false);
+      await clocks.setSettingCheckbox("Show second hand", false);
       await expect(clocks.analogTitle).toHaveText(/10:15/);
 
       // The screen slept for exactly an hour: same minute, different hour, no timers fired.
@@ -85,16 +85,16 @@ test.describe("Clocks App", () => {
     test("should toggle seconds", async () => {
       await expect(clocks.digitalSeconds).toHaveText("");
 
-      await clocks.setSettingCheckbox("Show Seconds", true);
+      await clocks.setSettingCheckbox("Show seconds", true);
       await expect(clocks.digitalSeconds).toHaveText(/^:\d{2}$/);
 
-      await clocks.setSettingCheckbox("Show Seconds", false);
+      await clocks.setSettingCheckbox("Show seconds", false);
       await expect(clocks.digitalSeconds).toHaveText("");
     });
 
     test("only touches the DOM when the text changes", async ({ page }) => {
-      await clocks.setSettingCheckbox("Show Seconds", true);
-      await clocks.setSettingCheckbox("Show Date", true);
+      await clocks.setSettingCheckbox("Show seconds", true);
+      await clocks.setSettingCheckbox("Show date", true);
       await page.clock.install();
       await clocks.reloadWidget();
       await clocks.verifyDigitalLoaded();
@@ -120,12 +120,12 @@ test.describe("Clocks App", () => {
     test("should toggle the date", async () => {
       await expect(clocks.digitalDate).toBeVisible();
 
-      await clocks.setSettingCheckbox("Show Date", false);
+      await clocks.setSettingCheckbox("Show date", false);
       await expect(clocks.digitalDate).toBeHidden();
     });
 
     test("should show a 12-hour time with a translated period", async () => {
-      await clocks.setSettingSelect("Time Format", { value: "12" });
+      await clocks.setSettingSelect("Time format", { value: "12" });
       await expect(clocks.digitalTime).toHaveText(/\d{1,2}:\d{2}/);
       await expect(clocks.digitalPeriod).toHaveText(/^(AM|PM)$/);
     });
@@ -144,25 +144,25 @@ test.describe("Clocks App", () => {
     test("should toggle seconds", async () => {
       await expect(clocks.flipSeconds).toHaveCount(0);
 
-      await clocks.setSettingCheckbox("Show Seconds", true);
+      await clocks.setSettingCheckbox("Show seconds", true);
       await expect(clocks.flipSeconds).toBeVisible();
 
-      await clocks.setSettingCheckbox("Show Seconds", false);
+      await clocks.setSettingCheckbox("Show seconds", false);
       await expect(clocks.flipSeconds).toHaveCount(0);
     });
 
     test("should toggle colons", async () => {
       await expect(clocks.app).not.toHaveClass(/hide-colons/);
 
-      await clocks.setSettingCheckbox("Show Colons", false);
+      await clocks.setSettingCheckbox("Show colons", false);
       await expect(clocks.app).toHaveClass(/hide-colons/);
 
-      await clocks.setSettingCheckbox("Show Colons", true);
+      await clocks.setSettingCheckbox("Show colons", true);
       await expect(clocks.app).not.toHaveClass(/hide-colons/);
     });
 
     test("should show the period card in 12-hour mode without flipping from undefined", async () => {
-      await clocks.setSettingSelect("Time Format", { value: "12" });
+      await clocks.setSettingSelect("Time format", { value: "12" });
       await expect(clocks.flipPeriod).toBeVisible();
       await expect(clocks.flipPeriod.locator(".half.top")).toHaveText(/^(AM|PM)$/);
       await expect(clocks.flipClock).not.toContainText("undefined");
@@ -205,26 +205,26 @@ test.describe("Clocks App", () => {
     });
 
     test("should toggle seconds", async () => {
-      await clocks.setSettingCheckbox("Show Seconds", false);
+      await clocks.setSettingCheckbox("Show seconds", false);
       await expect(clocks.binaryGroups).toHaveCount(2);
 
-      await clocks.setSettingCheckbox("Show Seconds", true);
+      await clocks.setSettingCheckbox("Show seconds", true);
       await expect(clocks.binaryGroups).toHaveCount(3);
     });
 
     test("should show translated labels", async () => {
       await expect(clocks.binaryLabels).toHaveText(["H", "M", "S"]);
 
-      await clocks.setSettingCheckbox("Show Labels", false);
+      await clocks.setSettingCheckbox("Show labels", false);
       await expect(clocks.app).toHaveClass(/hide-labels/);
       await expect(clocks.binaryLabels.first()).toBeHidden();
 
-      await clocks.setSettingCheckbox("Show Labels", true);
+      await clocks.setSettingCheckbox("Show labels", true);
       await expect(clocks.app).not.toHaveClass(/hide-labels/);
     });
 
     test("should show AM or PM as text in 12-hour mode", async () => {
-      await clocks.setSettingSelect("Time Format", { value: "12" });
+      await clocks.setSettingSelect("Time format", { value: "12" });
       await expect(clocks.binaryPeriod).toHaveText(/^(AM|PM)$/);
     });
   });

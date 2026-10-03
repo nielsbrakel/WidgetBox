@@ -22,9 +22,9 @@ Widgets are grouped into five apps by theme. Grouping keeps the number of instal
 | App (en / nl) | ID | Widgets | Category | Brand color |
 |---------------|----|---------|----------|-------------|
 | WidgetBox Clocks & Timers / Klokken & Timers | `com.nielsvanbrakel.widgetbox-clocks` | analog-clock, binary-clock, digital-clock, flip-clock, word-clock-grid, word-clock-sentence, stopwatch, timer | tools | `#5E35B1` |
-| WidgetBox Weather / Weer | `com.nielsvanbrakel.widgetbox-weather` | rain-graph, rain-radar, radar-5day, forecast, station (Buienradar data, NL/BE), weather-map (Windy embed) | internet | `#0277BD` |
+| WidgetBox Weather / Weer | `com.nielsvanbrakel.widgetbox-weather` | rain-graph, rain-radar, rain-radar-5day, daily-forecast, station (Buienradar data, NL/BE), weather-map (Windy embed) | internet | `#0277BD` |
 | WidgetBox Layout / Lay-out | `com.nielsvanbrakel.widgetbox-layout` | header, separator, spacer | tools | `#546E7A` |
-| WidgetBox Video | `com.nielsvanbrakel.widgetbox-video` | youtube (video player) | video | `#D84315` |
+| WidgetBox Video | `com.nielsvanbrakel.widgetbox-video` | video (YouTube player) | video | `#D84315` |
 | WidgetBox Games / Spellen | `com.nielsvanbrakel.widgetbox-games` | aquarium | tools | `#00796B` |
 
 Naming rules: never put a third-party brand (YouTube, Buienradar, Windy) in an app or widget name; "for YouTube videos" or "data from Buienradar" in text is fine. App names stay at four words or fewer and never contain "Homey" or "Athom".
@@ -180,7 +180,7 @@ Use the `hint` property to add explanation text to settings that may not be imme
 
 Pick ONE: a fixed/percentage `height` in `widget.compose.json`, OR runtime `Homey.ready({ height })` + `Homey.setHeight()`. Never both.
 
-### 1. Content-Based Height (clocks, stopwatch, timer, station, forecast, header)
+### 1. Content-Based Height (clocks, stopwatch, timer, station, daily-forecast, header)
 
 Measure the content (not `body`, to avoid ResizeObserver feedback loops) and only report changes:
 
@@ -239,7 +239,7 @@ Each widget keeps its CSS inline in `public/index.html` (Homey serves only `publ
 | Clock widgets | `false` | Card background for readability |
 | Stopwatch, Timer | `false` | Card background for readability |
 | Spacer | `true` | Invisible spacing element, blends with dashboard |
-| Embed widgets (radar-5day, weather map, video) | not set | Iframe handles its own background |
+| Embed widgets (rain-radar-5day, weather map, video) | not set | Iframe handles its own background |
 
 ---
 

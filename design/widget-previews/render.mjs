@@ -30,15 +30,15 @@ const APPS = {
     "timer",
   ],
   "com.nielsvanbrakel.widgetbox-weather": [
-    "radar-5day",
+    "rain-radar-5day",
     "rain-graph",
     "rain-radar",
-    "forecast",
+    "daily-forecast",
     "station",
     "weather-map",
   ],
   "com.nielsvanbrakel.widgetbox-layout": ["header", "separator", "spacer"],
-  "com.nielsvanbrakel.widgetbox-video": ["youtube"],
+  "com.nielsvanbrakel.widgetbox-video": ["video"],
 };
 
 const only = new Set(process.argv.slice(2));

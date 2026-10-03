@@ -4,7 +4,7 @@
  * The "real" scenarios call the public Buienradar endpoints from the browser.
  */
 
-const WEATHER_WIDGETS = ["rain-graph", "station", "forecast", "weather-map"];
+const WEATHER_WIDGETS = ["rain-graph", "station", "daily-forecast", "weather-map"];
 const MOCK_LOCATION = { latitude: 52.09, longitude: 5.12 };
 const ICON_BASE = "https://cdn.buienradar.nl/resources/images/icons/weather/96x96/";
 
@@ -166,7 +166,7 @@ async function fetchRealForecast(endpoint) {
 const REAL_HANDLERS = {
   "rain-graph": fetchRealRain,
   station: fetchRealStation,
-  forecast: fetchRealForecast,
+  "daily-forecast": fetchRealForecast,
 };
 
 /**
@@ -185,6 +185,7 @@ export async function handleWeatherApi(widgetId, scenario, _settings, _method, e
 
   if (widgetId === "rain-graph") return mockRainForecast(scenario.id);
   if (widgetId === "station") return mockStation();
-  if (widgetId === "forecast") return mockForecast(Number(readQuery(endpoint).get("days")) || 5);
+  if (widgetId === "daily-forecast")
+    return mockForecast(Number(readQuery(endpoint).get("days")) || 5);
   return null;
 }

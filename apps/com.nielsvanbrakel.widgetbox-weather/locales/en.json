@@ -29,12 +29,12 @@
       "invalidStation": "Station not found. Check the station ID in the widget settings.",
       "compass": "N,NE,E,SE,S,SW,W,NW"
     },
-    "forecast": {
+    "daily-forecast": {
       "today": "Today",
       "tomorrow": "Tomorrow",
       "rainChance": "Chance of rain"
     },
-    "radar-5day": {
+    "rain-radar-5day": {
       "title": "5-day rain radar"
     },
     "rain-radar": {

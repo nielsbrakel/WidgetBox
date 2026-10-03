@@ -49,7 +49,7 @@
         {
           "id": "swiss",
           "label": {
-            "en": "Swiss Railway",
+            "en": "Swiss railway",
             "nl": "Zwitserse stationsklok"
           }
         }
@@ -59,7 +59,7 @@
       "id": "showSeconds",
       "type": "checkbox",
       "label": {
-        "en": "Show Second Hand",
+        "en": "Show second hand",
         "nl": "Secondewijzer tonen"
       },
       "value": true
@@ -68,7 +68,7 @@
       "id": "showDate",
       "type": "checkbox",
       "label": {
-        "en": "Show Date",
+        "en": "Show date",
         "nl": "Datum tonen"
       },
       "value": false
@@ -85,7 +85,7 @@
         {
           "id": "xsmall",
           "label": {
-            "en": "Extra Small",
+            "en": "Extra small",
             "nl": "Extra klein"
           }
         },
@@ -113,7 +113,7 @@
         {
           "id": "xlarge",
           "label": {
-            "en": "Extra Large",
+            "en": "Extra large",
             "nl": "Extra groot"
           }
         }
@@ -131,8 +131,8 @@
         {
           "id": "default",
           "label": {
-            "en": "Default",
-            "nl": "Standaard"
+            "en": "Match theme",
+            "nl": "Volgt thema"
           }
         },
         {
@@ -180,7 +180,7 @@
       "id": "horizontalAlignment",
       "type": "dropdown",
       "label": {
-        "en": "Horizontal Alignment",
+        "en": "Horizontal alignment",
         "nl": "Horizontale uitlijning"
       },
       "value": "center",

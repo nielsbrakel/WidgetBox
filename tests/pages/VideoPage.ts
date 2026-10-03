@@ -3,7 +3,7 @@ import { SandboxPage } from "./SandboxPage";
 
 const VIDEO_LABEL = /^YouTube video/;
 const PLAYLIST_LABEL = /^YouTube playlist/;
-// SETTINGS_DEBOUNCE_MS in widgets/youtube/public/index.html, plus a frame.
+// SETTINGS_DEBOUNCE_MS in widgets/video/public/index.html, plus a frame.
 const SETTINGS_DEBOUNCE_MS = 200;
 
 export class VideoPage extends SandboxPage {

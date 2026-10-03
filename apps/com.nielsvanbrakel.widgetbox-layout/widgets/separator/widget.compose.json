@@ -93,8 +93,8 @@
         {
           "id": "default",
           "label": {
-            "en": "Default",
-            "nl": "Standaard"
+            "en": "Match theme",
+            "nl": "Volgt thema"
           }
         },
         {
@@ -138,7 +138,7 @@
       "id": "margin",
       "type": "number",
       "label": {
-        "en": "Side Margin (pixels)",
+        "en": "Side margin (pixels)",
         "nl": "Zijmarge (pixels)"
       },
       "hint": {

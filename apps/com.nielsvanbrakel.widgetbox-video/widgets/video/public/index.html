@@ -275,7 +275,7 @@
 
     function createWidget(Homey) {
       const container = document.getElementById("player");
-      const t = (key) => Homey.__(`widgets.youtube.${key}`);
+      const t = (key) => Homey.__(`widgets.video.${key}`);
       let settings = Homey.getSettings();
       let height = getHeight(settings);
       let renderKey = "";

@@ -251,8 +251,9 @@
         const date = parseDate(text);
         const offset = Math.round((date - parseDate(today())) / 86400000);
         const short = capitalize(weekdayShort.format(date).replace(".", ""));
-        if (offset === 0) return [t("widgets.forecast.today"), t("widgets.forecast.today")];
-        if (offset === 1) return [t("widgets.forecast.tomorrow"), short];
+        if (offset === 0)
+          return [t("widgets.daily-forecast.today"), t("widgets.daily-forecast.today")];
+        if (offset === 1) return [t("widgets.daily-forecast.tomorrow"), short];
         return [capitalize(weekdayLong.format(date)), short];
       }
 
@@ -290,7 +291,7 @@
         rain.className = "rain";
         if (day?.rainChance > 0) {
           rain.textContent = `${integer.format(day.rainChance)}%`;
-          rain.title = t("widgets.forecast.rainChance");
+          rain.title = t("widgets.daily-forecast.rainChance");
         }
 
         const temps = document.createElement("span");

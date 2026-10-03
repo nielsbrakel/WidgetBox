@@ -59,7 +59,7 @@ test.describe("Video App", () => {
 
     test("should prefer the Start At setting over the link timestamp", async () => {
       await video.setVideo(`https://youtu.be/${VIDEO_ID}?t=90`);
-      await video.setSettingInput("Start At (seconds)", "30");
+      await video.setSettingInput("Start at (seconds)", "30");
       const url = await video.getEmbedUrl();
       expect(url.searchParams.get("start")).toBe("30");
     });
@@ -111,7 +111,7 @@ test.describe("Video App", () => {
 
     test("should hide controls by default and show them when enabled", async () => {
       expect((await video.getEmbedUrl()).searchParams.get("controls")).toBe("0");
-      await video.setSettingCheckbox("Show Controls", true);
+      await video.setSettingCheckbox("Show controls", true);
       expect((await video.getEmbedUrl()).searchParams.has("controls")).toBe(false);
     });
 
@@ -131,21 +131,21 @@ test.describe("Video App", () => {
     });
 
     test("should update start time", async () => {
-      await video.setSettingInput("Start At (seconds)", "30");
+      await video.setSettingInput("Start at (seconds)", "30");
       expect((await video.getEmbedUrl()).searchParams.get("start")).toBe("30");
     });
 
     test("should resize the widget to the aspect ratio", async () => {
       await expect.poll(() => video.getCardAspectRatio()).toBeCloseTo(16 / 9, 2);
-      await video.setSettingSelect("Aspect Ratio", "4:3");
+      await video.setSettingSelect("Aspect ratio", "4:3");
       await expect.poll(() => video.getCardAspectRatio()).toBeCloseTo(4 / 3, 2);
-      await video.setSettingSelect("Aspect Ratio", "9:16");
+      await video.setSettingSelect("Aspect ratio", "9:16");
       await expect.poll(() => video.getCardAspectRatio()).toBeCloseTo(9 / 16, 2);
     });
 
     test("should not reload the player when only the aspect ratio changes", async () => {
       await video.player.evaluate((el) => el.setAttribute("data-marker", "first"));
-      await video.setSettingSelect("Aspect Ratio", "1:1");
+      await video.setSettingSelect("Aspect ratio", "1:1");
       await expect(video.player).toHaveAttribute("data-marker", "first");
     });
   });

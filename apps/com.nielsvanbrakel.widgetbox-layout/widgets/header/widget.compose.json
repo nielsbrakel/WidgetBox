@@ -34,7 +34,7 @@
         {
           "id": "xsmall",
           "label": {
-            "en": "Extra Small",
+            "en": "Extra small",
             "nl": "Extra klein"
           }
         },
@@ -62,7 +62,7 @@
         {
           "id": "xlarge",
           "label": {
-            "en": "Extra Large",
+            "en": "Extra large",
             "nl": "Extra groot"
           }
         }
@@ -72,7 +72,7 @@
       "id": "fontWeight",
       "type": "dropdown",
       "label": {
-        "en": "Font Weight",
+        "en": "Font weight",
         "nl": "Letterdikte"
       },
       "value": "bold",
@@ -104,7 +104,7 @@
       "id": "horizontalAlignment",
       "type": "dropdown",
       "label": {
-        "en": "Horizontal Alignment",
+        "en": "Horizontal alignment",
         "nl": "Horizontale uitlijning"
       },
       "value": "left",
@@ -144,8 +144,8 @@
         {
           "id": "default",
           "label": {
-            "en": "Default",
-            "nl": "Standaard"
+            "en": "Match theme",
+            "nl": "Volgt thema"
           }
         },
         {

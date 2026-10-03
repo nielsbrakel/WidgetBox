@@ -1,6 +1,6 @@
 {
   "widgets": {
-    "youtube": {
+    "video": {
       "emptyTitle": "Nog geen video",
       "emptyMessage": "Voeg een YouTube-link of video-ID toe in de widgetinstellingen.",
       "invalidTitle": "Link niet herkend",

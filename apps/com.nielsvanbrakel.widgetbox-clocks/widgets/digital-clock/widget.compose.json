@@ -13,7 +13,7 @@
       "id": "clockFormat",
       "type": "dropdown",
       "label": {
-        "en": "Time Format",
+        "en": "Time format",
         "nl": "Tijdnotatie"
       },
       "value": "24",
@@ -38,7 +38,7 @@
       "id": "showSeconds",
       "type": "checkbox",
       "label": {
-        "en": "Show Seconds",
+        "en": "Show seconds",
         "nl": "Seconden tonen"
       },
       "value": false
@@ -47,7 +47,7 @@
       "id": "showDate",
       "type": "checkbox",
       "label": {
-        "en": "Show Date",
+        "en": "Show date",
         "nl": "Datum tonen"
       },
       "value": true
@@ -56,7 +56,7 @@
       "id": "dateFormat",
       "type": "dropdown",
       "label": {
-        "en": "Date Format",
+        "en": "Date format",
         "nl": "Datumnotatie"
       },
       "value": "weekday-short",
@@ -138,7 +138,7 @@
         {
           "id": "xsmall",
           "label": {
-            "en": "Extra Small",
+            "en": "Extra small",
             "nl": "Extra klein"
           }
         },
@@ -166,7 +166,7 @@
         {
           "id": "xlarge",
           "label": {
-            "en": "Extra Large",
+            "en": "Extra large",
             "nl": "Extra groot"
           }
         }
@@ -176,7 +176,7 @@
       "id": "fontWeight",
       "type": "dropdown",
       "label": {
-        "en": "Font Weight",
+        "en": "Font weight",
         "nl": "Letterdikte"
       },
       "value": "normal",
@@ -216,8 +216,8 @@
         {
           "id": "default",
           "label": {
-            "en": "Default",
-            "nl": "Standaard"
+            "en": "Match theme",
+            "nl": "Volgt thema"
           }
         },
         {
@@ -261,7 +261,7 @@
       "id": "horizontalAlignment",
       "type": "dropdown",
       "label": {
-        "en": "Horizontal Alignment",
+        "en": "Horizontal alignment",
         "nl": "Horizontale uitlijning"
       },
       "value": "center",

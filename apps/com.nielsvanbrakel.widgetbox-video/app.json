@@ -63,7 +63,7 @@
   "support": "mailto:info@nielsvanbrakel.com",
   "homeyCommunityTopicId": 152111,
   "widgets": {
-    "youtube": {
+    "video": {
       "name": {
         "en": "Video",
         "nl": "Video"
@@ -103,7 +103,7 @@
           "id": "aspectRatio",
           "type": "dropdown",
           "label": {
-            "en": "Aspect Ratio",
+            "en": "Aspect ratio",
             "nl": "Beeldverhouding"
           },
           "value": "16:9",
@@ -195,7 +195,7 @@
           "id": "controls",
           "type": "checkbox",
           "label": {
-            "en": "Show Controls",
+            "en": "Show controls",
             "nl": "Bediening tonen"
           },
           "value": false
@@ -204,7 +204,7 @@
           "id": "start",
           "type": "number",
           "label": {
-            "en": "Start At (seconds)",
+            "en": "Start at (seconds)",
             "nl": "Starten op (seconden)"
           },
           "hint": {
@@ -216,7 +216,7 @@
           "step": 1
         }
       ],
-      "id": "youtube"
+      "id": "video"
     }
   }
 }

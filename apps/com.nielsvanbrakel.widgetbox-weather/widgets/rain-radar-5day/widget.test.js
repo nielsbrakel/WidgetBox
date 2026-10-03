@@ -1,12 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { loadWidget } from "../../test/loadWidget.js";
 
-describe("radar-5day widget", () => {
+describe("rain-radar-5day widget", () => {
   beforeEach(() => vi.useFakeTimers());
   afterEach(() => vi.useRealTimers());
 
   function load(width = 300) {
-    return loadWidget("radar-5day", {
+    return loadWidget("rain-radar-5day", {
       beforeReady(window) {
         Object.defineProperty(window.document.body, "clientWidth", { value: width });
       },

@@ -166,7 +166,7 @@
         const iframe = document.createElement("iframe");
         iframe.width = GADGET_WIDTH;
         iframe.height = GADGET_HEIGHT;
-        iframe.title = t("widgets.radar-5day.title");
+        iframe.title = t("widgets.rain-radar-5day.title");
         iframe.tabIndex = -1;
         iframe.setAttribute("scrolling", "no");
         iframe.setAttribute("sandbox", "");
@@ -222,7 +222,7 @@
       });
 
       document.documentElement.lang = language;
-      $("frame").setAttribute("aria-label", t("widgets.radar-5day.title"));
+      $("frame").setAttribute("aria-label", t("widgets.rain-radar-5day.title"));
       $("message").textContent = t("common.loading");
       layout();
       new ResizeObserver(layout).observe(document.body);

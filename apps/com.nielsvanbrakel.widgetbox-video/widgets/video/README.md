@@ -1,8 +1,8 @@
-# Video widget (`youtube`)
+# Video widget (`video`)
 
-**Directory**: `widgets/youtube`
+**Directory**: `widgets/video`
 
-Embeds a YouTube video, livestream or playlist through `youtube-nocookie.com`. The widget id stays `youtube`; the visible name is "Video", because YouTube's branding rules do not allow "YouTube" as an app or widget name.
+Embeds a YouTube video, livestream or playlist through `youtube-nocookie.com`. The widget is called "Video", not "YouTube", because YouTube's branding rules do not allow "YouTube" as an app or widget name.
 
 ## Behaviour
 

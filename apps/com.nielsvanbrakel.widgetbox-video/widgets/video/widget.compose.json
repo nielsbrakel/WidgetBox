@@ -38,7 +38,7 @@
       "id": "aspectRatio",
       "type": "dropdown",
       "label": {
-        "en": "Aspect Ratio",
+        "en": "Aspect ratio",
         "nl": "Beeldverhouding"
       },
       "value": "16:9",
@@ -130,7 +130,7 @@
       "id": "controls",
       "type": "checkbox",
       "label": {
-        "en": "Show Controls",
+        "en": "Show controls",
         "nl": "Bediening tonen"
       },
       "value": false
@@ -139,7 +139,7 @@
       "id": "start",
       "type": "number",
       "label": {
-        "en": "Start At (seconds)",
+        "en": "Start at (seconds)",
         "nl": "Starten op (seconden)"
       },
       "hint": {

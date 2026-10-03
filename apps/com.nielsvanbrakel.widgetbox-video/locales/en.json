@@ -1,6 +1,6 @@
 {
   "widgets": {
-    "youtube": {
+    "video": {
       "emptyTitle": "No video yet",
       "emptyMessage": "Add a YouTube link or video ID in the widget settings.",
       "invalidTitle": "Link not recognized",
