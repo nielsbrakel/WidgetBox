@@ -316,7 +316,9 @@
 
     <div id="app"></div>
 
+    <script src="vendor/widget-kit.js"></script>
     <script>
+    const { createStateSync } = WidgetKit;
     const UNITS = [
       { field: "hours", ms: 3600000, max: 23 },
       { field: "minutes", ms: 60000, max: 59 },
@@ -335,10 +337,7 @@
     let settings = {};
     let config = {};
     let timers = [];
-    let clockOffsetMs = 0;
-    let saveTimeout = null;
-    let writesInFlight = 0;
-    let lastSyncedJson = "";
+    let sync = null;
     let tickTimeout = null;
     let lastHeight = 0;
     let audioContext = null;
@@ -352,7 +351,7 @@
       homey
         .__(`widgets.timer.${key}`)
         .replace(/\{(\w+)\}/g, (match, name) => String(tokens[name] ?? match));
-    const now = () => Date.now() + clockOffsetMs;
+    const now = () => sync.now();
     const pad = (n) => String(n).padStart(2, "0");
     const clampInt = (value, min, max, fallback) =>
       Math.min(max, Math.max(min, Number.isFinite(Number(value)) ? Math.round(value) : fallback));
@@ -464,65 +463,14 @@
         startedAt,
       }));
 
-    const serialize = () => canonical(timers);
-
-    const updateClockOffset = (state) => {
-      if (typeof state?.serverNow === "number") clockOffsetMs = state.serverNow - Date.now();
-    };
-
-    /** Replaces local state with a state from Homey. Returns true when the view must update. */
-    const applyState = (state) => {
-      updateClockOffset(state);
-      if (!Array.isArray(state?.items)) return false;
-      const json = JSON.stringify(canonical(state.items));
-      if (json === lastSyncedJson) return false;
-      lastSyncedJson = json;
-      timers = state.items.map((item) => ({ ...item, isNew: false }));
-      return true;
-    };
-
-    const isSaving = () => saveTimeout !== null || writesInFlight > 0;
-
-    const flushSave = async () => {
-      if (saveTimeout === null) return;
-      clearTimeout(saveTimeout);
-      saveTimeout = null;
-
-      const items = serialize();
-      lastSyncedJson = JSON.stringify(items);
-      writesInFlight += 1;
-      try {
-        updateClockOffset(await homey.api("PUT", statePath(), { items }));
-      } catch (err) {
-        console.error("Failed to save timer state", err);
-      } finally {
-        writesInFlight -= 1;
-      }
-    };
-
-    const saveSoon = () => {
-      clearTimeout(saveTimeout);
-      saveTimeout = setTimeout(flushSave, SAVE_DELAY_MS);
-    };
-
-    const loadState = async () => {
-      try {
-        return await homey.api("GET", statePath());
-      } catch (err) {
-        console.error("Failed to load timer state", err);
-        return null;
-      }
-    };
-
     const refreshFromHomey = async () => {
-      const state = await loadState();
-      if (!isSaving() && applyState(state)) render();
+      if (await sync.load()) render();
       tick();
     };
 
     const onRemoteState = (payload) => {
-      if (payload?.widgetId !== widgetId || isSaving()) return;
-      if (applyState(payload.state)) render();
+      if (payload?.widgetId !== widgetId) return;
+      if (sync.receive(payload.state)) render();
       tick();
     };
 
@@ -618,7 +566,7 @@
       actions[action](timer);
       render();
       tick();
-      saveSoon();
+      sync.saveSoon();
     };
 
     // --- Duration stepper (tap or hold; no swiping or dragging) ---
@@ -634,7 +582,7 @@
       timer.remainingMs = timer.durationMs;
 
       updateStepper(timer);
-      saveSoon();
+      sync.saveSoon();
     };
 
     const stopRepeat = () => {
@@ -805,7 +753,7 @@
       if (document.hidden) {
         clearTimeout(tickTimeout);
         stopRepeat();
-        flushSave();
+        sync.flush();
         return;
       }
       tick();
@@ -836,7 +784,17 @@
       settings = { ...homey.getSettings() };
       readConfig();
 
-      applyState(await loadState());
+      sync = createStateSync({
+        request: (method, body) => homey.api(method, statePath(), body),
+        canonical,
+        getItems: () => timers,
+        setItems: (items) => {
+          timers = items.map((item) => ({ ...item, isNew: false }));
+        },
+        delayMs: SAVE_DELAY_MS,
+        onError: (err) => console.error("Failed to sync timer state", err),
+      });
+      await sync.load();
       const created = reconcileCount();
 
       updateNarrow();
@@ -845,7 +803,7 @@
       for (const timer of timers)
         if (isFinished(timer)) alerted.add(`${timer.id}:${timer.startedAt}`);
       tick();
-      if (created) saveSoon();
+      if (created) sync.saveSoon();
 
       app.addEventListener("click", onClick);
       app.addEventListener("pointerdown", onPointerDown);
@@ -856,7 +814,7 @@
         if (event.target.closest?.('button[data-action="step"]')) stopRepeat();
       });
       document.addEventListener("visibilitychange", onVisibilityChange);
-      window.addEventListener("pagehide", flushSave);
+      window.addEventListener("pagehide", () => sync.flush());
 
       homey.on("timer:state", onRemoteState);
       homey.on("settings.set", (key, value) => {
@@ -864,7 +822,7 @@
         settings[key] = value;
         readConfig();
         const countChanged = reconcileCount();
-        if (applyNewDefault(previousDefaultMs) || countChanged) saveSoon();
+        if (applyNewDefault(previousDefaultMs) || countChanged) sync.saveSoon();
         render();
         tick();
       });

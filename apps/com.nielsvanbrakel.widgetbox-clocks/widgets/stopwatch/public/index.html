@@ -250,7 +250,9 @@
 
     <div id="app"></div>
 
+    <script src="vendor/widget-kit.js"></script>
     <script>
+    const { createStateSync } = WidgetKit;
     const MAX_LAPS = 99;
     const VISIBLE_LAPS = 3;
     const SAVE_DELAY_MS = 300;
@@ -264,10 +266,7 @@
     let settings = {};
     let config = {};
     let stopwatches = [];
-    let clockOffsetMs = 0;
-    let saveTimeout = null;
-    let writesInFlight = 0;
-    let lastSyncedJson = "";
+    let sync = null;
     let tickTimeout = null;
     let lastHeight = 0;
     let timeNodes = new Map();
@@ -279,7 +278,7 @@
       homey
         .__(`widgets.stopwatch.${key}`)
         .replace(/\{(\w+)\}/g, (match, name) => String(tokens[name] ?? match));
-    const now = () => Date.now() + clockOffsetMs;
+    const now = () => sync.now();
     const pad = (n) => String(n).padStart(2, "0");
     const createId = () =>
       crypto.randomUUID?.() ??
@@ -365,65 +364,14 @@
         laps: laps.map(Math.round),
       }));
 
-    const serialize = () => canonical(stopwatches);
-
-    const updateClockOffset = (state) => {
-      if (typeof state?.serverNow === "number") clockOffsetMs = state.serverNow - Date.now();
-    };
-
-    /** Replaces local state with a state from Homey. Returns true when the view must update. */
-    const applyState = (state) => {
-      updateClockOffset(state);
-      if (!Array.isArray(state?.items)) return false;
-      const json = JSON.stringify(canonical(state.items));
-      if (json === lastSyncedJson) return false;
-      lastSyncedJson = json;
-      stopwatches = state.items.map((item) => ({ ...item, isNew: false }));
-      return true;
-    };
-
-    const isSaving = () => saveTimeout !== null || writesInFlight > 0;
-
-    const flushSave = async () => {
-      if (saveTimeout === null) return;
-      clearTimeout(saveTimeout);
-      saveTimeout = null;
-
-      const items = serialize();
-      lastSyncedJson = JSON.stringify(items);
-      writesInFlight += 1;
-      try {
-        updateClockOffset(await homey.api("PUT", statePath(), { items }));
-      } catch (err) {
-        console.error("Failed to save stopwatch state", err);
-      } finally {
-        writesInFlight -= 1;
-      }
-    };
-
-    const saveSoon = () => {
-      clearTimeout(saveTimeout);
-      saveTimeout = setTimeout(flushSave, SAVE_DELAY_MS);
-    };
-
-    const loadState = async () => {
-      try {
-        return await homey.api("GET", statePath());
-      } catch (err) {
-        console.error("Failed to load stopwatch state", err);
-        return null;
-      }
-    };
-
     const refreshFromHomey = async () => {
-      const state = await loadState();
-      if (!isSaving() && applyState(state)) render();
+      if (await sync.load()) render();
       scheduleTick();
     };
 
     const onRemoteState = (payload) => {
-      if (payload?.widgetId !== widgetId || isSaving()) return;
-      if (applyState(payload.state)) render();
+      if (payload?.widgetId !== widgetId) return;
+      if (sync.receive(payload.state)) render();
       scheduleTick();
     };
 
@@ -465,7 +413,7 @@
       actions[action](sw);
       render();
       scheduleTick();
-      saveSoon();
+      sync.saveSoon();
     };
 
     // --- Rendering ---
@@ -599,7 +547,7 @@
     const onVisibilityChange = () => {
       if (document.hidden) {
         clearTimeout(tickTimeout);
-        flushSave();
+        sync.flush();
         return;
       }
       updateTimes();
@@ -627,23 +575,33 @@
       settings = { ...homey.getSettings() };
       readConfig();
 
-      applyState(await loadState());
+      sync = createStateSync({
+        request: (method, body) => homey.api(method, statePath(), body),
+        canonical,
+        getItems: () => stopwatches,
+        setItems: (items) => {
+          stopwatches = items.map((item) => ({ ...item, isNew: false }));
+        },
+        delayMs: SAVE_DELAY_MS,
+        onError: (err) => console.error("Failed to sync stopwatch state", err),
+      });
+      await sync.load();
       const created = reconcileCount();
 
       document.body.classList.toggle("narrow", app.clientWidth < NARROW_WIDTH);
       render();
       scheduleTick();
-      if (created) saveSoon();
+      if (created) sync.saveSoon();
 
       app.addEventListener("click", onClick);
       document.addEventListener("visibilitychange", onVisibilityChange);
-      window.addEventListener("pagehide", flushSave);
+      window.addEventListener("pagehide", () => sync.flush());
 
       homey.on("stopwatch:state", onRemoteState);
       homey.on("settings.set", (key, value) => {
         settings[key] = value;
         readConfig();
-        if (reconcileCount()) saveSoon();
+        if (reconcileCount()) sync.saveSoon();
         render();
         scheduleTick();
       });

@@ -79,5 +79,80 @@
     return element.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
   };
 
-  return { contentWidth, createHeightReporter, createTicker, createTranslator };
+  /**
+   * Keeps a widget's items in step with the copy stored on Homey (the stopwatch and timer state
+   * routes). Local edits are saved after `delayMs` of quiet, so a burst of taps is one write.
+   * While a save is pending or in flight, states from Homey are ignored so a stale broadcast
+   * never undoes a tap; a state equal to the last one synced (an echo of our own save) is ignored
+   * too. `now()` is Homey's clock, from the `serverNow` every response carries.
+   *
+   * - `request(method, body)` calls the widget API and resolves to its state.
+   * - `canonical(items)` gives the stored form, used for saving and for spotting echoes.
+   * - `getItems()` / `setItems(items)` read and replace the widget's items.
+   */
+  const createStateSync = ({
+    request,
+    canonical,
+    getItems,
+    setItems,
+    delayMs = 300,
+    onError = console.error,
+  }) => {
+    let clockOffsetMs = 0;
+    let saveTimer = null;
+    let writesInFlight = 0;
+    let lastSyncedJson = "";
+
+    const now = () => Date.now() + clockOffsetMs;
+    const isSaving = () => saveTimer !== null || writesInFlight > 0;
+    const syncClock = (state) => {
+      if (typeof state?.serverNow === "number") clockOffsetMs = state.serverNow - Date.now();
+    };
+
+    /** Takes a state from Homey. Returns true when the items changed and the view must update. */
+    const receive = (state) => {
+      if (isSaving()) return false;
+      syncClock(state);
+      if (!Array.isArray(state?.items)) return false;
+      const json = JSON.stringify(canonical(state.items));
+      if (json === lastSyncedJson) return false;
+      lastSyncedJson = json;
+      setItems(state.items);
+      return true;
+    };
+
+    const load = async () => {
+      try {
+        return receive(await request("GET"));
+      } catch (err) {
+        onError(err);
+        return false;
+      }
+    };
+
+    const flush = async () => {
+      if (saveTimer === null) return;
+      clearTimeout(saveTimer);
+      saveTimer = null;
+      const items = canonical(getItems());
+      lastSyncedJson = JSON.stringify(items);
+      writesInFlight += 1;
+      try {
+        syncClock(await request("PUT", { items }));
+      } catch (err) {
+        onError(err);
+      } finally {
+        writesInFlight -= 1;
+      }
+    };
+
+    const saveSoon = () => {
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(flush, delayMs);
+    };
+
+    return { flush, isSaving, load, now, receive, saveSoon };
+  };
+
+  return { contentWidth, createHeightReporter, createStateSync, createTicker, createTranslator };
 });

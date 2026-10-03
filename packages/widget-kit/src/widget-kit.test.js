@@ -155,3 +155,128 @@ describe("contentWidth", () => {
     expect(WidgetKit.contentWidth(element)).toBe(187.5);
   });
 });
+
+describe("createStateSync", () => {
+  const canonical = (items) => items.map(({ id, ms }) => ({ id, ms: Math.round(ms) }));
+
+  const setup = ({ responses = {}, delayMs = 300 } = {}) => {
+    let items = [];
+    const request = vi.fn(async (method, body) => {
+      const response = responses[method];
+      if (response instanceof Error) throw response;
+      return typeof response === "function" ? response(body) : response;
+    });
+    const onError = vi.fn();
+    const sync = WidgetKit.createStateSync({
+      request,
+      canonical,
+      getItems: () => items,
+      setItems: (next) => {
+        items = next;
+      },
+      delayMs,
+      onError,
+    });
+    return {
+      sync,
+      request,
+      onError,
+      items: () => items,
+      edit: (next) => {
+        items = next;
+      },
+    };
+  };
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(1_000_000);
+  });
+  afterEach(() => vi.useRealTimers());
+
+  it("loads the stored items and reports a change", async () => {
+    const { sync, items } = setup({ responses: { GET: { items: [{ id: "a", ms: 5 }] } } });
+    expect(await sync.load()).toBe(true);
+    expect(items()).toEqual([{ id: "a", ms: 5 }]);
+  });
+
+  it("ignores a state with no items, and a load that fails", async () => {
+    const failing = setup({ responses: { GET: new Error("offline") } });
+    expect(await failing.sync.load()).toBe(false);
+    expect(failing.onError).toHaveBeenCalledOnce();
+    expect(setup().sync.receive({ items: "nope" })).toBe(false);
+  });
+
+  it("ignores an echo of a state it already has", () => {
+    const { sync } = setup();
+    expect(sync.receive({ items: [{ id: "a", ms: 5.2 }] })).toBe(true);
+    expect(sync.receive({ items: [{ id: "a", ms: 5 }] })).toBe(false);
+  });
+
+  it("debounces saves and sends the latest canonical items once", async () => {
+    const { sync, request, edit } = setup({ responses: { PUT: {} } });
+    edit([{ id: "a", ms: 1.4 }]);
+    sync.saveSoon();
+    vi.advanceTimersByTime(200);
+    edit([{ id: "a", ms: 2.6 }]);
+    sync.saveSoon();
+    expect(sync.isSaving()).toBe(true);
+    await vi.advanceTimersByTimeAsync(300);
+    expect(request).toHaveBeenCalledExactlyOnceWith("PUT", { items: [{ id: "a", ms: 3 }] });
+    expect(sync.isSaving()).toBe(false);
+  });
+
+  it("does not take the echo of its own save as a change", async () => {
+    const { sync, edit } = setup({ responses: { PUT: {} } });
+    edit([{ id: "a", ms: 3 }]);
+    sync.saveSoon();
+    await sync.flush();
+    expect(sync.receive({ items: [{ id: "a", ms: 3 }] })).toBe(false);
+  });
+
+  it("ignores remote states while a save is pending or in flight", async () => {
+    let finish;
+    const { sync, edit, items } = setup({
+      responses: { PUT: () => new Promise((resolve) => (finish = resolve)) },
+    });
+    edit([{ id: "mine", ms: 1 }]);
+    sync.saveSoon();
+    expect(sync.receive({ items: [{ id: "theirs", ms: 1 }] })).toBe(false);
+
+    const saving = sync.flush();
+    expect(sync.isSaving()).toBe(true);
+    expect(sync.receive({ items: [{ id: "theirs", ms: 1 }] })).toBe(false);
+    expect(await sync.load()).toBe(false);
+    finish({});
+    await saving;
+
+    expect(sync.isSaving()).toBe(false);
+    expect(items()).toEqual([{ id: "mine", ms: 1 }]);
+  });
+
+  it("flush does nothing when no save is pending", async () => {
+    const { sync, request } = setup();
+    await sync.flush();
+    expect(request).not.toHaveBeenCalled();
+  });
+
+  it("reports a failed save and is idle again afterwards", async () => {
+    const { sync, onError } = setup({ responses: { PUT: new Error("offline") } });
+    sync.saveSoon();
+    await sync.flush();
+    expect(onError).toHaveBeenCalledOnce();
+    expect(sync.isSaving()).toBe(false);
+  });
+
+  it("keeps now() on Homey's clock from serverNow in loads and saves", async () => {
+    const { sync } = setup({
+      responses: { GET: { serverNow: 1_005_000, items: [] }, PUT: { serverNow: 998_000 } },
+    });
+    expect(sync.now()).toBe(1_000_000);
+    await sync.load();
+    expect(sync.now()).toBe(1_005_000);
+    sync.saveSoon();
+    await sync.flush();
+    expect(sync.now()).toBe(998_000);
+  });
+});
