@@ -135,7 +135,14 @@
         "whale_bone": "Whale Bones",
         "sea_lily": "Sea Lily",
         "vent": "Hydrothermal Vent",
-        "relic": "Ancient Relic"
+        "relic": "Ancient Relic",
+        "hairgrass": "Dwarf Hairgrass",
+        "seiryu_stone": "Seiryu Stones",
+        "spider_wood": "Spider Wood",
+        "monte_carlo": "Monte Carlo Carpet",
+        "dragon_stone": "Dragon Stone",
+        "rotala": "Rotala",
+        "live_rock": "Live Rock"
       },
       "species": {
         "guppy": "Guppy",

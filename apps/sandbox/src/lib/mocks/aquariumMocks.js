@@ -97,15 +97,19 @@ function gallery(save, tankId) {
   const L = items.filter((d) => C.DECOR[d].size === "L");
   const M = items.filter((d) => C.DECOR[d].size === "M");
   const S = items.filter((d) => C.DECOR[d].size === "S");
+  // Back: tall pieces. Front: small ones. Mid: whatever large pieces are left.
   decor(save, tankId, [
     L[0],
     M[0],
-    M[1] || S[2],
-    L[1] || M[2],
+    M[1],
+    L[1] || M[3],
     S[0],
     S[1],
-    M[2] ? S[2] : null,
+    S[2] || null,
     S[3] || null,
+    L[2] || M[4] || null,
+    M[2] || null,
+    L[3] || M[5] || S[4] || null,
   ]);
 }
 
@@ -186,12 +190,15 @@ const SCENARIOS = {
     fish(s, "reef", "shrimp");
     decor(s, "reef", [
       "rock_cave",
-      "anemone",
       "staghorn",
       "sea_fan",
+      "live_rock",
       "brain_coral",
       null,
       "giant_clam",
+      null,
+      null,
+      "anemone",
       null,
     ]);
     s.tanks.reef.up.size = 4;
@@ -276,14 +283,17 @@ const SCENARIOS = {
       s,
       "pond",
       [
-        null,
         { d: "vallisneria", days: 10, bloom: true },
         { d: "vallisneria", days: 0.3 },
-        null,
-        { d: "anubias", days: 10, bloom: true },
+        { d: "vallisneria", days: 6 },
+        { d: "driftwood", days: 10 },
+        { d: "hairgrass", days: 10 },
+        { d: "pebbles", days: 10 },
+        { d: "hairgrass", days: 1 },
         { d: "moss_ball", days: 1 },
-        { d: "anubias", days: 1.2 },
-        null,
+        { d: "spider_wood", days: 10 },
+        { d: "seiryu_stone", days: 10 },
+        { d: "anubias", days: 10, bloom: true },
       ],
       now,
     );
@@ -296,14 +306,17 @@ const SCENARIOS = {
       s,
       "amazon",
       [
-        null,
         { d: "sword_plant", days: 10, bloom: true },
+        { d: "rotala", days: 10, bloom: true },
         { d: "ludwigia", days: 10, bloom: true },
-        null,
-        { d: "java_fern", days: 0.5 },
+        { d: "root", days: 10 },
+        { d: "monte_carlo", days: 10 },
         { d: "java_fern", days: 8 },
-        { d: "sword_plant", days: 1 },
+        { d: "monte_carlo", days: 0.5 },
         null,
+        { d: "dragon_stone", days: 10 },
+        { d: "rotala", days: 1 },
+        { d: "stump", days: 10 },
       ],
       now,
     );

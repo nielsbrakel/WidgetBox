@@ -81,7 +81,7 @@ widgets/aquarium/
 Tank = {
   id, unlocked, up: { size, filter, feeder, chest },
   fish:   [{ id, s, v, born, stage, growth, fed, played, buff }],
-  decor:  [8 slots: { id, d, at } | null],   at = purchase time, drives growth (0 = mature)
+  decor:  [11 slots: { id, d, at } | null],   at = purchase time, drives growth (0 = mature)
   drops:  [{ id, x, v }],        // coins on the sand
   algae:  [{ id, x, y, hp, max }], debris: [{ id, x }],
   eggs:   [{ id, s, at, x, m?, v? }],   // m: 1 mystery, 2 golden (bought eggs)
@@ -126,7 +126,7 @@ Tank = {
 - **Mystery egg** (level 2): coins (150 × tank multiplier). One random fish of that tank, with 3× rare odds.
 - **Golden egg** (level 3): 20 pearls. Always a rare colour, picked from the ones still missing in that tank.
 
-**Decor.** There are 8 fixed slots per tank: 4 back (L, M, M, L) behind the fish and 4 front (S) in front of them. S fits any slot, M fits M and L, and L only fits L. Placing is a mode: after buying, valid slots glow and a tap places the item. Decor can be moved or sold (two taps) from its card. Pearl decor adds +10% tank income. Caves are real shelters: shy fish hide in them, and the moray lives in its rock cave (see §7).
+**Decor.** Each tank is aquascaped in three layers with 11 fixed slots: 4 back (L, M, M, L) against the back glass for tall plants and wood, 3 mid (L, M, L) for hardscape and homes, and 4 front (S) for carpets and small stones in front of the fish. Mid slots are indices 8 to 10 so older saves keep their slots. A light water haze between the back and mid layers adds depth. Every tank sells plants, wood and realistic stone (river stones, seiryu, dragon stone, live rock), and carpet plants such as hairgrass and Monte Carlo spread as they grow. S fits any slot, M fits M and L, and L only fits L. Placing is a mode: after buying, valid slots glow and a tap places the item. Decor can be moved or sold (two taps) from its card. Pearl decor adds +10% tank income. Caves are real shelters: shy fish hide in them, and the moray lives in its rock cave (see §7).
 
 **Growth.** Plants and coral grow in place after they are bought (`GROWTH` in the catalog, `decorGrowth` in the engine). A plant starts as a small cutting and reaches full size in 3 days, gaining leaves and height as it goes. Coral takes 6 days. Plants marked `bloom` (vallisneria, anubias, Amazon sword, ludwigia) then flower for about 8 hours every 2 days, at a time seeded by the item id. Growth is visual only and follows from the save, so it is the same on every device.
 

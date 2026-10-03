@@ -411,14 +411,20 @@
     vallisneria: { tank: "pond", level: 1, size: "M", price: 30, tags: ["plant"], bloom: true },
     anubias: { tank: "pond", level: 1, size: "S", price: 20, tags: ["plant"], bloom: true },
     pebbles: { tank: "pond", level: 1, size: "S", price: 25, tags: ["rock"] },
+    hairgrass: { tank: "pond", level: 2, size: "S", price: 30, tags: ["plant"] },
+    seiryu_stone: { tank: "pond", level: 2, size: "M", price: 45, tags: ["rock"] },
     moss_ball: { tank: "pond", level: 2, size: "S", price: 15, tags: ["plant"] },
     chest: { tank: "pond", level: 2, size: "S", price: 60, tags: ["ornament"] },
     driftwood: { tank: "pond", level: 3, size: "L", price: 80, tags: ["wood"] },
+    spider_wood: { tank: "pond", level: 4, size: "L", price: 130, tags: ["wood"] },
     castle: { tank: "pond", level: 4, size: "L", price: 150, tags: ["ornament", "cave"] },
     golden_chest: { tank: "pond", level: 3, size: "S", pearls: 15, tags: ["ornament"], bonus: 0.1 },
     // Amazon
     java_fern: { tank: "amazon", level: 5, size: "S", price: 90, tags: ["plant"] },
     sword_plant: { tank: "amazon", level: 5, size: "M", price: 120, tags: ["plant"], bloom: true },
+    monte_carlo: { tank: "amazon", level: 5, size: "S", price: 100, tags: ["plant"] },
+    dragon_stone: { tank: "amazon", level: 6, size: "M", price: 160, tags: ["rock"] },
+    rotala: { tank: "amazon", level: 6, size: "M", price: 170, tags: ["plant"], bloom: true },
     root: { tank: "amazon", level: 6, size: "L", price: 300, tags: ["wood"] },
     stump: { tank: "amazon", level: 7, size: "M", price: 250, tags: ["wood", "cave"] },
     ludwigia: { tank: "amazon", level: 8, size: "M", price: 200, tags: ["plant"], bloom: true },
@@ -429,6 +435,7 @@
     brain_coral: { tank: "reef", level: 10, size: "S", price: 500, tags: ["coral"] },
     staghorn: { tank: "reef", level: 11, size: "M", price: 800, tags: ["coral"] },
     sea_fan: { tank: "reef", level: 12, size: "L", price: 1400, tags: ["coral"] },
+    live_rock: { tank: "reef", level: 11, size: "L", price: 1000, tags: ["rock"] },
     rock_cave: { tank: "reef", level: 13, size: "L", price: 2200, tags: ["cave", "rock"] },
     giant_clam: { tank: "reef", level: 12, size: "S", pearls: 30, tags: ["ornament"], bonus: 0.1 },
     // Abyss
@@ -447,7 +454,11 @@
     },
   };
 
-  // Decor slots, the same in every tank. x is the anchor (0..1), row back sits behind fish.
+  // Decor slots, the same in every tank, laid out like an aquascape in three layers: tall
+  // plants and wood against the back glass, a midground for hardscape and homes, and a low
+  // foreground for carpets and small stones. x is the anchor (0..1). Back and mid sit behind
+  // the fish, front in front of them. Mid slots were added later, so they come last to keep
+  // older saves on the same slots.
   const SLOTS = [
     { x: 0.13, row: "back", size: "L" },
     { x: 0.37, row: "back", size: "M" },
@@ -457,6 +468,9 @@
     { x: 0.27, row: "front", size: "S" },
     { x: 0.5, row: "front", size: "S" },
     { x: 0.72, row: "front", size: "S" },
+    { x: 0.25, row: "mid", size: "L" },
+    { x: 0.47, row: "mid", size: "M" },
+    { x: 0.66, row: "mid", size: "L" },
   ];
 
   // Per-tank upgrades. Cost of level n is cost[n-1] × tank costMult.

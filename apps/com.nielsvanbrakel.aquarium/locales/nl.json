@@ -135,7 +135,14 @@
         "whale_bone": "Walvisbotten",
         "sea_lily": "Zeelelie",
         "vent": "Hydrothermale Bron",
-        "relic": "Oud Relikwie"
+        "relic": "Oud Relikwie",
+        "hairgrass": "Dwergnaaldgras",
+        "seiryu_stone": "Seiryu-stenen",
+        "spider_wood": "Spiderwood",
+        "monte_carlo": "Monte Carlo-tapijt",
+        "dragon_stone": "Drakensteen",
+        "rotala": "Rotala",
+        "live_rock": "Levend steen"
       },
       "species": {
         "guppy": "Guppy",

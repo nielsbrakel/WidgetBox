@@ -255,6 +255,19 @@ describe("aquarium engine", () => {
     expect(() => E.simulate(out, T0 + 5 * H)).not.toThrow();
   });
 
+  it("keeps decor of older eight-slot saves and adds empty midground slots", () => {
+    const save = E.createSave(T0, 3);
+    save.tanks.pond.decor = save.tanks.pond.decor.slice(0, 8);
+    save.tanks.pond.decor[3] = { id: "d9", d: "driftwood", at: T0 };
+    const out = E.migrate(save, T0);
+    expect(out.tanks.pond.decor).toHaveLength(C.SLOTS.length);
+    expect(out.tanks.pond.decor[3].d).toBe("driftwood");
+    expect(out.tanks.pond.decor.slice(8)).toEqual([null, null, null]);
+    const mid = C.SLOTS.map((s, i) => (s.row === "mid" ? i : -1)).filter((i) => i >= 0);
+    expect(mid.some((i) => E.slotFits(i, "spider_wood"))).toBe(true);
+    expect(mid.every((i) => E.slotFits(i, "seiryu_stone"))).toBe(true);
+  });
+
   it("reaches the same save whether time passes in seconds or in one jump", () => {
     const a = E.createSave(T0, 21);
     const b = clone(a);

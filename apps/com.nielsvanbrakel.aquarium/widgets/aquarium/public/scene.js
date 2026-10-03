@@ -33,9 +33,15 @@
 
   // The tank is painted into a small buffer of about this many rows and scaled up with hard
   // edges, which gives the high-resolution pixel-art look.
-  const PIXEL_ROWS = 180;
+  const PIXEL_ROWS = 110;
+  // Where each decor layer stands on the sand (0 waterline .. 1 front glass) and how big it is.
+  const ROWS = {
+    back: { y: 0.1, scale: 1.1 },
+    mid: { y: 0.45, scale: 1.12 },
+    front: { y: 0.8, scale: 1 },
+  };
   // Colour levels per channel after ordered dithering; fewer levels look more retro.
-  const COLOR_LEVELS = 20;
+  const COLOR_LEVELS = 12;
   const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map((v) => v / 16 - 0.5);
 
   class Scene {
@@ -128,9 +134,10 @@
     slotPos(i) {
       const slot = C.SLOTS[i];
       const depth = this.H - this.sandY;
-      // Front items stand a little up the sand so feet, bases and lids stay inside the frame.
-      const y = slot.row === "back" ? this.sandY + depth * 0.18 : this.H - depth * 0.2;
-      return { x: slot.x * this.W, y, scale: slot.row === "back" ? this.s * 0.95 : this.s * 1.05 };
+      // Three depth layers on the sand. Front items stand a little up the sand so feet, bases
+      // and lids stay inside the frame.
+      const row = ROWS[slot.row];
+      return { x: slot.x * this.W, y: this.sandY + depth * row.y, scale: this.s * row.scale };
     }
 
     slotBox(i, size) {
@@ -261,7 +268,7 @@
         if (!wants) continue;
         for (let i = 0; i < this.decor.length; i++) {
           const d = this.decor[i];
-          if (!d || C.SLOTS[i].row !== "back") continue;
+          if (!d || C.SLOTS[i].row === "front") continue;
           const tags = C.DECOR[d.d].tags;
           if (!tags.includes(wants)) continue;
           const p = this.slotPos(i);
@@ -538,11 +545,13 @@
         a.pause = r("p") < 0.45 ? 1.5 + r("pp") * 4 : 0;
         return;
       }
-      if (a.home && a.home.kind === "anemone" && r("h") < 0.75) {
+      if (a.home && a.home.kind === "anemone" && r("h") < 0.85) {
         a.tx = a.home.x + (r("x") - 0.5) * 70 * a.home.s;
         a.ty = a.home.y + (r("y") - 0.5) * 40 * a.home.s;
-        a.nestle = r("n") < 0.5;
+        a.nestle = r("n") < 0.6;
         if (a.nestle) {
+          // Settle into the tentacles for a while, like real clownfish.
+          a.timer += 4;
           a.tx = a.home.x + (r("x") - 0.5) * 14 * a.home.s;
           a.ty = a.home.y + 6 * a.home.s;
         }
@@ -727,16 +736,16 @@
         a.peekT = (a.peekT ?? -1.2) + 0;
         const target =
           a.fed < 30 || this.food.some((f) => a.sp.eats.includes(f.food))
-            ? 1.2
-            : 0.45 + 0.35 * Math.sin(this.t * 0.4 + a.speedK * 5);
-        a.peek = lerp(a.peek ?? -1.2, target, dt * 0.8);
+            ? 2.2
+            : 1.45 + 0.4 * Math.sin(this.t * 0.4 + a.speedK * 5);
+        a.peek = lerp(a.peek ?? 0.8, target, dt * 0.8);
         const hx = h.x + out.x * h.rx * a.peek;
         const hy = h.y + out.y * h.rx * a.peek + Math.sin(this.t * 1.5) * h.ry * 0.12;
         // Body folds back into the rock interior, where it is hidden by the cave clip.
         const inner = [
-          { x: h.x + 46 * home.s, y: h.y },
-          { x: h.x + 46 * home.s, y: h.y - 36 * home.s },
-          { x: h.x - 12 * home.s, y: h.y - 36 * home.s },
+          { x: h.x + 40 * home.s, y: h.y },
+          { x: h.x + 40 * home.s, y: h.y - 30 * home.s },
+          { x: h.x - 8 * home.s, y: h.y - 34 * home.s },
         ];
         const pts = [{ x: hx, y: hy }];
         let px = hx;
@@ -1022,7 +1031,7 @@
       ctx.save();
       ctx.globalAlpha = a.alpha * (a.fed < 15 ? 0.8 : 1) * (1 - a.hidden * 0.6);
       if (a.move === "eel") {
-        if (a.pts) A.drawEel(ctx, a.v, a.pts, a.L * 0.055, { phase: a.phase });
+        if (a.pts) A.drawEel(ctx, a.v, a.pts, a.L * 0.068, { phase: a.phase });
         ctx.restore();
         return;
       }
@@ -1062,6 +1071,22 @@
       ctx.ellipse(h.x, h.y, h.rx, h.ry, 0, 0, TAU);
       ctx.fill();
       ctx.restore();
+    }
+
+    // A resting moray pushes its head out of the opening towards the viewer, so the neck is
+    // drawn over the rock face: every body point up to the first one deep inside the hole.
+    drawEelNeck(ctx, a) {
+      if (a.move !== "eel" || a.state !== "home" || !a.pts) return;
+      const h = a.home.hole;
+      let n = 0;
+      while (n < a.pts.length) {
+        const p = a.pts[n++];
+        const dx = (p.x - h.x) / h.rx;
+        const dy = (p.y - h.y) / h.ry;
+        if (dx * dx + dy * dy < 0.25) break;
+      }
+      if (n < 2) return;
+      A.drawEel(ctx, a.v, a.pts.slice(0, n), a.L * 0.068, { phase: a.phase, total: a.pts.length });
     }
 
     isHomed(a) {
@@ -1104,16 +1129,26 @@
         }
       }
 
-      // Back row decor, with homed fish between its back and front layers.
-      this.crisp((c) => {
-        this.decor.forEach((d, i) => {
-          if (!d || C.SLOTS[i].row !== "back") return;
-          const p = this.slotPos(i);
-          A.drawDecor(c, d.d, p.x, p.y, p.scale, t, "back", d.look);
-          const list = homed.get(i);
-          if (list) for (const a of list) this.drawHomed(c, a);
-          A.drawDecor(c, d.d, p.x, p.y, p.scale, t, "front", d.look);
+      // Back and mid layers, with homed fish between each item's back and front parts. A thin
+      // veil of water between the layers gives the scape depth.
+      for (const row of ["back", "mid"]) {
+        this.crisp((c) => {
+          this.decor.forEach((d, i) => {
+            if (!d || C.SLOTS[i].row !== row) return;
+            const p = this.slotPos(i);
+            A.drawDecor(c, d.d, p.x, p.y, p.scale, t, "back", d.look);
+            const list = homed.get(i);
+            if (list) for (const a of list) this.drawHomed(c, a);
+            A.drawDecor(c, d.d, p.x, p.y, p.scale, t, "front", d.look);
+            if (list) for (const a of list) this.drawEelNeck(c, a);
+          });
         });
+        if (row === "back") {
+          ctx.fillStyle = biome.haze;
+          ctx.fillRect(0, 0, W, this.sandY + (H - this.sandY) * 0.3);
+        }
+      }
+      this.crisp((c) => {
         for (const d of this.debris) {
           const p = this.debrisPos(d);
           A.drawDebris(c, p.x, p.y, this.unit * 0.22, E.hash(d.id));
