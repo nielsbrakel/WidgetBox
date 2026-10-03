@@ -172,7 +172,10 @@
       <div class="binary-clock" id="clock" role="img"></div>
     </div>
 
+    <script src="vendor/widget-kit.js"></script>
+
     <script>
+    const { contentWidth, createHeightReporter, createTicker, createTranslator } = WidgetKit;
     const WIDGET_ID = "binary-clock";
     const SECOND = 1000;
     const MINUTE = 60 * SECOND;
@@ -273,12 +276,6 @@
       );
     }
 
-    /** Width available to the clock: the #app box minus its padding. */
-    function contentWidth(element) {
-      const style = getComputedStyle(element);
-      return element.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
-    }
-
     /** Shrinks the clock (never grows it) so it fits the widget width. */
     function fitToWidth() {
       const available = contentWidth(app);
@@ -304,47 +301,12 @@
       fitToWidth();
     }
 
-    function translate(Homey, key, fallback) {
-      const value = Homey.__(`widgets.${WIDGET_ID}.${key}`);
-      return value && value !== key ? value : fallback;
-    }
-
-    function createHeightReporter(Homey) {
-      let reportedHeight = null;
-      return () => {
-        const height = Math.ceil(document.body.getBoundingClientRect().height);
-        if (height === reportedHeight) return;
-        if (reportedHeight === null) Homey.ready({ height });
-        else Homey.setHeight(height);
-        reportedHeight = height;
-      };
-    }
-
-    /** Runs `tick` on every second or minute boundary and pauses while the page is hidden. */
-    function createTicker(tick, getInterval) {
-      let timer = null;
-      const stop = () => clearTimeout(timer);
-      const run = () => {
-        tick();
-        const interval = getInterval();
-        timer = setTimeout(run, interval - (Date.now() % interval) + 20);
-      };
-      const start = () => {
-        stop();
-        run();
-      };
-      document.addEventListener("visibilitychange", () => {
-        if (document.hidden) stop();
-        else start();
-      });
-      return { start };
-    }
-
     window.onHomeyReady = (Homey) => {
+      const t = createTranslator(Homey, `widgets.${WIDGET_ID}`);
       settings = Homey.getSettings();
-      locale = translate(Homey, "language", navigator.language || "en");
+      locale = t("language", navigator.language || "en");
       document.documentElement.lang = locale;
-      for (const key of Object.keys(labels)) labels[key] = translate(Homey, key, labels[key]);
+      for (const key of Object.keys(labels)) labels[key] = t(key, labels[key]);
 
       const reportHeight = createHeightReporter(Homey);
       const ticker = createTicker(render, () => (settings.showSeconds ? SECOND : MINUTE));

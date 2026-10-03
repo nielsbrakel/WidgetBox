@@ -16,7 +16,11 @@
     },
     "apps/com.*": {
       "entry": ["widgets/*/api.js", "widgets/*/public/*.js"],
-      "project": ["**/*.js", "!widgets/aquarium/**"]
+      "project": ["**/*.js", "!widgets/aquarium/**", "!widgets/*/public/vendor/**"]
+    },
+    "packages/*": {
+      "entry": ["src/*.js"],
+      "project": ["src/**/*.js"]
     }
   },
   "ignoreDependencies": ["@commitlint/types"],

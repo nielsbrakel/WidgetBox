@@ -1,5 +1,6 @@
 packages:
   - "apps/*"
+  - "packages/*"
 
 # Supply-chain policy (docs/decisions.md D-011). pnpm 12 refuses dependencies younger than its
 # minimum release age and fails the install when an unreviewed dependency wants a build script.

@@ -228,7 +228,7 @@ Rules:
 
 ## Styling
 
-There is no shared stylesheet: each widget keeps its CSS inline in `public/index.html` (Homey serves only `public/`). Use `var(--homey-*)` variables for colors, fonts and spacing so light and dark mode work automatically. Homey marks dark mode with the `homey-dark-mode` class on `body`; use `.homey-dark-mode` selectors when a variable is not enough and never `prefers-color-scheme`. Use `--homey-font-family` and don't override it with your own font stacks. Don't draw a second card inside Homey's card.
+Each widget keeps its CSS inline in `public/index.html` (Homey serves only `public/`). Shared JavaScript helpers (height reporting, tickers that pause when hidden, translation with fallbacks, content width) come from `packages/widget-kit`: load `<script src="vendor/widget-kit.js"></script>` before the widget script, run `pnpm kit:sync` to copy it in, and never edit the vendored copy (D-014). Use `var(--homey-*)` variables for colors, fonts and spacing so light and dark mode work automatically. Homey marks dark mode with the `homey-dark-mode` class on `body`; use `.homey-dark-mode` selectors when a variable is not enough and never `prefers-color-scheme`. Use `--homey-font-family` and don't override it with your own font stacks. Don't draw a second card inside Homey's card.
 
 ---
 

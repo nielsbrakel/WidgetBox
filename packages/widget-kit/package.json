@@ -1,0 +1,10 @@
+{
+  "name": "@widgetbox/widget-kit",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Small shared helpers for WidgetBox widget pages. Copied into each widget's public/vendor/ by `pnpm kit:sync`; never imported at runtime.",
+  "license": "MIT",
+  "files": [
+    "src/widget-kit.js"
+  ]
+}

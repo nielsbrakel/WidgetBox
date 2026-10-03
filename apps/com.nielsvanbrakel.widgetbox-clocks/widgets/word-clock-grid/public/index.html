@@ -119,8 +119,10 @@
       <p class="visually-hidden" id="spoken-time" role="timer" aria-live="off"></p>
     </div>
 
+    <script src="vendor/widget-kit.js"></script>
     <script src="word-clock.js"></script>
     <script>
+    const { createHeightReporter, createTicker } = WidgetKit;
     const WIDGET_ID = "word-clock-grid";
     const SUPPORTED_LANGUAGES = ["en", "nl"];
     const MINUTE = 60 * 1000;
@@ -192,41 +194,12 @@
       matrix.style.fontSize = `${(matrix.clientWidth / 10) * 0.55}px`;
     }
 
-    function createHeightReporter(Homey) {
-      let reportedHeight = null;
-      return () => {
-        const height = Math.ceil(document.body.getBoundingClientRect().height);
-        if (height === reportedHeight) return;
-        if (reportedHeight === null) Homey.ready({ height });
-        else Homey.setHeight(height);
-        reportedHeight = height;
-      };
-    }
-
-    function createMinuteTicker(tick) {
-      let timer = null;
-      const stop = () => clearTimeout(timer);
-      const run = () => {
-        tick();
-        timer = setTimeout(run, MINUTE - (Date.now() % MINUTE) + 50);
-      };
-      const start = () => {
-        stop();
-        run();
-      };
-      document.addEventListener("visibilitychange", () => {
-        if (document.hidden) stop();
-        else start();
-      });
-      return { start };
-    }
-
     window.onHomeyReady = (Homey) => {
       settings = Homey.getSettings();
       homeyLanguage = Homey.__(`widgets.${WIDGET_ID}.language`);
 
       const reportHeight = createHeightReporter(Homey);
-      const ticker = createMinuteTicker(render);
+      const ticker = createTicker(render, () => MINUTE, { slackMs: 50 });
 
       applySettings();
       ticker.start();

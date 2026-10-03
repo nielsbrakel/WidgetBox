@@ -7,7 +7,7 @@
     "lint:fix": "biome check --write .",
     "format": "biome format --write .",
     "check": "pnpm check:static && pnpm test:coverage && pnpm validate",
-    "check:static": "biome ci --error-on-warnings . && knip",
+    "check:static": "biome ci --error-on-warnings . && knip && pnpm kit:check",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
@@ -18,7 +18,9 @@
     "test:coverage": "vitest run --coverage",
     "changeset": "changeset",
     "release:version": "changeset version && node scripts/sync-homey-versions.mjs && biome format --write apps",
-    "release:tag": "changeset git-tag"
+    "release:tag": "changeset git-tag",
+    "kit:sync": "node scripts/sync-kit.mjs",
+    "kit:check": "node scripts/sync-kit.mjs --check"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.15",

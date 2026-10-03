@@ -11,6 +11,7 @@
       "!**/.homeybuild",
       "!**/app.json",
       "!**/assets",
+      "!**/public/vendor",
       "!pnpm-lock.yaml",
       "!apps/com.nielsvanbrakel.widgetbox-games/widgets/aquarium",
       "!apps/sandbox/src/lib/mocks/aquariumMocks.js",

@@ -6,6 +6,9 @@ pre-commit:
     biome:
       glob: '*.{js,mjs,ts,jsx,json,css,html}'
       run: pnpm exec biome check --no-errors-on-unmatched --files-ignore-unknown=true {staged_files}
+    widget-kit:
+      glob: '{packages/widget-kit/**,apps/*/widgets/*/public/**}'
+      run: pnpm kit:check
 
 commit-msg:
   commands:
