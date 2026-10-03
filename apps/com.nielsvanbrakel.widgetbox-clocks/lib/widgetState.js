@@ -72,7 +72,18 @@ const createStateApi = ({ prefix, sanitizeItem }) => {
 
   return {
     async getState({ homey, query }) {
-      return withServerTime(homey.settings.get(keyFor(query?.widgetId)) ?? null);
+      const stored = homey.settings.get(keyFor(query?.widgetId));
+      if (!stored) return null;
+      // Validate on the way out too: state written by an older app version (or by hand) must
+      // not reach the widget unchecked. Invalid state reads as "nothing stored".
+      try {
+        return withServerTime({
+          ...sanitizeState(stored, sanitizeItem),
+          updatedAt: stored.updatedAt,
+        });
+      } catch {
+        return null;
+      }
     },
 
     async setState({ homey, query, body }) {

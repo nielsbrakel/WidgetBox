@@ -83,6 +83,25 @@ describe("stopwatch state api", () => {
     expect(loaded.serverNow).toBeTypeOf("number");
   });
 
+  it("validates stored state again on read and returns nothing when it no longer passes", async () => {
+    // Stored by an older app version, or edited by hand: never trust it on the way out either.
+    homey.store.set(`stopwatch_${widgetId}`, {
+      items: [stopwatch({ id: '"><img src=x onerror=alert(1)>' })],
+      updatedAt: Date.now(),
+    });
+    expect(await stopwatchApi.getState({ homey, query })).toBeNull();
+  });
+
+  it("drops unknown stored fields on read", async () => {
+    homey.store.set(`stopwatch_${widgetId}`, {
+      items: [stopwatch({ extra: "<b>old</b>" })],
+      updatedAt: 1234,
+    });
+    const loaded = await stopwatchApi.getState({ homey, query });
+    expect(loaded.items).toEqual([stopwatch()]);
+    expect(loaded.updatedAt).toBe(1234);
+  });
+
   it("returns items in the same key order as the widgets serialize them (id first)", async () => {
     const saved = await stopwatchApi.setState({ homey, query, body: { items: [stopwatch()] } });
     expect(JSON.stringify(saved.items)).toBe(JSON.stringify([stopwatch()]));

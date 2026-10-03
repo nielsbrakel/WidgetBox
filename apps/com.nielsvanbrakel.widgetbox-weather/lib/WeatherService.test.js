@@ -8,11 +8,11 @@ const { intensityToMmPerHour, parseRaintext } = require("./buienradar");
 const UTRECHT = { lat: 52.0907, lon: 5.1214 };
 
 function textResponse(body, status = 200) {
-  return { ok: status >= 200 && status < 300, status, text: async () => body };
+  return new Response(body, { status });
 }
 
 function jsonResponse(body, status = 200) {
-  return { ok: status >= 200 && status < 300, status, json: async () => body };
+  return new Response(JSON.stringify(body), { status });
 }
 
 function createService(handler, now = new Date("2026-10-03T10:00:00Z")) {
@@ -209,5 +209,41 @@ describe("WeatherService.getForecast", () => {
     );
     expect((await service.getForecast(UTRECHT, 99)).days).toHaveLength(7);
     expect((await service.getForecast(UTRECHT, Number.NaN)).days).toHaveLength(5);
+  });
+});
+
+describe("upstream limits", () => {
+  it("refuses redirects, so data only comes from the Buienradar hosts", async () => {
+    const { service, fetchImpl } = createService(() => jsonResponse(FEED));
+    await service.getStation({ location: UTRECHT });
+    expect(fetchImpl.mock.calls[0][1]).toMatchObject({ redirect: "error" });
+  });
+
+  it("rejects a response that announces a body over the size limit", async () => {
+    const response = jsonResponse(FEED);
+    response.headers.set("content-length", String(10 * 1024 * 1024));
+    const { service } = createService(() => response);
+    await expect(service.getStation({ location: UTRECHT })).rejects.toMatchObject({
+      code: "UPSTREAM_UNAVAILABLE",
+    });
+  });
+
+  it("stops reading a body that grows past the size limit", async () => {
+    const chunk = new TextEncoder().encode("x".repeat(64 * 1024));
+    let sent = 0;
+    const endless = new ReadableStream({
+      pull(controller) {
+        sent += chunk.length;
+        controller.enqueue(chunk);
+      },
+    });
+    const service = new WeatherService({
+      fetchImpl: async () => new Response(endless),
+      maxBodyBytes: 256 * 1024,
+    });
+    await expect(service.getRainForecast(UTRECHT)).rejects.toMatchObject({
+      code: "UPSTREAM_UNAVAILABLE",
+    });
+    expect(sent).toBeLessThan(1024 * 1024);
   });
 });

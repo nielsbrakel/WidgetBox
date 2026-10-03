@@ -27,7 +27,7 @@ WidgetBox/
 │   ├── com.nielsvanbrakel.widgetbox-video/
 │   ├── com.nielsvanbrakel.widgetbox-games/
 │   └── sandbox/             # Local preview of every widget with a mocked Homey API
-├── packages/widget-kit/      # Shared widget helpers, copied into each widget (pnpm kit:sync)
+├── packages/widget-kit/     # Shared widget helpers, copied into each widget (pnpm kit:sync)
 ├── scripts/                 # Release, kit sync and bundle checks
 ├── tests/                   # Repo-wide checks and Playwright end-to-end tests
 ├── docs/                    # Glossary, architecture, decisions, releasing
