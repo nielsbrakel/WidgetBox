@@ -12,7 +12,8 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "validate": "pnpm -r --filter \"./apps/com.*\" run homey:validate",
-    "sandbox": "pnpm --filter sandbox dev"
+    "sandbox": "pnpm --filter sandbox dev",
+    "prepare": "node scripts/install-hooks.mjs"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",

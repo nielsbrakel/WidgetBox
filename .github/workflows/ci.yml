@@ -114,11 +114,30 @@ jobs:
             MIT, ISC, Apache-2.0, BSD-2-Clause, BSD-3-Clause, 0BSD, CC0-1.0, CC-BY-4.0,
             BlueOak-1.0.0, MPL-2.0, Python-2.0, Zlib, Unlicense
 
+  commitlint:
+    name: commit messages
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: ./.github/actions/setup
+      - name: Lint every commit in the pull request
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+        run: pnpm exec commitlint --from "$BASE" --to "$HEAD" --verbose
+
   # The only required status check (docs/releasing.md). Add every new job to `needs`.
   ci-ok:
     name: ci-ok
     if: always()
-    needs: [static, unit, homey, e2e, workflow-lint, dependency-review]
+    needs: [static, unit, homey, e2e, workflow-lint, dependency-review, commitlint]
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     permissions: {}
