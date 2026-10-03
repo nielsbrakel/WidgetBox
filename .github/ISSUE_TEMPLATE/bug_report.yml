@@ -1,0 +1,61 @@
+name: Bug report
+description: A widget doesn't work as expected.
+labels: ['type:bug']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting! Security problems go through
+        [SECURITY.md](https://github.com/nielsbrakel/WidgetBox/blob/main/SECURITY.md) instead.
+  - type: dropdown
+    id: app
+    attributes:
+      label: App
+      options:
+        - Clocks & Timers
+        - Weather
+        - Layout
+        - Video
+        - Games
+    validations:
+      required: true
+  - type: input
+    id: widget
+    attributes:
+      label: Widget
+      placeholder: e.g. Timer, Rain graph
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What did you see, and what did you expect to see instead?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Include the widget settings you use.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: App version
+      description: Shown in the Homey app under Settings → Apps.
+      placeholder: e.g. 1.0.0
+    validations:
+      required: true
+  - type: input
+    id: device
+    attributes:
+      label: Where do you view the dashboard?
+      placeholder: e.g. Homey app on an iPad, Homey web app in Chrome, Android tablet
+    validations:
+      required: true
+  - type: textarea
+    id: extra
+    attributes:
+      label: Screenshots or extra context
