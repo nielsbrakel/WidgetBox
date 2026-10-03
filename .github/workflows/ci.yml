@@ -1,38 +1,129 @@
 name: CI
 
 on:
+  pull_request:
   push:
     branches: [main, dev]
-  pull_request:
+
+# Every job declares its own minimal permissions (docs/decisions.md D-011).
+permissions: {}
 
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  check:
-    runs-on: ubuntu-latest
+  static:
+    name: static (lint, format, dead code)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@v5
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          node-version-file: .nvmrc
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - name: Lint and format
-        run: pnpm exec biome ci .
-      - name: Validate Homey apps
-        run: pnpm validate
-      - name: Unit tests
-        run: pnpm test
-      - name: Install Playwright browser
-        run: pnpm exec playwright install --with-deps chromium
-      - name: End-to-end tests
-        run: pnpm test:e2e
-      - uses: actions/upload-artifact@v4
-        if: failure()
+          persist-credentials: false
+      - uses: ./.github/actions/setup
+      - run: pnpm check:static
+
+  unit:
+    name: unit (Vitest)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup
+      - run: pnpm test
+
+  homey:
+    name: homey (validate --level publish, app.json drift)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    env:
+      HOMEY_SKIP_STARTUP_NOTIFIERS: '1'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup
+      - run: pnpm validate
+      # Validate regenerates app.json from the compose files; a stale or hand-edited app.json shows up here.
+      - name: Committed app.json files match their compose sources
+        run: git diff --exit-code -- 'apps/*/app.json'
+
+  e2e:
+    name: e2e (Playwright, Chromium)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    # Keep the tag in sync with @playwright/test (dependabot leaves it alone; bump both together).
+    container:
+      image: mcr.microsoft.com/playwright:v1.63.0-noble@sha256:eff16c30e6f3f4af0a03fa4b706120d5e9b0891c344a27d64559aff5900a4a27
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup
+      - run: pnpm test:e2e
+      - if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: playwright-report
-          path: test-results/
-          retention-days: 7
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 14
+
+  workflow-lint:
+    name: workflow lint (actionlint, zizmor)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: docker://rhysd/actionlint:1.7.12@sha256:b1934ee5f1c509618f2508e6eb47ee0d3520686341fec936f3b79331f9315667
+        with:
+          args: -color
+      - uses: zizmorcore/zizmor-action@cc914d7f3750a2d13d75c7f184a1060aa0e9d482 # v0.6.4
+        with:
+          version: 1.30.1
+          advanced-security: false
+
+  dependency-review:
+    name: dependency review
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
+        with:
+          fail-on-severity: moderate
+          allow-licenses: >-
+            MIT, ISC, Apache-2.0, BSD-2-Clause, BSD-3-Clause, 0BSD, CC0-1.0, CC-BY-4.0,
+            BlueOak-1.0.0, MPL-2.0, Python-2.0, Zlib, Unlicense
+
+  # The only required status check (docs/releasing.md). Add every new job to `needs`.
+  ci-ok:
+    name: ci-ok
+    if: always()
+    needs: [static, unit, homey, e2e, workflow-lint, dependency-review]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions: {}
+    steps:
+      - name: Fail unless every job succeeded or was skipped
+        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
+        run: exit 1
+      - run: echo "All CI jobs passed."

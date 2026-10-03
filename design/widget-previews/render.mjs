@@ -55,7 +55,6 @@ if (jobs.length === 0) {
 
 const fallbackChromium = "/opt/pw-browsers/chromium-1194/chrome-linux/chrome";
 const executablePath =
-  // biome-ignore lint/suspicious/noUndeclaredEnvVars: local design tool, not a turbo task
   process.env.PW_CHROMIUM ?? (existsSync(fallbackChromium) ? fallbackChromium : undefined);
 
 const browser = await chromium.launch({ executablePath });

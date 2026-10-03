@@ -1,10 +1,18 @@
 packages:
   - "apps/*"
 
-# Native build scripts pulled in by the Homey CLI are not needed
-# (sharp ships prebuilt binaries; ssh2/protobufjs/cpu-features are optional).
+# Supply-chain policy (docs/decisions.md D-011). pnpm 12 refuses dependencies younger than its
+# minimum release age and fails the install when an unreviewed dependency wants a build script.
+# Refuse to install on a Node or pnpm version outside package.json `engines`.
+engineStrict: true
+
+# Reviewed install scripts. None is needed:
+# - sharp ships prebuilt binaries; ssh2/protobufjs/cpu-features are optional extras of the Homey CLI.
+# - lefthook's postinstall would install git hooks from inside a dependency; `pnpm prepare`
+#   (scripts/install-hooks.mjs) installs them instead.
 allowBuilds:
   cpu-features: false
+  lefthook: false
   protobufjs: false
   sharp: false
   ssh2: false

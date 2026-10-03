@@ -5,9 +5,7 @@
   "main": "app.js",
   "scripts": {
     "homey:validate": "homey app validate --level publish",
-    "homey:build": "homey app build",
-    "homey:install": "homey app install && sleep 5",
-    "homey:publish": "homey app publish"
+    "homey:build": "homey app build"
   },
   "license": "MIT"
 }

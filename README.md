@@ -28,12 +28,11 @@ WidgetBox/
 │   ├── com.nielsvanbrakel.widgetbox-games/
 │   └── sandbox/             # Local preview of every widget with a mocked Homey API
 ├── tests/                   # Playwright end-to-end tests against the sandbox
-├── turbo.json               # Turborepo task definitions
 ├── pnpm-workspace.yaml      # pnpm workspace configuration
 └── biome.json               # Linting and formatting
 ```
 
-Each app is a standalone Homey app that can be developed, validated and published on its own. The monorepo uses [Turborepo](https://turborepo.dev/) with [pnpm](https://pnpm.io/) workspaces.
+Each app is a standalone Homey app that can be developed, validated and published on its own. The monorepo uses [pnpm](https://pnpm.io/) workspaces; root scripts run the per-app Homey CLI commands with `pnpm -r`.
 
 ## Development
 

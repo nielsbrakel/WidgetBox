@@ -1,0 +1,5 @@
+rules:
+  # zizmor suggests GitHub's `$/` self-repository syntax for local actions; actionlint doesn't
+  # parse it yet. Revisit when actionlint supports it.
+  self-repository:
+    disable: true
