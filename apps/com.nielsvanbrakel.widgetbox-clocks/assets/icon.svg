@@ -1,6 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="960" height="960" viewBox="0 0 960 960" fill="none" stroke="#000" stroke-width="40" stroke-linecap="round" stroke-linejoin="round">
-  <circle cx="480" cy="540" r="360"/>
-  <path d="M420 60h120M480 60v120M735 285l55-55M765 205l50 50"/>
-  <path d="M480 300v240l150 100"/>
-  <path d="M480 220v30M800 540h-30M480 860v-30M160 540h30"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="960" viewBox="0 0 960 960" fill="none" stroke="#000" stroke-width="44" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="480" cy="530" r="340"/>
+  <path d="M410 80h140M480 80v110M760 250l56-56"/>
+  <path d="M480 236v40M774 530h-40M480 824v-40M186 530h40"/>
+  <path d="M480 340v190l130 86"/>
+  <circle cx="480" cy="530" r="40" fill="#000" stroke="none"/>
 </svg>

@@ -1,5 +1,5 @@
 /**
- * Mock API responses for the WidgetBox Weather widgets.
+ * Mock API responses for the Glance Weather widgets.
  * The shapes match what the app's WeatherService returns (see apps/…-weather/lib).
  * The "real" scenarios call the public Buienradar endpoints from the browser.
  */

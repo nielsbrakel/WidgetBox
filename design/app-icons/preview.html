@@ -1,0 +1,32 @@
+<!doctype html>
+<!-- Contact sheet for the app icons: white on the brand colour, the way Homey shows them,
+     at store, list and tiny sizes. Open this file directly in a browser. -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>App icons</title>
+  </head>
+  <body style="margin: 0; padding: 24px; background: #eee; font-family: system-ui">
+    <div
+      id="sheet"
+      style="display: grid; grid-template-columns: repeat(5, max-content); gap: 24px; align-items: center"
+    ></div>
+    <script type="module">
+    import { BRAND } from "../store-images/brand.mjs";
+
+    const sheet = document.getElementById("sheet");
+    for (const size of [240, 64, 32]) {
+      for (const [app, { color }] of Object.entries(BRAND)) {
+        const tile = document.createElement("div");
+        tile.style.cssText = `width:${size}px;height:${size}px;border-radius:${size / 4}px;background:${color};display:grid;place-items:center`;
+        const icon = document.createElement("img");
+        icon.src = `../../apps/${app}/assets/icon.svg`;
+        icon.style.cssText = "width:66%;filter:invert(1)";
+        tile.append(icon);
+        sheet.append(tile);
+      }
+      sheet.append(document.createElement("span"));
+    }
+    </script>
+  </body>
+</html>

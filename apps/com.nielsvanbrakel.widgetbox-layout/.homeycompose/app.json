@@ -7,8 +7,8 @@
     "local"
   ],
   "name": {
-    "en": "WidgetBox Layout",
-    "nl": "WidgetBox Lay-out"
+    "en": "Glance Layout",
+    "nl": "Glance Lay-out"
   },
   "description": {
     "en": "Bring calm and structure to your dashboard",
@@ -43,7 +43,7 @@
       "widget"
     ]
   },
-  "brandColor": "#546E7A",
+  "brandColor": "#0F7A5C",
   "permissions": [],
   "images": {
     "small": "/assets/images/small.jpg",

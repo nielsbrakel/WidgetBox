@@ -49,3 +49,4 @@ blob-report/
 
 # Generated sandbox registry
 apps/sandbox/src/registry.json
+design/store-images/.cache/

@@ -1,7 +1,7 @@
 import { expect, type Locator } from "@playwright/test";
 import { SandboxPage } from "./SandboxPage";
 
-/** Page object for the stopwatch and timer widgets of WidgetBox Clocks & Timers. */
+/** Page object for the stopwatch and timer widgets of Glance Clocks & Timers. */
 export class TimersPage extends SandboxPage {
   get items() {
     return this.iframe.locator(".item");

@@ -6,7 +6,7 @@ const PIXEL_PNG = Buffer.from(
   "base64",
 );
 
-/** Sandbox page for the WidgetBox Weather widgets, with third-party content stubbed. */
+/** Sandbox page for the Glance Weather widgets, with third-party content stubbed. */
 export class WeatherPage extends SandboxPage {
   constructor(page: Page) {
     super(page);

@@ -5,7 +5,7 @@ class WidgetBoxClocks extends Homey.App {
   async onInit() {
     this.pruneWidgetStates();
     this.homey.setInterval(() => this.pruneWidgetStates(), DAY_MS);
-    this.log("WidgetBox Clocks & Timers has been initialized");
+    this.log("Glance Clocks & Timers has been initialized");
   }
 
   pruneWidgetStates() {
