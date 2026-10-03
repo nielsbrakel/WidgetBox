@@ -5,12 +5,12 @@ description: Working on the Aquarium widget game in WidgetBox (Homey Pro). Cover
 
 # Aquarium widget development
 
-The full design lives in `apps/com.nielsvanbrakel.widgetbox-games/AQUARIUM_SPEC.md`. Read §3 (architecture) and §6 (systems) before changing rules.
+The full design lives in `apps/com.nielsvanbrakel.aquarium/AQUARIUM_SPEC.md`. Read §3 (architecture) and §6 (systems) before changing rules.
 
 ## Files
 
 ```
-apps/com.nielsvanbrakel.widgetbox-games/widgets/aquarium/
+apps/com.nielsvanbrakel.aquarium/widgets/aquarium/
   api.js                 load → migrate → simulate → apply actions → persist (aquarium2_<widgetId>)
   widget.compose.json    GET / and POST /, settings day_night and motion
   public/catalog.js      all content and balance numbers (AquaCatalog, UMD)

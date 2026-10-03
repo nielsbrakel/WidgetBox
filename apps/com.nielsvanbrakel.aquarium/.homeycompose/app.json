@@ -1,5 +1,5 @@
 {
-  "id": "com.nielsvanbrakel.widgetbox-games",
+  "id": "com.nielsvanbrakel.aquarium",
   "version": "0.1.0",
   "compatibility": ">=12.3.0",
   "sdk": 3,
@@ -7,12 +7,12 @@
     "local"
   ],
   "name": {
-    "en": "WidgetBox Games",
-    "nl": "WidgetBox Spellen"
+    "en": "Pocket Aquarium",
+    "nl": "Pocket Aquarium"
   },
   "description": {
-    "en": "Cozy little games that live on your dashboard",
-    "nl": "Gezellige spelletjes die op je dashboard wonen"
+    "en": "A cozy aquarium game that lives on your dashboard",
+    "nl": "Een gezellig aquariumspel dat op je dashboard woont"
   },
   "category": [
     "tools"

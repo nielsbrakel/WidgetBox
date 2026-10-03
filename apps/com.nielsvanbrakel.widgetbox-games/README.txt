@@ -1,3 +1,0 @@
-WidgetBox adds clean, native-looking widgets to your Homey dashboard. Designed to fit perfectly with Homey's style, these widgets help you customize your dashboard just the way you like it.
-
-This app brings a cozy aquarium game to your Homey dashboard. Start with a garden pond and grow into an Amazon river, a coral reef and the deep abyss. Feed your fish, tap to scrub algae and collect the coins they earn, decorate each tank and breed fish to discover rare colours for your Fishdex. Everything works with simple taps, and your fish keep earning while you are away. Check in once or twice a day: nothing ever dies, it just gets a little messy.

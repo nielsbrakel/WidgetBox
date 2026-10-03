@@ -4,9 +4,9 @@
  * Runs the real game engine (the same file the Homey API uses) against localStorage, so the
  * sandbox never drifts from production rules. Scenarios are just pre-built saves.
  */
-import "/apps/com.nielsvanbrakel.widgetbox-games/widgets/aquarium/public/catalog.js";
-import "/apps/com.nielsvanbrakel.widgetbox-games/widgets/aquarium/public/engine.js";
-import "/apps/com.nielsvanbrakel.widgetbox-games/widgets/aquarium/public/server.js";
+import "/apps/com.nielsvanbrakel.aquarium/widgets/aquarium/public/catalog.js";
+import "/apps/com.nielsvanbrakel.aquarium/widgets/aquarium/public/engine.js";
+import "/apps/com.nielsvanbrakel.aquarium/widgets/aquarium/public/server.js";
 
 const Engine = globalThis.AquaEngine;
 const Server = globalThis.AquaServer;

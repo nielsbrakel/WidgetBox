@@ -1,6 +1,6 @@
 # Aquarium widget, v2 specification
 
-**App:** `com.nielsvanbrakel.widgetbox-games` · **Widget:** `aquarium` · **Spec version:** 2.0.0 (2026-10-02)
+**App:** `com.nielsvanbrakel.aquarium` · **Widget:** `aquarium` · **Spec version:** 2.0.0 (2026-10-02)
 
 The aquarium is a cozy idle game on the Homey dashboard. You keep up to four tanks, from a garden
 pond to the deep abyss. Fish earn coins while you are away, so a visit or two a day keeps the tanks
