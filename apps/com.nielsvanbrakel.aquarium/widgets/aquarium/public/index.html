@@ -11,6 +11,14 @@
 
       <div id="hud">
         <div class="hud-left">
+          <button type="button" id="levelBtn" class="level" data-ui="journal">
+            <svg viewBox="0 0 36 36" aria-hidden="true">
+              <circle cx="18" cy="18" r="15.5" class="ring-bg" />
+              <circle cx="18" cy="18" r="15.5" class="ring" id="levelRing" />
+            </svg>
+            <span id="levelVal">1</span>
+            <span id="goalDot" class="dot" hidden></span>
+          </button>
           <button type="button" class="pill" id="coinPill" data-ui="coins">
             <span class="ico" data-icon="coin"></span><span id="coinVal">0</span>
           </button>
@@ -20,14 +28,6 @@
           <div id="chips"></div>
           <div id="coach" hidden></div>
         </div>
-        <button type="button" id="levelBtn" class="level" data-ui="journal">
-          <svg viewBox="0 0 36 36" aria-hidden="true">
-            <circle cx="18" cy="18" r="15.5" class="ring-bg" />
-            <circle cx="18" cy="18" r="15.5" class="ring" id="levelRing" />
-          </svg>
-          <span id="levelVal">1</span>
-          <span id="goalDot" class="dot" hidden></span>
-        </button>
       </div>
 
       <div id="dock">

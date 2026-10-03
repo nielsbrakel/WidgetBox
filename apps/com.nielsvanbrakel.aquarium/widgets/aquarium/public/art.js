@@ -38,6 +38,18 @@
   }
 
   // Small deterministic PRNG for decorative detail (spots, pebbles…).
+  // Fish read on tiny screens thanks to a dark ink outline in their own hue.
+  function ink(hex) {
+    return rgba(shade(hex, -0.62), 0.9);
+  }
+
+  function inkWidth(L) {
+    return Math.max(1, L * 0.028);
+  }
+
+  // Below this length (CSS px) fine detail turns into noise, so patterns get bolder and simpler.
+  const SMALL_FISH = 34;
+
   function prng(seed) {
     let s = seed >>> 0 || 1;
     return () => {
@@ -720,12 +732,14 @@
     const bot = def.belly * L;
     const pattern = pal.pattern || def.pattern;
     const rnd = prng(seed);
+    const small = L < SMALL_FISH;
     switch (pattern) {
       case "stripesH": {
         ctx.fillStyle = pal.accent;
         for (let i = -1; i <= 2; i++) {
           const y = i * (top + bot) * 0.17;
-          ctx.fillRect(-L * 0.45, y - L * 0.012, L * 0.88, L * 0.026);
+          const w = small ? L * 0.05 : L * 0.026;
+          ctx.fillRect(-L * 0.45, y - w / 2, L * 0.88, w);
         }
         break;
       }
@@ -740,18 +754,18 @@
       }
       case "spots": {
         ctx.fillStyle = pal.accent;
-        for (let i = 0; i < 18; i++) {
+        for (let i = 0, n = small ? 7 : 18; i < n; i++) {
           const x = (rnd() - 0.5) * L * 0.85;
           const y = (rnd() - 0.55) * (top + bot);
           ctx.beginPath();
-          ctx.arc(x, y, L * (0.015 + rnd() * 0.02), 0, TAU);
+          ctx.arc(x, y, L * ((small ? 0.04 : 0.015) + rnd() * 0.02), 0, TAU);
           ctx.fill();
         }
         break;
       }
       case "snake": {
         ctx.strokeStyle = pal.accent;
-        ctx.lineWidth = L * 0.018;
+        ctx.lineWidth = L * (small ? 0.04 : 0.018);
         for (let i = 0; i < 9; i++) {
           ctx.beginPath();
           ctx.arc(-L * 0.4 + i * L * 0.1, (i % 2 ? 1 : -1) * top * 0.2, L * 0.05, 0, Math.PI * 1.4);
@@ -783,6 +797,7 @@
         ctx.fill();
         break;
       case "scales": {
+        if (small) break;
         ctx.strokeStyle = rgba(pal.accent, 0.45);
         ctx.lineWidth = Math.max(0.6, L * 0.012);
         const r = L * 0.05;
@@ -864,8 +879,8 @@
         break;
       case "pepper":
         ctx.fillStyle = pal.accent;
-        for (let i = 0; i < 60; i++) {
-          ctx.fillRect((rnd() - 0.5) * L * 0.9, (rnd() - 0.5) * (top + bot), L * 0.018, L * 0.018);
+        for (let i = 0, n = small ? 14 : 60, d = small ? 0.045 : 0.018; i < n; i++) {
+          ctx.fillRect((rnd() - 0.5) * L * 0.9, (rnd() - 0.5) * (top + bot), L * d, L * d);
         }
         break;
       case "shimmer": {
@@ -1007,8 +1022,8 @@
     c.fillStyle = sh;
     c.fillRect(-L / 2, 0, L, bot);
     c.restore();
-    c.lineWidth = Math.max(0.6, L * 0.018);
-    c.strokeStyle = rgba(shade(pal.body, -0.5), 0.45);
+    c.lineWidth = inkWidth(L);
+    c.strokeStyle = ink(pal.body);
     c.stroke(body);
 
     // Gill line.
@@ -1038,7 +1053,7 @@
     }
 
     // Eye.
-    const eyeR = Math.max(1.1, L * (def.bigEye ? 0.085 : 0.055));
+    const eyeR = Math.max(1.6, L * (def.bigEye ? 0.095 : 0.072));
     const ex = L * (def.teeth ? 0.25 : 0.33);
     const ey = -top * 0.28;
     c.fillStyle = "#ffffff";
@@ -1150,9 +1165,9 @@
   function drawTail(ctx, kind, size, top, pal, wave, L) {
     const T = L * size;
     const fin = pal.tailFin || pal.fin;
-    ctx.fillStyle = rgba(fin, 0.88);
-    ctx.strokeStyle = rgba(shade(fin, -0.35), 0.5);
-    ctx.lineWidth = Math.max(0.5, L * 0.012);
+    ctx.fillStyle = rgba(fin, 0.92);
+    ctx.strokeStyle = ink(fin);
+    ctx.lineWidth = inkWidth(L);
     ctx.beginPath();
     const h = Math.max(top * 0.9, T * 0.55);
     switch (kind) {
@@ -1226,9 +1241,9 @@
     ctx.save();
     ctx.rotate(Math.sin(o.phase) * 0.03 * (0.5 + o.effort));
     // Dorsal and anal fins sit behind the body.
-    ctx.fillStyle = rgba(pal.fin, 0.82);
-    ctx.strokeStyle = rgba(shade(pal.fin, -0.35), 0.4);
-    ctx.lineWidth = Math.max(0.5, L * 0.012);
+    ctx.fillStyle = rgba(pal.fin, 0.9);
+    ctx.strokeStyle = ink(pal.fin);
+    ctx.lineWidth = inkWidth(L);
     if (finPath(ctx, def.dorsal, L, top, bot, finWave, true)) {
       ctx.fill();
       ctx.stroke();
@@ -2176,7 +2191,7 @@
         } else {
           ctx.fillStyle = "#b8e0ff";
           ctx.beginPath();
-          ctx.arc(x1, y1, w * 0.5 + Math.sin(t * 2 + x1) * 0.4, 0, TAU);
+          ctx.arc(x1, y1, w * 0.5 * (1 + 0.2 * Math.sin(t * 2 + x1)), 0, TAU);
           ctx.fill();
         }
       };

@@ -10,11 +10,16 @@
     Roboto,
     sans-serif
   );
-  --fs: clamp(11px, 3vw, 14px);
-  --fs-small: clamp(10px, 2.5vw, 12px);
-  --btn: clamp(38px, 9vw, 46px);
-  --pad: clamp(6px, 1.8vw, 10px);
-  --glass: rgba(6, 26, 40, 0.62);
+  /* One layout unit that follows the smaller side, so tiny and wide widgets both fit. */
+  --u: min(1vw, 1.333vh);
+  --fs: clamp(10px, calc(var(--u) * 3.4), 14px);
+  --fs-small: clamp(9px, calc(var(--u) * 2.8), 12px);
+  --btn: clamp(28px, calc(var(--u) * 11), 46px);
+  --pad: clamp(5px, calc(var(--u) * 2), 10px);
+  --glass: rgba(6, 30, 46, 0.66);
+  --feed: #ff9f43;
+  --play: #b18cff;
+  --shop: #2fd3b6;
   --glass-strong: rgba(6, 22, 34, 0.92);
   --line: rgba(255, 255, 255, 0.16);
   --text: #f2f8fb;
@@ -104,8 +109,10 @@ button {
 .hud-left {
   display: flex;
   flex-wrap: wrap;
-  gap: 5px;
-  max-width: 78%;
+  align-items: center;
+  gap: 4px;
+  /* The right column belongs to the dock. */
+  max-width: calc(100% - var(--btn) - var(--pad));
 }
 
 #hud button,
@@ -179,8 +186,9 @@ button {
 
 .level {
   position: relative;
-  width: calc(var(--btn) * 0.95);
-  height: calc(var(--btn) * 0.95);
+  width: calc(var(--btn) * 0.78);
+  height: calc(var(--btn) * 0.78);
+  font-size: var(--fs-small);
   border-radius: 50%;
   background: var(--glass);
   border: 1px solid var(--line);
@@ -231,16 +239,22 @@ button {
   bottom: var(--pad);
   display: flex;
   flex-direction: column;
-  gap: clamp(4px, 1.4vw, 8px);
+  gap: clamp(3px, calc(var(--u) * 1.4), 8px);
   z-index: 10;
 }
 
+/* Dock buttons are glassy bubbles; each action has its own colour so it is known at a glance. */
 .dock-btn {
+  --tone: #e8f4f8;
+  position: relative;
   width: var(--btn);
   height: var(--btn);
-  border-radius: 30%;
-  background: var(--glass);
-  border: 1px solid var(--line);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0) 42%),
+    var(--glass);
+  border: 1.5px solid color-mix(in srgb, var(--tone) 55%, transparent);
+  color: var(--tone);
   display: grid;
   place-items: center;
   transition:
@@ -248,9 +262,21 @@ button {
     background 0.2s;
 }
 
+.dock-btn[data-ui="feed"] {
+  --tone: var(--feed);
+}
+
+.dock-btn[data-ui="play"] {
+  --tone: var(--play);
+}
+
+.dock-btn[data-ui="shop"] {
+  --tone: var(--shop);
+}
+
 .dock-btn .ico {
-  width: 55%;
-  height: 55%;
+  width: 54%;
+  height: 54%;
 }
 
 .dock-btn:active,
@@ -272,8 +298,10 @@ button {
 }
 
 .dock-btn.on {
-  background: rgba(95, 208, 232, 0.85);
-  border-color: rgba(255, 255, 255, 0.6);
+  background:
+    radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0) 45%),
+    var(--tone);
+  border-color: rgba(255, 255, 255, 0.75);
   color: #06202c;
 }
 
@@ -694,6 +722,8 @@ button {
 .sheet-body {
   flex: 1;
   min-height: 0;
+  /* Views page to fit; scrolling is only a fallback for the very smallest widgets. */
+  overflow-y: auto;
   display: grid;
   gap: 6px;
   align-content: start;
@@ -1078,8 +1108,10 @@ button {
   display: none;
 }
 
-@media (min-width: 400px) {
+/* Labels under the bubbles only where there is plenty of room. */
+@media (min-width: 400px) and (min-height: 300px) {
   .dock-btn {
+    border-radius: 34%;
     height: calc(var(--btn) * 1.18);
     grid-template-rows: 1fr auto;
     padding: 4px 0 3px;
@@ -1097,7 +1129,111 @@ button {
     font-size: 9px;
     font-weight: 800;
     line-height: 1;
-    opacity: 0.85;
+    opacity: 0.9;
+  }
+}
+
+/* Very small widgets: the dock folds into a 2 by 2 cluster in the corner. */
+@media (max-height: 190px) {
+  #dock {
+    display: grid;
+    grid-template-columns: repeat(2, var(--btn));
+  }
+
+  .hud-left {
+    max-width: calc(100% - var(--btn) * 2 - var(--pad) * 2);
+  }
+
+  #pearlPill {
+    display: none;
+  }
+
+  #sheet {
+    gap: 3px;
+    padding: 4px 5px;
+  }
+
+  .sheet-meta {
+    display: none;
+  }
+
+  .sheet-head {
+    justify-content: space-between;
+  }
+
+  .icon-btn {
+    width: 28px;
+    height: 28px;
+  }
+
+  .tab {
+    height: 24px;
+    border-radius: 7px;
+    font-size: 9px;
+  }
+
+  .sheet-foot {
+    min-height: 0;
+  }
+
+  .foot-info .muted {
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+  }
+
+  .modal-box {
+    width: calc(100% - 10px);
+    max-height: calc(100% - 10px);
+    overflow-y: auto;
+    padding: 7px 9px;
+    border-radius: 12px;
+  }
+
+  .modal-box h2 {
+    font-size: 13px;
+  }
+
+  .modal-box .sub {
+    margin-bottom: 5px;
+  }
+
+  #coach,
+  .tray-hint {
+    padding: 3px 7px;
+    font-size: 9px;
+    line-height: 1.2;
+  }
+
+  #tray {
+    left: var(--pad);
+    bottom: var(--pad);
+    transform: none;
+    max-width: calc(100% - var(--btn) * 2 - var(--pad) * 3);
+    align-items: flex-start;
+    gap: 3px;
+  }
+
+  .tray-row {
+    justify-content: flex-start;
+  }
+
+  .list-row {
+    gap: 5px;
+    padding: 3px 7px;
+    min-height: 0;
+  }
+
+  .list-row .sub {
+    display: none;
+  }
+
+  .list-row .bar {
+    margin-top: 2px;
+  }
+
+  .food-btn {
+    height: 24px;
+    padding: 0 6px 0 3px;
   }
 }
 

@@ -14,7 +14,8 @@
   const C = root.AquaCatalog;
   const E = root.AquaEngine;
   const TAU = Math.PI * 2;
-  const STAGE_SCALE = [0.5, 0.78, 1];
+  const STAGE_SCALE = [0.58, 0.8, 1];
+  const MIN_FISH_PX = 24;
   const ZONES = { top: [0.1, 0.38], mid: [0.22, 0.62], low: [0.5, 0.74] };
   const BOTTOM_MOVERS = { crawl: true, bottom: true };
 
@@ -219,8 +220,13 @@
     }
 
     sizeAgent(a) {
-      a.L =
-        this.unit * a.art.len * STAGE_SCALE[a.stage] * (0.92 + rnd01(a.id, "size") * 0.16) * a.z;
+      // Small species are drawn relatively larger than in real life, with a floor in CSS
+      // pixels, so every fish keeps a readable shape on a tiny dashboard widget.
+      const adult = Math.max(MIN_FISH_PX, this.unit * (0.45 + 0.6 * a.art.len));
+      a.L = Math.max(
+        MIN_FISH_PX * 0.6,
+        adult * STAGE_SCALE[a.stage] * (0.94 + rnd01(a.id, "size") * 0.12) * a.z,
+      );
       if (a.move === "eel") a.L = this.unit * 2.4 * STAGE_SCALE[a.stage];
     }
 
