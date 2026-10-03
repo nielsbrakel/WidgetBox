@@ -1,8 +1,10 @@
-import { expect } from "@playwright/test";
+import { expect, type Locator } from "@playwright/test";
 import { SandboxPage } from "./SandboxPage";
 
 const VIDEO_LABEL = /^YouTube video/;
 const PLAYLIST_LABEL = /^YouTube playlist/;
+// SETTINGS_DEBOUNCE_MS in widgets/youtube/public/index.html, plus a frame.
+const SETTINGS_DEBOUNCE_MS = 200;
 
 export class VideoPage extends SandboxPage {
   get player() {
@@ -38,6 +40,8 @@ export class VideoPage extends SandboxPage {
   }
 
   async open() {
+    // A controllable clock lets setting changes skip the widget's render debounce.
+    await this.page.clock.install();
     await this.goto();
     await this.selectWidget("Video");
     // The widget starts in its empty state; wait for it so settings reach the live mock.
@@ -52,8 +56,13 @@ export class VideoPage extends SandboxPage {
   async setSettingCheckbox(label: string, checked: boolean) {
     const checkbox = this.page.getByRole("checkbox", { name: label, exact: true });
     await checkbox.setChecked(checked);
-    await expect(checkbox).toBeChecked({ checked });
-    await this.page.waitForTimeout(500);
+    await this.waitForSetting(checkbox, checked);
+  }
+
+  /** Also runs the widget's settings debounce, so the new embed is rendered. */
+  protected async waitForSetting(control: Locator, value: string | boolean) {
+    await super.waitForSetting(control, value);
+    await this.page.clock.runFor(SETTINGS_DEBOUNCE_MS);
   }
 
   async setPlaylist(value: string) {

@@ -6,7 +6,8 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   timeout: 30000,
-  workers: 1,
+  // Every test gets its own page and its own MockHomey state, so tests run in parallel.
+  workers: process.env.CI ? 2 : undefined,
   reporter: "list",
   use: {
     baseURL: "http://localhost:5173",

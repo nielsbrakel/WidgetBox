@@ -26,6 +26,7 @@ for (const widget of widgets) {
       const errors: string[] = [];
       page.on("pageerror", (error) => errors.push(error.message));
 
+      await page.clock.install();
       await page.goto(`/?widget=${widget.id}&lang=${lang}`);
       const frame = () => page.frame({ url: new RegExp(`/widgets/${widget.id}/public/`) });
       const probe = () =>
@@ -39,8 +40,9 @@ for (const widget of widgets) {
         }) ?? Promise.resolve(null);
 
       await expect.poll(async () => (await probe())?.readyCount ?? 0).toBeGreaterThan(0);
-      // Give a second ready() call (a common bug with several init paths) time to happen.
-      await page.waitForTimeout(500);
+      // Run every pending timer for a while: a second ready() call (a common bug with several
+      // init paths) would happen now.
+      await page.clock.runFor(2000);
       const result = await probe();
       expect(result?.readyCount, "Homey.ready() calls").toBe(1);
       expect(result?.missing, "missing translations").toEqual([]);
