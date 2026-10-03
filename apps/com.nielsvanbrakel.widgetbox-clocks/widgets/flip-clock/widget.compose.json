@@ -13,7 +13,7 @@
       "id": "clockFormat",
       "type": "dropdown",
       "label": {
-        "en": "Time Format",
+        "en": "Time format",
         "nl": "Tijdnotatie"
       },
       "value": "24",
@@ -38,7 +38,7 @@
       "id": "showSeconds",
       "type": "checkbox",
       "label": {
-        "en": "Show Seconds",
+        "en": "Show seconds",
         "nl": "Seconden tonen"
       },
       "value": false
@@ -47,7 +47,7 @@
       "id": "showColons",
       "type": "checkbox",
       "label": {
-        "en": "Show Colons",
+        "en": "Show colons",
         "nl": "Dubbele punten tonen"
       },
       "value": true
@@ -64,7 +64,7 @@
         {
           "id": "xsmall",
           "label": {
-            "en": "Extra Small",
+            "en": "Extra small",
             "nl": "Extra klein"
           }
         },
@@ -92,7 +92,7 @@
         {
           "id": "xlarge",
           "label": {
-            "en": "Extra Large",
+            "en": "Extra large",
             "nl": "Extra groot"
           }
         }
@@ -110,8 +110,8 @@
         {
           "id": "default",
           "label": {
-            "en": "Default",
-            "nl": "Standaard"
+            "en": "Match theme",
+            "nl": "Volgt thema"
           }
         },
         {
@@ -155,7 +155,7 @@
       "id": "horizontalAlignment",
       "type": "dropdown",
       "label": {
-        "en": "Horizontal Alignment",
+        "en": "Horizontal alignment",
         "nl": "Horizontale uitlijning"
       },
       "value": "center",

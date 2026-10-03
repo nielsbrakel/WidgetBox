@@ -1,6 +1,7 @@
-# Development-only files that should not ship in the app bundle
+# Development-only files that must not ship in the app bundle.
+# Identical in every app (tests/repo/apps.test.js); the bundle check in CI verifies the result.
+*.md
 *.test.js
-README.md
 docs/
-*.spec.md
-AQUARIUM_SPEC.md
+sandbox/
+test/

@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+    body {
+      --text: var(--homey-text-color, #333);
+      --line: var(--homey-line-color, rgba(0, 0, 0, 0.1));
+      --rain: var(--homey-color-blue-700, #0066ad);
+      --cold: var(--homey-color-blue-400, #1a9eff);
+      --warm: var(--homey-color-orange-500, #ff9500);
+      margin: 0;
+      overflow: hidden;
+      background: transparent;
+      color: var(--text);
+      font-family: var(--homey-font-family, system-ui, sans-serif);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .widget {
+      padding: 4px 8px 6px;
+      container-type: inline-size;
+    }
+
+    .days {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .day {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 32px 36px auto;
+      align-items: center;
+      gap: 8px;
+      height: 40px;
+      border-bottom: 1px solid var(--line);
+      font-size: var(--homey-font-size-small, 14px);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .day:last-child {
+      border-bottom: 0;
+    }
+
+    .name {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      font-weight: var(--homey-font-weight-medium, 500);
+    }
+
+    .icon {
+      width: 32px;
+      height: 32px;
+    }
+
+    body:not(.homey-dark-mode) .icon {
+      filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.45));
+    }
+
+    .homey-dark-mode {
+      --rain: var(--homey-color-blue-300, #4db8ff);
+    }
+
+    .rain {
+      color: var(--rain);
+      font-size: 12px;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .temps {
+      display: grid;
+      grid-template-columns: 3ch auto 3ch;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .min {
+      opacity: 0.7;
+      text-align: right;
+    }
+
+    .range {
+      position: relative;
+      width: 72px;
+      height: 4px;
+      border-radius: 2px;
+      background: var(--line);
+    }
+
+    .range span {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      border-radius: 2px;
+      background: linear-gradient(90deg, var(--cold), var(--warm));
+    }
+
+    .short {
+      display: none;
+    }
+
+    @container (max-width: 300px) {
+      .range {
+        display: none;
+      }
+
+      .temps {
+        grid-template-columns: 3ch 3ch;
+      }
+    }
+
+    @container (max-width: 230px) {
+      .day {
+        grid-template-columns: minmax(0, 1fr) 28px auto;
+        gap: 6px;
+      }
+
+      .icon {
+        width: 28px;
+        height: 28px;
+      }
+
+      .rain,
+      .long {
+        display: none;
+      }
+
+      .short {
+        display: inline;
+      }
+    }
+
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      height: 20px;
+      font-size: 11px;
+    }
+
+    .status {
+      opacity: 0.7;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .credit {
+      position: relative;
+      flex: none;
+      padding: 0;
+      border: 0;
+      background: none;
+      color: inherit;
+      font: inherit;
+      opacity: 0.7;
+      cursor: pointer;
+    }
+
+    .credit::after {
+      content: "";
+      position: absolute;
+      inset: -12px -8px -4px;
+    }
+
+    .message {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 80px;
+      padding: 0 8px;
+      text-align: center;
+      font-size: var(--homey-font-size-small, 14px);
+      opacity: 0.8;
+    }
+
+    .skeleton {
+      opacity: 0.35;
+    }
+
+    [hidden] {
+      display: none;
+    }
+    </style>
+  </head>
+
+  <body class="homey-widget">
+    <div class="widget" id="app">
+      <ul class="days" id="days"></ul>
+      <div class="message" id="message" role="status" hidden></div>
+      <div class="footer">
+        <span class="status" id="status"></span>
+        <button class="credit" id="credit" type="button">Buienradar.nl</button>
+      </div>
+    </div>
+
+    <script>
+    const REFRESH_MS = 30 * 60 * 1000;
+    const SETTINGS_DEBOUNCE_MS = 600;
+    const DAY_OPTIONS = [3, 5, 7];
+    const AMSTERDAM_DATE = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Europe/Amsterdam",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
+
+    const $ = (id) => document.getElementById(id);
+
+    function onHomeyReady(Homey) {
+      const settings = { ...Homey.getSettings() };
+      const state = { data: null, lastFetch: 0, timer: null, debounce: null, height: null };
+      const translated = Homey.__("language");
+      const language = /^[a-z]{2}$/.test(translated) ? translated : navigator.language;
+      const weekdayLong = new Intl.DateTimeFormat(language, { weekday: "long" });
+      const weekdayShort = new Intl.DateTimeFormat(language, { weekday: "short" });
+      const integer = new Intl.NumberFormat(language, { maximumFractionDigits: 0 });
+
+      function t(key, tokens = {}) {
+        const text = Homey.__(key) ?? key;
+        return text.replace(/\{(\w+)\}/g, (_, name) => tokens[name] ?? "");
+      }
+
+      function dayCount() {
+        const count = Number(settings.days);
+        return DAY_OPTIONS.includes(count) ? count : 5;
+      }
+
+      /** "YYYY-MM-DD" as a local date, so the weekday does not shift with the time zone. */
+      function parseDate(text) {
+        const [year, month, day] = text.split("-").map(Number);
+        return new Date(year, month - 1, day);
+      }
+
+      /** Today as "YYYY-MM-DD" in Europe/Amsterdam, the time zone of Buienradar's dates. */
+      function today() {
+        return AMSTERDAM_DATE.format(new Date());
+      }
+
+      function capitalize(text) {
+        return text.charAt(0).toUpperCase() + text.slice(1);
+      }
+
+      /** Long and short labels for a date, e.g. "Tomorrow" and "Sat". */
+      function dayNames(text) {
+        const date = parseDate(text);
+        const offset = Math.round((date - parseDate(today())) / 86400000);
+        const short = capitalize(weekdayShort.format(date).replace(".", ""));
+        if (offset === 0)
+          return [t("widgets.daily-forecast.today"), t("widgets.daily-forecast.today")];
+        if (offset === 1) return [t("widgets.daily-forecast.tomorrow"), short];
+        return [capitalize(weekdayLong.format(date)), short];
+      }
+
+      function temperature(value) {
+        return Number.isFinite(value) ? `${integer.format(value)}°` : "—";
+      }
+
+      function createRow(day, bounds) {
+        const row = document.createElement("li");
+        row.className = "day";
+
+        const name = document.createElement("span");
+        name.className = "name";
+        const [longName, shortName] = day ? dayNames(day.date) : ["—", "—"];
+        const long = document.createElement("span");
+        long.className = "long";
+        long.textContent = longName;
+        const short = document.createElement("span");
+        short.className = "short";
+        short.textContent = shortName;
+        name.append(long, short);
+
+        const icon = document.createElement("img");
+        icon.className = "icon";
+        icon.alt = "";
+        icon.width = 32;
+        icon.height = 32;
+        if (day?.iconUrl?.startsWith("https://cdn.buienradar.nl/")) icon.src = day.iconUrl;
+        else icon.style.visibility = "hidden";
+        icon.addEventListener("error", () => {
+          icon.style.visibility = "hidden";
+        });
+
+        const rain = document.createElement("span");
+        rain.className = "rain";
+        if (day?.rainChance > 0) {
+          rain.textContent = `${integer.format(day.rainChance)}%`;
+          rain.title = t("widgets.daily-forecast.rainChance");
+        }
+
+        const temps = document.createElement("span");
+        temps.className = "temps";
+        const min = document.createElement("span");
+        min.className = "min";
+        min.textContent = temperature(day?.min);
+        const range = document.createElement("span");
+        range.className = "range";
+        if (day && bounds && Number.isFinite(day.min) && Number.isFinite(day.max)) {
+          const span = Math.max(bounds.max - bounds.min, 1);
+          const fill = document.createElement("span");
+          fill.style.left = `${((day.min - bounds.min) / span) * 100}%`;
+          fill.style.right = `${((bounds.max - day.max) / span) * 100}%`;
+          range.append(fill);
+        }
+        const max = document.createElement("span");
+        max.textContent = temperature(day?.max);
+        temps.append(min, range, max);
+
+        row.append(name, icon, rain, temps);
+        return row;
+      }
+
+      function renderSkeleton() {
+        const rows = Array.from({ length: dayCount() }, () => createRow(null, null));
+        $("days").replaceChildren(...rows);
+        $("days").classList.add("skeleton");
+        $("days").hidden = false;
+        $("message").hidden = true;
+      }
+
+      function render() {
+        const from = today();
+        const days = (state.data?.days ?? [])
+          .filter((day) => typeof day.date === "string" && day.date >= from)
+          .slice(0, dayCount());
+        const temperatures = days.flatMap((day) => [day.min, day.max]).filter(Number.isFinite);
+        const bounds = temperatures.length
+          ? { min: Math.min(...temperatures), max: Math.max(...temperatures) }
+          : null;
+        $("days").replaceChildren(...days.map((day) => createRow(day, bounds)));
+        $("days").classList.remove("skeleton");
+        $("days").hidden = false;
+        $("message").hidden = true;
+      }
+
+      function renderStatus(failed) {
+        if (!state.data) {
+          $("status").textContent = "";
+          return;
+        }
+        const time = new Date(state.data.updatedAt).toLocaleTimeString(language, {
+          hour: "2-digit",
+          minute: "2-digit",
+          hourCycle: "h23",
+        });
+        const place = state.data.place ? `${state.data.place} · ` : "";
+        $("status").textContent = failed ? t("common.offline", { time }) : `${place}${time}`;
+      }
+
+      function showMessage(text) {
+        $("days").hidden = true;
+        $("message").textContent = text;
+        $("message").hidden = false;
+      }
+
+      function errorText(error) {
+        const code = String(error?.message ?? "");
+        if (code.includes("LOCATION_REQUIRED")) return t("common.locationRequired");
+        if (code.includes("INVALID_LOCATION")) return t("common.invalidLocation");
+        return `${t("common.errorTitle")}. ${t("common.errorRetry")}.`;
+      }
+
+      function updateHeight() {
+        // Measure the body so Homey's .homey-widget padding is part of the reported height.
+        const height = Math.ceil(document.body.getBoundingClientRect().height);
+        if (height === state.height) return;
+        if (state.height === null) Homey.ready({ height });
+        else Homey.setHeight(height);
+        state.height = height;
+      }
+
+      async function fetchData() {
+        const query = new URLSearchParams({
+          latitude: settings.latitude ?? "",
+          longitude: settings.longitude ?? "",
+          days: String(dayCount()),
+        });
+        try {
+          state.data = await Homey.api("GET", `/?${query}`);
+          render();
+          renderStatus(false);
+        } catch (error) {
+          if (state.data) renderStatus(true);
+          else showMessage(errorText(error));
+        }
+      }
+
+      async function refresh() {
+        clearTimeout(state.timer);
+        state.lastFetch = Date.now();
+        await fetchData();
+        schedule();
+      }
+
+      function schedule() {
+        clearTimeout(state.timer);
+        if (document.visibilityState === "hidden") return;
+        state.timer = setTimeout(refresh, Math.max(state.lastFetch + REFRESH_MS - Date.now(), 0));
+      }
+
+      function onSettingChanged(key, value) {
+        settings[key] = value;
+        clearTimeout(state.debounce);
+        state.debounce = setTimeout(() => {
+          state.data = null;
+          renderSkeleton();
+          refresh();
+        }, SETTINGS_DEBOUNCE_MS);
+      }
+
+      $("credit").addEventListener("click", () => Homey.popup("https://www.buienradar.nl"));
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "hidden") {
+          clearTimeout(state.timer);
+        } else if (Date.now() - state.lastFetch >= REFRESH_MS) {
+          refresh();
+        } else {
+          schedule();
+          if (state.data) render();
+        }
+      });
+      Homey.on("settings.set", onSettingChanged);
+
+      document.documentElement.lang = language;
+      renderSkeleton();
+      updateHeight();
+      new ResizeObserver(updateHeight).observe($("app"));
+      refresh();
+    }
+
+    window.onHomeyReady = onHomeyReady;
+    </script>
+  </body>
+</html>

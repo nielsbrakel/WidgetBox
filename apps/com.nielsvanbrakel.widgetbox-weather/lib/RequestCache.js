@@ -1,4 +1,5 @@
-const DEFAULT_MAX_ENTRIES = 50;
+// Enough for every location on a household's dashboards (rain, forecast, place per location).
+const DEFAULT_MAX_ENTRIES = 20;
 const DEFAULT_RETRY_AFTER_MS = 60 * 1000;
 
 /**

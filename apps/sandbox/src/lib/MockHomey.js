@@ -37,6 +37,10 @@ class MockHomey extends SimpleEventEmitter {
     this.localeData = null;
     this.widgetInstanceId = "mock-widget-id-12345";
     this.activeScenario = "default";
+    // What a real Homey would get wrong: e2e tests read these (tests/e2e/widget-contract.spec.ts).
+    // A widget that never calls ready() spins forever on a Homey; calling it twice is undefined.
+    this.readyCount = 0;
+    this.missingTranslations = new Set();
   }
 
   setLocaleData(data) {
@@ -45,6 +49,7 @@ class MockHomey extends SimpleEventEmitter {
   }
 
   ready(options) {
+    this.readyCount += 1;
     console.log("[MockHomey] Widget ready", options);
     if (options?.height != null && this.onHeightChange) {
       this.onHeightChange(options.height);
@@ -75,8 +80,10 @@ class MockHomey extends SimpleEventEmitter {
       }
     }
 
-    // Fallback: return the last segment of the key
-    return key.split(".").pop();
+    // Missing: record it and show the raw key, so the gap is visible instead of plausible text.
+    this.missingTranslations.add(key);
+    console.warn(`[MockHomey] Missing translation: ${key}`);
+    return key;
   }
 
   getSettings() {

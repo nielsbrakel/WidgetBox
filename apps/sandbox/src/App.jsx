@@ -23,6 +23,9 @@ function App() {
   const [key, setKey] = useState(0);
   const [theme, setTheme] = useState(localStorage.getItem("sandbox-theme") || "dark");
   const [activeScenario, setActiveScenario] = useState(DEFAULT_SCENARIO);
+  const [language, setLanguage] = useState(
+    () => new URLSearchParams(window.location.search).get("lang") ?? "en",
+  );
 
   // Group widgets by app for sidebar
   const groupedWidgets = useMemo(
@@ -79,9 +82,10 @@ function App() {
     if (selectedWidget) {
       const url = new URL(window.location);
       url.searchParams.set("widget", selectedWidget.id);
+      url.searchParams.set("lang", language);
       window.history.pushState({}, "", url);
     }
-  }, [selectedWidget]);
+  }, [selectedWidget, language]);
 
   // Theme effect
   useEffect(() => {
@@ -101,6 +105,11 @@ function App() {
     setTheme((prev) => (prev === "dark" ? "light" : "dark"));
   }, []);
 
+  const toggleLanguage = useCallback(() => {
+    setLanguage((prev) => (prev === "en" ? "nl" : "en"));
+    setKey((prev) => prev + 1);
+  }, []);
+
   const handleIframeLoad = useCallback(async () => {
     if (!iframeRef.current?.contentWindow) return;
 
@@ -111,9 +120,10 @@ function App() {
 
     // Fetch locale data
     let localeData = null;
-    if (selectedWidget.locales?.en) {
+    const localeUrl = selectedWidget.locales?.[language];
+    if (localeUrl) {
       try {
-        const res = await fetch(selectedWidget.locales.en);
+        const res = await fetch(localeUrl);
         localeData = await res.json();
       } catch (err) {
         console.error("[App] Failed to load locale", err);
@@ -149,7 +159,7 @@ function App() {
         console.error("Error calling onHomeyReady:", err);
       }
     }
-  }, [theme, selectedWidget, activeScenario]);
+  }, [theme, selectedWidget, activeScenario, language]);
 
   const updateSetting = useCallback((id, value) => {
     const newSettings = { ...settingsRef.current, [id]: value };
@@ -170,10 +180,12 @@ function App() {
         <Toolbar
           theme={theme}
           onToggleTheme={toggleTheme}
+          language={language}
+          onToggleLanguage={toggleLanguage}
           onReload={reloadWidget}
           previewWidth={previewWidth}
           onSetPreviewWidth={setPreviewWidth}
-          widgetName={selectedWidget?.name?.en}
+          widgetName={selectedWidget?.name?.[language] ?? selectedWidget?.name?.en}
         />
         <WidgetPreview
           ref={iframeRef}

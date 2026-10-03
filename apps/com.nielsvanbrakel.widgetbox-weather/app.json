@@ -73,7 +73,7 @@
   "support": "mailto:info@nielsvanbrakel.com",
   "homeyCommunityTopicId": 152111,
   "widgets": {
-    "forecast": {
+    "daily-forecast": {
       "name": {
         "en": "Weather forecast",
         "nl": "Weersverwachting"
@@ -149,20 +149,7 @@
           ]
         }
       ],
-      "id": "forecast"
-    },
-    "radar-5day": {
-      "name": {
-        "en": "5-day radar",
-        "nl": "5-daagse radar"
-      },
-      "description": {
-        "en": "Rain radar with a 5-day forecast for the Netherlands",
-        "nl": "Regenradar met een 5-daagse verwachting voor Nederland"
-      },
-      "transparent": true,
-      "settings": [],
-      "id": "radar-5day"
+      "id": "daily-forecast"
     },
     "rain-graph": {
       "name": {
@@ -251,8 +238,8 @@
             {
               "id": "default",
               "label": {
-                "en": "Default",
-                "nl": "Standaard"
+                "en": "Match theme",
+                "nl": "Volgt thema"
               }
             },
             {
@@ -391,6 +378,19 @@
       "settings": [],
       "id": "rain-radar"
     },
+    "rain-radar-5day": {
+      "name": {
+        "en": "5-day radar",
+        "nl": "5-daagse radar"
+      },
+      "description": {
+        "en": "Rain radar with a 5-day forecast for the Netherlands",
+        "nl": "Regenradar met een 5-daagse verwachting voor Nederland"
+      },
+      "transparent": true,
+      "settings": [],
+      "id": "rain-radar-5day"
+    },
     "station": {
       "name": {
         "en": "Weather station",
@@ -459,8 +459,8 @@
             {
               "id": "default",
               "label": {
-                "en": "Default",
-                "nl": "Standaard"
+                "en": "Match theme",
+                "nl": "Volgt thema"
               }
             },
             {
@@ -807,8 +807,8 @@
             {
               "id": "default",
               "label": {
-                "en": "Default",
-                "nl": "Standaard"
+                "en": "Match theme",
+                "nl": "Volgt thema"
               }
             },
             {
@@ -839,8 +839,8 @@
             {
               "id": "default",
               "label": {
-                "en": "Default",
-                "nl": "Standaard"
+                "en": "Match theme",
+                "nl": "Volgt thema"
               }
             },
             {
@@ -885,8 +885,8 @@
             {
               "id": "default",
               "label": {
-                "en": "Default",
-                "nl": "Standaard"
+                "en": "Match theme",
+                "nl": "Volgt thema"
               }
             },
             {

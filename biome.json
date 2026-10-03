@@ -11,6 +11,7 @@
       "!**/.homeybuild",
       "!**/app.json",
       "!**/assets",
+      "!**/public/vendor",
       "!pnpm-lock.yaml",
       "!apps/com.nielsvanbrakel.widgetbox-games/widgets/aquarium",
       "!apps/sandbox/src/lib/mocks/aquariumMocks.js",
@@ -44,17 +45,5 @@
       "quoteStyle": "double",
       "semicolons": "always"
     }
-  },
-  "overrides": [
-    {
-      "includes": ["playwright.config.ts"],
-      "linter": {
-        "rules": {
-          "suspicious": {
-            "noUndeclaredEnvVars": "off"
-          }
-        }
-      }
-    }
-  ]
+  }
 }

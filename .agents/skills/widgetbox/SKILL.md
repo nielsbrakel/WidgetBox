@@ -22,9 +22,9 @@ Widgets are grouped into five apps by theme. Grouping keeps the number of instal
 | App (en / nl) | ID | Widgets | Category | Brand color |
 |---------------|----|---------|----------|-------------|
 | WidgetBox Clocks & Timers / Klokken & Timers | `com.nielsvanbrakel.widgetbox-clocks` | analog-clock, binary-clock, digital-clock, flip-clock, word-clock-grid, word-clock-sentence, stopwatch, timer | tools | `#5E35B1` |
-| WidgetBox Weather / Weer | `com.nielsvanbrakel.widgetbox-weather` | rain-graph, rain-radar, radar-5day, forecast, station (Buienradar data, NL/BE), weather-map (Windy embed) | internet | `#0277BD` |
+| WidgetBox Weather / Weer | `com.nielsvanbrakel.widgetbox-weather` | rain-graph, rain-radar, rain-radar-5day, daily-forecast, station (Buienradar data, NL/BE), weather-map (Windy embed) | internet | `#0277BD` |
 | WidgetBox Layout / Lay-out | `com.nielsvanbrakel.widgetbox-layout` | header, separator, spacer | tools | `#546E7A` |
-| WidgetBox Video | `com.nielsvanbrakel.widgetbox-video` | youtube (video player) | video | `#D84315` |
+| WidgetBox Video | `com.nielsvanbrakel.widgetbox-video` | video (YouTube player) | video | `#D84315` |
 | WidgetBox Games / Spellen | `com.nielsvanbrakel.widgetbox-games` | aquarium | tools | `#00796B` |
 
 Naming rules: never put a third-party brand (YouTube, Buienradar, Windy) in an app or widget name; "for YouTube videos" or "data from Buienradar" in text is fine. App names stay at four words or fewer and never contain "Homey" or "Athom".
@@ -33,24 +33,13 @@ Naming rules: never put a third-party brand (YouTube, Buienradar, Windy) in an a
 
 ## Publishing & Versioning
 
-### Versioning
+### Versioning and releases
 
-Every app has its **own, independent version**. Bump only the app you are releasing; the version lives in `package.json`, `app.json` and `.homeycompose/app.json` of that app and must match across those three files. Use semver: patch for fixes, minor for new widgets or settings, major for breaking setting changes.
+Every app has its **own, independent version**, set by changesets, never by hand (D-012). A pull request that changes what users of an app see adds a changeset (`pnpm changeset`) with one `en:` and one `nl:` line; those lines become the App Store changelog. Use semver: patch for fixes, minor for new widgets or settings, major when a published widget or setting id would break.
 
-### Workflow
+Merging to `main` opens a version pull request; merging that tags the apps and uploads them with the Homey CLI after the owner approves. The full flow and the manual fallback are in `docs/releasing.md`. `tests/repo/apps.test.js` fails when `package.json`, `.homeycompose/app.json`, `app.json` and `.homeychangelog.json` disagree.
 
-Publish one app at a time from its folder:
-
-```bash
-cd apps/com.nielsvanbrakel.widgetbox-<app>
-homey app validate --level publish
-homey app publish
-```
-
-- The CLI asks `Do you want to update your app's version number?`. Answer **Yes** and pick patch/minor/major to let it bump all three files, or **No** if you already set the version yourself.
-- It then asks "What's new?" and writes the answer to `.homeychangelog.json`. Give both `en` and `nl` text (edit the file afterwards if the prompt only stored English).
-- `turbo run homey:publish --concurrency 1` still exists to step through every app interactively, but releasing per app is the normal flow.
-- After publishing, submit the build for certification in the Homey Developer Tools and explain in the submission note why the app is separate from similar apps (for Weather: what it adds over the official Buienradar app).
+After an upload, submit the build for certification in the Homey Developer Tools and explain in the submission note why the app is separate from similar apps (for Weather: what it adds over the official Buienradar app).
 
 ### Asset Standards
 
@@ -88,7 +77,7 @@ Most widgets support a `size` dropdown with these standard values:
 }
 ```
 
-**Used by:** All clock widgets, date widget.
+**Used by:** All clock widgets.
 
 ### Color Setting
 
@@ -191,7 +180,7 @@ Use the `hint` property to add explanation text to settings that may not be imme
 
 Pick ONE: a fixed/percentage `height` in `widget.compose.json`, OR runtime `Homey.ready({ height })` + `Homey.setHeight()`. Never both.
 
-### 1. Content-Based Height (clocks, stopwatch, timer, station, forecast, header)
+### 1. Content-Based Height (clocks, stopwatch, timer, station, daily-forecast, header)
 
 Measure the content (not `body`, to avoid ResizeObserver feedback loops) and only report changes:
 
@@ -239,7 +228,7 @@ Rules:
 
 ## Styling
 
-There is no shared stylesheet: each widget keeps its CSS inline in `public/index.html` (Homey serves only `public/`). Use `var(--homey-*)` variables for colors, fonts and spacing so light and dark mode work automatically. Homey marks dark mode with the `homey-dark-mode` class on `body`; use `.homey-dark-mode` selectors when a variable is not enough and never `prefers-color-scheme`. Use `--homey-font-family` and don't override it with your own font stacks. Don't draw a second card inside Homey's card.
+Each widget keeps its CSS inline in `public/index.html` (Homey serves only `public/`). Shared JavaScript helpers (height reporting, tickers that pause when hidden, translation with fallbacks, content width) come from `packages/widget-kit`: load `<script src="vendor/widget-kit.js"></script>` before the widget script, run `pnpm kit:sync` to copy it in, and never edit the vendored copy (D-014). Use `var(--homey-*)` variables for colors, fonts and spacing so light and dark mode work automatically. Homey marks dark mode with the `homey-dark-mode` class on `body`; use `.homey-dark-mode` selectors when a variable is not enough and never `prefers-color-scheme`. Use `--homey-font-family` and don't override it with your own font stacks. Don't draw a second card inside Homey's card.
 
 ---
 
@@ -250,7 +239,7 @@ There is no shared stylesheet: each widget keeps its CSS inline in `public/index
 | Clock widgets | `false` | Card background for readability |
 | Stopwatch, Timer | `false` | Card background for readability |
 | Spacer | `true` | Invisible spacing element, blends with dashboard |
-| Embed widgets (radar-5day, weather map, video) | not set | Iframe handles its own background |
+| Embed widgets (rain-radar-5day, weather map, video) | not set | Iframe handles its own background |
 
 ---
 

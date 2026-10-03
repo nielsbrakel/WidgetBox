@@ -30,15 +30,15 @@ const APPS = {
     "timer",
   ],
   "com.nielsvanbrakel.widgetbox-weather": [
-    "radar-5day",
+    "rain-radar-5day",
     "rain-graph",
     "rain-radar",
-    "forecast",
+    "daily-forecast",
     "station",
     "weather-map",
   ],
   "com.nielsvanbrakel.widgetbox-layout": ["header", "separator", "spacer"],
-  "com.nielsvanbrakel.widgetbox-video": ["youtube"],
+  "com.nielsvanbrakel.widgetbox-video": ["video"],
 };
 
 const only = new Set(process.argv.slice(2));
@@ -55,7 +55,6 @@ if (jobs.length === 0) {
 
 const fallbackChromium = "/opt/pw-browsers/chromium-1194/chrome-linux/chrome";
 const executablePath =
-  // biome-ignore lint/suspicious/noUndeclaredEnvVars: local design tool, not a turbo task
   process.env.PW_CHROMIUM ?? (existsSync(fallbackChromium) ? fallbackChromium : undefined);
 
 const browser = await chromium.launch({ executablePath });

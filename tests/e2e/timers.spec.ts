@@ -5,6 +5,8 @@ test.describe("Clocks & Timers: stopwatch and timer", () => {
   let ui: TimersPage;
 
   test.beforeEach(async ({ page }) => {
+    // A controllable clock in the sandbox and the widget frame: tests jump ahead instead of sleeping.
+    await page.clock.install();
     ui = new TimersPage(page);
     await ui.goto();
   });
@@ -27,12 +29,12 @@ test.describe("Clocks & Timers: stopwatch and timer", () => {
     test("runs, pauses and resets", async ({ page }) => {
       await ui.action("toggle").click();
       await expect(ui.action("toggle")).toHaveAttribute("aria-label", "Pause");
-      await page.waitForTimeout(1100);
+      await page.clock.fastForward(1100);
       await ui.action("toggle").click();
 
       const paused = await ui.time().innerText();
       expect(paused).toMatch(/^00:01\.\d\d$/);
-      await page.waitForTimeout(300);
+      await page.clock.fastForward(300);
       await expect(ui.time()).toHaveText(paused);
 
       await ui.action("reset").click();
@@ -41,11 +43,11 @@ test.describe("Clocks & Timers: stopwatch and timer", () => {
 
     test("persists through the widget API and keeps running after a reload", async ({ page }) => {
       await ui.action("toggle").click();
-      await page.waitForTimeout(1200);
+      await page.clock.fastForward(1200);
 
-      const stored = await ui.storedState("stopwatch");
-      expect(stored.items).toHaveLength(1);
-      expect(stored.items[0].startedAt).toEqual(expect.any(Number));
+      await expect
+        .poll(async () => (await ui.storedState("stopwatch"))?.items)
+        .toEqual([expect.objectContaining({ startedAt: expect.any(Number) })]);
 
       await ui.reloadWidget();
       await expect(ui.action("toggle")).toHaveAttribute("aria-label", "Pause");
@@ -60,9 +62,9 @@ test.describe("Clocks & Timers: stopwatch and timer", () => {
     test("records laps, newest first", async ({ page }) => {
       await ui.setSettingCheckbox("Show lap times", true);
       await ui.action("toggle").click();
-      await page.waitForTimeout(300);
+      await page.clock.fastForward(300);
       await ui.action("lap").click();
-      await page.waitForTimeout(300);
+      await page.clock.fastForward(300);
       await ui.action("lap").click();
 
       const laps = ui.item().locator(".lap");
@@ -136,7 +138,7 @@ test.describe("Clocks & Timers: stopwatch and timer", () => {
     test("counts down, pauses and resets", async ({ page }) => {
       await ui.action("toggle").click();
       await expect(ui.countdown()).toHaveText(/^0[45]:\d\d$/);
-      await page.waitForTimeout(1100);
+      await page.clock.fastForward(1100);
       await ui.action("toggle").click();
       await expect(ui.action("toggle")).toHaveAttribute("aria-label", "Start");
       await expect(ui.countdown()).toHaveText("04:59");
@@ -148,10 +150,10 @@ test.describe("Clocks & Timers: stopwatch and timer", () => {
     test("does not gain time when paused, resumed and reloaded", async ({ page }) => {
       await ui.setTimerDuration({ seconds: 10 });
       await ui.action("toggle").click();
-      await page.waitForTimeout(1500);
+      await page.clock.fastForward(1500);
       await ui.action("toggle").click();
       await ui.action("toggle").click();
-      await page.waitForTimeout(500);
+      await page.clock.fastForward(500);
 
       await ui.reloadWidget();
       await expect(ui.countdown()).toHaveText(/^00:0[78]$/);

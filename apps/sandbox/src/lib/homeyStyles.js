@@ -127,6 +127,10 @@ export function injectHomeyStyles(doc) {
       --homey-line-color-light: rgba(0, 0, 0, 0.05);
     }
 
+    /* The dashboard card behind the (transparent) widget frame. */
+    html:has(body.homey-theme-light) { background: #fff; }
+    html:has(body.homey-theme-dark) { background: #2c2c2c; }
+
     body {
       font-family: 'Nunito', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       color: var(--homey-text-color);

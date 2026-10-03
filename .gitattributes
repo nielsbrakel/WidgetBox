@@ -1,0 +1,15 @@
+# Normalize line endings; the repo uses LF everywhere (.editorconfig). The Homey CLI rewrites
+# app.json on every validate, so CRLF checkouts would show up as drift.
+* text=auto eol=lf
+
+# Binary assets
+*.png binary
+*.jpg binary
+*.ico binary
+*.zip binary
+
+# Generated files: hide from diffs and language stats
+pnpm-lock.yaml linguist-generated=true -diff
+apps/*/app.json linguist-generated=true
+docs/** linguist-documentation
+design/** linguist-documentation

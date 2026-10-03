@@ -94,6 +94,7 @@ export default function SettingsPanel({
                 <label className="checkbox-row">
                   <span className="setting-label">{setting.label?.en || setting.id}</span>
                   <input
+                    id={`setting-${setting.id}`}
                     type="checkbox"
                     checked={!!settingsValues[setting.id]}
                     onChange={(e) => onUpdateSetting(setting.id, e.target.checked)}

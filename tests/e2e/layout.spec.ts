@@ -69,7 +69,7 @@ test.describe("Layout App", () => {
     });
 
     test("should update margin", async () => {
-      await layout.setSettingInput("Side Margin", "32");
+      await layout.setSettingInput("Side margin", "32");
       expect(await layout.getSeparatorMargin()).toBe("0px 32px");
     });
 
@@ -105,12 +105,12 @@ test.describe("Layout App", () => {
     });
 
     test("should update alignment to center", async () => {
-      await layout.setSettingSelect("Horizontal Alignment", "center");
+      await layout.setSettingSelect("Horizontal alignment", "center");
       expect(await layout.getHeaderStyle("textAlign")).toBe("center");
     });
 
     test("should update weight to normal", async () => {
-      await layout.setSettingSelect("Font Weight", "normal");
+      await layout.setSettingSelect("Font weight", "normal");
       expect(await layout.getHeaderStyle("fontWeight")).toBe("400");
     });
 

@@ -1,0 +1,16 @@
+# Git hooks. They stay fast and never run the test suite, so a work-in-progress commit is always
+# possible; CI runs everything.
+pre-commit:
+  parallel: true
+  commands:
+    biome:
+      glob: '*.{js,mjs,ts,jsx,json,css,html}'
+      run: pnpm exec biome check --no-errors-on-unmatched --files-ignore-unknown=true {staged_files}
+    widget-kit:
+      glob: '{packages/widget-kit/**,apps/*/widgets/*/public/**}'
+      run: pnpm kit:check
+
+commit-msg:
+  commands:
+    commitlint:
+      run: pnpm exec commitlint --edit {1}

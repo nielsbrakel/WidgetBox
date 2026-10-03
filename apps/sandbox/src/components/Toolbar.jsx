@@ -1,6 +1,7 @@
 import { MoonIcon, RefreshIcon, SunIcon } from "./Icons";
 
 const WIDTH_PRESETS = [
+  { width: 240, label: "XS", title: "Extra small (240px), a narrow dashboard column" },
   { width: 360, label: "S", title: "Small (360px)" },
   { width: 480, label: "M", title: "Medium (480px)" },
   { width: 720, label: "L", title: "Large (720px)" },
@@ -9,6 +10,8 @@ const WIDTH_PRESETS = [
 export default function Toolbar({
   theme,
   onToggleTheme,
+  language,
+  onToggleLanguage,
   onReload,
   previewWidth,
   onSetPreviewWidth,
@@ -36,6 +39,14 @@ export default function Toolbar({
             </button>
           ))}
         </div>
+        <button
+          type="button"
+          onClick={onToggleLanguage}
+          title="Switch language (English / Dutch)"
+          className="toolbar-btn"
+        >
+          {language.toUpperCase()}
+        </button>
         <button type="button" onClick={onToggleTheme} title="Toggle Theme" className="toolbar-btn">
           {theme === "dark" ? <MoonIcon /> : <SunIcon />}
         </button>

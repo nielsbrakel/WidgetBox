@@ -1,0 +1,166 @@
+name: Release
+
+# Automatic deployment to the Homey App Store (docs/releasing.md, docs/decisions.md D-012).
+#
+# 1. On every push to main, changesets/action opens or updates a "Release: version apps" pull
+#    request that bumps each changed app and writes its en/nl store changelog.
+# 2. Merging that pull request tags each bumped app (com.nielsvanbrakel.widgetbox-<app>@x.y.z).
+# 3. Each tagged app is validated and uploaded with the Homey CLI from the protected
+#    `homey-app-store` environment, which waits for the owner's approval and holds HOMEY_PAT.
+#    The upload creates a Test build; moving it to Live stays a manual step in Homey's
+#    developer tools.
+#
+# A manual run publishes one app at its checked-in version; `dry_run` (the default) only validates.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      app:
+        description: App to publish
+        type: choice
+        options: [clocks, weather, layout, video, games]
+      dry_run:
+        description: Only validate, don't upload
+        type: boolean
+        default: true
+
+# Every job declares its own minimal permissions (docs/decisions.md D-011).
+permissions: {}
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  version:
+    name: version (open the version PR, or tag merged versions)
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write # version branch commits and release tags
+      pull-requests: write # the version pull request
+    outputs:
+      published: ${{ steps.changesets.outputs.published-packages }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      # No dependency cache in a release (cache poisoning): a clean, frozen install.
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          package-manager-cache: false
+      - run: pnpm install --frozen-lockfile
+      - id: changesets
+        uses: changesets/action@ae32849d5ba541f9ae29e40e22a623bc13562f51 # v2.1.2
+        with:
+          version-script: pnpm release:version
+          publish-script: pnpm release:tag
+          commit-message: 'chore(release): version apps'
+          pr-title: 'Release: version apps'
+          create-github-releases: true
+
+  plan:
+    name: plan (which apps to publish)
+    needs: [version]
+    if: ${{ !cancelled() && needs.version.result != 'failure' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    outputs:
+      apps: ${{ steps.plan.outputs.apps }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          package-manager-cache: false
+      # Plain Node: the script has no dependencies.
+      - id: plan
+        env:
+          PUBLISHED: ${{ needs.version.outputs.published }}
+          APP: ${{ inputs.app }}
+          HOLD: ${{ vars.HOMEY_RELEASE_HOLD }}
+        run: node scripts/release-plan.mjs >> "$GITHUB_OUTPUT"
+
+  validate:
+    name: validate (${{ matrix.app.short }} ${{ matrix.app.version }})
+    needs: [plan]
+    if: ${{ !cancelled() && needs.plan.outputs.apps != '' && needs.plan.outputs.apps != '[]' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        app: ${{ fromJSON(needs.plan.outputs.apps) }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          package-manager-cache: false
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec vitest run tests/repo
+      - name: Validate and check the bundle
+        env:
+          APP: ${{ matrix.app.short }}
+          HOMEY_SKIP_STARTUP_NOTIFIERS: '1'
+        run: |
+          pnpm --filter "./apps/com.nielsvanbrakel.widgetbox-$APP" run homey:validate
+          node scripts/check-bundles.mjs "$APP"
+
+  publish:
+    name: publish (${{ matrix.app.short }} ${{ matrix.app.version }})
+    needs: [plan, validate]
+    if: ${{ !cancelled() && needs.validate.result == 'success' && !(github.event_name == 'workflow_dispatch' && inputs.dry_run) }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    environment: homey-app-store
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        app: ${{ fromJSON(needs.plan.outputs.apps) }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          package-manager-cache: false
+      # Nothing from the workspace is installed next to the token: the pinned Homey CLI runs
+      # through npx with install scripts off (tests/repo/apps.test.js keeps the version in step
+      # with pnpm-lock.yaml). HOMEY_HEADLESS skips every prompt and refuses to publish a version
+      # without a changelog entry.
+      - name: Upload to the Homey App Store (Test)
+        working-directory: apps/com.nielsvanbrakel.widgetbox-${{ matrix.app.short }}
+        env:
+          npm_config_ignore_scripts: 'true'
+          HOMEY_PAT: ${{ secrets.HOMEY_PAT }}
+          HOMEY_HEADLESS: '1'
+          HOMEY_SKIP_STARTUP_NOTIFIERS: '1'
+          APP_ID: ${{ matrix.app.id }}
+          APP_VERSION: ${{ matrix.app.version }}
+        run: |
+          export HOMEY_HOME="$RUNNER_TEMP/homey"
+          npx --yes homey@4.5.3 app publish
+          {
+            echo "### $APP_ID $APP_VERSION uploaded"
+            echo
+            echo "Release it to Test or Live in the [Homey developer tools](https://tools.developer.homey.app/apps/app/$APP_ID)."
+          } >> "$GITHUB_STEP_SUMMARY"

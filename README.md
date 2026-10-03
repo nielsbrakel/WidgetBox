@@ -27,13 +27,15 @@ WidgetBox/
 │   ├── com.nielsvanbrakel.widgetbox-video/
 │   ├── com.nielsvanbrakel.widgetbox-games/
 │   └── sandbox/             # Local preview of every widget with a mocked Homey API
-├── tests/                   # Playwright end-to-end tests against the sandbox
-├── turbo.json               # Turborepo task definitions
+├── packages/widget-kit/     # Shared widget helpers, copied into each widget (pnpm kit:sync)
+├── scripts/                 # Release, kit sync and bundle checks
+├── tests/                   # Repo-wide checks and Playwright end-to-end tests
+├── docs/                    # Glossary, architecture, decisions, releasing
 ├── pnpm-workspace.yaml      # pnpm workspace configuration
 └── biome.json               # Linting and formatting
 ```
 
-Each app is a standalone Homey app that can be developed, validated and published on its own. The monorepo uses [Turborepo](https://turborepo.dev/) with [pnpm](https://pnpm.io/) workspaces.
+Each app is a standalone Homey app that can be developed, validated and published on its own. The monorepo uses [pnpm](https://pnpm.io/) workspaces; root scripts run the per-app Homey CLI commands with `pnpm -r`.
 
 ## Development
 
@@ -46,34 +48,35 @@ Each app is a standalone Homey app that can be developed, validated and publishe
 ### Common commands
 
 ```bash
-pnpm install
+pnpm install       # also installs the git hooks
 pnpm sandbox       # Preview all widgets in the browser
-pnpm lint          # Biome
+pnpm check         # Biome, knip, unit tests with coverage, Homey validation
 pnpm test          # Unit tests (Vitest)
 pnpm test:e2e      # End-to-end tests (Playwright)
 pnpm validate      # homey app validate --level publish for every app
+pnpm test:bundle   # Build every app and check what would ship
 ```
 
 ### Running an app on a Homey
 
 ```bash
 cd apps/com.nielsvanbrakel.widgetbox-clocks
-homey app run
+pnpm exec homey app run
 ```
 
 > **Note:** Only one app can run in dev mode at a time. Use `homey app install` to put several apps on a Homey at once.
 
-### Publishing
+### Releasing
 
-Apps are versioned and published independently. Publish one app at a time from its own folder:
+Apps are versioned and released independently and automatically: a pull request adds a changeset (`pnpm changeset`) with an English and a Dutch line, and after merge a release workflow versions, tags and uploads the app once the owner approves. See [docs/releasing.md](docs/releasing.md).
 
-```bash
-cd apps/com.nielsvanbrakel.widgetbox-weather
-homey app validate --level publish
-homey app publish
-```
+### Documentation
 
-The CLI asks whether to bump the version and what is new, and updates `app.json`, `.homeycompose/app.json`, `package.json` and `.homeychangelog.json` for you.
+- [CONTRIBUTING.md](CONTRIBUTING.md): workflow and hard rules
+- [docs/CONTEXT.md](docs/CONTEXT.md): the words we use
+- [docs/architecture.md](docs/architecture.md): where code lives and the quality gates
+- [docs/decisions.md](docs/decisions.md): why things are the way they are
+- [SECURITY.md](SECURITY.md): reporting problems and the threat model
 
 ## Store assets
 

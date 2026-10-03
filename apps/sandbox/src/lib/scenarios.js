@@ -15,13 +15,13 @@ export const SCENARIOS = {
     "no-location": { label: "No Location", type: "mock" },
     error: { label: "API Error", type: "error" },
   },
-  forecast: {
+  "daily-forecast": {
     default: { label: "Forecast (Default)", type: "mock" },
     real: { label: "Real Data (Live)", type: "real" },
     "no-location": { label: "No Location", type: "mock" },
     error: { label: "API Error", type: "error" },
   },
-  youtube: {
+  video: {
     default: { label: "Normal (Default)", type: "mock" },
     ios: { label: "Simulate iOS", type: "mock" },
   },

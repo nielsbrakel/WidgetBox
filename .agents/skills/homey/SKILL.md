@@ -390,7 +390,7 @@ homey app validate --level verified
 1. Validate app: `homey app validate --level publish`
 2. Publish: `homey app publish`
     - **Interactive**: This command will prompt you to select a new version (Patch/Minor/Major) or confirm the current one.
-    - **Monorepo**: In a script, you may need to handle this interactivity (e.g. via `turbo` with concurrency 1).
+    - **Headless**: with `HOMEY_PAT` (a personal access token) and `HOMEY_HEADLESS=1` the CLI skips every prompt, does not bump the version and refuses to publish a version without a `.homeychangelog.json` entry. WidgetBox publishes this way from CI (docs/releasing.md).
 3. Go to [tools.developer.homey.app](https://tools.developer.homey.app)
 4. Submit for Test or Live certification
 5. Wait for Athom review
@@ -586,46 +586,14 @@ my-monorepo/
 │   │       └── my-widget/
 │   └── com.example.app-two/
 │       └── ...
-├── pnpm-workspace.yaml
-└── turbo.json
+└── pnpm-workspace.yaml
 ```
 
 Each Homey app is a standalone package that can be developed and published independently.
 
-### Turbo Integration
+### Monorepo scripts
 
-Add these scripts to each app's `package.json`:
-
-```json
-{
-  "scripts": {
-    "homey:run": "echo 'Only one app can run in dev mode at a time. Run directly: homey app run'",
-    "homey:install": "homey app install",
-    "homey:build": "homey app build",
-    "homey:publish": "homey app publish"
-  }
-}
-```
-
-Add matching tasks to `turbo.json`:
-
-```json
-{
-  "tasks": {
-    "homey:run": { "cache": false, "persistent": true },
-    "homey:install": { "cache": false },
-    "homey:build": {},
-    "homey:publish": { "cache": false }
-  }
-}
-```
-
-Usage:
-```bash
-turbo run homey:install   # Install all apps to Homey
-turbo run homey:build     # Build all apps
-turbo run homey:publish   # Publish all apps
-```
+Give each app `homey:validate` and `homey:build` scripts and run them for every app from the root with `pnpm -r --filter "./apps/com.*" run homey:validate`. Publish one app at a time (see Publishing Process).
 
 > **WARNING**: `homey app run` (dev mode) uses port 9229 for debugging.
 > Only ONE app can run in dev mode at a time. Running multiple apps

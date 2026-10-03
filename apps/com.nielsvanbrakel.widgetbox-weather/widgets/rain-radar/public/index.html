@@ -91,6 +91,7 @@
     <script>
     const IMAGE_URL = "https://image.buienradar.nl/2.0/image/single/RadarMapRainNL";
     const REFRESH_MS = 5 * 60 * 1000;
+    const LOAD_TIMEOUT_MS = 20 * 1000;
     const SIZES = [256, 512, 768];
 
     const $ = (id) => document.getElementById(id);
@@ -116,7 +117,7 @@
     }
 
     function onHomeyReady(Homey) {
-      const state = { lastLoad: 0, lastAttempt: 0, timer: null };
+      const state = { lastLoad: 0, lastAttempt: 0, timer: null, loadTimer: null };
       const translated = Homey.__("language");
       const language = /^[a-z]{2}$/.test(translated) ? translated : navigator.language;
 
@@ -133,12 +134,29 @@
         });
       }
 
+      /** Shows the offline badge (or the error) and keeps the last good image. */
+      function showFailure() {
+        if (state.lastLoad) {
+          $("offline").textContent = t("common.offline", { time: formatClock(state.lastLoad) });
+          $("offline").hidden = false;
+        } else {
+          $("message").textContent = `${t("common.errorTitle")}. ${t("common.errorRetry")}.`;
+        }
+      }
+
       /** Loads the next image off-screen and only swaps it in when it loaded successfully. */
       function refresh() {
         clearTimeout(state.timer);
+        clearTimeout(state.loadTimer);
         state.lastAttempt = Date.now();
         const next = new Image();
+        const settle = () => {
+          clearTimeout(state.loadTimer);
+          next.onload = null;
+          next.onerror = null;
+        };
         next.onload = () => {
+          settle();
           next.id = "radar";
           next.className = "radar";
           next.alt = t("widgets.rain-radar.alt");
@@ -149,14 +167,17 @@
           schedule();
         };
         next.onerror = () => {
-          if (state.lastLoad) {
-            $("offline").textContent = t("common.offline", { time: formatClock(state.lastLoad) });
-            $("offline").hidden = false;
-          } else {
-            $("message").textContent = `${t("common.errorTitle")}. ${t("common.errorRetry")}.`;
-          }
+          settle();
+          showFailure();
           schedule();
         };
+        // A request that never answers (flaky tablet Wi-Fi) would otherwise stop all refreshes.
+        state.loadTimer = setTimeout(() => {
+          settle();
+          next.removeAttribute("src");
+          showFailure();
+          schedule();
+        }, LOAD_TIMEOUT_MS);
         next.src = imageUrl();
       }
 
@@ -168,8 +189,10 @@
 
       $("credit").addEventListener("click", () => Homey.popup("https://www.buienradar.nl"));
       document.addEventListener("visibilitychange", () => {
-        if (document.visibilityState === "hidden") clearTimeout(state.timer);
-        else schedule();
+        if (document.visibilityState === "hidden") {
+          clearTimeout(state.timer);
+          clearTimeout(state.loadTimer);
+        } else schedule();
       });
 
       document.documentElement.lang = language;

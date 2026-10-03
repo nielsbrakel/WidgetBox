@@ -137,7 +137,10 @@
       <div class="date" id="date" hidden></div>
     </div>
 
+    <script src="vendor/widget-kit.js"></script>
+
     <script>
+    const { contentWidth, createHeightReporter, createTicker, createTranslator } = WidgetKit;
     const WIDGET_ID = "digital-clock";
     const SECOND = 1000;
     const MINUTE = 60 * SECOND;
@@ -181,6 +184,11 @@
       return text.charAt(0).toLocaleUpperCase(locale) + text.slice(1);
     }
 
+    /** Writes text only when it changed: each write replaces a node and restyles the clock. */
+    function setText(element, text) {
+      if (element.textContent !== text) element.textContent = text;
+    }
+
     function renderDate(now) {
       dateElement.hidden = !settings.showDate;
       if (!settings.showDate) return;
@@ -197,21 +205,15 @@
       const displayHours = is12Hour ? String(hours % 12 || 12) : pad(hours);
       const hoursMinutes = `${displayHours}:${pad(now.getMinutes())}`;
 
-      hoursMinutesElement.textContent = hoursMinutes;
-      secondsElement.textContent = settings.showSeconds ? `:${pad(now.getSeconds())}` : "";
-      periodElement.textContent = is12Hour ? periodLabels[hours < 12 ? "am" : "pm"] : "";
+      setText(hoursMinutesElement, hoursMinutes);
+      setText(secondsElement, settings.showSeconds ? `:${pad(now.getSeconds())}` : "");
+      setText(periodElement, is12Hour ? periodLabels[hours < 12 ? "am" : "pm"] : "");
       renderDate(now);
 
       if (hoursMinutes.length !== renderedTimeLength) {
         renderedTimeLength = hoursMinutes.length;
         fitToWidth();
       }
-    }
-
-    /** Width available to the clock: the #app box minus its padding. */
-    function contentWidth(element) {
-      const style = getComputedStyle(element);
-      return element.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
     }
 
     /** Shrinks the time (never grows it) so it fits the widget width without clipping. */
@@ -234,46 +236,11 @@
       renderedTimeLength = 0;
     }
 
-    function translate(Homey, key, fallback) {
-      const value = Homey.__(`widgets.${WIDGET_ID}.${key}`);
-      return value && value !== key ? value : fallback;
-    }
-
-    function createHeightReporter(Homey) {
-      let reportedHeight = null;
-      return () => {
-        const height = Math.ceil(document.body.getBoundingClientRect().height);
-        if (height === reportedHeight) return;
-        if (reportedHeight === null) Homey.ready({ height });
-        else Homey.setHeight(height);
-        reportedHeight = height;
-      };
-    }
-
-    /** Runs `tick` on every second or minute boundary and pauses while the page is hidden. */
-    function createTicker(tick, getInterval) {
-      let timer = null;
-      const stop = () => clearTimeout(timer);
-      const run = () => {
-        tick();
-        const interval = getInterval();
-        timer = setTimeout(run, interval - (Date.now() % interval) + 20);
-      };
-      const start = () => {
-        stop();
-        run();
-      };
-      document.addEventListener("visibilitychange", () => {
-        if (document.hidden) stop();
-        else start();
-      });
-      return { start };
-    }
-
     window.onHomeyReady = (Homey) => {
+      const t = createTranslator(Homey, `widgets.${WIDGET_ID}`);
       settings = Homey.getSettings();
-      locale = translate(Homey, "language", navigator.language || "en");
-      periodLabels = { am: translate(Homey, "am", "AM"), pm: translate(Homey, "pm", "PM") };
+      locale = t("language", navigator.language || "en");
+      periodLabels = { am: t("am", "AM"), pm: t("pm", "PM") };
       document.documentElement.lang = locale;
 
       const reportHeight = createHeightReporter(Homey);

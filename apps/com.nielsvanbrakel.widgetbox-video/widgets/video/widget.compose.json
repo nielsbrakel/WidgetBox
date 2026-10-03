@@ -1,0 +1,154 @@
+{
+  "name": {
+    "en": "Video",
+    "nl": "Video"
+  },
+  "description": {
+    "en": "Play a YouTube video, livestream or playlist",
+    "nl": "Speel een YouTube-video, livestream of afspeellijst af"
+  },
+  "settings": [
+    {
+      "id": "videoId",
+      "type": "text",
+      "label": {
+        "en": "YouTube video (link or ID)",
+        "nl": "YouTube-video (link of ID)"
+      },
+      "hint": {
+        "en": "Paste a YouTube link, for example https://youtu.be/dQw4w9WgXcQ, or just the 11-character video ID. Livestream and Shorts links work too.",
+        "nl": "Plak een YouTube-link, bijvoorbeeld https://youtu.be/dQw4w9WgXcQ, of alleen de video-ID van 11 tekens. Links naar livestreams en Shorts werken ook."
+      },
+      "value": ""
+    },
+    {
+      "id": "playlistId",
+      "type": "text",
+      "label": {
+        "en": "YouTube playlist (link or ID)",
+        "nl": "YouTube-afspeellijst (link of ID)"
+      },
+      "hint": {
+        "en": "Optional. Paste a playlist link or ID (starts with PL). When a video is also set, the playlist starts with that video.",
+        "nl": "Optioneel. Plak een link of ID van een afspeellijst (begint met PL). Als er ook een video is ingesteld, begint de afspeellijst met die video."
+      },
+      "value": ""
+    },
+    {
+      "id": "aspectRatio",
+      "type": "dropdown",
+      "label": {
+        "en": "Aspect ratio",
+        "nl": "Beeldverhouding"
+      },
+      "value": "16:9",
+      "values": [
+        {
+          "id": "1:1",
+          "label": {
+            "en": "Square (1:1)",
+            "nl": "Vierkant (1:1)"
+          }
+        },
+        {
+          "id": "4:3",
+          "label": {
+            "en": "4:3",
+            "nl": "4:3"
+          }
+        },
+        {
+          "id": "16:9",
+          "label": {
+            "en": "16:9 (Default)",
+            "nl": "16:9 (Standaard)"
+          }
+        },
+        {
+          "id": "9:16",
+          "label": {
+            "en": "Portrait (9:16)",
+            "nl": "Staand (9:16)"
+          }
+        },
+        {
+          "id": "21:9",
+          "label": {
+            "en": "Ultrawide (21:9)",
+            "nl": "Ultrabreed (21:9)"
+          }
+        },
+        {
+          "id": "3:1",
+          "label": {
+            "en": "Panoramic (3:1)",
+            "nl": "Panoramisch (3:1)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "autoplay",
+      "type": "checkbox",
+      "label": {
+        "en": "Autoplay",
+        "nl": "Automatisch afspelen"
+      },
+      "hint": {
+        "en": "Starts playing when the dashboard opens. Browsers only allow this without sound, so the video always starts muted. When off, the widget shows a preview image and loads the player when you tap it.",
+        "nl": "Begint met afspelen zodra het dashboard opent. Browsers staan dit alleen zonder geluid toe, dus de video start altijd gedempt. Staat dit uit, dan toont de widget een voorbeeldafbeelding en laadt de speler pas als je erop tikt."
+      },
+      "value": true
+    },
+    {
+      "id": "mute",
+      "type": "checkbox",
+      "label": {
+        "en": "Muted",
+        "nl": "Gedempt"
+      },
+      "value": false,
+      "hint": {
+        "en": "Always on while Autoplay is enabled.",
+        "nl": "Staat altijd aan als Automatisch afspelen is ingeschakeld."
+      }
+    },
+    {
+      "id": "loop",
+      "type": "checkbox",
+      "label": {
+        "en": "Loop",
+        "nl": "Herhalen"
+      },
+      "value": false,
+      "hint": {
+        "en": "Plays the video or playlist again when it ends.",
+        "nl": "Speelt de video of afspeellijst opnieuw af als die is afgelopen."
+      }
+    },
+    {
+      "id": "controls",
+      "type": "checkbox",
+      "label": {
+        "en": "Show controls",
+        "nl": "Bediening tonen"
+      },
+      "value": false
+    },
+    {
+      "id": "start",
+      "type": "number",
+      "label": {
+        "en": "Start at (seconds)",
+        "nl": "Starten op (seconden)"
+      },
+      "hint": {
+        "en": "Start playback this many seconds into the video. 0 starts at the beginning, or at the time in the link (?t=).",
+        "nl": "Begin zoveel seconden na het begin van de video. Bij 0 start de video bij het begin, of op het tijdstip in de link (?t=)."
+      },
+      "value": 0,
+      "min": 0,
+      "step": 1
+    }
+  ]
+}

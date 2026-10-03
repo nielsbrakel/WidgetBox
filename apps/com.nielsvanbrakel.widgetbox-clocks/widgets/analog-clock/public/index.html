@@ -192,7 +192,10 @@
       </svg>
     </div>
 
+    <script src="vendor/widget-kit.js"></script>
+
     <script>
+    const { createHeightReporter, createTicker, createTranslator } = WidgetKit;
     const WIDGET_ID = "analog-clock";
     const SVG_NS = "http://www.w3.org/2000/svg";
     const SECOND = 1000;
@@ -319,45 +322,10 @@
       renderedMinute = -1;
     }
 
-    function translate(Homey, key, fallback) {
-      const value = Homey.__(`widgets.${WIDGET_ID}.${key}`);
-      return value && value !== key ? value : fallback;
-    }
-
-    function createHeightReporter(Homey) {
-      let reportedHeight = null;
-      return () => {
-        const height = Math.ceil(document.body.getBoundingClientRect().height);
-        if (height === reportedHeight) return;
-        if (reportedHeight === null) Homey.ready({ height });
-        else Homey.setHeight(height);
-        reportedHeight = height;
-      };
-    }
-
-    /** Runs `tick` on every second or minute boundary and pauses while the page is hidden. */
-    function createTicker(tick, getInterval) {
-      let timer = null;
-      const stop = () => clearTimeout(timer);
-      const run = () => {
-        tick();
-        const interval = getInterval();
-        timer = setTimeout(run, interval - (Date.now() % interval) + 20);
-      };
-      const start = () => {
-        stop();
-        run();
-      };
-      document.addEventListener("visibilitychange", () => {
-        if (document.hidden) stop();
-        else start();
-      });
-      return { start };
-    }
-
     window.onHomeyReady = (Homey) => {
+      const t = createTranslator(Homey, `widgets.${WIDGET_ID}`);
       settings = Homey.getSettings();
-      locale = translate(Homey, "language", navigator.language || "en");
+      locale = t("language", navigator.language || "en");
       document.documentElement.lang = locale;
 
       const reportHeight = createHeightReporter(Homey);

@@ -115,6 +115,59 @@ function normalizeForecastDays(forecast, count, today = "") {
     }));
 }
 
+const pick = (source, fields) =>
+  Object.fromEntries(
+    fields.filter((field) => field in source).map((field) => [field, source[field]]),
+  );
+
+// The upstream fields normalizeStation, findNearestStation and normalizeForecastDays read.
+const STATION_FIELDS = [
+  "stationid",
+  "stationname",
+  "regio",
+  "lat",
+  "lon",
+  "timestamp",
+  "temperature",
+  "feeltemperature",
+  "humidity",
+  "windspeedBft",
+  "winddirectiondegrees",
+  "rainFallLastHour",
+  "fullIconUrl",
+  "iconcode",
+];
+const DAY_FIELDS = [
+  "date",
+  "mintemperature",
+  "maxtemperature",
+  "precipitation",
+  "precipitationmm",
+  "iconcode",
+];
+
+/** The feed reduced to the station fields the widgets use, so the cache stays small. */
+function trimFeed(feed) {
+  const stations = feed?.actual?.stationmeasurements;
+  return {
+    actual: {
+      stationmeasurements: Array.isArray(stations)
+        ? stations
+            .filter((station) => station && typeof station === "object")
+            .map((station) => pick(station, STATION_FIELDS))
+        : [],
+    },
+  };
+}
+
+/** A forecast reduced to the day fields the widgets use, so the cache stays small. */
+function trimForecast(forecast) {
+  const days = Array.isArray(forecast?.days) ? forecast.days : [];
+  return {
+    days: days.filter((day) => day && typeof day === "object").map((day) => pick(day, DAY_FIELDS)),
+  };
+}
+
 module.exports = {
   amsterdamDate,
   findNearestStation,
@@ -122,4 +175,6 @@ module.exports = {
   normalizeForecastDays,
   normalizeStation,
   parseRaintext,
+  trimFeed,
+  trimForecast,
 };

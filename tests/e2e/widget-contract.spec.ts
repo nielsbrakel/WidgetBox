@@ -1,0 +1,38 @@
+import { expect, test } from "@playwright/test";
+import { widgets } from "./catalog";
+
+// Every widget, in both languages, behaves the way a real Homey needs (D-016):
+// it calls Homey.ready() exactly once, uses no translation key that is missing, and throws nothing.
+// The aquarium is rebuilt separately and checked by its own specs.
+type HomeyProbe = { readyCount: number; missing: string[] } | null;
+
+for (const widget of widgets) {
+  for (const lang of ["en", "nl"]) {
+    test(`${widget.name} (${lang}) is ready once and fully translated`, async ({ page }) => {
+      const errors: string[] = [];
+      page.on("pageerror", (error) => errors.push(error.message));
+
+      await page.clock.install();
+      await page.goto(`/?widget=${widget.id}&lang=${lang}`);
+      const frame = () => page.frame({ url: new RegExp(`/widgets/${widget.id}/public/`) });
+      const probe = () =>
+        frame()?.evaluate((): HomeyProbe => {
+          const homey = (window as unknown as { Homey?: Record<string, unknown> }).Homey;
+          if (!homey || typeof homey.readyCount !== "number") return null;
+          return {
+            readyCount: homey.readyCount as number,
+            missing: [...(homey.missingTranslations as Set<string>)],
+          };
+        }) ?? Promise.resolve(null);
+
+      await expect.poll(async () => (await probe())?.readyCount ?? 0).toBeGreaterThan(0);
+      // Run every pending timer for a while: a second ready() call (a common bug with several
+      // init paths) would happen now.
+      await page.clock.runFor(2000);
+      const result = await probe();
+      expect(result?.readyCount, "Homey.ready() calls").toBe(1);
+      expect(result?.missing, "missing translations").toEqual([]);
+      expect(errors, "uncaught errors").toEqual([]);
+    });
+  }
+}

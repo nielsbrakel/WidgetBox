@@ -8,11 +8,11 @@ const { intensityToMmPerHour, parseRaintext } = require("./buienradar");
 const UTRECHT = { lat: 52.0907, lon: 5.1214 };
 
 function textResponse(body, status = 200) {
-  return { ok: status >= 200 && status < 300, status, text: async () => body };
+  return new Response(body, { status });
 }
 
 function jsonResponse(body, status = 200) {
-  return { ok: status >= 200 && status < 300, status, json: async () => body };
+  return new Response(JSON.stringify(body), { status });
 }
 
 function createService(handler, now = new Date("2026-10-03T10:00:00Z")) {
@@ -209,5 +209,105 @@ describe("WeatherService.getForecast", () => {
     );
     expect((await service.getForecast(UTRECHT, 99)).days).toHaveLength(7);
     expect((await service.getForecast(UTRECHT, Number.NaN)).days).toHaveLength(5);
+  });
+});
+
+describe("upstream limits", () => {
+  it("refuses redirects, so data only comes from the Buienradar hosts", async () => {
+    const { service, fetchImpl } = createService(() => jsonResponse(FEED));
+    await service.getStation({ location: UTRECHT });
+    expect(fetchImpl.mock.calls[0][1]).toMatchObject({ redirect: "error" });
+  });
+
+  it("rejects a response that announces a body over the size limit", async () => {
+    const response = jsonResponse(FEED);
+    response.headers.set("content-length", String(10 * 1024 * 1024));
+    const { service } = createService(() => response);
+    await expect(service.getStation({ location: UTRECHT })).rejects.toMatchObject({
+      code: "UPSTREAM_UNAVAILABLE",
+    });
+  });
+
+  it("stops reading a body that grows past the size limit", async () => {
+    const chunk = new TextEncoder().encode("x".repeat(64 * 1024));
+    let sent = 0;
+    const endless = new ReadableStream({
+      pull(controller) {
+        sent += chunk.length;
+        controller.enqueue(chunk);
+      },
+    });
+    const service = new WeatherService({
+      fetchImpl: async () => new Response(endless),
+      maxBodyBytes: 256 * 1024,
+    });
+    await expect(service.getRainForecast(UTRECHT)).rejects.toMatchObject({
+      code: "UPSTREAM_UNAVAILABLE",
+    });
+    expect(sent).toBeLessThan(1024 * 1024);
+  });
+});
+
+describe("cache footprint", () => {
+  // Homey runs each app in its own small Node process: keep only what the widgets read.
+  const cached = (service, key) => service.cache.entries.get(key).value.data;
+
+  it("keeps only the station fields the widgets use from the feed", async () => {
+    const bulky = {
+      ...FEED,
+      actual: {
+        ...FEED.actual,
+        sunrise: "x",
+        stationmeasurements: FEED.actual.stationmeasurements.map((station) => ({
+          ...station,
+          graphUrl: "https://example.com/".repeat(20),
+          weatherdescription: "Zwaar bewolkt",
+        })),
+      },
+      forecast: { fivedayforecast: Array(5).fill({ text: "long".repeat(200) }) },
+    };
+    const { service } = createService(() => jsonResponse(bulky));
+
+    const result = await service.getStation({ location: UTRECHT });
+
+    expect(result.station.name).toBe("De Bilt");
+    expect(Object.keys(cached(service, "feed"))).toEqual(["actual"]);
+    expect(Object.keys(cached(service, "feed").actual)).toEqual(["stationmeasurements"]);
+    expect(cached(service, "feed").actual.stationmeasurements[0]).not.toHaveProperty("graphUrl");
+  });
+
+  it("keeps only the day fields the widgets use from a forecast", async () => {
+    const days = Array.from({ length: 14 }, (_, i) => ({
+      date: `2026-10-${String(3 + i).padStart(2, "0")}T00:00:00`,
+      mintemperature: 8,
+      maxtemperature: 15,
+      precipitation: 10,
+      precipitationmm: 1,
+      iconcode: "j",
+      hours: Array(24).fill({ temperature: 10, winddirection: "ZW" }),
+    }));
+    const { service } = createService((url) =>
+      url.startsWith(URLS.geoLocation)
+        ? jsonResponse({ id: 1, name: "Utrecht" })
+        : jsonResponse({ location: { name: "x".repeat(500) }, days }),
+    );
+
+    await service.getForecast(UTRECHT, 5);
+
+    const stored = cached(service, "forecast:1");
+    expect(Object.keys(stored)).toEqual(["days"]);
+    expect(stored.days[0]).toEqual({
+      date: "2026-10-03T00:00:00",
+      mintemperature: 8,
+      maxtemperature: 15,
+      precipitation: 10,
+      precipitationmm: 1,
+      iconcode: "j",
+    });
+    expect(JSON.stringify(stored).length).toBeLessThan(8 * 1024);
+  });
+
+  it("holds at most 20 locations", () => {
+    expect(new WeatherService().cache.maxEntries).toBe(20);
   });
 });
