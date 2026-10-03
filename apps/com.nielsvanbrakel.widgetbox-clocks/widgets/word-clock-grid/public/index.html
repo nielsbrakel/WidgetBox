@@ -1,323 +1,253 @@
-<!DOCTYPE html>
-<html>
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../../_shared/shared-styles.css">
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
-        /* Reset */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    html,
+    body {
+      margin: 0;
+      background: transparent;
+      overflow: hidden;
+    }
 
-        html,
-        body {
-            width: 100%;
-            background: transparent;
-            overflow: visible;
-        }
+    body {
+      font-family: var(--homey-font-family, system-ui, sans-serif);
+      color: var(--homey-text-color, #333);
+    }
 
-        /* Wrapper provides space for shadow */
-        .wrapper {
-            padding: 4px;
-        }
+    :where(#app) {
+      box-sizing: border-box;
+      padding: var(--homey-su-3, 12px) var(--homey-su-4, 16px);
+      --accent: var(--homey-text-color, #333);
+      --max-width: 260px;
+      display: flex;
+      justify-content: center;
+    }
 
-        .wrapper.no-padding {
-            padding: 0;
-        }
+    .align-left {
+      justify-content: flex-start;
+    }
 
-        /* Card - full width, handles background */
-        .card {
-            display: flex;
-            width: 100%;
-            background: var(--homey-background-color);
-            border-radius: var(--homey-border-radius, 12px);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
-            padding: 16px;
-        }
+    .align-right {
+      justify-content: flex-end;
+    }
 
-        .card.transparent {
-            background: transparent;
-            box-shadow: none;
-            padding: 0;
-        }
+    .size-xsmall {
+      --max-width: 140px;
+    }
 
-        /* Alignment within the card */
-        .card.align-left {
-            justify-content: flex-start;
-        }
+    .size-small {
+      --max-width: 200px;
+    }
 
-        .card.align-center {
-            justify-content: center;
-        }
+    .size-large {
+      --max-width: 340px;
+    }
 
-        .card.align-right {
-            justify-content: flex-end;
-        }
+    .size-xlarge {
+      --max-width: 100%;
+    }
 
-        /* Word Matrix Grid */
-        .matrix {
-            display: grid;
-            grid-template-columns: repeat(10, 1fr);
-            aspect-ratio: 1;
-            font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
-            line-height: 1;
-        }
+    .color-blue {
+      --accent: var(--homey-color-blue-500, #0099ff);
+    }
 
-        .matrix span {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--homey-text-color);
-            opacity: 0.08;
-            /* Darker inactive */
-            transition: opacity 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), color 0.4s ease;
-            aspect-ratio: 1;
-        }
+    .color-green {
+      --accent: var(--homey-color-green-500, #26c281);
+    }
 
-        .matrix span.active {
-            opacity: 1;
-            font-weight: 700;
-            text-shadow: 0 0 10px currentColor;
-            transform: scale(1.05);
-            /* Slight pop */
-        }
+    .color-orange {
+      --accent: var(--homey-color-orange-500, #ff9500);
+    }
 
-        /* Size variants - width determines everything, capped at available space */
-        .size-xsmall .matrix {
-            width: min(140px, 100%);
-            font-size: 10px;
-        }
+    .color-red {
+      --accent: var(--homey-color-red-500, #ff3b30);
+    }
 
-        .size-small .matrix {
-            width: min(200px, 100%);
-            font-size: 14px;
-        }
+    .color-purple {
+      --accent: var(--homey-color-purple-500, #a855f7);
+    }
 
-        .size-medium .matrix {
-            width: min(260px, 100%);
-            font-size: 18px;
-        }
+    .matrix {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      width: min(var(--max-width), 100%);
+      min-width: 0;
+      aspect-ratio: 1;
+      line-height: 1;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
 
-        .size-large .matrix {
-            width: min(340px, 100%);
-            font-size: 24px;
-        }
+    .cell {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0.15;
+      transition:
+        opacity 0.4s ease,
+        color 0.4s ease;
+    }
 
-        .size-xlarge .matrix {
-            width: 100%;
-            font-size: clamp(14px, 4vw, 30px);
-        }
+    .cell.active {
+      opacity: 1;
+      font-weight: 800;
+      color: var(--accent);
+    }
 
-        /* Color variants */
-        .color-default .matrix span.active {
-            color: var(--homey-text-color);
-        }
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
 
-        .color-blue .matrix span.active {
-            color: #3B82F6;
-        }
-
-        .color-green .matrix span.active {
-            color: #22C55E;
-        }
-
-        .color-orange .matrix span.active {
-            color: #F97316;
-        }
-
-        .color-red .matrix span.active {
-            color: #EF4444;
-        }
-
-        .color-purple .matrix span.active {
-            color: #A855F7;
-        }
+    @media (prefers-reduced-motion: reduce) {
+      .cell {
+        transition: none;
+      }
+    }
     </style>
-</head>
+  </head>
 
-<body>
-    <div class="wrapper" id="wrapper">
-        <div class="card" id="card">
-            <div class="matrix" id="matrix"></div>
-        </div>
+  <body class="homey-widget-full">
+    <div id="app">
+      <div class="matrix" id="matrix" aria-hidden="true"></div>
+      <p class="visually-hidden" id="spoken-time" role="timer" aria-live="off"></p>
     </div>
 
+    <script src="word-clock.js"></script>
     <script>
-        // ===== Configuration =====
-        let settings = {};
+    const WIDGET_ID = "word-clock-grid";
+    const SUPPORTED_LANGUAGES = ["en", "nl"];
+    const MINUTE = 60 * 1000;
 
-        // ===== Language Data =====
-        const LANGUAGES = {
-            en: {
-                matrix: [
-                    ['I', 'T', 'L', 'I', 'S', 'H', 'A', 'L', 'F', 'M'],
-                    ['T', 'E', 'N', 'Q', 'U', 'A', 'R', 'T', 'E', 'R'],
-                    ['T', 'W', 'E', 'N', 'T', 'Y', 'F', 'I', 'V', 'E'],
-                    ['M', 'I', 'N', 'U', 'T', 'E', 'S', 'T', 'O', 'R'],
-                    ['P', 'A', 'S', 'T', 'O', 'N', 'E', 'T', 'W', 'O'],
-                    ['T', 'H', 'R', 'E', 'E', 'F', 'O', 'U', 'R', 'K'],
-                    ['F', 'I', 'V', 'E', 'S', 'I', 'X', 'T', 'E', 'N'],
-                    ['S', 'E', 'V', 'E', 'N', 'E', 'I', 'G', 'H', 'T'],
-                    ['N', 'I', 'N', 'E', 'L', 'E', 'V', 'E', 'N', 'R'],
-                    ['T', 'W', 'E', 'L', 'V', 'E', 'O', 'C', 'L', 'K']
-                ],
-                words: {
-                    IT: [0, 0, 1], IS: [0, 3, 4], HALF: [0, 5, 8],
-                    TEN_MIN: [1, 0, 2], QUARTER: [1, 3, 9],
-                    TWENTY: [2, 0, 5], FIVE_MIN: [2, 6, 9],
-                    MINUTES: [3, 0, 6], TO: [3, 7, 8],
-                    PAST: [4, 0, 3], ONE: [4, 4, 6], TWO: [4, 7, 9],
-                    THREE: [5, 0, 4], FOUR: [5, 5, 8],
-                    FIVE: [6, 0, 3], SIX: [6, 4, 6], TEN: [6, 7, 9],
-                    SEVEN: [7, 0, 4], EIGHT: [7, 5, 9],
-                    NINE: [8, 0, 3], ELEVEN: [8, 3, 8],
-                    TWELVE: [9, 0, 5], OCLOCK: [9, 6, 9]
-                },
-                hours: ['TWELVE', 'ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN', 'EIGHT', 'NINE', 'TEN', 'ELEVEN', 'TWELVE'],
-                getActiveWords: (h, m) => {
-                    const h12 = h % 12;
-                    const next = (h12 + 1) % 12 || 12;
-                    const m5 = Math.round(m / 5) * 5;
-                    const hours = LANGUAGES.en.hours;
-                    const active = ['IT', 'IS'];
+    const app = document.getElementById("app");
+    const matrix = document.getElementById("matrix");
+    const spokenTime = document.getElementById("spoken-time");
 
-                    if (m5 === 0 || m5 === 60) return [...active, hours[m5 === 60 ? next : h12 || 12], 'OCLOCK'];
-                    if (m5 === 15) return [...active, 'QUARTER', 'PAST', hours[h12 || 12]];
-                    if (m5 === 30) return [...active, 'HALF', 'PAST', hours[h12 || 12]];
-                    if (m5 === 45) return [...active, 'QUARTER', 'TO', hours[next]];
-                    if (m5 < 30) {
-                        const minMap = { 5: ['FIVE_MIN'], 10: ['TEN_MIN'], 20: ['TWENTY'], 25: ['TWENTY', 'FIVE_MIN'] };
-                        return [...active, ...minMap[m5], 'MINUTES', 'PAST', hours[h12 || 12]];
-                    }
-                    const minMap = { 35: ['TWENTY', 'FIVE_MIN'], 40: ['TWENTY'], 50: ['TEN_MIN'], 55: ['FIVE_MIN'] };
-                    return [...active, ...minMap[m5], 'MINUTES', 'TO', hours[next]];
-                }
-            },
-            nl: {
-                matrix: [
-                    ['H', 'E', 'T', 'K', 'I', 'S', 'V', 'I', 'J', 'F'],
-                    ['T', 'I', 'E', 'N', 'A', 'K', 'W', 'A', 'R', 'T'],
-                    ['V', 'O', 'O', 'R', 'O', 'V', 'E', 'R', 'H', 'M'],
-                    ['H', 'A', 'L', 'F', 'T', 'W', 'E', 'E', 'E', 'N'],
-                    ['D', 'R', 'I', 'E', 'V', 'I', 'E', 'R', 'M', 'K'],
-                    ['V', 'I', 'J', 'F', 'Z', 'E', 'S', 'R', 'T', 'U'],
-                    ['Z', 'E', 'V', 'E', 'N', 'A', 'C', 'H', 'T', 'R'],
-                    ['N', 'E', 'G', 'E', 'N', 'T', 'I', 'E', 'N', 'S'],
-                    ['E', 'L', 'F', 'T', 'W', 'A', 'A', 'L', 'F', 'D'],
-                    ['O', 'N', 'E', 'D', 'R', 'I', 'E', 'U', 'U', 'R']
-                ],
-                words: {
-                    HET: [0, 0, 2], IS: [0, 4, 5], VIJF_MIN: [0, 6, 9],
-                    TIEN_MIN: [1, 0, 3], KWART: [1, 5, 9],
-                    VOOR: [2, 0, 3], OVER: [2, 4, 7],
-                    HALF: [3, 0, 3], TWEE: [3, 4, 7], EEN: [3, 7, 9],
-                    DRIE: [4, 0, 3], VIER: [4, 4, 7],
-                    VIJF: [5, 0, 3], ZES: [5, 4, 6],
-                    ZEVEN: [6, 0, 4], ACHT: [6, 5, 8],
-                    NEGEN: [7, 0, 4], TIEN: [7, 5, 8],
-                    ELF: [8, 0, 2], TWAALF: [8, 3, 8],
-                    UUR: [9, 7, 9]
-                },
-                hours: ['TWAALF', 'EEN', 'TWEE', 'DRIE', 'VIER', 'VIJF', 'ZES', 'ZEVEN', 'ACHT', 'NEGEN', 'TIEN', 'ELF', 'TWAALF'],
-                getActiveWords: (h, m) => {
-                    const h12 = h % 12;
-                    const next = (h12 + 1) % 12 || 12;
-                    const m5 = Math.round(m / 5) * 5;
-                    const hours = LANGUAGES.nl.hours;
-                    const active = ['HET', 'IS'];
+    let settings = {};
+    let homeyLanguage = null;
+    let renderedLanguage = null;
+    let renderedWordsKey = "";
+    let cells = [];
 
-                    if (m5 === 0 || m5 === 60) return [...active, hours[m5 === 60 ? next : h12 || 12], 'UUR'];
-                    if (m5 === 5) return [...active, 'VIJF_MIN', 'OVER', hours[h12 || 12]];
-                    if (m5 === 10) return [...active, 'TIEN_MIN', 'OVER', hours[h12 || 12]];
-                    if (m5 === 15) return [...active, 'KWART', 'OVER', hours[h12 || 12]];
-                    if (m5 === 20) return [...active, 'TIEN_MIN', 'VOOR', 'HALF', hours[next]];
-                    if (m5 === 25) return [...active, 'VIJF_MIN', 'VOOR', 'HALF', hours[next]];
-                    if (m5 === 30) return [...active, 'HALF', hours[next]];
-                    if (m5 === 35) return [...active, 'VIJF_MIN', 'OVER', 'HALF', hours[next]];
-                    if (m5 === 40) return [...active, 'TIEN_MIN', 'OVER', 'HALF', hours[next]];
-                    if (m5 === 45) return [...active, 'KWART', 'VOOR', hours[next]];
-                    if (m5 === 50) return [...active, 'TIEN_MIN', 'VOOR', hours[next]];
-                    if (m5 === 55) return [...active, 'VIJF_MIN', 'VOOR', hours[next]];
-                    return active;
-                }
-            }
-        };
+    function resolveLanguage() {
+      if (SUPPORTED_LANGUAGES.includes(settings.language)) return settings.language;
+      if (SUPPORTED_LANGUAGES.includes(homeyLanguage)) return homeyLanguage;
+      return navigator.language?.toLowerCase().startsWith("nl") ? "nl" : "en";
+    }
 
-        // ===== Core Functions =====
-        function getLanguage() {
-            return (navigator.language || 'en').startsWith('nl') ? 'nl' : 'en';
+    function buildMatrix(language) {
+      const fragment = document.createDocumentFragment();
+      cells = [];
+      for (const row of WordClockGrid.GRIDS[language].rows) {
+        for (const letter of row) {
+          const cell = document.createElement("span");
+          cell.className = "cell";
+          cell.textContent = letter;
+          cells.push(cell);
+          fragment.appendChild(cell);
         }
+      }
+      matrix.replaceChildren(fragment);
+      document.documentElement.lang = language;
+      renderedLanguage = language;
+      renderedWordsKey = "";
+    }
 
-        function renderMatrix(lang, activeWords) {
-            const data = LANGUAGES[lang];
-            return data.matrix.map((row, r) =>
-                row.map((letter, c) => {
-                    const isActive = activeWords.some(word => {
-                        const pos = data.words[word];
-                        return pos && pos[0] === r && c >= pos[1] && c <= pos[2];
-                    });
-                    return `<span class="${isActive ? 'active' : ''}">${letter}</span>`;
-                }).join('')
-            ).join('');
+    function spokenWords(wordIds) {
+      return wordIds.map((id) => id.split("_")[0].toLowerCase()).join(" ");
+    }
+
+    function render() {
+      const language = resolveLanguage();
+      if (language !== renderedLanguage) buildMatrix(language);
+
+      const now = new Date();
+      const wordIds = WordClockGrid.getActiveWords(language, now.getHours(), now.getMinutes());
+      const wordsKey = wordIds.join(" ");
+      if (wordsKey === renderedWordsKey) return;
+      renderedWordsKey = wordsKey;
+
+      const activeCells = WordClockGrid.getActiveCells(language, wordIds);
+      cells.forEach((cell, index) => {
+        cell.classList.toggle("active", activeCells.has(index));
+      });
+      spokenTime.textContent = spokenWords(wordIds);
+    }
+
+    function applySettings() {
+      app.className = [
+        `size-${settings.size || "medium"}`,
+        `color-${settings.color || "default"}`,
+        `align-${settings.horizontalAlignment || "center"}`,
+      ].join(" ");
+    }
+
+    function fitFontSize() {
+      matrix.style.fontSize = `${(matrix.clientWidth / 10) * 0.55}px`;
+    }
+
+    function createHeightReporter(Homey) {
+      let reportedHeight = null;
+      return () => {
+        const height = Math.ceil(document.body.getBoundingClientRect().height);
+        if (height === reportedHeight) return;
+        if (reportedHeight === null) Homey.ready({ height });
+        else Homey.setHeight(height);
+        reportedHeight = height;
+      };
+    }
+
+    function createMinuteTicker(tick) {
+      let timer = null;
+      const stop = () => clearTimeout(timer);
+      const run = () => {
+        tick();
+        timer = setTimeout(run, MINUTE - (Date.now() % MINUTE) + 50);
+      };
+      const start = () => {
+        stop();
+        run();
+      };
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden) stop();
+        else start();
+      });
+      return { start };
+    }
+
+    window.onHomeyReady = (Homey) => {
+      settings = Homey.getSettings();
+      homeyLanguage = Homey.__(`widgets.${WIDGET_ID}.language`);
+
+      const reportHeight = createHeightReporter(Homey);
+      const ticker = createMinuteTicker(render);
+
+      applySettings();
+      ticker.start();
+      fitFontSize();
+      reportHeight();
+
+      let observedWidth = matrix.clientWidth;
+      new ResizeObserver(() => {
+        if (matrix.clientWidth !== observedWidth) {
+          observedWidth = matrix.clientWidth;
+          fitFontSize();
         }
+        reportHeight();
+      }).observe(app);
 
-        function updateClock() {
-            const now = new Date();
-            const lang = getLanguage();
-            const activeWords = LANGUAGES[lang].getActiveWords(now.getHours(), now.getMinutes());
-            document.getElementById('matrix').innerHTML = renderMatrix(lang, activeWords);
-        }
-
-        function applyStyles() {
-            const wrapper = document.getElementById('wrapper');
-            const card = document.getElementById('card');
-
-            // Reset classes
-            card.className = 'card';
-            wrapper.className = 'wrapper';
-
-            // Alignment
-            card.classList.add('align-' + (settings.horizontalAlignment || 'center'));
-
-            // Size & Color
-            card.classList.add('size-' + (settings.size || 'medium'));
-            card.classList.add('color-' + (settings.color || 'default'));
-
-            // Card background is handled by widget compose transparent setting
-        }
-
-        function updateHeight() {
-            const wrapper = document.getElementById('wrapper');
-            const height = wrapper.offsetHeight;
-            if (window.Homey) {
-                Homey.ready({ height });
-                if (Homey.setHeight) Homey.setHeight(height);
-            }
-        }
-
-        // ===== Initialization =====
-        function onHomeyReady(Homey) {
-            settings = Homey.getSettings();
-
-            Homey.on('settings.set', (key, value) => {
-                settings[key] = value;
-                applyStyles();
-                updateClock();
-            });
-
-            applyStyles();
-            updateClock();
-            setInterval(updateClock, 1000);
-
-            // Height observer
-            new ResizeObserver(updateHeight).observe(document.body);
-            setTimeout(updateHeight, 0);
-        }
+      Homey.on("settings.set", (key, value) => {
+        settings[key] = value;
+        applySettings();
+        render();
+      });
+    };
     </script>
-</body>
-
+  </body>
 </html>

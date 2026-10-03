@@ -1,145 +1,216 @@
 {
-    "name": {
-        "en": "Word Clock Sentence",
-        "nl": "Woordenklok (Zin)"
-    },
-    "description": {
-        "en": "Time displayed as a natural language sentence",
-        "nl": "Tijd weergegeven als een natuurlijke zin"
-    },
-    "height": 200,
-    "transparent": false,
-    "settings": [
+  "name": {
+    "en": "Word Clock Sentence",
+    "nl": "Woordklok (zin)"
+  },
+  "description": {
+    "en": "Time written as a natural sentence.",
+    "nl": "Tijd geschreven als een gewone zin."
+  },
+  "transparent": false,
+  "settings": [
+    {
+      "id": "language",
+      "type": "dropdown",
+      "label": {
+        "en": "Language",
+        "nl": "Taal"
+      },
+      "value": "auto",
+      "hint": {
+        "en": "Language of the words. Automatic follows the language of your Homey.",
+        "nl": "Taal van de woorden. Automatisch volgt de taal van je Homey."
+      },
+      "values": [
         {
-            "id": "color",
-            "type": "dropdown",
-            "label": {
-                "en": "Highlight Color",
-                "nl": "Markeerkleur"
-            },
-            "value": "default",
-            "values": [
-                {
-                    "id": "default",
-                    "label": {
-                        "en": "Default",
-                        "nl": "Standaard"
-                    }
-                },
-                {
-                    "id": "blue",
-                    "label": {
-                        "en": "Blue",
-                        "nl": "Blauw"
-                    }
-                },
-                {
-                    "id": "green",
-                    "label": {
-                        "en": "Green",
-                        "nl": "Groen"
-                    }
-                },
-                {
-                    "id": "orange",
-                    "label": {
-                        "en": "Orange",
-                        "nl": "Oranje"
-                    }
-                },
-                {
-                    "id": "red",
-                    "label": {
-                        "en": "Red",
-                        "nl": "Rood"
-                    }
-                },
-                {
-                    "id": "purple",
-                    "label": {
-                        "en": "Purple",
-                        "nl": "Paars"
-                    }
-                }
-            ]
+          "id": "auto",
+          "label": {
+            "en": "Automatic",
+            "nl": "Automatisch"
+          }
         },
         {
-            "id": "horizontalAlignment",
-            "type": "dropdown",
-            "label": {
-                "en": "Horizontal Alignment",
-                "nl": "Horizontale Uitlijning"
-            },
-            "value": "center",
-            "values": [
-                {
-                    "id": "left",
-                    "label": {
-                        "en": "Left",
-                        "nl": "Links"
-                    }
-                },
-                {
-                    "id": "center",
-                    "label": {
-                        "en": "Center",
-                        "nl": "Midden"
-                    }
-                },
-                {
-                    "id": "right",
-                    "label": {
-                        "en": "Right",
-                        "nl": "Rechts"
-                    }
-                }
-            ]
+          "id": "en",
+          "label": {
+            "en": "English",
+            "nl": "Engels"
+          }
         },
         {
-            "id": "size",
-            "type": "dropdown",
-            "label": {
-                "en": "Size",
-                "nl": "Grootte"
-            },
-            "value": "medium",
-            "values": [
-                {
-                    "id": "xsmall",
-                    "label": {
-                        "en": "Extra Small",
-                        "nl": "Extra Klein"
-                    }
-                },
-                {
-                    "id": "small",
-                    "label": {
-                        "en": "Small",
-                        "nl": "Klein"
-                    }
-                },
-                {
-                    "id": "medium",
-                    "label": {
-                        "en": "Medium",
-                        "nl": "Gemiddeld"
-                    }
-                },
-                {
-                    "id": "large",
-                    "label": {
-                        "en": "Large",
-                        "nl": "Groot"
-                    }
-                },
-                {
-                    "id": "xlarge",
-                    "label": {
-                        "en": "Extra Large",
-                        "nl": "Extra Groot"
-                    }
-                }
-            ]
+          "id": "nl",
+          "label": {
+            "en": "Dutch",
+            "nl": "Nederlands"
+          }
         }
-    ]
+      ]
+    },
+    {
+      "id": "size",
+      "type": "dropdown",
+      "label": {
+        "en": "Size",
+        "nl": "Grootte"
+      },
+      "value": "medium",
+      "values": [
+        {
+          "id": "xsmall",
+          "label": {
+            "en": "Extra Small",
+            "nl": "Extra klein"
+          }
+        },
+        {
+          "id": "small",
+          "label": {
+            "en": "Small",
+            "nl": "Klein"
+          }
+        },
+        {
+          "id": "medium",
+          "label": {
+            "en": "Medium",
+            "nl": "Gemiddeld"
+          }
+        },
+        {
+          "id": "large",
+          "label": {
+            "en": "Large",
+            "nl": "Groot"
+          }
+        },
+        {
+          "id": "xlarge",
+          "label": {
+            "en": "Extra Large",
+            "nl": "Extra groot"
+          }
+        }
+      ]
+    },
+    {
+      "id": "fontWeight",
+      "type": "dropdown",
+      "label": {
+        "en": "Font Weight",
+        "nl": "Letterdikte"
+      },
+      "value": "normal",
+      "values": [
+        {
+          "id": "thin",
+          "label": {
+            "en": "Thin",
+            "nl": "Dun"
+          }
+        },
+        {
+          "id": "normal",
+          "label": {
+            "en": "Normal",
+            "nl": "Normaal"
+          }
+        },
+        {
+          "id": "bold",
+          "label": {
+            "en": "Bold",
+            "nl": "Vetgedrukt"
+          }
+        }
+      ]
+    },
+    {
+      "id": "color",
+      "type": "dropdown",
+      "label": {
+        "en": "Color",
+        "nl": "Kleur"
+      },
+      "value": "default",
+      "values": [
+        {
+          "id": "default",
+          "label": {
+            "en": "Default",
+            "nl": "Standaard"
+          }
+        },
+        {
+          "id": "blue",
+          "label": {
+            "en": "Blue",
+            "nl": "Blauw"
+          }
+        },
+        {
+          "id": "green",
+          "label": {
+            "en": "Green",
+            "nl": "Groen"
+          }
+        },
+        {
+          "id": "orange",
+          "label": {
+            "en": "Orange",
+            "nl": "Oranje"
+          }
+        },
+        {
+          "id": "red",
+          "label": {
+            "en": "Red",
+            "nl": "Rood"
+          }
+        },
+        {
+          "id": "purple",
+          "label": {
+            "en": "Purple",
+            "nl": "Paars"
+          }
+        }
+      ],
+      "hint": {
+        "en": "Color of the words that tell the time.",
+        "nl": "Kleur van de woorden die de tijd aangeven."
+      }
+    },
+    {
+      "id": "horizontalAlignment",
+      "type": "dropdown",
+      "label": {
+        "en": "Horizontal Alignment",
+        "nl": "Horizontale uitlijning"
+      },
+      "value": "center",
+      "values": [
+        {
+          "id": "left",
+          "label": {
+            "en": "Left",
+            "nl": "Links"
+          }
+        },
+        {
+          "id": "center",
+          "label": {
+            "en": "Center",
+            "nl": "Midden"
+          }
+        },
+        {
+          "id": "right",
+          "label": {
+            "en": "Right",
+            "nl": "Rechts"
+          }
+        }
+      ]
+    }
+  ]
 }

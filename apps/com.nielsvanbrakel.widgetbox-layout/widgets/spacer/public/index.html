@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+    html,
+    body {
+      margin: 0;
+      height: 100%;
+      overflow: hidden;
+    }
+    </style>
+  </head>
+
+  <body>
+    <div id="spacer" aria-hidden="true"></div>
+
+    <script type="text/javascript">
+    const MIN_HEIGHT = 8;
+    const MAX_HEIGHT = 200;
+    const DEFAULT_HEIGHT = 32;
+
+    function getHeight(settings) {
+      const height = Number.parseInt(settings.height, 10);
+      if (!Number.isFinite(height)) return DEFAULT_HEIGHT;
+      return Math.min(MAX_HEIGHT, Math.max(MIN_HEIGHT, height));
+    }
+
+    window.onHomeyReady = (Homey) => {
+      const settings = Homey.getSettings();
+      let height = getHeight(settings);
+      Homey.ready({ height });
+
+      Homey.on("settings.set", (key, value) => {
+        settings[key] = value;
+        const nextHeight = getHeight(settings);
+        if (nextHeight !== height) {
+          height = nextHeight;
+          Homey.setHeight(height);
+        }
+      });
+    };
+    </script>
+  </body>
+</html>

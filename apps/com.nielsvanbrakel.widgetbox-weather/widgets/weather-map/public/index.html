@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
+      --text: var(--homey-text-color, #333);
+      margin: 0;
+      overflow: hidden;
+      background: transparent;
+      color: var(--text);
+      font-family: var(--homey-font-family, system-ui, sans-serif);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .widget {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .map {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    .shield {
+      position: absolute;
+      inset: 0;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      cursor: pointer;
+    }
+
+    .chip {
+      position: absolute;
+      top: 50%;
+      left: 8px;
+      transform: translateY(-50%);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 32px;
+      padding: 0 12px;
+      border-radius: 16px;
+      background: rgba(0, 0, 0, 0.55);
+      color: #fff;
+      font: inherit;
+      font-size: 12px;
+      pointer-events: none;
+    }
+
+    .lock {
+      position: absolute;
+      top: 50%;
+      left: 6px;
+      transform: translateY(-50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      padding: 0;
+      border: 0;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.55);
+      color: #fff;
+      cursor: pointer;
+    }
+
+    @media (max-width: 240px) {
+      .chip {
+        padding: 0 8px;
+      }
+
+      .chip span {
+        display: none;
+      }
+    }
+
+    .chip svg,
+    .lock svg {
+      width: 16px;
+      height: 16px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .notice {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      height: 100%;
+      padding: 16px;
+      box-sizing: border-box;
+      text-align: center;
+    }
+
+    .notice svg {
+      width: 28px;
+      height: 28px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.5;
+      opacity: 0.6;
+    }
+
+    .notice-title {
+      font-size: var(--homey-font-size-small, 14px);
+      font-weight: var(--homey-font-weight-medium, 500);
+    }
+
+    .notice-text {
+      font-size: 12px;
+      opacity: 0.7;
+    }
+
+    [hidden] {
+      display: none;
+    }
+    </style>
+  </head>
+
+  <body class="homey-widget-full">
+    <div class="widget" id="app">
+      <div class="notice" id="notice" role="status">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z" />
+          <circle cx="12" cy="10" r="2.5" />
+        </svg>
+        <span class="notice-title" id="notice-title"></span>
+        <span class="notice-text" id="notice-text" hidden></span>
+      </div>
+      <button class="shield" id="shield" type="button" hidden>
+        <span class="chip">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M9 11V5a2 2 0 0 1 4 0v5m0-1a2 2 0 0 1 4 0v2m0 0a2 2 0 0 1 4 0v3a7 7 0 0 1-7 7h-1a7 7 0 0 1-6-3.4L4 13a2 2 0 0 1 3.4-2L9 13"
+            />
+          </svg>
+          <span id="hint"></span>
+        </span>
+      </button>
+      <button class="lock" id="lock" type="button" hidden>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="5" y="11" width="14" height="10" rx="2" />
+          <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+        </svg>
+      </button>
+    </div>
+
+    <script>
+    const EMBED_URL = "https://embed.windy.com/embed.html";
+    const ASPECT_RATIOS = {
+      "1:1": "100%",
+      "4:3": "75%",
+      "16:9": "56.25%",
+      "21:9": "42.86%",
+      "3:1": "33.33%",
+    };
+    const OPTIONS = {
+      overlay: ["wind", "temp", "rain", "clouds", "pressure"],
+      product: ["ecmwf", "gfs", "nam"],
+      level: ["surface", "100m", "850h", "500h"],
+      metricRain: ["default", "mm", "in"],
+      metricTemp: ["default", "°C", "°F"],
+    };
+    const WIND_UNITS = { default: "default", kmh: "km/h", mph: "mph", ms: "m/s", knots: "kt" };
+    const ZOOM = { min: 3, max: 11, fallback: 5 };
+    const UNLOCK_MS = 30 * 1000;
+    const UNLOAD_WHEN_HIDDEN_MS = 60 * 1000;
+    const SETTINGS_DEBOUNCE_MS = 600;
+
+    const $ = (id) => document.getElementById(id);
+
+    function isIOSDevice() {
+      if (window.__SIMULATE_IOS__) return true;
+      return (
+        /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+        (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)
+      );
+    }
+
+    function isBlank(value) {
+      return value === undefined || value === null || String(value).trim() === "";
+    }
+
+    /** Parses "52.1" or "52,1". Returns null when invalid or out of range. */
+    function parseCoordinate(value, limit) {
+      if (isBlank(value)) return null;
+      const number = Number(String(value).trim().replace(",", "."));
+      return Number.isFinite(number) && Math.abs(number) <= limit ? number : null;
+    }
+
+    /** `{ lat, lon }`, `null` when both are empty, or `"invalid"`. */
+    function readLocation(latitude, longitude) {
+      if (isBlank(latitude) && isBlank(longitude)) return null;
+      const lat = parseCoordinate(latitude, 90);
+      const lon = parseCoordinate(longitude, 180);
+      return lat === null || lon === null ? "invalid" : { lat, lon };
+    }
+
+    function pick(value, allowed) {
+      return allowed.includes(value) ? value : allowed[0];
+    }
+
+    function zoomLevel(value) {
+      const zoom = Math.round(Number(value));
+      if (!Number.isFinite(zoom)) return ZOOM.fallback;
+      return Math.min(Math.max(zoom, ZOOM.min), ZOOM.max);
+    }
+
+    function buildEmbedUrl(settings, location) {
+      const detail = readLocation(settings.detailLatitude, settings.detailLongitude);
+      const detailLocation = detail && detail !== "invalid" ? detail : location;
+      const params = new URLSearchParams({
+        type: "map",
+        location: "coordinates",
+        lat: String(location.lat),
+        lon: String(location.lon),
+        detailLat: String(detailLocation.lat),
+        detailLon: String(detailLocation.lon),
+        detail: String(settings.openDetailsByDefault === true),
+        zoom: String(zoomLevel(settings.zoom)),
+        overlay: pick(settings.overlay, OPTIONS.overlay),
+        product: pick(settings.product, OPTIONS.product),
+        level: pick(settings.level, OPTIONS.level),
+        metricRain: pick(settings.metricRain, OPTIONS.metricRain),
+        metricTemp: pick(settings.metricTemp, OPTIONS.metricTemp),
+        metricWind: WIND_UNITS[settings.metricWind] ?? WIND_UNITS.default,
+        pressure: String(settings.pressure === true),
+        marker: String(settings.marker !== false),
+        message: String(settings.message !== false),
+      });
+      return `${EMBED_URL}?${params}`;
+    }
+
+    function onHomeyReady(Homey) {
+      const settings = { ...Homey.getSettings() };
+      const state = { url: null, homeyLocation: undefined, lockTimer: null, hiddenTimer: null };
+      let debounce = null;
+
+      function t(key) {
+        return Homey.__(key) ?? key;
+      }
+
+      function heightFor() {
+        return ASPECT_RATIOS[settings.aspectRatio] ?? ASPECT_RATIOS["16:9"];
+      }
+
+      function showNotice(title, text = "") {
+        removeMap();
+        $("notice-title").textContent = title;
+        $("notice-text").textContent = text;
+        $("notice-text").hidden = text === "";
+        $("notice").hidden = false;
+      }
+
+      function removeMap() {
+        $("app").querySelector("iframe")?.remove();
+        $("shield").hidden = true;
+        $("lock").hidden = true;
+        clearTimeout(state.lockTimer);
+        state.url = null;
+      }
+
+      async function homeyLocation() {
+        if (state.homeyLocation === undefined) {
+          try {
+            const location = await Homey.api("GET", "/location");
+            state.homeyLocation = location
+              ? readLocation(location.latitude, location.longitude)
+              : null;
+          } catch {
+            state.homeyLocation = null;
+          }
+        }
+        return state.homeyLocation === "invalid" ? null : state.homeyLocation;
+      }
+
+      async function resolveLocation() {
+        const configured = readLocation(settings.latitude, settings.longitude);
+        return configured ?? (await homeyLocation());
+      }
+
+      function lock() {
+        clearTimeout(state.lockTimer);
+        if (!state.url) return;
+        $("shield").hidden = false;
+        $("lock").hidden = true;
+      }
+
+      function unlock() {
+        $("shield").hidden = true;
+        $("lock").hidden = false;
+        clearTimeout(state.lockTimer);
+        state.lockTimer = setTimeout(lock, UNLOCK_MS);
+      }
+
+      function showMap(url) {
+        if (url === state.url) return;
+        removeMap();
+        const iframe = document.createElement("iframe");
+        iframe.className = "map";
+        iframe.title = t("widgets.weather-map.title");
+        iframe.allow = "fullscreen";
+        iframe.setAttribute("referrerpolicy", "strict-origin-when-cross-origin");
+        iframe.src = url;
+        $("app").prepend(iframe);
+        $("notice").hidden = true;
+        state.url = url;
+        lock();
+      }
+
+      async function render() {
+        const location = await resolveLocation();
+        if (location === "invalid") {
+          showNotice(t("common.invalidLocation"));
+        } else if (!location) {
+          showNotice(t("common.locationRequired"));
+        } else {
+          showMap(buildEmbedUrl(settings, location));
+        }
+      }
+
+      function onSettingChanged(key, value) {
+        settings[key] = value;
+        if (key === "aspectRatio") Homey.setHeight(heightFor());
+        clearTimeout(debounce);
+        debounce = setTimeout(render, SETTINGS_DEBOUNCE_MS);
+      }
+
+      function onVisibilityChange() {
+        clearTimeout(state.hiddenTimer);
+        if (document.visibilityState === "hidden") {
+          lock();
+          state.hiddenTimer = setTimeout(removeMap, UNLOAD_WHEN_HIDDEN_MS);
+        } else if (!state.url) {
+          render();
+        }
+      }
+
+      const language = t("language");
+      document.documentElement.lang = /^[a-z]{2}$/.test(language) ? language : navigator.language;
+      $("hint").textContent = t("widgets.weather-map.tapToInteract");
+      $("shield").setAttribute("aria-label", t("widgets.weather-map.tapToInteract"));
+      $("lock").setAttribute("aria-label", t("widgets.weather-map.lock"));
+
+      if (isIOSDevice()) {
+        showNotice(t("widgets.weather-map.iosTitle"), t("widgets.weather-map.iosMessage"));
+        Homey.ready({ height: heightFor() });
+        return;
+      }
+
+      $("shield").addEventListener("click", unlock);
+      $("lock").addEventListener("click", lock);
+      document.addEventListener("visibilitychange", onVisibilityChange);
+      Homey.on("settings.set", onSettingChanged);
+
+      $("notice-title").textContent = t("common.loading");
+      Homey.ready({ height: heightFor() });
+      render();
+    }
+
+    window.onHomeyReady = onHomeyReady;
+    </script>
+  </body>
+</html>

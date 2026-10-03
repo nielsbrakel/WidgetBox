@@ -1,0 +1,74 @@
+{
+  "id": "com.nielsvanbrakel.widgetbox-weather",
+  "version": "0.1.0",
+  "compatibility": ">=12.3.0",
+  "sdk": 3,
+  "platforms": [
+    "local"
+  ],
+  "name": {
+    "en": "WidgetBox Weather",
+    "nl": "WidgetBox Weer"
+  },
+  "description": {
+    "en": "Know when the next shower is coming",
+    "nl": "Weet wanneer de volgende bui eraan komt"
+  },
+  "category": [
+    "internet"
+  ],
+  "tags": {
+    "en": [
+      "weather",
+      "rain",
+      "rain radar",
+      "precipitation",
+      "forecast",
+      "weather station",
+      "temperature",
+      "wind",
+      "weather map",
+      "buienradar",
+      "netherlands",
+      "belgium",
+      "dashboard",
+      "widget"
+    ],
+    "nl": [
+      "weer",
+      "regen",
+      "buienradar",
+      "neerslag",
+      "weersverwachting",
+      "regenradar",
+      "weerstation",
+      "temperatuur",
+      "wind",
+      "weerkaart",
+      "nederland",
+      "belgië",
+      "dashboard",
+      "widget"
+    ]
+  },
+  "brandColor": "#0277BD",
+  "permissions": [
+    "homey:manager:geolocation"
+  ],
+  "images": {
+    "small": "/assets/images/small.jpg",
+    "large": "/assets/images/large.jpg",
+    "xlarge": "/assets/images/xlarge.jpg"
+  },
+  "author": {
+    "name": "Niels van Brakel",
+    "email": "info@nielsvanbrakel.com"
+  },
+  "bugs": {
+    "url": "https://github.com/nielsbrakel/WidgetBox/issues"
+  },
+  "source": "https://github.com/nielsbrakel/WidgetBox",
+  "homepage": "https://nielsvanbrakel.com",
+  "support": "mailto:info@nielsvanbrakel.com",
+  "homeyCommunityTopicId": 152111
+}

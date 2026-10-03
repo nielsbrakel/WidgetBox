@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<?xml-stylesheet href="theme.css" type="text/css" ?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <title>Rain graph widget preview</title>
+  <!-- 16:9 card: expected-rain area chart with a "now" marker -->
+  <defs>
+    <linearGradient id="rain" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0080ff" stop-opacity="0.45" />
+      <stop offset="1" stop-color="#0080ff" stop-opacity="0" />
+    </linearGradient>
+    <clipPath id="plot"><rect x="112" y="287" width="800" height="450" rx="64" /></clipPath>
+  </defs>
+  <rect class="card" x="112" y="287" width="800" height="450" rx="64" />
+  <g class="ph">
+    <rect x="168" y="420" width="688" height="6" rx="3" />
+    <rect x="168" y="520" width="688" height="6" rx="3" />
+    <rect x="168" y="620" width="688" height="6" rx="3" />
+    <rect x="168" y="335" width="150" height="30" rx="15" />
+  </g>
+  <g clip-path="url(#plot)">
+    <path
+      fill="url(#rain)"
+      d="M168 672 C260 672 300 640 360 560 C420 470 450 430 500 432 C560 434 580 560 640 580 C700 600 720 520 770 520 C810 520 830 590 856 640 L856 690 L168 690 Z"
+    />
+  </g>
+  <path
+    class="s-accent"
+    stroke-width="12"
+    d="M168 672 C260 672 300 640 360 560 C420 470 450 430 500 432 C560 434 580 560 640 580 C700 600 720 520 770 520 C810 520 830 590 856 640"
+  />
+  <rect class="warm" x="196" y="392" width="10" height="298" rx="5" />
+  <circle class="warm" cx="201" cy="392" r="14" />
+</svg>

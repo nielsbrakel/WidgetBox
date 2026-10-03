@@ -1,0 +1,77 @@
+{
+  "name": {
+    "en": "Weather forecast",
+    "nl": "Weersverwachting"
+  },
+  "description": {
+    "en": "Daily forecast with temperature and chance of rain",
+    "nl": "Dagelijkse verwachting met temperatuur en kans op regen"
+  },
+  "api": {
+    "getData": {
+      "method": "GET",
+      "path": "/"
+    }
+  },
+  "transparent": true,
+  "settings": [
+    {
+      "id": "latitude",
+      "type": "text",
+      "label": {
+        "en": "Latitude",
+        "nl": "Breedtegraad"
+      },
+      "value": "",
+      "hint": {
+        "en": "Leave empty to use the location of your Homey. Example: 52.09",
+        "nl": "Laat leeg om de locatie van je Homey te gebruiken. Bijvoorbeeld: 52,09"
+      }
+    },
+    {
+      "id": "longitude",
+      "type": "text",
+      "label": {
+        "en": "Longitude",
+        "nl": "Lengtegraad"
+      },
+      "value": "",
+      "hint": {
+        "en": "Leave empty to use the location of your Homey. Example: 5.12",
+        "nl": "Laat leeg om de locatie van je Homey te gebruiken. Bijvoorbeeld: 5,12"
+      }
+    },
+    {
+      "id": "days",
+      "type": "dropdown",
+      "label": {
+        "en": "Number of days",
+        "nl": "Aantal dagen"
+      },
+      "value": "5",
+      "values": [
+        {
+          "id": "3",
+          "label": {
+            "en": "3 days",
+            "nl": "3 dagen"
+          }
+        },
+        {
+          "id": "5",
+          "label": {
+            "en": "5 days",
+            "nl": "5 dagen"
+          }
+        },
+        {
+          "id": "7",
+          "label": {
+            "en": "7 days",
+            "nl": "7 dagen"
+          }
+        }
+      ]
+    }
+  ]
+}

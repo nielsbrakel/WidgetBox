@@ -1,0 +1,120 @@
+{
+  "name": {
+    "en": "Timer",
+    "nl": "Timer"
+  },
+  "description": {
+    "en": "One or more countdown timers with an alert when time is up, synced across your devices",
+    "nl": "Een of meer afteltimers met een melding als de tijd om is, gesynchroniseerd tussen je apparaten"
+  },
+  "transparent": false,
+  "settings": [
+    {
+      "id": "defaultHours",
+      "type": "number",
+      "label": {
+        "en": "Default hours",
+        "nl": "Standaard uren"
+      },
+      "hint": {
+        "en": "Hours of the starting duration for new timers (0-23).",
+        "nl": "Uren van de begintijd voor nieuwe timers (0-23)."
+      },
+      "min": 0,
+      "max": 23,
+      "value": 0
+    },
+    {
+      "id": "defaultMinutes",
+      "type": "number",
+      "label": {
+        "en": "Default minutes",
+        "nl": "Standaard minuten"
+      },
+      "hint": {
+        "en": "Minutes of the starting duration for new timers (0-59).",
+        "nl": "Minuten van de begintijd voor nieuwe timers (0-59)."
+      },
+      "min": 0,
+      "max": 59,
+      "value": 5
+    },
+    {
+      "id": "defaultSeconds",
+      "type": "number",
+      "label": {
+        "en": "Default seconds",
+        "nl": "Standaard seconden"
+      },
+      "hint": {
+        "en": "Seconds of the starting duration for new timers (0-59).",
+        "nl": "Seconden van de begintijd voor nieuwe timers (0-59)."
+      },
+      "min": 0,
+      "max": 59,
+      "value": 0
+    },
+    {
+      "id": "playSound",
+      "type": "checkbox",
+      "label": {
+        "en": "Beep when time is up",
+        "nl": "Piepen als de tijd om is"
+      },
+      "hint": {
+        "en": "Plays a short beep on the device that shows the widget, after you have started a timer there.",
+        "nl": "Speelt een korte pieptoon af op het apparaat dat de widget toont, nadat je daar een timer hebt gestart."
+      },
+      "value": true
+    },
+    {
+      "id": "allowAddingTimers",
+      "type": "checkbox",
+      "label": {
+        "en": "Allow adding and removing timers",
+        "nl": "Timers toevoegen en verwijderen toestaan"
+      },
+      "value": true
+    },
+    {
+      "id": "initialTimers",
+      "type": "number",
+      "label": {
+        "en": "Number of timers",
+        "nl": "Aantal timers"
+      },
+      "hint": {
+        "en": "How many timers to show when the widget is first added (1-10). If adding is not allowed, the widget always shows this many.",
+        "nl": "Hoeveel timers er worden getoond wanneer de widget wordt toegevoegd (1-10). Als toevoegen niet is toegestaan, toont de widget er altijd zoveel."
+      },
+      "min": 1,
+      "max": 10,
+      "value": 1
+    },
+    {
+      "id": "maxTimers",
+      "type": "number",
+      "label": {
+        "en": "Maximum number of timers",
+        "nl": "Maximaal aantal timers"
+      },
+      "hint": {
+        "en": "The add button is hidden once this many timers are shown (1-10).",
+        "nl": "De knop om toe te voegen verdwijnt zodra er zoveel timers worden getoond (1-10)."
+      },
+      "min": 1,
+      "max": 10,
+      "value": 3
+    }
+  ],
+  "api": {
+    "getState": {
+      "method": "GET",
+      "path": "/state"
+    },
+    "setState": {
+      "method": "PUT",
+      "path": "/state"
+    }
+  }
+}

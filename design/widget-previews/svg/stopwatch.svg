@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<?xml-stylesheet href="theme.css" type="text/css" ?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <title>Stopwatch widget preview</title>
+  <!-- Wide card: elapsed-time ring on the left, reset and play buttons on the right -->
+  <rect class="card" x="112" y="332" width="800" height="360" rx="64" />
+  <circle class="s-mid" cx="300" cy="512" r="112" stroke-width="20" />
+  <path class="s-accent" d="M300 400 A112 112 0 0 1 406.5 546.6" stroke-width="20" />
+  <rect class="ink" x="246" y="494" width="108" height="36" rx="18" />
+  <circle class="mid" cx="640" cy="512" r="58" />
+  <path class="s-ink" d="M664 512 A24 24 0 1 1 656.97 495.03" stroke-width="9" />
+  <path class="ink" d="M650 484 L672 486 L664 506 Z" />
+  <circle class="accent" cx="786" cy="512" r="58" />
+  <path class="on-accent" d="M770 484 L810 512 L770 540 Z" />
+</svg>

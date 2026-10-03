@@ -37,3 +37,15 @@ yarn-error.log*
 .DS_Store
 *.pem
 __assets__/*
+# Homey build output
+.homeybuild/
+env.json
+
+# Playwright
+playwright-report/
+test-results/
+blob-report/
+.playwright-mcp/
+
+# Generated sandbox registry
+apps/sandbox/src/registry.json

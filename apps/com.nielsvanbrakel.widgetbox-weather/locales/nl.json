@@ -1,0 +1,51 @@
+{
+  "language": "nl",
+  "common": {
+    "loading": "Laden…",
+    "updated": "Bijgewerkt {time}",
+    "offline": "Offline · bijgewerkt {time}",
+    "errorTitle": "Weergegevens konden niet worden geladen",
+    "errorRetry": "Er wordt automatisch opnieuw geprobeerd",
+    "locationRequired": "Stel een locatie in bij de widgetinstellingen",
+    "invalidLocation": "De locatie in de widgetinstellingen is niet geldig"
+  },
+  "widgets": {
+    "rain-graph": {
+      "now": "Nu",
+      "light": "Licht",
+      "moderate": "Matig",
+      "heavy": "Zwaar",
+      "noRain": "Geen regen verwacht in de komende 2 uur",
+      "outOfRange": "De regenverwachting is alleen beschikbaar in Nederland en België",
+      "tooltip": "{time} · {value} mm/u"
+    },
+    "station": {
+      "wind": "Wind",
+      "rain": "Regen afgelopen uur",
+      "humidity": "Luchtvochtigheid",
+      "feelsLike": "Voelt als {value}°",
+      "observedAt": "Gemeten {time}",
+      "offline": "Offline · {time}",
+      "invalidStation": "Station niet gevonden. Controleer het station-ID in de widgetinstellingen.",
+      "compass": "N,NO,O,ZO,Z,ZW,W,NW"
+    },
+    "forecast": {
+      "today": "Vandaag",
+      "tomorrow": "Morgen",
+      "rainChance": "Kans op regen"
+    },
+    "radar-5day": {
+      "title": "5-daagse regenradar"
+    },
+    "rain-radar": {
+      "alt": "Regenradarkaart van Nederland"
+    },
+    "weather-map": {
+      "title": "Weerkaart",
+      "tapToInteract": "Tik om te bedienen",
+      "lock": "Kaart vergrendelen",
+      "iosTitle": "De weerkaart is niet beschikbaar op iOS",
+      "iosMessage": "Door een beperking van de Homey-app werkt deze widget alleen op Android en in de web-app."
+    }
+  }
+}

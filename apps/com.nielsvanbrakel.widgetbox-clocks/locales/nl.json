@@ -1,10 +1,63 @@
 {
-    "widgets": {
-        "analog-clock": {},
-        "binary-clock": {},
-        "digital-clock": {},
-        "flip-clock": {},
-        "word-clock-grid": {},
-        "word-clock-sentence": {}
+  "widgets": {
+    "analog-clock": {
+      "language": "nl"
+    },
+    "binary-clock": {
+      "language": "nl",
+      "hours": "U",
+      "minutes": "M",
+      "seconds": "S",
+      "am": "AM",
+      "pm": "PM"
+    },
+    "digital-clock": {
+      "language": "nl",
+      "am": "AM",
+      "pm": "PM"
+    },
+    "flip-clock": {
+      "language": "nl",
+      "am": "AM",
+      "pm": "PM"
+    },
+    "word-clock-grid": {
+      "language": "nl"
+    },
+    "word-clock-sentence": {
+      "language": "nl"
+    },
+    "stopwatch": {
+      "name": "Stopwatch",
+      "nameNumbered": "Stopwatch {number}",
+      "start": "Starten",
+      "pause": "Pauzeren",
+      "reset": "Opnieuw instellen",
+      "lap": "Ronde",
+      "lapNumber": "Ronde {number}",
+      "laps": "Rondetijden",
+      "remove": "Stopwatch verwijderen",
+      "addStopwatch": "Stopwatch toevoegen"
+    },
+    "timer": {
+      "name": "Timer",
+      "nameNumbered": "Timer {number}",
+      "hours": "Uren",
+      "minutes": "Minuten",
+      "seconds": "Seconden",
+      "hoursShort": "uur",
+      "minutesShort": "min",
+      "secondsShort": "sec",
+      "increase": "Meer {unit}",
+      "decrease": "Minder {unit}",
+      "start": "Starten",
+      "pause": "Pauzeren",
+      "reset": "Opnieuw instellen",
+      "restart": "Opnieuw starten",
+      "done": "Klaar",
+      "timeUp": "Tijd is om",
+      "remove": "Timer verwijderen",
+      "addTimer": "Timer toevoegen"
     }
+  }
 }

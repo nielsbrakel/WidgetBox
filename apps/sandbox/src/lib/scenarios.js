@@ -1,56 +1,73 @@
 export const SCENARIOS = {
-    'buienradar-graph': {
-        'default': { label: 'Dynamic Rain (Default)', type: 'mock' },
-        'real': { label: 'Real Data (Live)', type: 'real' },
-        'no-rain': { label: 'No Rain', type: 'mock' },
-        'light-rain': { label: 'Light Rain', type: 'mock' },
-        'heavy-rain': { label: 'Heavy Rain', type: 'mock' },
-        'error': { label: 'API Error', type: 'error' }
+  "rain-graph": {
+    default: { label: "Dynamic Rain (Default)", type: "mock" },
+    real: { label: "Real Data (Live)", type: "real" },
+    "no-rain": { label: "No Rain", type: "mock" },
+    "light-rain": { label: "Light Rain", type: "mock" },
+    "heavy-rain": { label: "Heavy Rain", type: "mock" },
+    "out-of-range": { label: "Outside NL/BE", type: "mock" },
+    "no-location": { label: "No Location", type: "mock" },
+    error: { label: "API Error", type: "error" },
+  },
+  station: {
+    default: { label: "Station Data (Default)", type: "mock" },
+    real: { label: "Real Data (Live)", type: "real" },
+    "no-location": { label: "No Location", type: "mock" },
+    error: { label: "API Error", type: "error" },
+  },
+  forecast: {
+    default: { label: "Forecast (Default)", type: "mock" },
+    real: { label: "Real Data (Live)", type: "real" },
+    "no-location": { label: "No Location", type: "mock" },
+    error: { label: "API Error", type: "error" },
+  },
+  youtube: {
+    default: { label: "Normal (Default)", type: "mock" },
+    ios: { label: "Simulate iOS", type: "mock" },
+  },
+  "weather-map": {
+    default: { label: "Normal (Default)", type: "mock" },
+    "no-location": { label: "No Homey Location", type: "mock" },
+    ios: { label: "Simulate iOS", type: "mock" },
+  },
+  aquarium: {
+    default: { label: "Fresh Start", type: "mock", group: "Progression" },
+    "tier-2-ready": { label: "Tropical Ready", type: "mock", group: "Progression" },
+    "tier-2-active": { label: "Tropical Active", type: "mock", group: "Progression" },
+    "tier-3-endgame": { label: "Saltwater Endgame", type: "mock", group: "Progression" },
+    "neglected-48h": { label: "Neglected 48h", type: "mock", group: "Problem States" },
+    "low-food": { label: "Low Food", type: "mock", group: "Problem States" },
+    "dirty-near-threshold": { label: "Dirty Tank (25%)", type: "mock", group: "Problem States" },
+    "dirty-big-tank": { label: "Dirty Saltwater (15%)", type: "mock", group: "Problem States" },
+    rich: { label: "Rich (10k coins)", type: "mock", group: "Test Scenarios" },
+    "tank-full": { label: "Fresh Full (8/8)", type: "mock", group: "Test Scenarios" },
+    "tier-3-crowded": { label: "Saltwater Crowded (18/20)", type: "mock", group: "Test Scenarios" },
+    "multi-tank-decorated": {
+      label: "Multi-Tank Decorated",
+      type: "mock",
+      group: "Test Scenarios",
     },
-    'buienradar-station': {
-        'default': { label: 'Station Data (Default)', type: 'mock' },
-        'real': { label: 'Real Data (Live)', type: 'real' },
-        'error': { label: 'API Error', type: 'error' }
+    "empty-tank": { label: "Empty Tank (0 fish)", type: "mock", group: "New Features" },
+    "movement-showcase": { label: "Movement Types Showcase", type: "mock", group: "New Features" },
+    "schooling-showcase": {
+      label: "Schooling Fish (10 tetras)",
+      type: "mock",
+      group: "New Features",
     },
-    'buienradar-forecast': {
-        'default': { label: 'Forecast (Default)', type: 'mock' },
-        'real': { label: 'Real Data (Live)', type: 'real' },
-        'error': { label: 'API Error', type: 'error' }
+    "floating-decor": { label: "Floating Plants & Decor", type: "mock", group: "New Features" },
+    "territorial-showcase": {
+      label: "Territorial Fish Behavior",
+      type: "mock",
+      group: "Design Overhaul",
     },
-    'youtube': {
-        'default': { label: 'Normal (Default)', type: 'mock' },
-        'ios': { label: 'Simulate iOS', type: 'mock' },
-    },
-    'windy': {
-        'default': { label: 'Normal (Default)', type: 'mock' },
-        'ios': { label: 'Simulate iOS', type: 'mock' },
-    },
-    'aquarium': {
-        'default':              { label: 'Fresh Start',                type: 'mock', group: 'Progression' },
-        'tier-2-ready':         { label: 'Tropical Ready',             type: 'mock', group: 'Progression' },
-        'tier-2-active':        { label: 'Tropical Active',            type: 'mock', group: 'Progression' },
-        'tier-3-endgame':       { label: 'Saltwater Endgame',          type: 'mock', group: 'Progression' },
-        'neglected-48h':        { label: 'Neglected 48h',              type: 'mock', group: 'Problem States' },
-        'low-food':             { label: 'Low Food',                   type: 'mock', group: 'Problem States' },
-        'dirty-near-threshold': { label: 'Dirty Tank (25%)',           type: 'mock', group: 'Problem States' },
-        'dirty-big-tank':       { label: 'Dirty Saltwater (15%)',      type: 'mock', group: 'Problem States' },
-        'rich':                 { label: 'Rich (10k coins)',           type: 'mock', group: 'Test Scenarios' },
-        'tank-full':            { label: 'Fresh Full (8/8)',           type: 'mock', group: 'Test Scenarios' },
-        'tier-3-crowded':       { label: 'Saltwater Crowded (18/20)',  type: 'mock', group: 'Test Scenarios' },
-        'multi-tank-decorated': { label: 'Multi-Tank Decorated',       type: 'mock', group: 'Test Scenarios' },
-        'empty-tank':           { label: 'Empty Tank (0 fish)',        type: 'mock', group: 'New Features' },
-        'movement-showcase':    { label: 'Movement Types Showcase',    type: 'mock', group: 'New Features' },
-        'schooling-showcase':   { label: 'Schooling Fish (10 tetras)', type: 'mock', group: 'New Features' },
-        'floating-decor':       { label: 'Floating Plants & Decor',    type: 'mock', group: 'New Features' },
-        'territorial-showcase': { label: 'Territorial Fish Behavior',  type: 'mock', group: 'Design Overhaul' },
-        'lush-planted':         { label: 'Lush Planted Tank (Depth)',  type: 'mock', group: 'Design Overhaul' },
-        'size-showcase':        { label: 'Fish Size Showcase',         type: 'mock', group: 'Design Overhaul' },
-        'full-grown-fresh':     { label: 'Full Grown Fresh Tank',      type: 'mock', group: 'Full Grown' },
-        'full-grown-tropical':  { label: 'Full Grown Tropical Tank',   type: 'mock', group: 'Full Grown' },
-        'full-grown-salt':      { label: 'Full Grown Salt Tank',       type: 'mock', group: 'Full Grown' },
-        'depth-row-showcase':   { label: '3-Row Depth Showcase',       type: 'mock', group: 'v3 Visual' },
-        'hiding-showcase':      { label: 'Fish Hiding Behavior',       type: 'mock', group: 'v3 Visual' },
-    }
+    "lush-planted": { label: "Lush Planted Tank (Depth)", type: "mock", group: "Design Overhaul" },
+    "size-showcase": { label: "Fish Size Showcase", type: "mock", group: "Design Overhaul" },
+    "full-grown-fresh": { label: "Full Grown Fresh Tank", type: "mock", group: "Full Grown" },
+    "full-grown-tropical": { label: "Full Grown Tropical Tank", type: "mock", group: "Full Grown" },
+    "full-grown-salt": { label: "Full Grown Salt Tank", type: "mock", group: "Full Grown" },
+    "depth-row-showcase": { label: "3-Row Depth Showcase", type: "mock", group: "v3 Visual" },
+    "hiding-showcase": { label: "Fish Hiding Behavior", type: "mock", group: "v3 Visual" },
+  },
 };
 
-export const DEFAULT_SCENARIO = 'default';
+export const DEFAULT_SCENARIO = "default";

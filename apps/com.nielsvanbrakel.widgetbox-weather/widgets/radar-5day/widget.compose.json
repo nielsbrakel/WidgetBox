@@ -1,0 +1,12 @@
+{
+  "name": {
+    "en": "5-day radar",
+    "nl": "5-daagse radar"
+  },
+  "description": {
+    "en": "Rain radar with a 5-day forecast for the Netherlands",
+    "nl": "Regenradar met een 5-daagse verwachting voor Nederland"
+  },
+  "transparent": true,
+  "settings": []
+}

@@ -1,21 +1,14 @@
-# Separator Widget
+# Separator widget
 
 **Directory**: `widgets/separator`
 
-A horizontal line to visually separate widgets on a dashboard.
+A transparent, 24 px high widget that draws a horizontal line between widgets.
 
-## Features
-*   **Color**: Any hex color.
-*   **Thickness**: 1–4px.
-*   **Style**: Solid, dashed, or dotted.
-*   **Side Margin**: Horizontal inset from the edges.
-*   **Transparent**: Only the line is visible.
-
-## Settings (`widget.compose.json`)
+## Settings
 
 | ID | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
-| `color` | Text | `#CCCCCC` | Hex color code for the line. |
-| `thickness` | Dropdown | `1` | Line thickness in pixels (1–4). |
-| `style` | Dropdown | `solid` | Line style (solid, dashed, dotted). |
-| `margin` | Number | `16` | Horizontal margin on each side (0–200px). |
+| `style` | Dropdown | `solid` | `solid`, `dashed` or `dotted`. |
+| `thickness` | Dropdown | `1` | Line thickness, 1 to 4 px. |
+| `color` | Dropdown | `default` | `default` (`--homey-color-mono-300`, adapts to light and dark mode), `blue`, `green`, `orange`, `red` or `purple`. |
+| `margin` | Number | `16` | Empty space left and right of the line, 0 to 200 px. |

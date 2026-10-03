@@ -1,23 +1,15 @@
-# Header Widget
+# Header widget
 
 **Directory**: `widgets/header`
 
-A section title widget to visually organize dashboard groups.
+A transparent, single-line section title for grouping widgets on a dashboard. Text that does not fit ends with an ellipsis.
 
-## Features
-*   **Custom Text**: Any label you want.
-*   **Size**: Small (14px), Medium (18px), Large (24px).
-*   **Weight**: Normal or Bold.
-*   **Alignment**: Left, Center, or Right.
-*   **Color**: Custom hex color or Homey's default text color.
-*   **Transparent**: Only the text is visible.
-
-## Settings (`widget.compose.json`)
+## Settings
 
 | ID | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
-| `text` | Text | `Section` | The header text to display. |
-| `size` | Dropdown | `medium` | Font size (small, medium, large). |
-| `weight` | Dropdown | `bold` | Font weight (normal, bold). |
-| `align` | Dropdown | `left` | Text alignment (left, center, right). |
-| `color` | Text | *(empty)* | Hex color code. Empty = Homey default text color. |
+| `text` | Text | `Section` | The title text. |
+| `size` | Dropdown | `medium` | `xsmall` to `xlarge`, mapped to `--homey-font-size-small` … `--homey-font-size-xxlarge`. The widget height follows the size (24 to 56 px). |
+| `fontWeight` | Dropdown | `bold` | `thin`, `normal` or `bold`. |
+| `horizontalAlignment` | Dropdown | `left` | `left`, `center` or `right`. |
+| `color` | Dropdown | `default` | `default` (Homey text color), `blue`, `green`, `orange`, `red` or `purple` (`--homey-color-*-500` with hex fallbacks). |

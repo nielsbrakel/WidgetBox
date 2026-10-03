@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<?xml-stylesheet href="theme.css" type="text/css" ?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <title>Flip clock widget preview</title>
+  <!-- Wide card: four split flip tiles in two pairs with a colon; digits shown as bars -->
+  <rect class="card" x="112" y="362" width="800" height="300" rx="64" />
+  <g class="ph">
+    <rect x="164" y="412" width="150" height="200" rx="24" />
+    <rect x="330" y="412" width="150" height="200" rx="24" />
+    <rect x="544" y="412" width="150" height="200" rx="24" />
+    <rect x="710" y="412" width="150" height="200" rx="24" />
+  </g>
+  <g class="ink">
+    <rect x="194" y="484" width="90" height="56" rx="28" />
+    <rect x="360" y="484" width="90" height="56" rx="28" />
+    <rect x="574" y="484" width="90" height="56" rx="28" />
+    <rect x="740" y="484" width="90" height="56" rx="28" />
+  </g>
+  <g class="card-fill">
+    <rect x="164" y="508" width="316" height="8" />
+    <rect x="544" y="508" width="316" height="8" />
+  </g>
+  <g class="mid">
+    <circle cx="512" cy="482" r="11" />
+    <circle cx="512" cy="542" r="11" />
+  </g>
+</svg>

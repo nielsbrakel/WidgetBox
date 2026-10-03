@@ -1,0 +1,212 @@
+{
+  "name": {
+    "en": "Rain forecast graph",
+    "nl": "Regenverwachting"
+  },
+  "description": {
+    "en": "Expected rain for the next 2 hours",
+    "nl": "Verwachte regen voor de komende 2 uur"
+  },
+  "api": {
+    "getData": {
+      "method": "GET",
+      "path": "/"
+    }
+  },
+  "transparent": true,
+  "settings": [
+    {
+      "id": "latitude",
+      "type": "text",
+      "label": {
+        "en": "Latitude",
+        "nl": "Breedtegraad"
+      },
+      "value": "",
+      "hint": {
+        "en": "Leave empty to use the location of your Homey. Example: 52.09",
+        "nl": "Laat leeg om de locatie van je Homey te gebruiken. Bijvoorbeeld: 52,09"
+      }
+    },
+    {
+      "id": "longitude",
+      "type": "text",
+      "label": {
+        "en": "Longitude",
+        "nl": "Lengtegraad"
+      },
+      "value": "",
+      "hint": {
+        "en": "Leave empty to use the location of your Homey. Example: 5.12",
+        "nl": "Laat leeg om de locatie van je Homey te gebruiken. Bijvoorbeeld: 5,12"
+      }
+    },
+    {
+      "id": "graphStyle",
+      "type": "dropdown",
+      "label": {
+        "en": "Graph style",
+        "nl": "Grafiekstijl"
+      },
+      "value": "bars",
+      "values": [
+        {
+          "id": "bars",
+          "label": {
+            "en": "Bars",
+            "nl": "Staven"
+          }
+        },
+        {
+          "id": "line",
+          "label": {
+            "en": "Line",
+            "nl": "Lijn"
+          }
+        },
+        {
+          "id": "smooth",
+          "label": {
+            "en": "Smooth line",
+            "nl": "Vloeiende lijn"
+          }
+        }
+      ]
+    },
+    {
+      "id": "color",
+      "type": "dropdown",
+      "label": {
+        "en": "Color",
+        "nl": "Kleur"
+      },
+      "value": "default",
+      "values": [
+        {
+          "id": "default",
+          "label": {
+            "en": "Default",
+            "nl": "Standaard"
+          }
+        },
+        {
+          "id": "blue",
+          "label": {
+            "en": "Blue",
+            "nl": "Blauw"
+          }
+        },
+        {
+          "id": "green",
+          "label": {
+            "en": "Green",
+            "nl": "Groen"
+          }
+        },
+        {
+          "id": "orange",
+          "label": {
+            "en": "Orange",
+            "nl": "Oranje"
+          }
+        },
+        {
+          "id": "red",
+          "label": {
+            "en": "Red",
+            "nl": "Rood"
+          }
+        },
+        {
+          "id": "purple",
+          "label": {
+            "en": "Purple",
+            "nl": "Paars"
+          }
+        }
+      ]
+    },
+    {
+      "id": "aspectRatio",
+      "type": "dropdown",
+      "label": {
+        "en": "Aspect ratio",
+        "nl": "Beeldverhouding"
+      },
+      "value": "16:9",
+      "values": [
+        {
+          "id": "1:1",
+          "label": {
+            "en": "Square (1:1)",
+            "nl": "Vierkant (1:1)"
+          }
+        },
+        {
+          "id": "4:3",
+          "label": {
+            "en": "4:3",
+            "nl": "4:3"
+          }
+        },
+        {
+          "id": "16:9",
+          "label": {
+            "en": "16:9",
+            "nl": "16:9"
+          }
+        },
+        {
+          "id": "2:1",
+          "label": {
+            "en": "Wide (2:1)",
+            "nl": "Breed (2:1)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "refreshInterval",
+      "type": "dropdown",
+      "label": {
+        "en": "Refresh",
+        "nl": "Verversen"
+      },
+      "value": "300",
+      "values": [
+        {
+          "id": "300",
+          "label": {
+            "en": "Every 5 minutes",
+            "nl": "Elke 5 minuten"
+          }
+        },
+        {
+          "id": "600",
+          "label": {
+            "en": "Every 10 minutes",
+            "nl": "Elke 10 minuten"
+          }
+        },
+        {
+          "id": "900",
+          "label": {
+            "en": "Every 15 minutes",
+            "nl": "Elke 15 minuten"
+          }
+        },
+        {
+          "id": "1800",
+          "label": {
+            "en": "Every 30 minutes",
+            "nl": "Elke 30 minuten"
+          }
+        }
+      ],
+      "hint": {
+        "en": "Buienradar updates the rain forecast every 5 minutes.",
+        "nl": "Buienradar werkt de regenverwachting elke 5 minuten bij."
+      }
+    }
+  ]
+}

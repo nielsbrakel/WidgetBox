@@ -1,0 +1,878 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+    /* Defined on body: Homey sets its theme variables on body, so they resolve per theme there. */
+    body {
+      --accent: var(--homey-color-blue-600, #0080d9);
+      --on-accent: var(--homey-color-white, #fff);
+      --danger: var(--homey-color-red-600, #d93229);
+      --danger-text: var(--homey-text-color-danger, var(--homey-color-red-600, #d93229));
+      --surface: var(--homey-color-mono-050, #f2f2f2);
+      --text: var(--homey-text-color, #333);
+      --text-light: var(--homey-text-color-light, #808080);
+      --line: var(--homey-line-light, 1px solid rgba(0, 0, 0, 0.05));
+    }
+
+    .homey-dark-mode {
+      --surface: rgba(255, 255, 255, 0.08);
+      --danger-text: var(--homey-text-color-danger, var(--homey-color-red-400, #ff5e5b));
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: transparent;
+    }
+
+    body {
+      font-family: var(
+        --homey-font-family,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        sans-serif
+      );
+      color: var(--text);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .item {
+      position: relative;
+      overflow: hidden;
+      padding: var(--homey-su-3, 12px) var(--homey-su-4, 16px);
+      border-bottom: var(--line);
+    }
+
+    .item:last-child {
+      border-bottom: none;
+    }
+
+    .list:not(:last-child) .item:last-child {
+      border-bottom: var(--line);
+    }
+
+    .narrow .item {
+      padding: var(--homey-su-3, 12px) var(--homey-su-2, 8px);
+    }
+
+    .item.is-new {
+      animation: fade-in 0.25s ease-out;
+    }
+
+    .item.finished::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: var(--danger);
+      opacity: 0.12;
+      pointer-events: none;
+      animation: pulse 2s ease-in-out 30;
+    }
+
+    .progress {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 3px;
+      background: var(--accent);
+      transform-origin: left;
+      transition: transform 1s linear;
+    }
+
+    .row {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: var(--homey-su-3, 12px);
+    }
+
+    .narrow .row {
+      flex-direction: column;
+      gap: var(--homey-su-2, 8px);
+    }
+
+    .display {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .countdown {
+      font-size: clamp(30px, 9vw, 56px);
+      font-weight: 300;
+      line-height: 1.1;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .narrow .countdown {
+      text-align: center;
+      font-size: clamp(28px, 17vw, 56px);
+    }
+
+    .finished .countdown {
+      color: var(--danger-text);
+    }
+
+    .status {
+      font-size: var(--homey-font-size-small, 14px);
+      font-weight: var(--homey-font-weight-bold, 700);
+      color: var(--danger-text);
+    }
+
+    .narrow .status {
+      text-align: center;
+    }
+
+    .stepper {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .narrow .stepper {
+      justify-content: center;
+    }
+
+    .unit {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 44px;
+    }
+
+    .unit-value {
+      font-size: 28px;
+      font-weight: 400;
+      line-height: 32px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .unit-label {
+      font-size: 12px;
+      line-height: 14px;
+      color: var(--text-light);
+    }
+
+    .separator {
+      align-self: center;
+      width: 8px;
+      text-align: center;
+      font-size: 24px;
+      color: var(--text-light);
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: var(--homey-su-2, 8px);
+      flex-shrink: 0;
+    }
+
+    button {
+      font: inherit;
+      color: inherit;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    button:disabled {
+      opacity: 0.35;
+      cursor: default;
+    }
+
+    button:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: var(--surface);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: var(--on-accent);
+    }
+
+    .finished .btn-primary {
+      background: var(--danger);
+    }
+
+    .btn-ghost,
+    .btn-step {
+      width: 44px;
+      height: 44px;
+      background: transparent;
+      color: var(--text-light);
+    }
+
+    .btn-step {
+      height: 36px;
+      border-radius: var(--homey-border-radius-small, 8px);
+      color: var(--text);
+    }
+
+    .btn-step:active:not(:disabled) {
+      background: var(--surface);
+    }
+
+    .icon {
+      width: 24px;
+      height: 24px;
+      fill: currentColor;
+      pointer-events: none;
+    }
+
+    .btn-ghost .icon {
+      width: 20px;
+      height: 20px;
+    }
+
+    .add {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--homey-su-1, 4px);
+      min-height: 44px;
+      margin: var(--homey-su-2, 8px) auto;
+      padding: 0 var(--homey-su-4, 16px);
+      border-radius: 22px;
+      background: transparent;
+      color: var(--accent);
+      font-weight: var(--homey-font-weight-bold, 700);
+      font-size: var(--homey-font-size-small, 14px);
+    }
+
+    .homey-dark-mode .add {
+      color: var(--homey-color-blue-400, #1a9eff);
+    }
+
+    @keyframes fade-in {
+      from {
+        opacity: 0;
+        transform: translateY(-6px);
+      }
+    }
+
+    @keyframes pulse {
+      50% {
+        opacity: 0.28;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .item.is-new,
+      .item.finished::before {
+        animation: none;
+      }
+
+      .progress {
+        transition: none;
+      }
+    }
+    </style>
+  </head>
+
+  <body class="homey-widget-full">
+    <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+      <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></symbol>
+      <symbol id="i-pause" viewBox="0 0 24 24"><path d="M6 4h4v16H6zm8 0h4v16h-4z" /></symbol>
+      <symbol id="i-reset" viewBox="0 0 24 24">
+        <path d="M12 5V1L7 6l5 5V7a6 6 0 1 1-6 6H4a8 8 0 1 0 8-8z" />
+      </symbol>
+      <symbol id="i-done" viewBox="0 0 24 24">
+        <path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z" />
+      </symbol>
+      <symbol id="i-close" viewBox="0 0 24 24">
+        <path
+          d="M19 6.4 17.6 5 12 10.6 6.4 5 5 6.4l5.6 5.6L5 17.6 6.4 19l5.6-5.6 5.6 5.6 1.4-1.4-5.6-5.6z"
+        />
+      </symbol>
+      <symbol id="i-up" viewBox="0 0 24 24">
+        <path d="M7.4 15.4 12 10.8l4.6 4.6L18 14l-6-6-6 6z" />
+      </symbol>
+      <symbol id="i-down" viewBox="0 0 24 24">
+        <path d="M7.4 8.6 12 13.2l4.6-4.6L18 10l-6 6-6-6z" />
+      </symbol>
+      <symbol id="i-add" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z" /></symbol>
+    </svg>
+
+    <div id="app"></div>
+
+    <script>
+    const UNITS = [
+      { field: "hours", ms: 3600000, max: 23 },
+      { field: "minutes", ms: 60000, max: 59 },
+      { field: "seconds", ms: 1000, max: 59 },
+    ];
+    const SAVE_DELAY_MS = 400;
+    const NARROW_WIDTH = 360;
+    const REPEAT_DELAY_MS = 400;
+    const REPEAT_INTERVAL_MS = 110;
+    const ALERT_WINDOW_MS = 5000;
+
+    const app = document.getElementById("app");
+
+    let homey = null;
+    let widgetId = null;
+    let settings = {};
+    let config = {};
+    let timers = [];
+    let clockOffsetMs = 0;
+    let saveTimeout = null;
+    let writesInFlight = 0;
+    let lastSyncedJson = "";
+    let tickTimeout = null;
+    let lastHeight = 0;
+    let audioContext = null;
+    const alerted = new Set();
+    const repeat = { delay: null, interval: null };
+
+    // --- Helpers ---
+
+    /** Translates a key; `{name}` placeholders are filled in here so it works with any runtime. */
+    const t = (key, tokens = {}) =>
+      homey
+        .__(`widgets.timer.${key}`)
+        .replace(/\{(\w+)\}/g, (match, name) => String(tokens[name] ?? match));
+    const now = () => Date.now() + clockOffsetMs;
+    const pad = (n) => String(n).padStart(2, "0");
+    const clampInt = (value, min, max, fallback) =>
+      Math.min(max, Math.max(min, Number.isFinite(Number(value)) ? Math.round(value) : fallback));
+    const createId = () =>
+      crypto.randomUUID?.() ??
+      `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 10)}`;
+
+    const icon = (name) => `<svg class="icon" aria-hidden="true"><use href="#i-${name}"/></svg>`;
+
+    const button = ({ action, iconName, label, variant = "", disabled = false, data = "" }) =>
+      `<button type="button" class="btn ${variant}" data-action="${action}" ${data} aria-label="${label}"${
+        disabled ? " disabled" : ""
+      }>${icon(iconName)}</button>`;
+
+    const formatSeconds = (totalSeconds) => {
+      const h = Math.floor(totalSeconds / 3600);
+      const m = Math.floor((totalSeconds % 3600) / 60);
+      const s = totalSeconds % 60;
+      return h > 0 ? `${h}:${pad(m)}:${pad(s)}` : `${pad(m)}:${pad(s)}`;
+    };
+
+    /** Remaining ms; negative once a running timer has passed zero (overtime). */
+    const remainingOf = (timer) =>
+      timer.status === "running"
+        ? timer.remainingMs - Math.max(0, now() - timer.startedAt)
+        : timer.remainingMs;
+
+    const isFinished = (timer) => timer.status === "running" && remainingOf(timer) <= 0;
+
+    /** Countdown text: rounds up while counting down, counts the overtime once finished. */
+    const countdownText = (timer) => {
+      const remaining = remainingOf(timer);
+      return remaining > 0
+        ? formatSeconds(Math.ceil(remaining / 1000))
+        : `−${formatSeconds(Math.floor(-remaining / 1000))}`;
+    };
+
+    const unitValue = (durationMs, unit) => Math.floor(durationMs / unit.ms) % (unit.max + 1);
+
+    // --- Settings ---
+
+    const defaultDurationMs = () =>
+      clampInt(settings.defaultHours, 0, 23, 0) * 3600000 +
+      clampInt(settings.defaultMinutes, 0, 59, 5) * 60000 +
+      clampInt(settings.defaultSeconds, 0, 59, 0) * 1000;
+
+    const readConfig = () => {
+      config = {
+        defaultDurationMs: defaultDurationMs(),
+        playSound: settings.playSound !== false,
+        allowAdding: settings.allowAddingTimers !== false,
+        initialCount: clampInt(settings.initialTimers, 1, 10, 1),
+        maxCount: clampInt(settings.maxTimers, 1, 10, 3),
+      };
+    };
+
+    const createTimer = () => ({
+      id: createId(),
+      status: "idle",
+      durationMs: config.defaultDurationMs,
+      remainingMs: config.defaultDurationMs,
+      startedAt: null,
+      isNew: true,
+    });
+
+    const isUntouched = (timer) => timer.status === "idle";
+
+    /**
+     * Makes the number of timers match the settings. Returns true when it changed anything.
+     * With adding disabled the count is fixed to the configured number; idle timers are
+     * removed from the end first so no running countdown is lost.
+     */
+    const reconcileCount = () => {
+      const before = timers.length;
+      const target = config.allowAdding
+        ? Math.max(1, Math.min(before || config.initialCount, config.maxCount))
+        : config.initialCount;
+
+      while (timers.length < target) timers.push(createTimer());
+      if (!config.allowAdding) {
+        while (timers.length > target && isUntouched(timers.at(-1))) timers.pop();
+      }
+      return timers.length !== before;
+    };
+
+    /** Idle timers that still show the old default follow a changed default duration. */
+    const applyNewDefault = (previousDefaultMs) => {
+      let changed = false;
+      for (const timer of timers) {
+        if (timer.status === "idle" && timer.durationMs === previousDefaultMs) {
+          timer.durationMs = timer.remainingMs = config.defaultDurationMs;
+          changed = true;
+        }
+      }
+      return changed;
+    };
+
+    // --- Persistence & sync (Homey is the source of truth) ---
+
+    const statePath = () => `/state?widgetId=${encodeURIComponent(widgetId)}`;
+
+    /** Canonical form of the items, as stored on Homey: same fields, order and rounding. */
+    const canonical = (items) =>
+      items.map(({ id, status, durationMs, remainingMs, startedAt }) => ({
+        id,
+        status,
+        durationMs,
+        remainingMs: Math.round(remainingMs),
+        startedAt,
+      }));
+
+    const serialize = () => canonical(timers);
+
+    const updateClockOffset = (state) => {
+      if (typeof state?.serverNow === "number") clockOffsetMs = state.serverNow - Date.now();
+    };
+
+    /** Replaces local state with a state from Homey. Returns true when the view must update. */
+    const applyState = (state) => {
+      updateClockOffset(state);
+      if (!Array.isArray(state?.items)) return false;
+      const json = JSON.stringify(canonical(state.items));
+      if (json === lastSyncedJson) return false;
+      lastSyncedJson = json;
+      timers = state.items.map((item) => ({ ...item, isNew: false }));
+      return true;
+    };
+
+    const isSaving = () => saveTimeout !== null || writesInFlight > 0;
+
+    const flushSave = async () => {
+      if (saveTimeout === null) return;
+      clearTimeout(saveTimeout);
+      saveTimeout = null;
+
+      const items = serialize();
+      lastSyncedJson = JSON.stringify(items);
+      writesInFlight += 1;
+      try {
+        updateClockOffset(await homey.api("PUT", statePath(), { items }));
+      } catch (err) {
+        console.error("Failed to save timer state", err);
+      } finally {
+        writesInFlight -= 1;
+      }
+    };
+
+    const saveSoon = () => {
+      clearTimeout(saveTimeout);
+      saveTimeout = setTimeout(flushSave, SAVE_DELAY_MS);
+    };
+
+    const loadState = async () => {
+      try {
+        return await homey.api("GET", statePath());
+      } catch (err) {
+        console.error("Failed to load timer state", err);
+        return null;
+      }
+    };
+
+    const refreshFromHomey = async () => {
+      const state = await loadState();
+      if (!isSaving() && applyState(state)) render();
+      tick();
+    };
+
+    const onRemoteState = (payload) => {
+      if (payload?.widgetId !== widgetId || isSaving()) return;
+      if (applyState(payload.state)) render();
+      tick();
+    };
+
+    // --- Alert when time is up ---
+
+    /** Audio may only start after a tap, so the context is created on the first button press. */
+    const unlockAudio = () => {
+      if (!config.playSound) return;
+      try {
+        audioContext ??= new (window.AudioContext || window.webkitAudioContext)();
+        if (audioContext.state === "suspended") audioContext.resume();
+      } catch {
+        audioContext = null;
+      }
+    };
+
+    const beep = () => {
+      if (!config.playSound || audioContext?.state !== "running") return;
+      const start = audioContext.currentTime + 0.05;
+      for (let i = 0; i < 9; i++) {
+        const at = start + Math.floor(i / 3) * 1 + (i % 3) * 0.2;
+        const oscillator = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        oscillator.frequency.value = 880;
+        gain.gain.setValueAtTime(0.0001, at);
+        gain.gain.exponentialRampToValueAtTime(0.3, at + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.0001, at + 0.14);
+        oscillator.connect(gain).connect(audioContext.destination);
+        oscillator.start(at);
+        oscillator.stop(at + 0.15);
+      }
+    };
+
+    /** Alerts once per finished run, and only when it finished just now (not on a later wake). */
+    const alertIfJustFinished = (timer) => {
+      const key = `${timer.id}:${timer.startedAt}`;
+      if (alerted.has(key) || -remainingOf(timer) > ALERT_WINDOW_MS) return;
+      alerted.add(key);
+      navigator.vibrate?.([300, 150, 300, 150, 300]);
+      beep();
+    };
+
+    // --- Actions ---
+
+    const findTimer = (id) => timers.find((timer) => timer.id === id);
+
+    const resetToIdle = (timer) => {
+      Object.assign(timer, { status: "idle", remainingMs: timer.durationMs, startedAt: null });
+    };
+
+    const actions = {
+      toggle(timer) {
+        if (timer.status === "running") {
+          // Clock offset jitter can make the elapsed time negative; the server rejects > duration.
+          timer.remainingMs = Math.min(timer.durationMs, Math.max(0, remainingOf(timer)));
+          Object.assign(timer, { status: "paused", startedAt: null });
+        } else if (timer.remainingMs > 0) {
+          Object.assign(timer, { status: "running", startedAt: now() });
+        }
+      },
+      reset: resetToIdle,
+      done: resetToIdle,
+      restart(timer) {
+        Object.assign(timer, {
+          status: "running",
+          remainingMs: timer.durationMs,
+          startedAt: now(),
+        });
+      },
+      remove(timer) {
+        timers = timers.filter((other) => other !== timer);
+      },
+      add() {
+        if (timers.length < config.maxCount) timers.push(createTimer());
+      },
+    };
+
+    const onClick = (event) => {
+      const target = event.target.closest("button[data-action]");
+      if (!target || target.disabled) return;
+      const { action } = target.dataset;
+      const timer = findTimer(target.closest("[data-id]")?.dataset.id);
+
+      // Pointer presses on steppers are handled on pointerdown; keyboard clicks have detail 0.
+      if (action === "step") {
+        if (event.detail === 0) stepDuration(target);
+        return;
+      }
+      if (!actions[action] || (action !== "add" && !timer)) return;
+
+      homey.hapticFeedback?.();
+      unlockAudio();
+      actions[action](timer);
+      render();
+      tick();
+      saveSoon();
+    };
+
+    // --- Duration stepper (tap or hold; no swiping or dragging) ---
+
+    const stepDuration = (stepButton) => {
+      const timer = findTimer(stepButton.closest("[data-id]")?.dataset.id);
+      if (timer?.status !== "idle") return;
+
+      const unit = UNITS.find(({ field }) => field === stepButton.dataset.field);
+      const current = unitValue(timer.durationMs, unit);
+      const next = (current + Number(stepButton.dataset.delta) + unit.max + 1) % (unit.max + 1);
+      timer.durationMs += (next - current) * unit.ms;
+      timer.remainingMs = timer.durationMs;
+
+      updateStepper(timer);
+      saveSoon();
+    };
+
+    const stopRepeat = () => {
+      clearTimeout(repeat.delay);
+      clearInterval(repeat.interval);
+      repeat.delay = repeat.interval = null;
+    };
+
+    const onPointerDown = (event) => {
+      const stepButton = event.target.closest('button[data-action="step"]');
+      if (!stepButton || event.button > 0) return;
+      homey.hapticFeedback?.();
+      stopRepeat();
+      stepDuration(stepButton);
+      repeat.delay = setTimeout(() => {
+        repeat.interval = setInterval(() => stepDuration(stepButton), REPEAT_INTERVAL_MS);
+      }, REPEAT_DELAY_MS);
+    };
+
+    // --- Rendering ---
+
+    const renderStepper = (timer) => {
+      const units = UNITS.map((unit) => {
+        const label = t(unit.field);
+        const step = (delta, iconName, key) =>
+          button({
+            action: "step",
+            iconName,
+            label: t(key, { unit: label.toLowerCase() }),
+            variant: "btn-step",
+            data: `data-field="${unit.field}" data-delta="${delta}"`,
+          });
+        return `<div class="unit" role="group" aria-label="${label}">
+            ${step(1, "up", "increase")}
+            <span class="unit-value" data-field="${unit.field}">${pad(unitValue(timer.durationMs, unit))}</span>
+            <span class="unit-label">${t(`${unit.field}Short`)}</span>
+            ${step(-1, "down", "decrease")}
+          </div>`;
+      });
+      return `<div class="stepper">${units.join('<span class="separator">:</span>')}</div>`;
+    };
+
+    const updateStepper = (timer) => {
+      const item = app.querySelector(`[data-id="${timer.id}"]`);
+      if (!item) return;
+      for (const unit of UNITS) {
+        const value = pad(unitValue(timer.durationMs, unit));
+        item.querySelector(`.unit-value[data-field="${unit.field}"]`).textContent = value;
+      }
+      item.querySelector('[data-action="toggle"]').disabled = timer.durationMs === 0;
+    };
+
+    const renderActions = (timer) => {
+      const finished = isFinished(timer);
+      const running = timer.status === "running";
+      const remove =
+        config.allowAdding && timers.length > 1
+          ? button({
+              action: "remove",
+              iconName: "close",
+              label: t("remove"),
+              variant: "btn-ghost",
+            })
+          : "";
+
+      if (finished) {
+        return (
+          button({ action: "restart", iconName: "reset", label: t("restart") }) +
+          button({ action: "done", iconName: "done", label: t("done"), variant: "btn-primary" }) +
+          remove
+        );
+      }
+
+      const secondary =
+        timer.status === "idle"
+          ? ""
+          : button({ action: "reset", iconName: "reset", label: t("reset") });
+      const primary = button({
+        action: "toggle",
+        iconName: running ? "pause" : "play",
+        label: running ? t("pause") : t("start"),
+        variant: "btn-primary",
+        disabled: timer.status === "idle" && timer.durationMs === 0,
+      });
+      return secondary + primary + remove;
+    };
+
+    const renderTimer = (timer, index) => {
+      const finished = isFinished(timer);
+      const classes = ["item", finished && "finished", timer.isNew && "is-new"].filter(Boolean);
+      timer.isNew = false;
+      const name = timers.length > 1 ? t("nameNumbered", { number: index + 1 }) : t("name");
+
+      const display =
+        timer.status === "idle"
+          ? renderStepper(timer)
+          : `${finished ? `<div class="status">${t("timeUp")}</div>` : ""}
+               <div class="countdown" role="timer">${countdownText(timer)}</div>`;
+      const progress =
+        timer.status === "idle" || finished
+          ? ""
+          : '<div class="progress" aria-hidden="true"></div>';
+
+      return `<section class="${classes.join(" ")}" data-id="${timer.id}" aria-label="${name}">
+          <div class="row">
+            <div class="display">${display}</div>
+            <div class="actions">${renderActions(timer)}</div>
+          </div>
+          ${progress}
+        </section>`;
+    };
+
+    const render = () => {
+      stopRepeat();
+      const canAdd = config.allowAdding && timers.length < config.maxCount;
+      const addButton = canAdd
+        ? `<button type="button" class="add" data-action="add">${icon("add")}${t("addTimer")}</button>`
+        : "";
+      app.innerHTML = `<div class="list">${timers.map(renderTimer).join("")}</div>${addButton}`;
+      updateCountdowns();
+    };
+
+    /** Updates countdown texts and progress bars; re-renders when a timer has just finished. */
+    const updateCountdowns = () => {
+      for (const timer of timers) {
+        if (timer.status === "idle") continue;
+        const item = app.querySelector(`[data-id="${timer.id}"]`);
+        if (!item) continue;
+        if (isFinished(timer) !== item.classList.contains("finished")) {
+          render();
+          return;
+        }
+        const countdown = item.querySelector(".countdown");
+        const text = countdownText(timer);
+        if (countdown.textContent !== text) countdown.textContent = text;
+        const bar = item.querySelector(".progress");
+        if (bar) {
+          const fraction =
+            timer.durationMs > 0 ? Math.max(0, remainingOf(timer)) / timer.durationMs : 0;
+          bar.style.transform = `scaleX(${fraction.toFixed(4)})`;
+        }
+      }
+    };
+
+    // --- Ticking: once per displayed second, only while visible ---
+
+    const nextTickDelay = (running) => {
+      const untilNextSecond = running.map((timer) => {
+        const msIntoSecond = ((remainingOf(timer) % 1000) + 1000) % 1000;
+        return msIntoSecond === 0 ? 1000 : msIntoSecond;
+      });
+      return Math.min(...untilNextSecond) + 5;
+    };
+
+    const tick = () => {
+      clearTimeout(tickTimeout);
+      tickTimeout = null;
+      if (document.hidden) return;
+
+      updateCountdowns();
+      for (const timer of timers) if (isFinished(timer)) alertIfJustFinished(timer);
+
+      const running = timers.filter((timer) => timer.status === "running");
+      if (running.length > 0) tickTimeout = setTimeout(tick, nextTickDelay(running));
+    };
+
+    const onVisibilityChange = () => {
+      if (document.hidden) {
+        clearTimeout(tickTimeout);
+        stopRepeat();
+        flushSave();
+        return;
+      }
+      tick();
+      refreshFromHomey();
+    };
+
+    // --- Layout ---
+
+    const updateNarrow = () =>
+      document.body.classList.toggle("narrow", app.clientWidth < NARROW_WIDTH);
+
+    const observeSize = () => {
+      new ResizeObserver(() => {
+        updateNarrow();
+        const height = Math.ceil(app.getBoundingClientRect().height);
+        if (height !== lastHeight) {
+          lastHeight = height;
+          homey.setHeight(height);
+        }
+      }).observe(app);
+    };
+
+    // --- Init ---
+
+    window.onHomeyReady = async (Homey) => {
+      homey = Homey;
+      widgetId = await homey.getWidgetInstanceId();
+      settings = { ...homey.getSettings() };
+      readConfig();
+
+      applyState(await loadState());
+      const created = reconcileCount();
+
+      updateNarrow();
+      render();
+      // Timers that finished while nobody was watching are shown as finished without an alert.
+      for (const timer of timers)
+        if (isFinished(timer)) alerted.add(`${timer.id}:${timer.startedAt}`);
+      tick();
+      if (created) saveSoon();
+
+      app.addEventListener("click", onClick);
+      app.addEventListener("pointerdown", onPointerDown);
+      for (const type of ["pointerup", "pointercancel", "pointerleave", "blur"]) {
+        window.addEventListener(type, stopRepeat);
+      }
+      app.addEventListener("pointerout", (event) => {
+        if (event.target.closest?.('button[data-action="step"]')) stopRepeat();
+      });
+      document.addEventListener("visibilitychange", onVisibilityChange);
+      window.addEventListener("pagehide", flushSave);
+
+      homey.on("timer:state", onRemoteState);
+      homey.on("settings.set", (key, value) => {
+        const previousDefaultMs = config.defaultDurationMs;
+        settings[key] = value;
+        readConfig();
+        const countChanged = reconcileCount();
+        if (applyNewDefault(previousDefaultMs) || countChanged) saveSoon();
+        render();
+        tick();
+      });
+
+      lastHeight = Math.ceil(app.getBoundingClientRect().height);
+      homey.ready({ height: lastHeight });
+      observeSize();
+    };
+    </script>
+  </body>
+</html>

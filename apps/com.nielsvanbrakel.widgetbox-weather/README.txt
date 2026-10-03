@@ -1,0 +1,3 @@
+WidgetBox is a small family of widgets made to feel at home on your Homey dashboard. This one helps you decide whether to grab an umbrella: see how much rain is expected in the next two hours, watch the showers move in on the radar, and check the forecast for the coming days or the latest readings from a nearby weather station.
+
+The rain and forecast widgets use data from Buienradar and work for locations in the Netherlands and Belgium, using your Homey's location unless you pick another place. For a wider view there is also an interactive weather map by Windy with wind, temperature and clouds for anywhere in the world. The weather map does not work in the Homey app on iPhone and iPad yet.

@@ -1,5 +1,3 @@
-WidgetBox adds clean, native-looking widgets to your Homey dashboard. Designed to fit perfectly with Homey's style, these widgets help you customize your dashboard just the way you like it.
+WidgetBox is a small family of widgets made to feel at home on your Homey dashboard. This one helps you bring some order to it: give a group of widgets a clear header, draw a subtle line between sections, or add a bit of empty space so everything can breathe.
 
-WidgetBox Layout provides tools to organize your dashboard structure and spacing.
-
-The Divider is a simple but useful layout tool. Use it to add vertical breathing room between your other widgets. Pick a size from Extra Small to Extra Large to get exactly the spacing you want, creating a clean and organized dashboard layout.
+They are simple building blocks, but they make a busy dashboard much easier to read at a glance, especially on a tablet on the wall. Each one follows Homey's light and dark mode, so your layout stays tidy whichever theme you use.

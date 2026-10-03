@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<?xml-stylesheet href="theme.css" type="text/css" ?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <title>Radar 5day widget preview</title>
+  <!-- Portrait card: forecast radar map above a five-day selector strip -->
+  <defs>
+    <clipPath id="map"><rect x="236" y="156" width="552" height="600" rx="36" /></clipPath>
+  </defs>
+  <rect class="card" x="212" y="132" width="600" height="760" rx="64" />
+  <g clip-path="url(#map)">
+    <rect class="ph" x="236" y="156" width="552" height="600" />
+    <path
+      class="land"
+      d="M460 156 C480 230 440 290 470 360 C500 430 460 500 490 570 C520 650 480 700 510 756 L788 756 L788 156 Z"
+    />
+    <path
+      class="accent-soft"
+      d="M300 260 C380 200 520 220 600 270 C680 320 700 420 640 470 C580 520 460 500 380 470 C300 440 240 320 300 260 Z"
+    />
+    <path
+      class="accent"
+      opacity="0.7"
+      d="M430 320 C480 300 540 320 545 360 C550 400 500 420 460 410 C420 400 400 340 430 320 Z"
+    />
+    <path
+      class="accent-soft"
+      d="M560 560 C620 530 700 560 710 620 C720 680 650 700 600 690 C550 680 520 590 560 560 Z"
+    />
+  </g>
+  <rect class="accent" x="236" y="780" width="96" height="80" rx="22" />
+  <rect class="on-accent" x="260" y="808" width="48" height="24" rx="12" />
+  <g class="ph">
+    <rect x="350" y="780" width="96" height="80" rx="22" />
+    <rect x="464" y="780" width="96" height="80" rx="22" />
+    <rect x="578" y="780" width="96" height="80" rx="22" />
+    <rect x="692" y="780" width="96" height="80" rx="22" />
+  </g>
+  <g class="mid">
+    <rect x="374" y="808" width="48" height="24" rx="12" />
+    <rect x="488" y="808" width="48" height="24" rx="12" />
+    <rect x="602" y="808" width="48" height="24" rx="12" />
+    <rect x="716" y="808" width="48" height="24" rx="12" />
+  </g>
+</svg>

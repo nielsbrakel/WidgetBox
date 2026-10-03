@@ -1,37 +1,68 @@
 {
-    "id": "com.nielsvanbrakel.widgetbox-clocks",
-    "version": "0.1.0",
-    "compatibility": ">=12.3.0",
-    "sdk": 3,
-    "platforms": [
-        "local"
+  "id": "com.nielsvanbrakel.widgetbox-clocks",
+  "version": "0.1.0",
+  "compatibility": ">=12.3.0",
+  "sdk": 3,
+  "platforms": [
+    "local"
+  ],
+  "name": {
+    "en": "WidgetBox Clocks & Timers",
+    "nl": "WidgetBox Klokken & Timers"
+  },
+  "description": {
+    "en": "Keep an eye on the time, your way",
+    "nl": "Houd de tijd in de gaten, op jouw manier"
+  },
+  "category": [
+    "tools"
+  ],
+  "tags": {
+    "en": [
+      "clock",
+      "time",
+      "analog clock",
+      "digital clock",
+      "flip clock",
+      "word clock",
+      "binary clock",
+      "stopwatch",
+      "timer",
+      "countdown",
+      "dashboard",
+      "widget"
     ],
-    "name": {
-        "en": "WidgetBox Clocks"
-    },
-    "description": {
-        "en": "Multiple ways to tell time on your dashboard",
-        "nl": "Meerdere manieren om de tijd op je dashboard te tonen"
-    },
-    "category": [
-        "tools"
-    ],
-    "permissions": [],
-    "images": {
-        "small": "/assets/images/small.png",
-        "large": "/assets/images/large.png",
-        "xlarge": "/assets/images/xlarge.png"
-    },
-    "author": {
-        "name": "Niels van Brakel",
-        "email": "info@nielsvanbrakel.com"
-    },
-    "brandColor": "#4169E1",
-    "bugs": {
-        "url": "https://github.com/nielsbrakel/WidgetBox/issues"
-    },
-    "source": "https://github.com/nielsbrakel/WidgetBox",
-    "homepage": "https://nielsvanbrakel.com",
-    "support": "mailto:info@nielsvanbrakel.com",
-    "homeyCommunityTopicId": 152111
+    "nl": [
+      "klok",
+      "tijd",
+      "analoge klok",
+      "digitale klok",
+      "flipklok",
+      "woordklok",
+      "binaire klok",
+      "stopwatch",
+      "timer",
+      "aftellen",
+      "dashboard",
+      "widget"
+    ]
+  },
+  "brandColor": "#5E35B1",
+  "permissions": [],
+  "images": {
+    "small": "/assets/images/small.jpg",
+    "large": "/assets/images/large.jpg",
+    "xlarge": "/assets/images/xlarge.jpg"
+  },
+  "author": {
+    "name": "Niels van Brakel",
+    "email": "info@nielsvanbrakel.com"
+  },
+  "bugs": {
+    "url": "https://github.com/nielsbrakel/WidgetBox/issues"
+  },
+  "source": "https://github.com/nielsbrakel/WidgetBox",
+  "homepage": "https://nielsvanbrakel.com",
+  "support": "mailto:info@nielsvanbrakel.com",
+  "homeyCommunityTopicId": 152111
 }

@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+    body {
+      --text: var(--homey-text-color, #333);
+      --line: var(--homey-line-color, rgba(0, 0, 0, 0.1));
+      margin: 0;
+      overflow: hidden;
+      background: transparent;
+      color: var(--text);
+      font-family: var(--homey-font-family, system-ui, sans-serif);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .widget {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 12px 14px 8px;
+      text-align: left;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+      font-size: 12px;
+      opacity: 0.7;
+    }
+
+    .name {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .current {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 2px 10px;
+    }
+
+    .temperature {
+      font-size: 44px;
+      font-weight: 300;
+      line-height: 1;
+      letter-spacing: -1px;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .icon {
+      width: 40px;
+      height: 40px;
+      flex: none;
+    }
+
+    .feels {
+      font-size: 12px;
+      opacity: 0.7;
+    }
+
+    .details {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 16px;
+    }
+
+    .detail {
+      min-width: 0;
+    }
+
+    .value {
+      display: block;
+      font-size: var(--homey-font-size-small, 14px);
+      font-weight: var(--homey-font-weight-medium, 500);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .label {
+      display: block;
+      font-size: 11px;
+      opacity: 0.7;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      padding-top: 6px;
+      border-top: 1px solid var(--line);
+      font-size: 11px;
+    }
+
+    .status {
+      opacity: 0.6;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .credit {
+      position: relative;
+      flex: none;
+      padding: 0;
+      border: 0;
+      background: none;
+      color: inherit;
+      font: inherit;
+      opacity: 0.6;
+      cursor: pointer;
+    }
+
+    .credit::after {
+      content: "";
+      position: absolute;
+      inset: -14px -8px -8px;
+    }
+
+    .message {
+      font-size: var(--homey-font-size-small, 14px);
+      opacity: 0.8;
+    }
+
+    .align-center {
+      text-align: center;
+    }
+
+    .align-center .header,
+    .align-center .current,
+    .align-center .details {
+      justify-content: center;
+    }
+
+    .align-right {
+      text-align: right;
+    }
+
+    .align-right .header,
+    .align-right .current,
+    .align-right .details {
+      justify-content: flex-end;
+    }
+
+    .style-compact {
+      gap: 6px;
+      padding-top: 10px;
+    }
+
+    .style-compact .temperature {
+      font-size: 32px;
+    }
+
+    .style-compact .icon {
+      width: 30px;
+      height: 30px;
+    }
+
+    .style-compact .feels,
+    .style-compact .label {
+      display: none;
+    }
+
+    body:not(.homey-dark-mode) .icon {
+      filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.45));
+    }
+
+    [hidden] {
+      display: none;
+    }
+    </style>
+  </head>
+
+  <body class="homey-widget">
+    <div class="widget" id="app">
+      <div class="header"><span class="name" id="name"></span></div>
+      <div class="current" id="current">
+        <img class="icon" id="icon" alt="" width="40" height="40" hidden>
+        <span class="temperature" id="temperature">--°</span>
+        <span class="feels" id="feels"></span>
+      </div>
+      <div class="message" id="message" role="status" hidden></div>
+      <div class="details" id="details">
+        <div class="detail">
+          <span class="value" id="wind">—</span>
+          <span class="label" id="wind-label"></span>
+        </div>
+        <div class="detail">
+          <span class="value" id="rain">—</span>
+          <span class="label" id="rain-label"></span>
+        </div>
+        <div class="detail">
+          <span class="value" id="humidity">—</span>
+          <span class="label" id="humidity-label"></span>
+        </div>
+      </div>
+      <div class="footer">
+        <span class="status" id="status"></span>
+        <button class="credit" id="credit" type="button">Buienradar.nl</button>
+      </div>
+    </div>
+
+    <script>
+    const REFRESH_MS = 10 * 60 * 1000;
+    const SETTINGS_DEBOUNCE_MS = 600;
+    const DATA_SETTINGS = ["latitude", "longitude", "stationId"];
+    const ALIGNMENTS = ["left", "center", "right"];
+
+    const $ = (id) => document.getElementById(id);
+
+    function onHomeyReady(Homey) {
+      const settings = { ...Homey.getSettings() };
+      const state = { data: null, lastFetch: 0, timer: null, debounce: null, height: null };
+      const translated = Homey.__("language");
+      const language = /^[a-z]{2}$/.test(translated) ? translated : navigator.language;
+      const decimal = new Intl.NumberFormat(language, {
+        minimumFractionDigits: 1,
+        maximumFractionDigits: 1,
+      });
+      const integer = new Intl.NumberFormat(language, { maximumFractionDigits: 0 });
+
+      function t(key, tokens = {}) {
+        const text = Homey.__(key) ?? key;
+        return text.replace(/\{(\w+)\}/g, (_, name) => tokens[name] ?? "");
+      }
+
+      function format(value, formatter, suffix = "") {
+        return Number.isFinite(value) ? `${formatter.format(value)}${suffix}` : "—";
+      }
+
+      function compass(degrees) {
+        if (!Number.isFinite(degrees)) return "";
+        const points = t("widgets.station.compass").split(",");
+        return points[Math.round((((degrees % 360) + 360) % 360) / 45) % 8] ?? "";
+      }
+
+      function applyLayout() {
+        const align = ALIGNMENTS.includes(settings.horizontalAlignment)
+          ? settings.horizontalAlignment
+          : "left";
+        $("app").className =
+          `widget align-${align} style-${settings.style === "compact" ? "compact" : "default"}`;
+      }
+
+      function updateHeight() {
+        // Measure the body so Homey's .homey-widget padding is part of the reported height.
+        const height = Math.ceil(document.body.getBoundingClientRect().height);
+        if (height === state.height) return;
+        if (state.height === null) Homey.ready({ height });
+        else Homey.setHeight(height);
+        state.height = height;
+      }
+
+      function render() {
+        const station = state.data?.station;
+        if (!station) return;
+        const distance =
+          Number.isFinite(station.distanceKm) && station.distanceKm > 0
+            ? ` · ${integer.format(station.distanceKm)} km`
+            : "";
+        $("name").textContent = `${station.name}${distance}`;
+        $("temperature").textContent = format(station.temperature, decimal, "°");
+        $("feels").textContent = Number.isFinite(station.feelTemperature)
+          ? t("widgets.station.feelsLike", { value: integer.format(station.feelTemperature) })
+          : "";
+        $("wind").textContent = Number.isFinite(station.windBft)
+          ? `${station.windBft} Bft ${compass(station.windDirectionDegrees)}`.trim()
+          : "—";
+        $("rain").textContent = format(station.rainLastHour, decimal, " mm");
+        $("humidity").textContent = format(station.humidity, integer, "%");
+
+        const icon = $("icon");
+        if (station.iconUrl?.startsWith("https://cdn.buienradar.nl/")) {
+          icon.src = station.iconUrl;
+          icon.hidden = false;
+        } else {
+          icon.hidden = true;
+        }
+        showContent(true);
+      }
+
+      function showContent(visible) {
+        $("current").hidden = !visible;
+        $("details").hidden = !visible;
+        $("message").hidden = visible;
+      }
+
+      function renderStatus(failed) {
+        const observedAt = state.data?.station?.observedAt;
+        const time = typeof observedAt === "string" ? observedAt.slice(11, 16) : "";
+        const status = $("status");
+        status.textContent = time && failed ? t("widgets.station.offline", { time }) : time;
+        status.title = time ? t("widgets.station.observedAt", { time }) : "";
+      }
+
+      function errorText(error) {
+        const code = String(error?.message ?? "");
+        if (code.includes("LOCATION_REQUIRED")) return t("common.locationRequired");
+        if (code.includes("INVALID_LOCATION")) return t("common.invalidLocation");
+        if (code.includes("INVALID_STATION")) return t("widgets.station.invalidStation");
+        return `${t("common.errorTitle")}. ${t("common.errorRetry")}.`;
+      }
+
+      async function fetchData() {
+        const query = new URLSearchParams({
+          latitude: settings.latitude ?? "",
+          longitude: settings.longitude ?? "",
+          stationId: (settings.stationId ?? "").trim(),
+        });
+        try {
+          state.data = await Homey.api("GET", `/?${query}`);
+          render();
+          renderStatus(false);
+        } catch (error) {
+          if (state.data) {
+            renderStatus(true);
+          } else {
+            $("name").textContent = "";
+            $("message").textContent = errorText(error);
+            showContent(false);
+          }
+        }
+        updateHeight();
+      }
+
+      async function refresh() {
+        clearTimeout(state.timer);
+        state.lastFetch = Date.now();
+        await fetchData();
+        schedule();
+      }
+
+      function schedule() {
+        clearTimeout(state.timer);
+        if (document.visibilityState === "hidden") return;
+        state.timer = setTimeout(refresh, Math.max(state.lastFetch + REFRESH_MS - Date.now(), 0));
+      }
+
+      function onSettingChanged(key, value) {
+        settings[key] = value;
+        if (!DATA_SETTINGS.includes(key)) {
+          applyLayout();
+          updateHeight();
+          return;
+        }
+        clearTimeout(state.debounce);
+        state.debounce = setTimeout(() => {
+          state.data = null;
+          refresh();
+        }, SETTINGS_DEBOUNCE_MS);
+      }
+
+      $("icon").addEventListener("error", () => {
+        $("icon").hidden = true;
+      });
+      $("credit").addEventListener("click", () => Homey.popup("https://www.buienradar.nl"));
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "hidden") clearTimeout(state.timer);
+        else if (Date.now() - state.lastFetch >= REFRESH_MS) refresh();
+        else schedule();
+      });
+      Homey.on("settings.set", onSettingChanged);
+
+      document.documentElement.lang = language;
+      $("wind-label").textContent = t("widgets.station.wind");
+      $("rain-label").textContent = t("widgets.station.rain");
+      $("humidity-label").textContent = t("widgets.station.humidity");
+      $("name").textContent = t("common.loading");
+      applyLayout();
+      updateHeight();
+      new ResizeObserver(updateHeight).observe($("app"));
+      refresh();
+    }
+
+    window.onHomeyReady = onHomeyReady;
+    </script>
+  </body>
+</html>

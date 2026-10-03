@@ -1,0 +1,605 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+    body {
+      --text: var(--homey-text-color, #333);
+      --line: var(--homey-line-color, rgba(0, 0, 0, 0.1));
+      --accent: var(--homey-color-blue-500, #0099ff);
+      --now: var(--homey-color-red-500, #ff3b30);
+      margin: 0;
+      height: 100vh;
+      overflow: hidden;
+      background: transparent;
+      color: var(--text);
+      font-family: var(--homey-font-family, system-ui, sans-serif);
+      font-size: 12px;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .widget {
+      display: grid;
+      grid-template-rows: 1fr auto auto;
+      height: 100%;
+      padding: 8px 4px 2px;
+      box-sizing: border-box;
+    }
+
+    .chart {
+      position: relative;
+      min-height: 0;
+      margin-top: 12px;
+      border-bottom: 1px solid var(--line);
+      container-type: size;
+    }
+
+    .plot {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+    .bar {
+      fill: var(--accent);
+    }
+
+    .area {
+      fill: var(--accent);
+      opacity: 0.2;
+    }
+
+    .stroke {
+      fill: none;
+      stroke: var(--accent);
+      stroke-width: 2.5;
+      stroke-linejoin: round;
+      stroke-linecap: round;
+      vector-effect: non-scaling-stroke;
+    }
+
+    .level {
+      position: absolute;
+      left: 0;
+      right: 0;
+      border-top: 1px dashed var(--line);
+      pointer-events: none;
+    }
+
+    .level span {
+      position: absolute;
+      right: 0;
+      bottom: 1px;
+      font-size: 10px;
+      opacity: 0.6;
+    }
+
+    @container (max-height: 72px) {
+      .level span {
+        display: none;
+      }
+    }
+
+    .now {
+      position: absolute;
+      top: -12px;
+      bottom: 0;
+      width: 0;
+      border-left: 2px solid var(--now);
+      pointer-events: none;
+    }
+
+    .now span {
+      position: absolute;
+      top: -2px;
+      left: 4px;
+      color: var(--now);
+      font-size: 10px;
+      font-weight: var(--homey-font-weight-bold, 700);
+      white-space: nowrap;
+    }
+
+    .marker {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      margin: -5px 0 0 -5px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 2px var(--homey-background-color, #fff);
+      pointer-events: none;
+    }
+
+    .tooltip {
+      position: absolute;
+      top: -10px;
+      padding: 4px 8px;
+      border-radius: var(--homey-border-radius-small, 8px);
+      background: var(--text);
+      color: var(--homey-background-color, #fff);
+      font-size: 12px;
+      font-weight: var(--homey-font-weight-medium, 500);
+      white-space: nowrap;
+      transform: translate(-50%, -100%);
+      pointer-events: none;
+    }
+
+    .axis {
+      position: relative;
+      height: 16px;
+      margin-top: 2px;
+      container-type: inline-size;
+    }
+
+    @container (max-width: 240px) {
+      .axis .minor {
+        display: none;
+      }
+    }
+
+    .axis span {
+      position: absolute;
+      top: 0;
+      font-size: 10px;
+      opacity: 0.6;
+      transform: translateX(-50%);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .axis span:first-child {
+      transform: none;
+    }
+
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      min-height: 16px;
+      font-size: 11px;
+    }
+
+    .status {
+      opacity: 0.6;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .credit {
+      position: relative;
+      flex: none;
+      padding: 0;
+      border: 0;
+      background: none;
+      color: inherit;
+      font: inherit;
+      opacity: 0.6;
+      cursor: pointer;
+    }
+
+    .credit::after {
+      content: "";
+      position: absolute;
+      inset: -14px -8px -4px;
+    }
+
+    .message {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 12px;
+      text-align: center;
+      font-size: var(--homey-font-size-small, 14px);
+      pointer-events: none;
+    }
+
+    [hidden] {
+      display: none;
+    }
+    </style>
+  </head>
+
+  <body class="homey-widget">
+    <div class="widget">
+      <div class="chart" id="chart">
+        <svg
+          class="plot"
+          id="plot"
+          viewBox="0 0 100 100"
+          preserveAspectRatio="none"
+          aria-hidden="true"
+        ></svg>
+        <div id="levels"></div>
+        <div class="now" id="now" hidden><span id="now-label"></span></div>
+        <div class="marker" id="marker" hidden></div>
+        <div class="tooltip" id="tooltip" role="status" hidden></div>
+        <div class="message" id="message" role="status"></div>
+      </div>
+      <div class="axis" id="axis"></div>
+      <div class="footer">
+        <span class="status" id="status"></span>
+        <button class="credit" id="credit" type="button">Buienradar.nl</button>
+      </div>
+    </div>
+
+    <script>
+    const SVG_NS = "http://www.w3.org/2000/svg";
+    const ASPECT_RATIOS = { "1:1": "100%", "4:3": "75%", "16:9": "56.25%", "2:1": "50%" };
+    const COLORS = {
+      default: "var(--homey-color-blue-500, #0099ff)",
+      blue: "var(--homey-color-blue-500, #0099ff)",
+      green: "var(--homey-color-green-500, #26c281)",
+      orange: "var(--homey-color-orange-500, #ff9500)",
+      red: "var(--homey-color-red-500, #ff3b30)",
+      purple: "var(--homey-color-purple-500, #a855f7)",
+    };
+    const LEVELS = [
+      { mm: 1, key: "light" },
+      { mm: 4, key: "moderate" },
+      { mm: 8, key: "heavy" },
+    ];
+    const MIN_SCALE_MM = 9;
+    const SCALE_POWER = 0.7;
+    const MIN_REFRESH_MS = 5 * 60 * 1000;
+    const TOOLTIP_TIMEOUT_MS = 4000;
+    const NOW_LINE_MS = 60 * 1000;
+    const SETTINGS_DEBOUNCE_MS = 500;
+    const DATA_SETTINGS = ["latitude", "longitude"];
+
+    const $ = (id) => document.getElementById(id);
+
+    /** Power scale: keeps drizzle visible next to heavy showers. Returns 0..100 (% of height). */
+    function scale(mm, maxMm) {
+      const ratio = Math.min(Math.max(mm / maxMm, 0), 1);
+      return ratio ** SCALE_POWER * 100;
+    }
+
+    /** Minutes since the first point, so a forecast that passes midnight keeps increasing. */
+    function toTimeline(points) {
+      let offset = 0;
+      let previous = -1;
+      return points.map(({ time }) => {
+        const [h, m] = time.split(":").map(Number);
+        let minutes = h * 60 + m + offset;
+        if (minutes < previous) {
+          offset += 1440;
+          minutes += 1440;
+        }
+        previous = minutes;
+        return minutes;
+      });
+    }
+
+    const AMSTERDAM_TIME = new Intl.DateTimeFormat("en-GB", {
+      timeZone: "Europe/Amsterdam",
+      hour: "2-digit",
+      minute: "2-digit",
+      hourCycle: "h23",
+    });
+
+    /** Minutes since midnight in Europe/Amsterdam, the time zone of the raintext "HH:MM" values. */
+    function amsterdamMinutes(date) {
+      const [h, m] = AMSTERDAM_TIME.format(date).split(":").map(Number);
+      return h * 60 + m;
+    }
+
+    /** Fractional index of the current time within the forecast, or null when outside it. */
+    function nowIndex(points, date = new Date()) {
+      const timeline = toTimeline(points);
+      let now = amsterdamMinutes(date);
+      if (now < timeline[0] - 720) now += 1440;
+      if (now < timeline[0] || now > timeline[timeline.length - 1]) return null;
+      for (let i = 1; i < timeline.length; i++) {
+        if (now <= timeline[i]) {
+          return i - 1 + (now - timeline[i - 1]) / (timeline[i] - timeline[i - 1]);
+        }
+      }
+      return timeline.length - 1;
+    }
+
+    /** Catmull-Rom spline through the points, with control points clamped to the plot. */
+    function smoothPath(points) {
+      const clamp = (y) => Math.max(0, Math.min(100, y));
+      let d = `M${points[0][0]},${points[0][1]}`;
+      for (let i = 0; i < points.length - 1; i++) {
+        const p0 = points[i - 1] ?? points[i];
+        const p1 = points[i];
+        const p2 = points[i + 1];
+        const p3 = points[i + 2] ?? p2;
+        const c1x = p1[0] + (p2[0] - p0[0]) / 6;
+        const c1y = clamp(p1[1] + (p2[1] - p0[1]) / 6);
+        const c2x = p2[0] - (p3[0] - p1[0]) / 6;
+        const c2y = clamp(p2[1] - (p3[1] - p1[1]) / 6);
+        d += ` C${c1x},${c1y} ${c2x},${c2y} ${p2[0]},${p2[1]}`;
+      }
+      return d;
+    }
+
+    function linePath(points) {
+      return points.map(([x, y], i) => `${i === 0 ? "M" : "L"}${x},${y}`).join(" ");
+    }
+
+    function svg(tag, attributes) {
+      const element = document.createElementNS(SVG_NS, tag);
+      for (const [name, value] of Object.entries(attributes)) element.setAttribute(name, value);
+      return element;
+    }
+
+    function onHomeyReady(Homey) {
+      const settings = { ...Homey.getSettings() };
+      const state = {
+        data: null,
+        lastFetch: 0,
+        timer: null,
+        tooltipTimer: null,
+        nowTimer: null,
+        debounce: null,
+        needsFetch: false,
+      };
+      const translated = Homey.__("language");
+      const language = /^[a-z]{2}$/.test(translated) ? translated : navigator.language;
+      const number = new Intl.NumberFormat(language, { maximumFractionDigits: 1 });
+
+      function t(key, tokens = {}) {
+        const text = Homey.__(key) ?? key;
+        return text.replace(/\{(\w+)\}/g, (_, name) => tokens[name] ?? "");
+      }
+
+      function formatClock(iso) {
+        return new Date(iso).toLocaleTimeString(language, {
+          hour: "2-digit",
+          minute: "2-digit",
+          hourCycle: "h23",
+        });
+      }
+
+      function heightFor() {
+        return ASPECT_RATIOS[settings.aspectRatio] ?? ASPECT_RATIOS["16:9"];
+      }
+
+      function refreshMs() {
+        return Math.max(Number(settings.refreshInterval) * 1000 || 0, MIN_REFRESH_MS);
+      }
+
+      function showMessage(text) {
+        $("message").textContent = text;
+      }
+
+      function renderLevels(maxMm) {
+        const levels = $("levels");
+        levels.replaceChildren(
+          ...LEVELS.filter((level) => level.mm < maxMm).map((level) => {
+            const line = document.createElement("div");
+            const label = document.createElement("span");
+            line.className = "level";
+            line.style.top = `${100 - scale(level.mm, maxMm)}%`;
+            label.textContent = t(`widgets.rain-graph.${level.key}`);
+            line.append(label);
+            return line;
+          }),
+        );
+      }
+
+      function renderAxis(points) {
+        const step = 6;
+        const labels = [];
+        for (let i = 0; i < points.length; i += step) {
+          const label = document.createElement("span");
+          label.style.left = `${(i / (points.length - 1)) * 100}%`;
+          if ((i / step) % 2 === 1) label.className = "minor";
+          label.textContent = points[i].time;
+          labels.push(label);
+        }
+        $("axis").replaceChildren(...labels);
+      }
+
+      function renderPlot(points, maxMm) {
+        const plot = $("plot");
+        const count = points.length;
+        if (settings.graphStyle === "line" || settings.graphStyle === "smooth") {
+          const coordinates = points.map((p, i) => [
+            (i / (count - 1)) * 100,
+            100 - scale(p.mmPerHour, maxMm),
+          ]);
+          const d =
+            settings.graphStyle === "smooth" ? smoothPath(coordinates) : linePath(coordinates);
+          plot.replaceChildren(
+            svg("path", { class: "area", d: `${d} L100,100 L0,100 Z` }),
+            svg("path", { class: "stroke", d }),
+          );
+          return;
+        }
+        const width = 100 / count;
+        plot.replaceChildren(
+          ...points.map((p, i) => {
+            const height = p.mmPerHour > 0 ? Math.max(scale(p.mmPerHour, maxMm), 1.5) : 0;
+            return svg("rect", {
+              class: "bar",
+              x: i * width + width * 0.12,
+              width: width * 0.76,
+              y: 100 - height,
+              height,
+            });
+          }),
+        );
+      }
+
+      function renderNowLine(points) {
+        const index = nowIndex(points);
+        $("now").hidden = index === null;
+        if (index !== null) $("now").style.left = `${(index / (points.length - 1)) * 100}%`;
+      }
+
+      /** Moves the now line on every minute boundary while visible, between data refreshes. */
+      function scheduleNowLine() {
+        clearTimeout(state.nowTimer);
+        if (document.visibilityState === "hidden") return;
+        state.nowTimer = setTimeout(
+          () => {
+            if (state.data?.points?.length) renderNowLine(state.data.points);
+            scheduleNowLine();
+          },
+          NOW_LINE_MS - (Date.now() % NOW_LINE_MS),
+        );
+      }
+
+      function render() {
+        document.body.style.setProperty("--accent", COLORS[settings.color] ?? COLORS.default);
+        hideTooltip();
+        const points = state.data?.points;
+        if (!points?.length) return;
+
+        const peak = Math.max(...points.map((p) => p.mmPerHour));
+        const maxMm = Math.max(peak * 1.1, MIN_SCALE_MM);
+        renderLevels(maxMm);
+        renderPlot(points, maxMm);
+        renderAxis(points);
+        renderNowLine(points);
+        $("now-label").textContent = t("widgets.rain-graph.now");
+        showMessage(peak > 0 ? "" : t("widgets.rain-graph.noRain"));
+      }
+
+      function renderStatus(failed) {
+        if (!state.data) {
+          $("status").textContent = "";
+          return;
+        }
+        const time = formatClock(state.data.updatedAt);
+        $("status").textContent = t(failed ? "common.offline" : "common.updated", { time });
+      }
+
+      function errorText(error) {
+        const code = String(error?.message ?? "");
+        if (code.includes("LOCATION_REQUIRED")) return t("common.locationRequired");
+        if (code.includes("INVALID_LOCATION")) return t("common.invalidLocation");
+        if (code.includes("OUT_OF_RANGE")) return t("widgets.rain-graph.outOfRange");
+        return `${t("common.errorTitle")}. ${t("common.errorRetry")}.`;
+      }
+
+      async function fetchData() {
+        const query = new URLSearchParams({
+          latitude: settings.latitude ?? "",
+          longitude: settings.longitude ?? "",
+        });
+        try {
+          state.data = await Homey.api("GET", `/?${query}`);
+          render();
+          renderStatus(false);
+        } catch (error) {
+          if (state.data) {
+            renderStatus(true);
+          } else {
+            $("plot").replaceChildren();
+            $("now").hidden = true;
+            showMessage(errorText(error));
+          }
+        }
+      }
+
+      async function refresh() {
+        clearTimeout(state.timer);
+        state.lastFetch = Date.now();
+        await fetchData();
+        schedule();
+      }
+
+      function schedule() {
+        clearTimeout(state.timer);
+        if (document.visibilityState === "hidden") return;
+        const delay = Math.max(state.lastFetch + refreshMs() - Date.now(), 0);
+        state.timer = setTimeout(refresh, delay);
+      }
+
+      function hideTooltip() {
+        clearTimeout(state.tooltipTimer);
+        $("tooltip").hidden = true;
+        $("marker").hidden = true;
+      }
+
+      function showTooltip(clientX) {
+        const points = state.data?.points;
+        if (!points?.length) return;
+        const rect = $("chart").getBoundingClientRect();
+        const ratio = Math.min(Math.max((clientX - rect.left) / rect.width, 0), 1);
+        const isBars = settings.graphStyle !== "line" && settings.graphStyle !== "smooth";
+        const index = isBars
+          ? Math.min(Math.floor(ratio * points.length), points.length - 1)
+          : Math.round(ratio * (points.length - 1));
+        const point = points[index];
+        const x = isBars
+          ? ((index + 0.5) / points.length) * 100
+          : (index / (points.length - 1)) * 100;
+        const peak = Math.max(...points.map((p) => p.mmPerHour));
+        const y = 100 - scale(point.mmPerHour, Math.max(peak * 1.1, MIN_SCALE_MM));
+
+        const tooltip = $("tooltip");
+        tooltip.textContent = t("widgets.rain-graph.tooltip", {
+          time: point.time,
+          value: number.format(point.mmPerHour),
+        });
+        tooltip.hidden = false;
+        const half = tooltip.offsetWidth / 2;
+        const left = Math.min(Math.max((x / 100) * rect.width, half), rect.width - half);
+        tooltip.style.left = `${left}px`;
+        $("marker").style.left = `${x}%`;
+        $("marker").style.top = `${y}%`;
+        $("marker").hidden = false;
+
+        clearTimeout(state.tooltipTimer);
+        state.tooltipTimer = setTimeout(hideTooltip, TOOLTIP_TIMEOUT_MS);
+      }
+
+      function onSettingChanged(key, value) {
+        settings[key] = value;
+        if (key === "aspectRatio") Homey.setHeight(heightFor());
+        if (key === "refreshInterval") schedule();
+        if (DATA_SETTINGS.includes(key)) state.needsFetch = true;
+        clearTimeout(state.debounce);
+        state.debounce = setTimeout(
+          () => {
+            if (!state.needsFetch) return render();
+            state.needsFetch = false;
+            return refresh();
+          },
+          state.needsFetch ? SETTINGS_DEBOUNCE_MS : 0,
+        );
+      }
+
+      $("chart").addEventListener("click", (event) => showTooltip(event.clientX));
+      document.addEventListener("click", (event) => {
+        if (!$("chart").contains(event.target)) hideTooltip();
+      });
+      $("credit").addEventListener("click", () => Homey.popup("https://www.buienradar.nl"));
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "hidden") {
+          clearTimeout(state.timer);
+          clearTimeout(state.nowTimer);
+          return;
+        }
+        scheduleNowLine();
+        if (Date.now() - state.lastFetch >= refreshMs()) {
+          refresh();
+        } else {
+          schedule();
+          if (state.data?.points?.length) renderNowLine(state.data.points);
+        }
+      });
+      Homey.on("settings.set", onSettingChanged);
+
+      document.documentElement.lang = language;
+      showMessage(t("common.loading"));
+      Homey.ready({ height: heightFor() });
+      refresh();
+      scheduleNowLine();
+    }
+
+    window.onHomeyReady = onHomeyReady;
+    </script>
+  </body>
+</html>
