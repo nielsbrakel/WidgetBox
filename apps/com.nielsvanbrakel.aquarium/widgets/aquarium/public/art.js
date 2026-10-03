@@ -39,8 +39,11 @@
 
   // Small deterministic PRNG for decorative detail (spots, pebbles…).
   // Fish read on tiny screens thanks to a dark ink outline in their own hue.
+  // Dark fish swim in dark water, so they get a light rim instead.
   function ink(hex) {
-    return rgba(shade(hex, -0.62), 0.9);
+    const [r, g, b] = hexToRgb(hex);
+    const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    return lum < 0.3 ? rgba(shade(hex, 0.55), 0.85) : rgba(shade(hex, -0.62), 0.9);
   }
 
   function inkWidth(L) {
@@ -350,8 +353,8 @@
     },
     neon: {
       len: 0.5,
-      top: 0.12,
-      belly: 0.12,
+      top: 0.14,
+      belly: 0.13,
       nose: 0.6,
       tail: "fork",
       tailSize: 0.38,
@@ -360,7 +363,7 @@
       pattern: "neon",
       pal: [
         {
-          body: "#9fb0c2",
+          body: "#6f8196",
           belly: "#e6edf3",
           fin: "#d6e2ec",
           accent: "#22d8ff",
@@ -591,12 +594,12 @@
       pattern: "photophores",
       bigEye: true,
       pal: [
-        { body: "#3d4f6b", belly: "#55698a", fin: "#4a5d7c", accent: "#67e8ff", glow: "#67e8ff" },
-        { body: "#4a3a3a", belly: "#6b5050", fin: "#5a4545", accent: "#ff9a3d", glow: "#ff9a3d" },
+        { body: "#5f7aa3", belly: "#9ab0cf", fin: "#7d95ba", accent: "#67e8ff", glow: "#67e8ff" },
+        { body: "#8a5f52", belly: "#c19484", fin: "#a77a6a", accent: "#ff9a3d", glow: "#ff9a3d" },
         {
-          body: "#3a3f66",
-          belly: "#565c8a",
-          fin: "#474d7a",
+          body: "#5a5f99",
+          belly: "#8d92c4",
+          fin: "#7378b0",
           accent: "#9dff7a",
           accent2: "#ff7ae8",
           glow: "#b8ffa0",
@@ -617,7 +620,7 @@
       pal: [
         { body: "#b8c7d9", belly: "#e6eef7", fin: "#c9d6e6", accent: "#8fdcff", glow: "#8fdcff" },
         { body: "#e5c36a", belly: "#fff0c0", fin: "#efd590", accent: "#ffe9a3", glow: "#ffd76a" },
-        { body: "#1c2333", belly: "#2a3348", fin: "#232b3e", accent: "#4f8bff", glow: "#4f8bff" },
+        { body: "#2c3a57", belly: "#4a5d82", fin: "#3a4b6d", accent: "#4f8bff", glow: "#4f8bff" },
       ],
     },
     angler: {
@@ -749,7 +752,7 @@
         ctx.rect(-L * 0.42, 0, L * 0.45, bot);
         ctx.fill();
         ctx.fillStyle = pal.accent;
-        ctx.fillRect(-L * 0.42, -top * 0.25, L * 0.85, top * 0.28);
+        ctx.fillRect(-L * 0.42, -top * 0.28, L * 0.85, top * (small ? 0.4 : 0.3));
         break;
       }
       case "spots": {
@@ -954,9 +957,9 @@
         break;
       case "photophores":
         ctx.fillStyle = pal.accent;
-        for (let i = 0; i < 8; i++) {
+        for (let i = 0, n = small ? 5 : 8; i < n; i++) {
           ctx.beginPath();
-          ctx.arc(L * 0.3 - i * L * 0.09, bot * 0.62, L * 0.018, 0, TAU);
+          ctx.arc(L * 0.3 - i * L * (0.72 / n), bot * 0.6, L * (small ? 0.04 : 0.026), 0, TAU);
           ctx.fill();
         }
         break;
