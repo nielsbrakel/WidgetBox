@@ -1,0 +1,26 @@
+# Decision log
+
+Decisions that shape WidgetBox, newest last. Entries are never edited after they are made: a later
+decision supersedes an earlier one and says so. Reference them as `D-xxx` in code, docs and PRs.
+
+| ID | Topic | Decision and why | Status |
+| --- | --- | --- | --- |
+| D-001 | App grouping | Five apps by concept: Clocks & Timers, Weather, Layout, Video, Games. Athom rejects catch-all apps (guideline 2.1.3), and fewer apps use less storage on a Homey. | Active |
+| D-002 | Brand-free names | No YouTube, Buienradar or Windy in app or widget names; allowed in descriptions and tags (YouTube branding rules; Athom ships its own Buienradar app). | Active |
+| D-003 | Self-contained apps | An app folder never imports from outside itself and has no runtime npm dependencies. Homey packages one folder, and `homey app build` copies dependencies with `npm ls`, which breaks on pnpm's symlinked `node_modules`. Shared code is copied in (D-014). | Active |
+| D-004 | Instance state on the Homey | Timer and stopwatch state lives in app settings keyed by widget and instance id, is validated and size-capped, and is broadcast with realtime events. Homey's clock is the reference, not the device's, and not localStorage. | Active |
+| D-005 | State pruning | Instance state that was not written for 180 days is deleted daily, because Homey has no "widget removed" hook. | Active |
+| D-006 | One weather service | All Buienradar data goes through one cached `WeatherService` per app (cache, de-duplication, timeouts, stale-on-error). Widgets get normalised data and short error codes, never raw upstream responses. | Active |
+| D-007 | Location and time zone | The widget's location setting wins; when empty, the Homey's location is used. Coordinates are rounded to 0.01° for caching. Buienradar times are read in Europe/Amsterdam. | Active |
+| D-008 | Id freeze | App, widget and setting ids are frozen once an app is published; a rename then needs a new id and a migration, because placed widgets keep the old ids. Before the first release, renames are free and done in one batch. | Active |
+| D-009 | Testable modules | Logic that needs tests lives in `lib/` (Homey side) or `widgets/<id>/public/*.js` (plain scripts that set a global in the webview and export for Node), never only in inline `<script>`. Coverage counts these modules (lines 95%, branches 85%). | Active |
+| D-010 | Settings and language | Shared settings (size, color, horizontal alignment, font weight, time format) keep identical ids, values and labels in every widget. All user text exists in English and Dutch, in sentence case, matching Homey's own UI. | Active |
+| D-011 | Supply chain and CI | Actions pinned by SHA, `permissions: {}` with per-job grants, no persisted credentials, actionlint and zizmor, dependency review, exact toolchain pins, pnpm's minimum release age and build-script allow-list, Dependabot with a 7/14-day cooldown. `ci-ok` is the only required check. Mirrors SiteMark. | Active |
+| D-012 | Releases | Changesets version each app on its own; `scripts/sync-homey-versions.mjs` writes the version and the en/nl store changelog into the Homey files. Merging the version PR tags the apps, and the pinned Homey CLI uploads them from a protected environment after owner approval. Promoting a build to Live stays manual. See docs/releasing.md. | Active |
+| D-013 | No turbo | Root scripts run the per-app Homey commands with `pnpm -r`. Validating all five apps takes seconds, so turbo's caching gained nothing, while it rewrote AGENTS.md and failed to spawn tasks in some environments. | Active |
+| D-014 | Shared widget code | Small leaf helpers (height reporting, ticking, translation) live once in `packages/widget-kit` and are copied into each widget's `public/vendor/` by `pnpm kit:sync`, with a header that marks them generated and a CI check against drift. Rejected: symlinks (the Homey CLI copies a symlinked file as a dangling link into `.homeybuild`), workspace dependencies (never reach `public/`), a bundler or a widget framework (widgets stay plain, debuggable HTML). | Active |
+| D-015 | Not adopted from SiteMark | No task-id red/green commit grammar or replay, no build provenance attestation (the Homey CLI packs and uploads in one step, so an attested file would not be the uploaded one), no nightly mutation tests yet, no CSP or iframe sandbox without testing on a real Homey. | Active |
+| D-016 | Testing without a device | Unit tests (Vitest, jsdom) and Playwright e2e against the sandbox's fake Homey. The fake reports missing translations and counts `Homey.ready()` calls so a widget that would hang on a device fails in CI. A real-device pass is a manual release step. | Active |
+| D-017 | Aquarium | The aquarium becomes its own app and package with a new look, built in a separate effort. Until then it stays in the Games app and is excluded from changesets. | Proposed |
+| D-018 | Timer input | 44 px steppers instead of a drag wheel, which fought the dashboard's own swipe gestures. | Active |
+| D-019 | Store assets | One line icon per app, store images as JPGs of about 70 KB, simple 1024 px widget previews; each app has a size budget in `scripts/bundle-budgets.json`. | Active |
