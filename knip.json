@@ -1,0 +1,24 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "workspaces": {
+    ".": {
+      "entry": ["scripts/*.mjs", "design/widget-previews/render.mjs", "tests/e2e/**/*.spec.ts"],
+      "project": [
+        "scripts/**/*.mjs",
+        "tests/**/*.{js,ts}",
+        "design/**/*.mjs",
+        "*.config.{js,ts,mjs}"
+      ]
+    },
+    "apps/sandbox": {
+      "entry": ["scripts/*.js"],
+      "project": ["src/**/*.{js,jsx}", "scripts/**/*.js"]
+    },
+    "apps/com.*": {
+      "entry": ["widgets/*/api.js", "widgets/*/public/*.js"],
+      "project": ["**/*.js", "!widgets/aquarium/**"]
+    }
+  },
+  "ignoreDependencies": ["@commitlint/types"],
+  "ignoreExportsUsedInFile": true
+}
