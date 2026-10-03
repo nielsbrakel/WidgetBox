@@ -48,6 +48,20 @@ describe("rain-radar widget", () => {
     expect($("#offline").textContent).toMatch(/^Offline/);
   });
 
+  it("gives up on an image that hangs and tries again on schedule", async () => {
+    const { $ } = load();
+    images[0].onload();
+    await vi.advanceTimersByTimeAsync(5 * 60 * 1000);
+    expect(images).toHaveLength(2);
+
+    // The refresh never answers (flaky Wi-Fi): it is abandoned and the next one still runs.
+    await vi.advanceTimersByTimeAsync(20 * 1000);
+    expect(images[1].getAttribute("src")).toBeNull();
+    expect($("#offline").hidden).toBe(false);
+    await vi.advanceTimersByTimeAsync(5 * 60 * 1000);
+    expect(images).toHaveLength(3);
+  });
+
   it("always shows the credit and opens it in a popup", () => {
     const { $, Homey } = load();
     $("#credit").click();

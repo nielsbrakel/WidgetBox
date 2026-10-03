@@ -92,6 +92,31 @@ test.describe("Clocks App", () => {
       await expect(clocks.digitalSeconds).toHaveText("");
     });
 
+    test("only touches the DOM when the text changes", async ({ page }) => {
+      await clocks.setSettingCheckbox("Show Seconds", true);
+      await clocks.setSettingCheckbox("Show Date", true);
+      await page.clock.install();
+      await clocks.reloadWidget();
+      await clocks.verifyDigitalLoaded();
+
+      await clocks.iframe.locator("html").evaluate((html) => {
+        const win = html.ownerDocument.defaultView as Window & { mutations?: number };
+        win.mutations = 0;
+        new MutationObserver((records) => {
+          win.mutations = (win.mutations ?? 0) + records.length;
+        }).observe(html, { subtree: true, childList: true, characterData: true });
+      });
+      await page.clock.runFor(10_000);
+
+      const mutations = await clocks.iframe
+        .locator("html")
+        .evaluate(
+          (html) => (html.ownerDocument.defaultView as Window & { mutations?: number }).mutations,
+        );
+      // Ten seconds, at most one minute change. Rewriting unchanged text would be 30 or more.
+      expect(mutations).toBeLessThanOrEqual(12);
+    });
+
     test("should toggle the date", async () => {
       await expect(clocks.digitalDate).toBeVisible();
 

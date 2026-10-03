@@ -5,6 +5,8 @@ const {
   normalizeForecastDays,
   normalizeStation,
   parseRaintext,
+  trimFeed,
+  trimForecast,
 } = require("./buienradar");
 const { isValidStationId, roundLocation } = require("./location");
 
@@ -137,7 +139,7 @@ class WeatherService {
     }
 
     const feed = await this.cache.get("feed", POLICY.feed, async () => ({
-      data: await this.request(URLS.feed),
+      data: trimFeed(await this.request(URLS.feed)),
       updatedAt: new Date().toISOString(),
     }));
     const origin = roundLocation(location);
@@ -151,7 +153,7 @@ class WeatherService {
     const count = Math.min(Math.max(Math.trunc(dayCount) || 5, 1), MAX_FORECAST_DAYS);
     const place = await this.getPlace(location);
     const forecast = await this.cache.get(`forecast:${place.id}`, POLICY.forecast, async () => ({
-      data: await this.request(`${URLS.forecast}${place.id}`),
+      data: trimForecast(await this.request(`${URLS.forecast}${place.id}`)),
       updatedAt: new Date().toISOString(),
     }));
     // Filtered at read time: cached data fetched before midnight must not start with yesterday.

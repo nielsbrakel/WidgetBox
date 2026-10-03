@@ -247,3 +247,67 @@ describe("upstream limits", () => {
     expect(sent).toBeLessThan(1024 * 1024);
   });
 });
+
+describe("cache footprint", () => {
+  // Homey runs each app in its own small Node process: keep only what the widgets read.
+  const cached = (service, key) => service.cache.entries.get(key).value.data;
+
+  it("keeps only the station fields the widgets use from the feed", async () => {
+    const bulky = {
+      ...FEED,
+      actual: {
+        ...FEED.actual,
+        sunrise: "x",
+        stationmeasurements: FEED.actual.stationmeasurements.map((station) => ({
+          ...station,
+          graphUrl: "https://example.com/".repeat(20),
+          weatherdescription: "Zwaar bewolkt",
+        })),
+      },
+      forecast: { fivedayforecast: Array(5).fill({ text: "long".repeat(200) }) },
+    };
+    const { service } = createService(() => jsonResponse(bulky));
+
+    const result = await service.getStation({ location: UTRECHT });
+
+    expect(result.station.name).toBe("De Bilt");
+    expect(Object.keys(cached(service, "feed"))).toEqual(["actual"]);
+    expect(Object.keys(cached(service, "feed").actual)).toEqual(["stationmeasurements"]);
+    expect(cached(service, "feed").actual.stationmeasurements[0]).not.toHaveProperty("graphUrl");
+  });
+
+  it("keeps only the day fields the widgets use from a forecast", async () => {
+    const days = Array.from({ length: 14 }, (_, i) => ({
+      date: `2026-10-${String(3 + i).padStart(2, "0")}T00:00:00`,
+      mintemperature: 8,
+      maxtemperature: 15,
+      precipitation: 10,
+      precipitationmm: 1,
+      iconcode: "j",
+      hours: Array(24).fill({ temperature: 10, winddirection: "ZW" }),
+    }));
+    const { service } = createService((url) =>
+      url.startsWith(URLS.geoLocation)
+        ? jsonResponse({ id: 1, name: "Utrecht" })
+        : jsonResponse({ location: { name: "x".repeat(500) }, days }),
+    );
+
+    await service.getForecast(UTRECHT, 5);
+
+    const stored = cached(service, "forecast:1");
+    expect(Object.keys(stored)).toEqual(["days"]);
+    expect(stored.days[0]).toEqual({
+      date: "2026-10-03T00:00:00",
+      mintemperature: 8,
+      maxtemperature: 15,
+      precipitation: 10,
+      precipitationmm: 1,
+      iconcode: "j",
+    });
+    expect(JSON.stringify(stored).length).toBeLessThan(8 * 1024);
+  });
+
+  it("holds at most 20 locations", () => {
+    expect(new WeatherService().cache.maxEntries).toBe(20);
+  });
+});

@@ -43,9 +43,7 @@ export class TimersPage extends SandboxPage {
   }
 
   async reloadWidget() {
-    await this.markWidget();
-    await this.page.locator('button[title="Reload Widget"]').click();
-    await this.waitForWidgetReload();
+    await super.reloadWidget();
     await expect(this.items.first()).toBeVisible();
   }
 

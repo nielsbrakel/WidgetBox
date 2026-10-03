@@ -184,6 +184,11 @@
       return text.charAt(0).toLocaleUpperCase(locale) + text.slice(1);
     }
 
+    /** Writes text only when it changed: each write replaces a node and restyles the clock. */
+    function setText(element, text) {
+      if (element.textContent !== text) element.textContent = text;
+    }
+
     function renderDate(now) {
       dateElement.hidden = !settings.showDate;
       if (!settings.showDate) return;
@@ -200,9 +205,9 @@
       const displayHours = is12Hour ? String(hours % 12 || 12) : pad(hours);
       const hoursMinutes = `${displayHours}:${pad(now.getMinutes())}`;
 
-      hoursMinutesElement.textContent = hoursMinutes;
-      secondsElement.textContent = settings.showSeconds ? `:${pad(now.getSeconds())}` : "";
-      periodElement.textContent = is12Hour ? periodLabels[hours < 12 ? "am" : "pm"] : "";
+      setText(hoursMinutesElement, hoursMinutes);
+      setText(secondsElement, settings.showSeconds ? `:${pad(now.getSeconds())}` : "");
+      setText(periodElement, is12Hour ? periodLabels[hours < 12 ? "am" : "pm"] : "");
       renderDate(now);
 
       if (hoursMinutes.length !== renderedTimeLength) {

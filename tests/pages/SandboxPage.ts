@@ -64,6 +64,13 @@ export class SandboxPage {
       .toBe(String(value));
   }
 
+  /** Reloads the widget page with the toolbar button and waits until it is ready again. */
+  async reloadWidget() {
+    await this.markWidget();
+    await this.page.locator('button[title="Reload Widget"]').click();
+    await this.waitForWidgetReload();
+  }
+
   /** Tags the current widget page so waitForWidgetReload() can tell the new one apart. */
   async markWidget() {
     await this.widgetHtml.evaluate((html) => {
