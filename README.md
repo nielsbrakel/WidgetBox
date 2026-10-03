@@ -77,7 +77,7 @@ The CLI asks whether to bump the version and what is new, and updates `app.json`
 
 ## Store assets
 
-Each app has its own line icon (`assets/icon.svg`, 960×960, transparent), store images (`assets/images/{small,large,xlarge}.jpg`, 250×175 / 500×350 / 1000×700) showing the app's widgets on a dashboard, a `README.txt` with a Dutch `README.nl.txt`, and a brand color with enough contrast for a white icon.
+Each app has its own line icon (`assets/icon.svg`, 960×960, transparent), store images (`assets/images/{small,large,xlarge}.jpg`, 250×175 / 500×350 / 1000×700) showing the app's widgets on a dashboard, a `README.txt` with a Dutch `README.nl.txt`, and its own brand color. The icon rules, palette and store image generator are described in [`design/BRAND.md`](design/BRAND.md).
 
 ## Philosophy
 

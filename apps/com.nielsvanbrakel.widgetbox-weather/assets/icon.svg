@@ -1,14 +1,6 @@
-<svg
-  xmlns="http://www.w3.org/2000/svg"
-  width="960"
-  height="960"
-  viewBox="0 0 960 960"
-  fill="none"
-  stroke="#000"
-  stroke-width="40"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M230 620a150 150 0 0 1 20-298 230 230 0 0 1 440-32 170 170 0 0 1 60 330z" />
-  <path d="M330 720l-40 140M500 720l-40 140M670 720l-40 140" />
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="960" viewBox="0 0 960 960" fill="none" stroke="#000" stroke-width="44" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M520 214a180 180 0 0 1 300 196"/>
+  <path d="M660 60v40M850 140l-28 28M920 320h-40"/>
+  <path d="M250 690a150 150 0 0 1-10-300 220 220 0 0 1 420-20 162 162 0 0 1 30 320z"/>
+  <path d="M330 790l-30 100M500 790l-30 100M670 790l-30 100"/>
 </svg>

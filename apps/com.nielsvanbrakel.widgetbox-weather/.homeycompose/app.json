@@ -51,7 +51,7 @@
       "widget"
     ]
   },
-  "brandColor": "#0277BD",
+  "brandColor": "#0A6FC2",
   "permissions": [
     "homey:manager:geolocation"
   ],

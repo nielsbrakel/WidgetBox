@@ -21,10 +21,10 @@ Widgets are grouped into five apps by theme. Grouping keeps the number of instal
 
 | App (en / nl) | ID | Widgets | Category | Brand color |
 |---------------|----|---------|----------|-------------|
-| WidgetBox Clocks & Timers / Klokken & Timers | `com.nielsvanbrakel.widgetbox-clocks` | analog-clock, binary-clock, digital-clock, flip-clock, word-clock-grid, word-clock-sentence, stopwatch, timer | tools | `#5E35B1` |
-| WidgetBox Weather / Weer | `com.nielsvanbrakel.widgetbox-weather` | rain-graph, rain-radar, radar-5day, forecast, station (Buienradar data, NL/BE), weather-map (Windy embed) | internet | `#0277BD` |
-| WidgetBox Layout / Lay-out | `com.nielsvanbrakel.widgetbox-layout` | header, separator, spacer | tools | `#546E7A` |
-| WidgetBox Video | `com.nielsvanbrakel.widgetbox-video` | youtube (video player) | video | `#D84315` |
+| WidgetBox Clocks & Timers / Klokken & Timers | `com.nielsvanbrakel.widgetbox-clocks` | analog-clock, binary-clock, digital-clock, flip-clock, word-clock-grid, word-clock-sentence, stopwatch, timer | tools | `#6236D9` |
+| WidgetBox Weather / Weer | `com.nielsvanbrakel.widgetbox-weather` | rain-graph, rain-radar, radar-5day, forecast, station (Buienradar data, NL/BE), weather-map (Windy embed) | internet | `#0A6FC2` |
+| WidgetBox Layout / Lay-out | `com.nielsvanbrakel.widgetbox-layout` | header, separator, spacer | tools | `#0F7A5C` |
+| WidgetBox Video | `com.nielsvanbrakel.widgetbox-video` | youtube (video player) | video | `#D1401A` |
 | WidgetBox Games / Spellen | `com.nielsvanbrakel.widgetbox-games` | aquarium | tools | `#00796B` |
 
 Naming rules: never put a third-party brand (YouTube, Buienradar, Windy) in an app or widget name; "for YouTube videos" or "data from Buienradar" in text is fine. App names stay at four words or fewer and never contain "Homey" or "Athom".
@@ -56,13 +56,13 @@ homey app publish
 
 `homey app validate --level publish` requires these per app:
 
-- `assets/icon.svg`: one icon per app, line style (strokes, `fill="none"`, no background), 960x960 viewBox using the full canvas, `stroke-width="40"` with round caps and joins so all WidgetBox icons read as one family.
+- `assets/icon.svg`: one icon per app, line style (strokes, `fill="none"`, no background), 960x960 viewBox using the full canvas (content within 40-920), `stroke-width="44"` with round caps and joins, and at most one small solid dot as an accent, so all icons read as one family. Check them with `design/app-icons/preview.html`. See `design/BRAND.md`.
 - `assets/images/small.jpg` (250x175), `large.jpg` (500x350), `xlarge.jpg` (1000x700): the app's real widgets on a realistic dashboard, no logos, no generic AI art. Export as JPG (quality about 82) to keep the app small on the Homey.
 - `README.txt` plus `README.nl.txt` (the description is translated, so the README must be too), and `name`, `description` and `tags` in `en` and `nl`.
-- `brandColor`: distinct per app, at least 3:1 contrast against white, not very bright.
+- `brandColor`: one hue per app from the family palette in `design/store-images/brand.mjs` (and `design/BRAND.md`), at least 4.5:1 contrast against white.
 - Widget previews (`preview-light.png`, `preview-dark.png`): 1024x1024, transparent, simple shapes and no text, made with the Athom Figma widget preview template.
 
-The store images are rendered from the sandbox: capture each widget with Playwright, place the captures as cards on a soft dashboard background in a small HTML page, screenshot it at the three sizes and convert to JPG.
+The store images are rendered from the sandbox by `design/store-images/render.mjs` (start `pnpm sandbox` first): it captures the real widgets with Playwright at a frozen 10:09, places them on a dashboard tinted with the app's brand color (`scenes.mjs` says which widgets go where), and writes all three JPGs. Re-run it after a visible widget change.
 
 ---
 
