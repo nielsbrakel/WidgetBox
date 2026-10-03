@@ -21,10 +21,10 @@ Widgets are grouped into five apps by theme. Grouping keeps the number of instal
 
 | App (en / nl) | ID | Widgets | Category | Brand color |
 |---------------|----|---------|----------|-------------|
-| WidgetBox Clocks & Timers / Klokken & Timers | `com.nielsvanbrakel.widgetbox-clocks` | analog-clock, binary-clock, digital-clock, flip-clock, word-clock-grid, word-clock-sentence, stopwatch, timer | tools | `#6236D9` |
-| WidgetBox Weather / Weer | `com.nielsvanbrakel.widgetbox-weather` | rain-graph, rain-radar, radar-5day, forecast, station (Buienradar data, NL/BE), weather-map (Windy embed) | internet | `#0A6FC2` |
-| WidgetBox Layout / Lay-out | `com.nielsvanbrakel.widgetbox-layout` | header, separator, spacer | tools | `#0F7A5C` |
-| WidgetBox Video | `com.nielsvanbrakel.widgetbox-video` | youtube (video player) | video | `#D1401A` |
+| Glance Clocks & Timers / Klokken & Timers | `com.nielsvanbrakel.widgetbox-clocks` | analog-clock, binary-clock, digital-clock, flip-clock, word-clock-grid, word-clock-sentence, stopwatch, timer | tools | `#6236D9` |
+| Glance Weather / Weer | `com.nielsvanbrakel.widgetbox-weather` | rain-graph, rain-radar, radar-5day, forecast, station (Buienradar data, NL/BE), weather-map (Windy embed) | internet | `#0A6FC2` |
+| Glance Layout / Lay-out | `com.nielsvanbrakel.widgetbox-layout` | header, separator, spacer | tools | `#0F7A5C` |
+| Glance Video | `com.nielsvanbrakel.widgetbox-video` | youtube (video player) | video | `#D1401A` |
 | WidgetBox Games / Spellen | `com.nielsvanbrakel.widgetbox-games` | aquarium | tools | `#00796B` |
 
 Naming rules: never put a third-party brand (YouTube, Buienradar, Windy) in an app or widget name; "for YouTube videos" or "data from Buienradar" in text is fine. App names stay at four words or fewer and never contain "Homey" or "Athom".
@@ -331,7 +331,7 @@ const __ = (key) => Homey.__(`widgets.my-widget.${key}`) ?? key;
 - **Plain text only** — no markdown, no URLs, no changelogs
 - **No app name** in the text — it already appears above the README on the store page
 - **Describe possibilities** — write a friendly story, not a technical spec
-- Every `README.txt` starts with the **shared WidgetBox intro sentence** (see below)
+- Every `README.txt` starts with the **shared Glance intro sentence** (see below)
 - Every `README.txt` has a natural Dutch `README.nl.txt` next to it
 - One or two paragraphs, no feature or settings lists
 
@@ -340,13 +340,13 @@ const __ = (key) => Homey.__(`widgets.my-widget.${key}`) ?? key;
 Every app's README opens with this short sentence, followed directly (same paragraph) by what the app is about:
 
 ```
-WidgetBox is a small family of widgets made to feel at home on your Homey dashboard.
+Glance is a small family of widgets made to feel at home on your Homey dashboard.
 ```
 
 Dutch (`README.nl.txt`):
 
 ```
-WidgetBox is een kleine familie widgets die zich thuis voelen op je Homey-dashboard.
+Glance is een kleine familie widgets die zich thuis voelen op je Homey-dashboard.
 ```
 
 Keep the whole README to two short paragraphs.

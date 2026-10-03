@@ -2,7 +2,7 @@ const Homey = require("homey");
 
 class WidgetBoxLayout extends Homey.App {
   async onInit() {
-    this.log("WidgetBox Layout has been initialized");
+    this.log("Glance Layout has been initialized");
   }
 }
 

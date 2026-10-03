@@ -2,7 +2,7 @@ const Homey = require("homey");
 
 class WidgetBoxVideo extends Homey.App {
   async onInit() {
-    this.log("WidgetBox Video has been initialized");
+    this.log("Glance Video has been initialized");
   }
 }
 

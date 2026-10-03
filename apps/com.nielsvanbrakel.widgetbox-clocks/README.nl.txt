@@ -1,3 +1,3 @@
-WidgetBox is een kleine familie widgets die zich thuis voelen op je Homey-dashboard. Deze app draait helemaal om tijd: kies een klok die bij de ruimte past, van een rustige analoge wijzerplaat of een retro flipklok tot een woordklok die de tijd in een hele zin uitschrijft.
+Glance is een kleine familie widgets die zich thuis voelen op je Homey-dashboard. Deze app draait helemaal om tijd: kies een klok die bij de ruimte past, van een rustige analoge wijzerplaat of een retro flipklok tot een woordklok die de tijd in een hele zin uitschrijft.
 
 Wil je minuten tellen in plaats van uren, dan staan een stopwatch en timer gewoon naast je andere widgets, handig tijdens het koken, bij de was of om de schermtijd in de gaten te houden. Elke widget volgt de lichte en donkere modus van Homey en is in grootte en kleur aan te passen, zodat hij mooi aansluit bij de rest van je dashboard.

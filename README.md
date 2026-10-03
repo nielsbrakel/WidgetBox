@@ -1,8 +1,10 @@
-# WidgetBox
+# Glance
 
 **Dashboard widgets for Homey Pro.**
 
-WidgetBox is a small family of widgets made to feel at home on the Homey dashboard. Every widget uses Homey's own colors, fonts and spacing, follows light and dark mode, and adds something the built-in dashboard does not offer.
+The repository and app ids keep their original `widgetbox` name; Glance is the name people see in the Homey App Store.
+
+Glance is a small family of widgets made to feel at home on the Homey dashboard. Every widget uses Homey's own colors, fonts and spacing, follows light and dark mode, and adds something the built-in dashboard does not offer.
 
 ## Apps
 
@@ -10,10 +12,10 @@ The widgets are grouped into five Homey apps by theme. Grouping keeps the number
 
 | App | ID | Widgets |
 |-----|----|---------|
-| **WidgetBox Clocks & Timers** | `com.nielsvanbrakel.widgetbox-clocks` | Analog, digital, flip and binary clocks, two word clocks (grid and sentence), stopwatch, timer |
-| **WidgetBox Weather** | `com.nielsvanbrakel.widgetbox-weather` | 2-hour rain graph, rain radar, 5-day radar, weather forecast and weather station (Buienradar data, Netherlands and Belgium), interactive weather map (Windy) |
-| **WidgetBox Layout** | `com.nielsvanbrakel.widgetbox-layout` | Header, separator, spacer |
-| **WidgetBox Video** | `com.nielsvanbrakel.widgetbox-video` | Video player for YouTube videos, livestreams and playlists |
+| **Glance Clocks & Timers** | `com.nielsvanbrakel.widgetbox-clocks` | Analog, digital, flip and binary clocks, two word clocks (grid and sentence), stopwatch, timer |
+| **Glance Weather** | `com.nielsvanbrakel.widgetbox-weather` | 2-hour rain graph, rain radar, 5-day radar, weather forecast and weather station (Buienradar data, Netherlands and Belgium), interactive weather map (Windy) |
+| **Glance Layout** | `com.nielsvanbrakel.widgetbox-layout` | Header, separator, spacer |
+| **Glance Video** | `com.nielsvanbrakel.widgetbox-video` | Video player for YouTube videos, livestreams and playlists |
 | **WidgetBox Games** | `com.nielsvanbrakel.widgetbox-games` | Aquarium, a cozy idle game (being rebuilt, not released yet) |
 
 ## Monorepo structure

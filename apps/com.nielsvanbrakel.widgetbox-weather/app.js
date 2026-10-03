@@ -5,7 +5,7 @@ const { isBlank, parseCoordinate, parseLocation } = require("./lib/location");
 class WidgetBoxWeather extends Homey.App {
   async onInit() {
     this.weather = new WeatherService();
-    this.log("WidgetBox Weather has been initialized");
+    this.log("Glance Weather has been initialized");
   }
 
   /** The location configured on the Homey itself, or null when it is unknown. */
